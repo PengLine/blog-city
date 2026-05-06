@@ -4,36 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧城市管理平台</title>
+    <link rel="stylesheet" href="assets/css/common.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         .container {
-            font-family: 'Microsoft YaHei', sans-serif !important;
-            background: #1a1a2e !important;
-            min-height: 100vh !important;
-            color: #e0e0e0 !important;
-            max-width: 1600px !important;
-            margin: 0 auto !important;
-            padding: 20px !important;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            max-width: 1600px;
+            min-height: 100vh;
         }
 
-        .container header {
+        header {
             background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-content {
-            text-align: left;
         }
 
         h1 {
@@ -41,40 +23,23 @@
             color: #00d4ff;
             text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
         }
-		
-		h1, h2, h3, h4, h5, h6 {
-			position: relative !important;
-			margin: 20px 0 14px !important;
-			color: #eceff3  !important;
-			font-weight: bold !important;
-		}
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #eceff3;
+            font-weight: bold;
+        }
 
         .subtitle {
             font-size: 1.2em;
             color: #8892b0;
         }
 
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
         .nav-btn {
             background: linear-gradient(135deg, #00d4ff 0%, #0080ff 100%);
-            color: white !important;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
         }
 
         .nav-btn:hover {
-            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
         }
 
@@ -153,25 +118,9 @@
             color: #7f8c8d;
         }
 
-        .container footer {
-            text-align: center;
-            padding: 20px;
+        footer {
+            background: transparent;
             color: white;
-            margin-top: 50px;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-
-            .nav-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
     </style>
 </head>
@@ -184,10 +133,8 @@
             </div>
             <div class="nav-buttons">
                 <a href="city-platform-architecture.html" class="nav-btn">🏙️ 平台架构</a>
-                <!-- <a href="equipment-data.html" class="nav-btn">⚙️ 设备管理</a> -->
                 <a href="client-app.html" class="nav-btn">📱 客户端</a>
             </div>
-
         </header>
 
         <div class="stats">
@@ -212,7 +159,6 @@
         </div>
 
         <div class="nav-grid">
-
             <a href="digital-city-management.html" class="nav-item">
                 <i>🏠</i>
                 <h3>数字城管</h3>
@@ -228,7 +174,6 @@
                 <h3>决策分析</h3>
                 <p>可视化大屏展示6大模块数据</p>
             </a>
-
             <a href="smart-street.html" class="nav-item">
                 <i>🚦</i>
                 <h3>智慧街面</h3>
@@ -264,17 +209,11 @@
                 <h3>公共服务</h3>
                 <p>综合管理城市公共服务资源</p>
             </a>
-            <!-- <a href="client-app.html" class="nav-item">
-                <i>📱</i>
-                <h3>客户端</h3>
-                <p>市民与执法员登录入口</p>
-            </a> -->
             <a href="equipment-data.html" class="nav-item">
                 <i>🔧</i>
                 <h3>设备+数据</h3>
                 <p>设备管理与数据分析平台</p>
             </a>
-
         </div>
 
         <footer>
@@ -282,8 +221,8 @@
         </footer>
     </div>
 
+    <script src="assets/js/common.js"></script>
     <script>
-        // 添加页面加载动画
         window.addEventListener('load', function() {
             document.body.style.opacity = '0';
             document.body.style.transition = 'opacity 0.5s ease';
@@ -292,41 +231,7 @@
             }, 100);
         });
 
-        // 为导航项添加点击效果
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const href = this.getAttribute('href');
-                document.body.style.opacity = '0';
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 300);
-            });
-        });
-
-        // 数字动画效果
-        function animateNumbers() {
-            const statValues = document.querySelectorAll('.stat-value');
-            statValues.forEach(value => {
-                if (value.textContent === '智能') return;
-                const target = parseInt(value.textContent);
-                let current = 0;
-                const increment = target / 50;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        value.textContent = target;
-                        clearInterval(timer);
-                    } else {
-                        value.textContent = Math.floor(current);
-                    }
-                }, 30);
-            });
-        }
-
-        // 页面加载完成后执行数字动画
-        setTimeout(animateNumbers, 500);
+        initAnimatedNumbers();
     </script>
 </body>
 </html>
