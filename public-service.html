@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公共服务管理平台 - 智慧城市管理平台</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            font-family: 'Microsoft YaHei', sans-serif !important;
+            background: #1a1a2e !important;
+            color: #e0e0e0 !important;
+            line-height: 1.6 !important;
+            max-width: 1600px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+        }
+
+        .container header {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0080ff 100%);
+            color: white !important;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        /* 标签页导航样式 */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .tab-btn {
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .tab-btn.active {
+            background: #00d4ff;
+            color: #16213e;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        
+        .tab-content {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        
+        .tab-panel {
+            display: none;
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* 服务概览样式 */
+        .service-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .overview-card {
+            background: rgba(15, 52, 96, 0.8);
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .overview-card:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .overview-title {
+            font-size: 1.1em;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .overview-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #8892b0;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            color: #e0e0e0;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: #00d4ff;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            color: #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* 操作按钮样式 */
+        .action-btn {
+            background: rgba(22, 33, 62, 0.9);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .action-btn:hover {
+            background: #00d4ff;
+            color: #16213e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        /* 图表容器样式 */
+        .chart-container {
+            height: 400px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        /* 分页样式 */
+        .pagination-page {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: #00d4ff;
+            color: #16213e;
+        }
+
+        /* 搜索和筛选样式 */
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            background: rgba(15, 52, 96, 0.8);
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #e0e0e0;
+        }
+
+        .search-input::placeholder {
+            color: #8892b0;
+        }
+
+        /* 状态标签样式 */
+        .status-tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-inactive {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .status-pending {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .tab-navigation {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .overview-card {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(15, 52, 96, 0.8);
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #e0e0e0;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(15, 52, 96, 0.8);
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #e0e0e0;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(15, 52, 96, 0.8);
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #e0e0e0;
+        }
+
+        .form-button {
+            background: linear-gradient(135deg, #00d4ff 0%, #0080ff 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .form-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            background: rgba(22, 33, 62, 0.95);
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: #00d4ff;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            color: #8892b0;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #00d4ff;
+        }
+
+        /* 地图容器样式 */
+        .map-container {
+            height: 400px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: #00d4ff;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            color: #00d4ff;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #00d4ff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🏛️ 公共服务管理平台</h1>
+                <p>智慧城市公共服务资源管理与运营中心</p>
+            </div>
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-btn">🏠 主页</a>
+                <a href="central-command.html" class="nav-btn">🚨 综合指挥</a>
+                <a href="equipment-data.html" class="nav-btn">🔧 设备管理</a>
+                <a href="client-app.html" class="nav-btn">📱 客户端</a>
+            </div>
+        </header>
+
+        <!-- 主标签页导航 -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="overview">📊 服务概览</button>
+            <button class="tab-btn" data-tab="service-points">📍 办事网点</button>
+            <button class="tab-btn" data-tab="guides">📑 指南管理</button>
+            <button class="tab-btn" data-tab="bicycle">🚲 自行车租赁</button>
+            <button class="tab-btn" data-tab="points">🏆 用户积分</button>
+            <button class="tab-btn" data-tab="reports">📢 用户爆料</button>
+            <button class="tab-btn" data-tab="stations">🛍️ 驿站管理</button>
+            <button class="tab-btn" data-tab="news">📰 新闻管理</button>
+            <button class="tab-btn" data-tab="waterlogging">💧 道路积水点</button>
+            <button class="tab-btn" data-tab="policies">📜 政策法规</button>
+            <button class="tab-btn" data-tab="report-templates">📋 爆料模板</button>
+            <button class="tab-btn" data-tab="toilets">🚻 公厕管理</button>
+            <button class="tab-btn" data-tab="daily-question">❓ 每日一题</button>
+            <button class="tab-btn" data-tab="statistics">📈 统计分析</button>
+        </div>
+
+        <!-- 主标签页内容 -->
+        <div class="tab-content">
+            <!-- 服务概览 -->
+            <div id="overview-tab" class="tab-panel active">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📊 公共服务综合概览</h2>
+                <div class="service-overview">
+                    <div class="overview-card">
+                        <div class="overview-title">办事网点</div>
+                        <div class="overview-stats">
+                            <span class="stat-label">总网点数:</span>
+                            <span class="stat-value">156</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">活跃网点:</span>
+                            <span class="stat-value">142</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">今日访问:</span>
+                            <span class="stat-value">3,567</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-title">自行车租赁</div>
+                        <div class="overview-stats">
+                            <span class="stat-label">站点数:</span>
+                            <span class="stat-value">123</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">车辆数:</span>
+                            <span class="stat-value">3,456</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">今日租赁:</span>
+                            <span class="stat-value">2,345</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-title">用户爆料</div>
+                        <div class="overview-stats">
+                            <span class="stat-label">总爆料数:</span>
+                            <span class="stat-value">5,678</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">待处理:</span>
+                            <span class="stat-value">67</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">已解决:</span>
+                            <span class="stat-value">5,611</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-title">新闻资讯</div>
+                        <div class="overview-stats">
+                            <span class="stat-label">总新闻数:</span>
+                            <span class="stat-value">1,234</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">今日发布:</span>
+                            <span class="stat-value">18</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">总阅读量:</span>
+                            <span class="stat-value">789,234</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-title">公厕管理</div>
+                        <div class="overview-stats">
+                            <span class="stat-label">总公厕数:</span>
+                            <span class="stat-value">345</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">正常运行:</span>
+                            <span class="stat-value">332</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">今日使用:</span>
+                            <span class="stat-value">8,912</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-title">每日一题</div>
+                        <div class="overview-stats">
+                            <span class="stat-label">总题目数:</span>
+                            <span class="stat-value">1,567</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">今日参与:</span>
+                            <span class="stat-value">3,456</span>
+                        </div>
+                        <div class="overview-stats">
+                            <span class="stat-label">平均正确率:</span>
+                            <span class="stat-value">68%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 服务趋势图表 -->
+                <div class="chart-container">
+                    <canvas id="serviceTrendChart"></canvas>
+                </div>
+
+                <!-- 热门服务排行 -->
+                <h3 style="color: #00d4ff; margin-top: 30px; margin-bottom: 15px;">🔥 热门服务排行</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>服务名称</th>
+                            <th>访问量</th>
+                            <th>满意度</th>
+                            <th>环比增长</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>办事网点查询</td>
+                            <td>15,678</td>
+                            <td>98%</td>
+                            <td style="color: #00ff88;">+12.5%</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>自行车租赁</td>
+                            <td>12,345</td>
+                            <td>95%</td>
+                            <td style="color: #00ff88;">+8.3%</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>新闻资讯</td>
+                            <td>10,987</td>
+                            <td>92%</td>
+                            <td style="color: #00ff88;">+5.2%</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>政策法规查询</td>
+                            <td>8,765</td>
+                            <td>90%</td>
+                            <td style="color: #00ff88;">+3.1%</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>用户爆料</td>
+                            <td>7,890</td>
+                            <td>88%</td>
+                            <td style="color: #00ff88;">+6.7%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 办事网点 -->
+            <div id="service-points-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📍 办事网点管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索网点名称或地址">
+                    <select class="search-input">
+                        <option value="">全部区域</option>
+                        <option value="east">东区</option>
+                        <option value="west">西区</option>
+                        <option value="south">南区</option>
+                        <option value="north">北区</option>
+                        <option value="central">中心区</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部类型</option>
+                        <option value="government">政府机构</option>
+                        <option value="bank">银行金融</option>
+                        <option value="medical">医疗健康</option>
+                        <option value="education">教育服务</option>
+                        <option value="other">其他服务</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增网点</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>网点名称</th>
+                            <th>地址</th>
+                            <th>类型</th>
+                            <th>联系电话</th>
+                            <th>营业时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>东区政务服务中心</td>
+                            <td>东区人民大道123号</td>
+                            <td>政府机构</td>
+                            <td>0755-12345678</td>
+                            <td>9:00-17:00</td>
+                            <td><span class="status-tag status-active">正常</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>西区银行服务中心</td>
+                            <td>西区金融街45号</td>
+                            <td>银行金融</td>
+                            <td>0755-23456789</td>
+                            <td>9:00-18:00</td>
+                            <td><span class="status-tag status-active">正常</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>南区医疗服务中心</td>
+                            <td>南区健康路67号</td>
+                            <td>医疗健康</td>
+                            <td>0755-34567890</td>
+                            <td>8:00-20:00</td>
+                            <td><span class="status-tag status-active">正常</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>北区教育服务中心</td>
+                            <td>北区学府路89号</td>
+                            <td>教育服务</td>
+                            <td>0755-45678901</td>
+                            <td>9:00-17:00</td>
+                            <td><span class="status-tag status-inactive">暂停服务</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">上架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>中心区综合服务中心</td>
+                            <td>中心区市民广场1号</td>
+                            <td>其他服务</td>
+                            <td>0755-56789012</td>
+                            <td>9:00-21:00</td>
+                            <td><span class="status-tag status-active">正常</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+
+            <!-- 指南管理 -->
+            <div id="guides-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📑 指南管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索指南标题">
+                    <select class="search-input">
+                        <option value="">全部分类</option>
+                        <option value="government">政务服务</option>
+                        <option value="medical">医疗健康</option>
+                        <option value="education">教育服务</option>
+                        <option value="social">社会保障</option>
+                        <option value="other">其他指南</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="active">已发布</option>
+                        <option value="inactive">未发布</option>
+                        <option value="offline">已下架</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增指南</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>指南标题</th>
+                            <th>分类</th>
+                            <th>发布时间</th>
+                            <th>浏览量</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>身份证办理指南</td>
+                            <td>政务服务</td>
+                            <td>2026-01-15</td>
+                            <td>12,345</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>医疗保险报销流程</td>
+                            <td>医疗健康</td>
+                            <td>2026-01-14</td>
+                            <td>8,765</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>子女入学报名指南</td>
+                            <td>教育服务</td>
+                            <td>2026-01-13</td>
+                            <td>15,678</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>社保卡办理指南</td>
+                            <td>社会保障</td>
+                            <td>2026-01-12</td>
+                            <td>9,876</td>
+                            <td><span class="status-tag status-inactive">未发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">发布</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>不动产登记流程</td>
+                            <td>政务服务</td>
+                            <td>2026-01-11</td>
+                            <td>6,543</td>
+                            <td><span class="status-tag status-inactive">已下架</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">上架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+
+            <!-- 自行车租赁 -->
+            <div id="bicycle-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">🚲 自行车租赁管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索站点名称">
+                    <select class="search-input">
+                        <option value="">全部区域</option>
+                        <option value="east">东区</option>
+                        <option value="west">西区</option>
+                        <option value="south">南区</option>
+                        <option value="north">北区</option>
+                        <option value="central">中心区</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="active">正常运营</option>
+                        <option value="inactive">暂停运营</option>
+                        <option value="maintenance">维护中</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增站点</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>站点名称</th>
+                            <th>地址</th>
+                            <th>桩位数</th>
+                            <th>可用车辆</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>中心广场站</td>
+                            <td>中心区市民广场1号</td>
+                            <td>50</td>
+                            <td>35</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>东区地铁站</td>
+                            <td>东区地铁1号线出口</td>
+                            <td>40</td>
+                            <td>28</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>西区公园站</td>
+                            <td>西区中央公园南门</td>
+                            <td>30</td>
+                            <td>15</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>南区学校站</td>
+                            <td>南区第一中学门口</td>
+                            <td>35</td>
+                            <td>0</td>
+                            <td><span class="status-tag status-pending">维护中</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">恢复</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>北区商业区站</td>
+                            <td>北区商业步行街入口</td>
+                            <td>45</td>
+                            <td>38</td>
+                            <td><span class="status-tag status-inactive">暂停运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">恢复</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+                <div class="map-container" style="margin-top: 30px;">
+                    🗺️ 自行车租赁站点分布地图
+                </div>
+            </div>
+
+            <!-- 用户积分 -->
+            <div id="points-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">🏆 用户积分管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索用户姓名或ID">
+                    <select class="search-input">
+                        <option value="">全部等级</option>
+                        <option value="bronze">青铜会员</option>
+                        <option value="silver">白银会员</option>
+                        <option value="gold">黄金会员</option>
+                        <option value="platinum">铂金会员</option>
+                        <option value="diamond">钻石会员</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">🏆 积分规则</button>
+                    <button class="form-button">🎁 奖品管理</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>用户ID</th>
+                            <th>用户姓名</th>
+                            <th>当前积分</th>
+                            <th>会员等级</th>
+                            <th>积分变动</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>U001</td>
+                            <td>张三</td>
+                            <td>12,345</td>
+                            <td>钻石会员</td>
+                            <td style="color: #00ff88;">+150 (今日)</td>
+                            <td>
+                                <button class="action-btn">查看详情</button>
+                                <button class="action-btn">发放积分</button>
+                                <button class="action-btn">积分记录</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>U002</td>
+                            <td>李四</td>
+                            <td>8,765</td>
+                            <td>铂金会员</td>
+                            <td style="color: #00ff88;">+80 (今日)</td>
+                            <td>
+                                <button class="action-btn">查看详情</button>
+                                <button class="action-btn">发放积分</button>
+                                <button class="action-btn">积分记录</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>U003</td>
+                            <td>王五</td>
+                            <td>5,432</td>
+                            <td>黄金会员</td>
+                            <td style="color: #00ff88;">+50 (今日)</td>
+                            <td>
+                                <button class="action-btn">查看详情</button>
+                                <button class="action-btn">发放积分</button>
+                                <button class="action-btn">积分记录</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>U004</td>
+                            <td>赵六</td>
+                            <td>3,210</td>
+                            <td>白银会员</td>
+                            <td style="color: #00ff88;">+30 (今日)</td>
+                            <td>
+                                <button class="action-btn">查看详情</button>
+                                <button class="action-btn">发放积分</button>
+                                <button class="action-btn">积分记录</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>U005</td>
+                            <td>孙七</td>
+                            <td>1,567</td>
+                            <td>青铜会员</td>
+                            <td style="color: #00ff88;">+20 (今日)</td>
+                            <td>
+                                <button class="action-btn">查看详情</button>
+                                <button class="action-btn">发放积分</button>
+                                <button class="action-btn">积分记录</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+                <div class="chart-container" style="margin-top: 30px;">
+                    <canvas id="pointsDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 用户爆料 -->
+            <div id="reports-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📢 用户爆料管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索爆料内容或ID">
+                    <select class="search-input">
+                        <option value="">全部类型</option>
+                        <option value="traffic">交通问题</option>
+                        <option value="environment">环境问题</option>
+                        <option value="facility">设施问题</option>
+                        <option value="public">公共秩序</option>
+                        <option value="other">其他问题</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="resolved">已解决</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">📋 爆料模板</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>爆料ID</th>
+                            <th>标题</th>
+                            <th>类型</th>
+                            <th>上报时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>R001</td>
+                            <td>XX路路灯故障</td>
+                            <td>设施问题</td>
+                            <td>2026-01-16 10:23</td>
+                            <td><span class="status-tag status-pending">待处理</span></td>
+                            <td>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">处理</button>
+                                <button class="action-btn">回复</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R002</td>
+                            <td>XX公园垃圾堆积</td>
+                            <td>环境问题</td>
+                            <td>2026-01-16 09:45</td>
+                            <td><span class="status-tag status-pending">处理中</span></td>
+                            <td>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">处理</button>
+                                <button class="action-btn">回复</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R003</td>
+                            <td>XX路口交通拥堵</td>
+                            <td>交通问题</td>
+                            <td>2026-01-16 08:30</td>
+                            <td><span class="status-tag status-active">已解决</span></td>
+                            <td>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">评价</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R004</td>
+                            <td>XX小区噪音扰民</td>
+                            <td>公共秩序</td>
+                            <td>2026-01-16 07:15</td>
+                            <td><span class="status-tag status-pending">待处理</span></td>
+                            <td>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">处理</button>
+                                <button class="action-btn">回复</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R005</td>
+                            <td>XX街道卫生脏乱</td>
+                            <td>环境问题</td>
+                            <td>2026-01-15 18:45</td>
+                            <td><span class="status-tag status-active">已解决</span></td>
+                            <td>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">评价</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+                <div class="chart-container" style="margin-top: 30px;">
+                    <canvas id="reportTypeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 驿站管理 -->
+            <div id="stations-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">🛍️ 驿站管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索驿站名称">
+                    <select class="search-input">
+                        <option value="">全部区域</option>
+                        <option value="east">东区</option>
+                        <option value="west">西区</option>
+                        <option value="south">南区</option>
+                        <option value="north">北区</option>
+                        <option value="central">中心区</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部类型</option>
+                        <option value="community">社区驿站</option>
+                        <option value="commercial">商业驿站</option>
+                        <option value="transport">交通枢纽</option>
+                        <option value="tourism">旅游景点</option>
+                        <option value="other">其他类型</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增驿站</button>
+                    <button class="form-button">📤 导入数据</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>驿站名称</th>
+                            <th>地址</th>
+                            <th>类型</th>
+                            <th>服务项目</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>中心社区驿站</td>
+                            <td>中心区市民广场旁</td>
+                            <td>社区驿站</td>
+                            <td>便民服务、快递代收、政务咨询</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>东区商业驿站</td>
+                            <td>东区商业步行街中心</td>
+                            <td>商业驿站</td>
+                            <td>休息区、手机充电、信息查询</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>西区交通驿站</td>
+                            <td>西区地铁站出口</td>
+                            <td>交通枢纽</td>
+                            <td>票务服务、交通咨询、休息区</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>南区旅游驿站</td>
+                            <td>南区湿地公园入口</td>
+                            <td>旅游景点</td>
+                            <td>景点介绍、导游服务、纪念品销售</td>
+                            <td><span class="status-tag status-inactive">暂停运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">上架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>北区社区驿站</td>
+                            <td>北区幸福小区内</td>
+                            <td>社区驿站</td>
+                            <td>便民服务、老年活动、儿童托管</td>
+                            <td><span class="status-tag status-active">正常运营</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+
+            <!-- 新闻管理 -->
+            <div id="news-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📰 新闻管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索新闻标题">
+                    <select class="search-input">
+                        <option value="">全部分类</option>
+                        <option value="government">政务新闻</option>
+                        <option value="society">社会新闻</option>
+                        <option value="culture">文化新闻</option>
+                        <option value="economic">经济新闻</option>
+                        <option value="other">其他新闻</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="active">已发布</option>
+                        <option value="inactive">未发布</option>
+                        <option value="offline">已下架</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增新闻</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>新闻标题</th>
+                            <th>分类</th>
+                            <th>发布时间</th>
+                            <th>浏览量</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>智慧城市建设取得新进展</td>
+                            <td>政务新闻</td>
+                            <td>2026-01-16</td>
+                            <td>12,345</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>城市环境整治成效显著</td>
+                            <td>社会新闻</td>
+                            <td>2026-01-15</td>
+                            <td>9,876</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>春节文化活动安排出炉</td>
+                            <td>文化新闻</td>
+                            <td>2026-01-14</td>
+                            <td>8,765</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>新区经济发展规划发布</td>
+                            <td>经济新闻</td>
+                            <td>2026-01-13</td>
+                            <td>7,654</td>
+                            <td><span class="status-tag status-inactive">未发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">发布</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>城市交通优化方案实施</td>
+                            <td>社会新闻</td>
+                            <td>2026-01-12</td>
+                            <td>6,543</td>
+                            <td><span class="status-tag status-inactive">已下架</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">上架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+
+            <!-- 道路积水点 -->
+            <div id="waterlogging-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">💧 道路积水点管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索积水点名称或地址">
+                    <select class="search-input">
+                        <option value="">全部区域</option>
+                        <option value="east">东区</option>
+                        <option value="west">西区</option>
+                        <option value="south">南区</option>
+                        <option value="north">北区</option>
+                        <option value="central">中心区</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部风险等级</option>
+                        <option value="high">高风险</option>
+                        <option value="medium">中风险</option>
+                        <option value="low">低风险</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增积水点</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>积水点名称</th>
+                            <th>地址</th>
+                            <th>风险等级</th>
+                            <th>最大积水深度</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>东区低洼路段</td>
+                            <td>东区人民大道与和平路交叉口</td>
+                            <td>高风险</td>
+                            <td>1.2米</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>西区涵洞</td>
+                            <td>西区工业路涵洞</td>
+                            <td>高风险</td>
+                            <td>1.5米</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>南区桥下</td>
+                            <td>南区高速桥下</td>
+                            <td>中风险</td>
+                            <td>0.8米</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>北区路口</td>
+                            <td>北区建设北路与黄河路交叉口</td>
+                            <td>低风险</td>
+                            <td>0.3米</td>
+                            <td><span class="status-tag status-inactive">未发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">发布</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>中心区地道</td>
+                            <td>中心区地铁地道入口</td>
+                            <td>中风险</td>
+                            <td>0.6米</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+                <div class="map-container" style="margin-top: 30px;">
+                    🗺️ 道路积水点分布地图
+                </div>
+            </div>
+
+            <!-- 政策法规 -->
+            <div id="policies-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📜 政策法规管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索政策法规标题">
+                    <select class="search-input">
+                        <option value="">全部分类</option>
+                        <option value="national">国家法规</option>
+                        <option value="local">地方法规</option>
+                        <option value="government">政府规章</option>
+                        <option value="regulation">规范性文件</option>
+                        <option value="other">其他法规</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="active">有效</option>
+                        <option value="inactive">无效</option>
+                        <option value="revised">修订中</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增法规</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>法规标题</th>
+                            <th>分类</th>
+                            <th>发布时间</th>
+                            <th>实施时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>智慧城市建设管理条例</td>
+                            <td>地方法规</td>
+                            <td>2025-12-01</td>
+                            <td>2026-01-01</td>
+                            <td><span class="status-tag status-active">有效</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>城市环境管理办法</td>
+                            <td>政府规章</td>
+                            <td>2025-10-15</td>
+                            <td>2025-11-01</td>
+                            <td><span class="status-tag status-active">有效</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>公共设施管理规定</td>
+                            <td>规范性文件</td>
+                            <td>2025-09-01</td>
+                            <td>2025-10-01</td>
+                            <td><span class="status-tag status-active">有效</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>城市交通管理条例</td>
+                            <td>地方法规</td>
+                            <td>2025-08-01</td>
+                            <td>2025-09-01</td>
+                            <td><span class="status-tag status-pending">修订中</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">发布</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>老旧小区改造实施办法</td>
+                            <td>政府规章</td>
+                            <td>2025-07-01</td>
+                            <td>2025-08-01</td>
+                            <td><span class="status-tag status-inactive">无效</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">上架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+
+            <!-- 爆料模板 -->
+            <div id="report-templates-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📋 爆料模板管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索模板名称">
+                    <select class="search-input">
+                        <option value="">全部类型</option>
+                        <option value="traffic">交通问题</option>
+                        <option value="environment">环境问题</option>
+                        <option value="facility">设施问题</option>
+                        <option value="public">公共秩序</option>
+                        <option value="other">其他问题</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增模板</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>模板名称</th>
+                            <th>类型</th>
+                            <th>创建时间</th>
+                            <th>使用次数</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>交通拥堵爆料模板</td>
+                            <td>交通问题</td>
+                            <td>2026-01-10</td>
+                            <td>1,234</td>
+                            <td><span class="status-tag status-active">启用</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">禁用</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>环境脏乱爆料模板</td>
+                            <td>环境问题</td>
+                            <td>2026-01-08</td>
+                            <td>987</td>
+                            <td><span class="status-tag status-active">启用</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">禁用</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>设施损坏爆料模板</td>
+                            <td>设施问题</td>
+                            <td>2026-01-05</td>
+                            <td>876</td>
+                            <td><span class="status-tag status-active">启用</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">禁用</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>噪音扰民爆料模板</td>
+                            <td>公共秩序</td>
+                            <td>2026-01-03</td>
+                            <td>765</td>
+                            <td><span class="status-tag status-active">启用</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">禁用</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>其他问题爆料模板</td>
+                            <td>其他问题</td>
+                            <td>2026-01-01</td>
+                            <td>543</td>
+                            <td><span class="status-tag status-inactive">禁用</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">启用</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+
+            <!-- 公厕管理 -->
+            <div id="toilets-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">🚻 公厕管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索公厕名称或地址">
+                    <select class="search-input">
+                        <option value="">全部区域</option>
+                        <option value="east">东区</option>
+                        <option value="west">西区</option>
+                        <option value="south">南区</option>
+                        <option value="north">北区</option>
+                        <option value="central">中心区</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="active">正常开放</option>
+                        <option value="inactive">暂停开放</option>
+                        <option value="maintenance">维护中</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增公厕</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>公厕名称</th>
+                            <th>地址</th>
+                            <th>蹲位数</th>
+                            <th>无障碍设施</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>中心广场公厕</td>
+                            <td>中心区市民广场1号</td>
+                            <td>15</td>
+                            <td>有</td>
+                            <td><span class="status-tag status-active">正常开放</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>东区公园公厕</td>
+                            <td>东区中央公园内</td>
+                            <td>10</td>
+                            <td>有</td>
+                            <td><span class="status-tag status-active">正常开放</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>西区商业街公厕</td>
+                            <td>西区商业步行街</td>
+                            <td>12</td>
+                            <td>有</td>
+                            <td><span class="status-tag status-pending">维护中</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">恢复</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>南区地铁站公厕</td>
+                            <td>南区地铁1号线站厅</td>
+                            <td>20</td>
+                            <td>有</td>
+                            <td><span class="status-tag status-active">正常开放</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>北区体育中心公厕</td>
+                            <td>北区体育中心内</td>
+                            <td>18</td>
+                            <td>有</td>
+                            <td><span class="status-tag status-inactive">暂停开放</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">恢复</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+                <div class="map-container" style="margin-top: 30px;">
+                    🗺️ 公厕分布地图
+                </div>
+            </div>
+
+            <!-- 每日一题 -->
+            <div id="daily-question-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">❓ 每日一题管理</h2>
+                <div class="search-filter">
+                    <input type="text" class="search-input" placeholder="搜索题目内容">
+                    <select class="search-input">
+                        <option value="">全部类型</option>
+                        <option value="knowledge">知识题</option>
+                        <option value="policy">政策题</option>
+                        <option value="culture">文化题</option>
+                        <option value="environment">环境题</option>
+                        <option value="other">其他题目</option>
+                    </select>
+                    <select class="search-input">
+                        <option value="">全部状态</option>
+                        <option value="active">已发布</option>
+                        <option value="inactive">未发布</option>
+                        <option value="offline">已下架</option>
+                    </select>
+                    <button class="form-button">🔍 搜索</button>
+                    <button class="form-button">➕ 新增题目</button>
+                    <button class="form-button">📢 发布今日题目</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>题目ID</th>
+                            <th>题目内容</th>
+                            <th>类型</th>
+                            <th>发布时间</th>
+                            <th>参与人数</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Q001</td>
+                            <td>智慧城市建设的核心是什么？</td>
+                            <td>知识题</td>
+                            <td>2026-01-16</td>
+                            <td>2,345</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q002</td>
+                            <td>最新的城市环境管理条例是哪一年发布的？</td>
+                            <td>政策题</td>
+                            <td>2026-01-15</td>
+                            <td>1,987</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q003</td>
+                            <td>城市文化遗产保护的重要性是什么？</td>
+                            <td>文化题</td>
+                            <td>2026-01-14</td>
+                            <td>1,765</td>
+                            <td><span class="status-tag status-active">已发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">下架</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q004</td>
+                            <td>垃圾分类的四个类别是什么？</td>
+                            <td>环境题</td>
+                            <td>2026-01-13</td>
+                            <td>1,543</td>
+                            <td><span class="status-tag status-inactive">未发布</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">发布</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Q005</td>
+                            <td>城市交通优化的主要措施有哪些？</td>
+                            <td>其他题目</td>
+                            <td>2026-01-12</td>
+                            <td>1,321</td>
+                            <td><span class="status-tag status-inactive">已下架</span></td>
+                            <td>
+                                <button class="action-btn">编辑</button>
+                                <button class="action-btn">查看</button>
+                                <button class="action-btn">上架</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-page">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+                <div class="chart-container" style="margin-top: 30px;">
+                    <canvas id="questionParticipationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 统计分析 -->
+            <div id="statistics-tab" class="tab-panel">
+                <h2 style="color: #00d4ff; margin-bottom: 20px;">📈 统计分析</h2>
+                
+                <!-- 爆料高发区域 -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #00d4ff; margin-bottom: 20px;">📍 爆料高发区域</h3>
+                    <div class="chart-container">
+                        <canvas id="reportHotspotChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 爆料活跃用户 -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #00d4ff; margin-bottom: 20px;">👥 爆料活跃用户</h3>
+                    <div class="chart-container">
+                        <canvas id="activeUserChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 重点上报 -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #00d4ff; margin-bottom: 20px;">⚠️ 重点上报</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>爆料ID</th>
+                                <th>标题</th>
+                                <th>类型</th>
+                                <th>上报时间</th>
+                                <th>严重程度</th>
+                                <th>处理状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>R001</td>
+                                <td>西区燃气泄漏</td>
+                                <td>安全隐患</td>
+                                <td>2026-01-16 10:23</td>
+                                <td>严重</td>
+                                <td><span class="status-tag status-pending">处理中</span></td>
+                            </tr>
+                            <tr>
+                                <td>R002</td>
+                                <td>东区道路塌陷</td>
+                                <td>道路问题</td>
+                                <td>2026-01-16 09:45</td>
+                                <td>严重</td>
+                                <td><span class="status-tag status-pending">处理中</span></td>
+                            </tr>
+                            <tr>
+                                <td>R003</td>
+                                <td>南区水污染</td>
+                                <td>环境问题</td>
+                                <td>2026-01-16 08:30</td>
+                                <td>中度</td>
+                                <td><span class="status-tag status-pending">待处理</span></td>
+                            </tr>
+                            <tr>
+                                <td>R004</td>
+                                <td>北区噪音扰民</td>
+                                <td>公共秩序</td>
+                                <td>2026-01-16 07:15</td>
+                                <td>轻度</td>
+                                <td><span class="status-tag status-pending">待处理</span></td>
+                            </tr>
+                            <tr>
+                                <td>R005</td>
+                                <td>中心区垃圾堆积</td>
+                                <td>环境问题</td>
+                                <td>2026-01-15 18:45</td>
+                                <td>中度</td>
+                                <td><span class="status-tag status-active">已解决</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 服务满意度分析 -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #00d4ff; margin-bottom: 20px;">⭐ 服务满意度分析</h3>
+                    <div class="chart-container">
+                        <canvas id="satisfactionChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 服务量趋势 -->
+                <div>
+                    <h3 style="color: #00d4ff; margin-bottom: 20px;">📈 服务量趋势</h3>
+                    <div class="chart-container">
+                        <canvas id="serviceVolumeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 标签页切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 移除所有标签页的活动状态
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanels.forEach(panel => panel.classList.remove('active'));
+                    
+                    // 添加当前标签页的活动状态
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // 初始化图表
+            initCharts();
+        });
+        
+        // 初始化所有图表
+        function initCharts() {
+            // 服务趋势图表
+            const serviceTrendCtx = document.getElementById('serviceTrendChart');
+            if (serviceTrendCtx) {
+                new Chart(serviceTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '办事网点访问量',
+                            data: [8500, 9200, 10500, 11800, 12300, 13500],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: '自行车租赁量',
+                            data: [6200, 7100, 7800, 8500, 9200, 10500],
+                            borderColor: '#00ff88',
+                            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: '用户爆料量',
+                            data: [4100, 4800, 5500, 6200, 6800, 7500],
+                            borderColor: '#ffa502',
+                            backgroundColor: 'rgba(255, 165, 2, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '公共服务趋势分析',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 积分分布图表
+            const pointsDistributionCtx = document.getElementById('pointsDistributionChart');
+            if (pointsDistributionCtx) {
+                new Chart(pointsDistributionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['钻石会员', '铂金会员', '黄金会员', '白银会员', '青铜会员'],
+                        datasets: [{
+                            data: [5, 15, 25, 30, 25],
+                            backgroundColor: [
+                                '#00d4ff',
+                                '#00ff88',
+                                '#ffa502',
+                                '#ff8c00',
+                                '#ff4757'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '用户积分等级分布',
+                                color: '#00d4ff'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 爆料类型图表
+            const reportTypeCtx = document.getElementById('reportTypeChart');
+            if (reportTypeCtx) {
+                new Chart(reportTypeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['交通问题', '环境问题', '设施问题', '公共秩序', '其他问题'],
+                        datasets: [{
+                            label: '爆料数量',
+                            data: [1200, 980, 850, 620, 450],
+                            backgroundColor: '#00d4ff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '用户爆料类型分布',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 题目参与度图表
+            const questionParticipationCtx = document.getElementById('questionParticipationChart');
+            if (questionParticipationCtx) {
+                new Chart(questionParticipationCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月1日', '1月2日', '1月3日', '1月4日', '1月5日', '1月6日', '1月7日'],
+                        datasets: [{
+                            label: '参与人数',
+                            data: [1234, 1456, 1678, 1890, 2100, 2345, 2567],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '每日一题参与趋势',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 爆料高发区域图表
+            const reportHotspotCtx = document.getElementById('reportHotspotChart');
+            if (reportHotspotCtx) {
+                new Chart(reportHotspotCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['东区', '西区', '南区', '北区', '中心区'],
+                        datasets: [{
+                            label: '爆料数量',
+                            data: [850, 920, 780, 650, 1230],
+                            backgroundColor: '#ff4757'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '各区域爆料数量分布',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 活跃用户图表
+            const activeUserCtx = document.getElementById('activeUserChart');
+            if (activeUserCtx) {
+                new Chart(activeUserCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['张三', '李四', '王五', '赵六', '孙七', '周八', '吴九', '郑十'],
+                        datasets: [{
+                            label: '爆料数量',
+                            data: [120, 98, 85, 76, 65, 54, 43, 32],
+                            backgroundColor: '#00ff88'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '活跃用户爆料排行榜',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 满意度图表
+            const satisfactionCtx = document.getElementById('satisfactionChart');
+            if (satisfactionCtx) {
+                new Chart(satisfactionCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['办事网点', '自行车租赁', '驿站服务', '公厕管理', '新闻资讯', '政策法规'],
+                        datasets: [{
+                            label: '满意度',
+                            data: [98, 95, 92, 90, 88, 85],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.2)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '各服务满意度评价',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                pointLabels: {
+                                    color: '#e0e0e0'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0',
+                                    backdropColor: 'transparent'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 服务量趋势图表
+            const serviceVolumeCtx = document.getElementById('serviceVolumeChart');
+            if (serviceVolumeCtx) {
+                new Chart(serviceVolumeCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                        datasets: [{
+                            label: '总服务量',
+                            data: [25000, 28000, 32000, 35000, 38000, 42000, 45000, 48000, 52000, 55000, 58000, 62000],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '年度服务量趋势',
+                                color: '#00d4ff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
