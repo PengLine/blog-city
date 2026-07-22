@@ -1,127 +1,72 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧环卫 - 智慧城市管理平台</title>
-    <!-- 地图功能暂时禁用，避免API密钥错误 -->
+    <link rel="stylesheet" href="assets/css/common.css">
     <style>
-        /* 地图容器样式 */
-        .map-container {
-            width: 100%;
-            height: 400px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-    </style>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         .container {
-            font-family: 'Microsoft YaHei', sans-serif !important;
-            background: #f0f9ff !important;
-            color: #333 !important;
-            line-height: 1.6 !important;
-            max-width: 1400px !important;
-            margin: 0 auto !important;
-            padding: 20px !important;
-        }
-
-        .container header {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        h1 {
-            font-size: 2em;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            background: #f0f9ff;
+            color: #333;
         }
 
         .nav-btn {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%) !important;
-            color: white !important;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
             box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
         }
 
         .nav-btn:hover {
-            transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
         }
 
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+        .module-btn.active,
+        .tab-btn.active {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
         }
 
-        .metric-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: all 0.3s ease;
+        .btn-sm {
+            background: #27ae60;
         }
 
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        .btn-sm:hover {
+            background: #229954;
         }
 
-        .metric-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
+        .btn-primary {
+            background: #27ae60;
         }
 
-        .metric-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .btn-primary:hover {
+            background: #229954;
         }
 
-        .metric-label {
-            font-size: 1em;
-            color: #7f8c8d;
-            margin-bottom: 10px;
+        .fill-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
         }
 
-        .metric-trend {
-            font-size: 0.9em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+        .fill-progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
         }
 
-        .trend-up {
-            color: #27ae60;
+        .fill-green {
+            background: #27ae60;
         }
 
-        .trend-down {
-            color: #e74c3c;
+        .fill-yellow {
+            background: #f39c12;
+        }
+
+        .fill-red {
+            background: #e74c3c;
         }
 
         .main-content {
@@ -138,12 +83,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .map-section h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3em;
-        }
-
         .map-container {
             width: 100%;
             height: 450px;
@@ -151,26 +90,12 @@
             margin-bottom: 20px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-        }
-
-        /* 地图标记样式 */
-        .map-marker {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .map-info-window {
-            max-width: 300px;
-        }
-
-        .map-info-window h4 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        .map-info-window p {
-            margin-bottom: 5px;
-            font-size: 0.9em;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
         }
 
         .map-controls {
@@ -189,7 +114,8 @@
             font-size: 0.9em;
         }
 
-        .map-btn:hover, .map-btn.active {
+        .map-btn:hover,
+        .map-btn.active {
             background: #27ae60;
             color: white;
             transform: translateY(-2px);
@@ -209,7 +135,8 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .garbage-status h3 {
+        .garbage-status h3,
+        .vehicle-monitor h3 {
             margin-bottom: 20px;
             color: #2c3e50;
             font-size: 1.3em;
@@ -258,12 +185,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .vehicle-monitor h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3em;
-        }
-
         .vehicle-item {
             background: #f8f9fa;
             padding: 15px;
@@ -277,10 +198,6 @@
 
         .vehicle-item:hover {
             background: #e9ecef;
-        }
-
-        .vehicle-info {
-            flex: 1;
         }
 
         .vehicle-number {
@@ -314,424 +231,6 @@
             color: #f39c12;
         }
 
-        .stats-section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .stats-section h3 {
-            margin-bottom: 25px;
-            color: #2c3e50;
-            font-size: 1.3em;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .stat-icon {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-
-        .container footer {
-            text-align: center;
-            padding: 25px;
-            color: #7f8c8d;
-            margin-top: 40px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .metric-value {
-                font-size: 2em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-
-            .map-controls {
-                flex-direction: column;
-            }
-        }
-
-        /* 填充进度条 */
-        .fill-bar {
-            height: 8px;
-            background: #ecf0f1;
-            border-radius: 4px;
-            margin: 8px 0;
-            overflow: hidden;
-        }
-
-        .fill-progress {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .fill-green {
-            background: #27ae60;
-        }
-
-        .fill-yellow {
-            background: #f39c12;
-        }
-
-        .fill-red {
-            background: #e74c3c;
-        }
-
-        /* 模块导航样式 */
-        .module-nav {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .module-btn {
-            background: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            color: #2c3e50;
-        }
-
-        .module-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-            color: white;
-        }
-
-        .module-btn.active {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-        }
-
-        /* 模块内容样式 */
-        .module-content {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
-        }
-
-        .module-content.active {
-            display: block;
-        }
-
-        /* 模块标签页样式 */
-        .module-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            color: #7f8c8d;
-        }
-
-        .tab-btn:hover {
-            background: #ecf0f1;
-            color: #2c3e50;
-            transform: translateY(-2px);
-        }
-
-        .tab-btn.active {
-            background: #27ae60;
-            color: white;
-            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
-        }
-
-        /* 标签内容样式 */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 内容头部样式 */
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .content-header h3 {
-            font-size: 1.5em;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .content-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        /* 按钮样式 */
-        .action-btn {
-            background: #ecf0f1;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-        }
-
-        .action-btn:hover {
-            background: #bdc3c7;
-            transform: translateY(-2px);
-        }
-
-        .btn-sm {
-            background: #27ae60;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: white;
-            font-size: 0.8em;
-            transition: all 0.3s ease;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-
-        .btn-sm:hover {
-            background: #229954;
-            transform: translateY(-1px);
-        }
-
-        .btn-sm.btn-warning {
-            background: #f39c12;
-        }
-
-        .btn-sm.btn-warning:hover {
-            background: #e67e22;
-        }
-
-        .btn-primary {
-            background: #27ae60;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: white;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: #229954;
-            transform: translateY(-2px);
-        }
-
-        /* 数据表格样式 */
-        .data-table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        .data-table th {
-            background: #f8f9fa;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* 状态样式 */
-        .status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        .status-normal {
-            background: rgba(39, 174, 96, 0.2);
-            color: #27ae60;
-        }
-
-        .status-working {
-            background: rgba(39, 174, 96, 0.2);
-            color: #27ae60;
-        }
-
-        .status-alarm {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-        }
-
-        /* 搜索输入框样式 */
-        .search-input {
-            padding: 10px 15px;
-            border: 1px solid #bdc3c7;
-            border-radius: 8px;
-            font-size: 0.9em;
-            width: 250px;
-        }
-
-        /* 表单样式 */
-        .parameter-form {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 6px;
-            font-size: 1em;
-        }
-
-        .form-actions {
-            text-align: right;
-        }
-
-        /* 统计卡片样式 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #27ae60;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1em;
-            color: #7f8c8d;
-        }
-
-        /* 排班日历样式 */
         .schedule-calendar {
             background: white;
             border-radius: 12px;
@@ -766,10 +265,6 @@
             font-size: 1.2em;
             font-weight: bold;
             color: #2c3e50;
-        }
-
-        .calendar-body {
-            margin-top: 20px;
         }
 
         .calendar-weekdays {
@@ -825,10 +320,6 @@
             color: white;
         }
 
-        .calendar-day.has-shift {
-            background: #e8f5e9;
-        }
-
         .day-number {
             font-weight: bold;
             margin-bottom: 5px;
@@ -851,60 +342,6 @@
             color: #3498db;
         }
 
-        .schedule-details {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .shift-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .shift-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .shift-info h5 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        .shift-staff {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .staff-tag {
-            background: white;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.9em;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 图表样式 */
-        .chart-container {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 25px;
-        }
-
-        .chart-container h4 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        /* 柱状图样式 */
         .bar-chart {
             display: flex;
             justify-content: space-around;
@@ -943,282 +380,20 @@
             text-align: center;
         }
 
-        /* 横向柱状图 */
-        .bar-chart.horizontal {
-            flex-direction: column;
-            height: auto;
-            gap: 15px;
-            align-items: stretch;
-        }
-
-        .chart-item.horizontal {
-            flex-direction: row;
-            align-items: center;
-            max-width: none;
-        }
-
-        .chart-bar.horizontal {
-            height: 40px;
-            border-radius: 0 4px 4px 0;
-            min-width: 20px;
-            margin-right: 15px;
-        }
-
-        .chart-label.horizontal {
-            margin-top: 0;
-            flex: 0 0 200px;
-            text-align: left;
-        }
-
-        /* 饼图样式 */
-        .pie-chart-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-
-        .pie-chart {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            background: #f8f9fa;
-        }
-
-        .pie-slice {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%);
-            transform-origin: 50% 50%;
-            background-color: var(--color);
-            transition: transform 0.3s ease;
-        }
-
-        .pie-slice:nth-child(1) {
-            transform: rotate(0deg) translateY(-50%) rotate(0deg) translateY(50%);
-            animation: rotateSlice 1s ease forwards;
-            animation-delay: 0.2s;
-        }
-
-        .pie-slice:nth-child(2) {
-            transform: rotate(calc(360deg * 0.6)) translateY(-50%) rotate(0deg) translateY(50%);
-            animation: rotateSlice 1s ease forwards;
-            animation-delay: 0.4s;
-        }
-
-        .pie-slice:nth-child(3) {
-            transform: rotate(calc(360deg * (0.6 + 0.25))) translateY(-50%) rotate(0deg) translateY(50%);
-            animation: rotateSlice 1s ease forwards;
-            animation-delay: 0.6s;
-        }
-
-        .pie-slice:nth-child(4) {
-            transform: rotate(calc(360deg * (0.6 + 0.25 + 0.1))) translateY(-50%) rotate(0deg) translateY(50%);
-            animation: rotateSlice 1s ease forwards;
-            animation-delay: 0.8s;
-        }
-
-        @keyframes rotateSlice {
-            to {
-                transform: rotate(calc(360deg * var(--percentage) / 100)) translateY(-50%) rotate(0deg) translateY(50%);
-            }
-        }
-
-        .pie-legend {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .legend-text {
-            color: #7f8c8d;
-        }
-
-        /* 告警列表样式 */
-        .alarm-list {
-            margin: 20px 0;
-        }
-
-        .alarm-items {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .alarm-item {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s ease;
-        }
-
-        .alarm-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .alarm-info {
-            flex: 1;
-        }
-
-        .alarm-type {
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 5px;
-        }
-
-        .alarm-vehicle, .alarm-location, .alarm-time {
-            color: #555;
-            font-size: 14px;
-            margin: 3px 0;
-        }
-
-        .alarm-status {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        /* 规划监管样式 */
-        .planning-info {
-            display: flex;
-            gap: 30px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .planning-column {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .route-list, .area-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .route-item, .area-item {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .route-item:hover, .area-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .route-name, .area-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .route-area, .route-length, .route-vehicles, .route-status,
-        .area-responsibility, .area-vehicles, .area-time {
-            color: #555;
-            font-size: 14px;
-            margin: 3px 0;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .module-nav {
-                flex-direction: column;
-            }
-
-            .module-tabs {
-                flex-direction: column;
-                align-items: flex-start;
-                border-bottom: none;
-                padding-bottom: 0;
-            }
-
-            .tab-btn {
-                display: block;
-                width: 100%;
-                text-align: left;
-                margin-bottom: 5px;
-            }
-
-            .content-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .content-actions {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .action-btn {
-                width: 100%;
-            }
-
-            .search-input {
-                width: 100%;
-            }
-
-            .stats-grid {
+        @media (max-width: 1024px) {
+            .main-content {
                 grid-template-columns: 1fr;
-            }
-
-            .shift-details {
-                grid-template-columns: 1fr;
-            }
-
-            .bar-chart {
-                flex-wrap: wrap;
-                height: auto;
-                min-height: 300px;
-            }
-
-            .chart-item {
-                flex: 0 0 30%;
-                margin-bottom: 20px;
-            }
-
-            .pie-chart-container {
-                flex-direction: column;
-            }
-
-            .pie-legend {
-                margin-top: 30px;
-                width: 100%;
             }
         }
 
         @media (max-width: 480px) {
-            .chart-item {
-                flex: 0 0 45%;
+            .map-controls {
+                flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -1234,41 +409,28 @@
                 <div class="metric-icon">🗑️</div>
                 <div class="metric-value" style="color: #27ae60;">77,234</div>
                 <div class="metric-label">垃圾桶总数</div>
-                <div class="metric-trend trend-up">
-                    <span>↑</span>
-                    <span>123</span>
-                </div>
+                <div class="metric-trend trend-up"><span>↑</span><span>123</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">🚛</div>
                 <div class="metric-value" style="color: #3498db;">1,234</div>
                 <div class="metric-label">环卫车辆数</div>
-                <div class="metric-trend trend-up">
-                    <span>↑</span>
-                    <span>5</span>
-                </div>
+                <div class="metric-trend trend-up"><span>↑</span><span>5</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">⚠️</div>
                 <div class="metric-value" style="color: #f39c12;">3,456</div>
                 <div class="metric-label">满溢垃圾桶</div>
-                <div class="metric-trend trend-down">
-                    <span>↓</span>
-                    <span>12</span>
-                </div>
+                <div class="metric-trend trend-down"><span>↓</span><span>12</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">📊</div>
                 <div class="metric-value" style="color: #9b59b6;">92%</div>
                 <div class="metric-label">清运完成率</div>
-                <div class="metric-trend trend-up">
-                    <span>↑</span>
-                    <span>3.5%</span>
-                </div>
+                <div class="metric-trend trend-up"><span>↑</span><span>3.5%</span></div>
             </div>
         </div>
 
-        <!-- 模块导航 -->
         <div class="module-nav">
             <button class="module-btn active" data-module="online-supervision">👁️‍🗨️ 在线监管</button>
             <button class="module-btn" data-module="application-maintenance">🔧 应用维护</button>
@@ -1279,7 +441,6 @@
             <button class="module-btn" data-module="trajectory-supervision">🗺️ 轨迹监管</button>
         </div>
 
-        <!-- 在线监管模块 -->
         <div id="online-supervision-module" class="module-content active">
             <div class="module-tabs">
                 <button class="tab-btn active" data-tab="vehicles">🚛 车辆监管</button>
@@ -1288,8 +449,7 @@
                 <button class="tab-btn" data-tab="incineration-plants">🏭 焚烧厂监管</button>
                 <button class="tab-btn" data-tab="kitchen-waste">🍽️ 餐厨企业</button>
             </div>
-            
-            <!-- 统计概览 -->
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon">🚛</div>
@@ -1318,7 +478,6 @@
                 </div>
             </div>
 
-            <!-- 车辆监管 -->
             <div id="vehicles-tab" class="tab-content active">
                 <div class="content-header">
                     <h3>🚛 车辆监管</h3>
@@ -1326,9 +485,6 @@
                         <input type="text" placeholder="搜索车辆编号..." class="search-input">
                         <button class="action-btn">搜索</button>
                     </div>
-                </div>
-                <div class="map-section">
-                    <div id="vehicle-map" class="map-container"></div>
                 </div>
                 <div class="data-table-container">
                     <table class="data-table">
@@ -1347,228 +503,31 @@
                                 <td>粤A-12345</td>
                                 <td>环卫清运车</td>
                                 <td>天河区天河路</td>
-                                <td><span class="status status-working">作业中</span></td>
+                                <td><span class="status-working">作业中</span></td>
                                 <td>4h 30m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td>
                             </tr>
                             <tr>
                                 <td>粤A-67890</td>
                                 <td>道路清扫车</td>
                                 <td>越秀区北京路</td>
-                                <td><span class="status status-working">作业中</span></td>
+                                <td><span class="status-working">作业中</span></td>
                                 <td>3h 15m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td>
                             </tr>
                             <tr>
                                 <td>粤A-24680</td>
                                 <td>高压清洗车</td>
                                 <td>海珠区江南大道</td>
-                                <td><span class="status status-working">作业中</span></td>
+                                <td><span class="status-working">作业中</span></td>
                                 <td>5h 20m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-13579</td>
-                                <td>洒水车</td>
-                                <td>荔湾区上下九路</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>2h 45m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-97531</td>
-                                <td>餐厨清运车</td>
-                                <td>白云区广园路</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-86420</td>
-                                <td>垃圾转运车</td>
-                                <td>黄埔区科学城大道</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-36925</td>
-                                <td>吸粪车</td>
-                                <td>番禺区大学城</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>1h 30m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-14725</td>
-                                <td>扫路车</td>
-                                <td>花都区新华街道</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-95135</td>
-                                <td>垃圾压缩车</td>
-                                <td>增城区新塘镇</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>3h 45m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-75395</td>
-                                <td>雾炮车</td>
-                                <td>从化区街口街道</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-65432</td>
-                                <td>自卸车</td>
-                                <td>南沙区黄阁镇</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>2h 15m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-25845</td>
-                                <td>侧装压缩车</td>
-                                <td>天河区珠江新城</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-36987</td>
-                                <td>护栏清洗车</td>
-                                <td>越秀区解放路</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>2h 30m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-45678</td>
-                                <td>扫雪车</td>
-                                <td>白云区白云大道</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-56789</td>
-                                <td>落叶清扫车</td>
-                                <td>海珠区滨江路</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>1h 45m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-67891</td>
-                                <td>粪便清运车</td>
-                                <td>天河区五山路</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>3h 20m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-78912</td>
-                                <td>多功能抑尘车</td>
-                                <td>黄埔区开发大道</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-89123</td>
-                                <td>路面养护车</td>
-                                <td>番禺区市桥街道</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-91234</td>
-                                <td>垃圾收集车</td>
-                                <td>花都区秀全街道</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>4h 10m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-12346</td>
-                                <td>高压冲洗车</td>
-                                <td>增城区荔城街道</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>3h 50m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 垃圾桶监管 -->
             <div id="garbage-bins-tab" class="tab-content">
                 <div class="content-header">
                     <h3>🗑️ 垃圾桶监管</h3>
@@ -1576,9 +535,6 @@
                         <input type="text" placeholder="搜索位置..." class="search-input">
                         <button class="action-btn">搜索</button>
                     </div>
-                </div>
-                <div class="map-section">
-                    <div id="garbage-map" class="map-container"></div>
                 </div>
                 <div class="garbage-status">
                     <h3>垃圾桶状态</h3>
@@ -1598,22 +554,6 @@
                         </div>
                         <div class="garbage-time">2026-01-15 16:15:45</div>
                     </div>
-                    <div class="garbage-item alert">
-                        <div class="garbage-location">海珠区江南大道广百新一城</div>
-                        <div class="garbage-fill">填充度：92%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-red" style="width: 92%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 16:10:20</div>
-                    </div>
-                    <div class="garbage-item warning">
-                        <div class="garbage-location">荔湾区上下九路公交站</div>
-                        <div class="garbage-fill">填充度：88%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-yellow" style="width: 88%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 16:05:15</div>
-                    </div>
                     <div class="garbage-item">
                         <div class="garbage-location">白云区白云山公园</div>
                         <div class="garbage-fill">填充度：45%</div>
@@ -1622,108 +562,12 @@
                         </div>
                         <div class="garbage-time">2026-01-15 16:00:00</div>
                     </div>
-                    <div class="garbage-item">
-                        <div class="garbage-location">黄埔区中山大学附属医院</div>
-                        <div class="garbage-fill">填充度：60%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-green" style="width: 60%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:55:30</div>
-                    </div>
-                    <div class="garbage-item warning">
-                        <div class="garbage-location">番禺区大学城华南理工大学</div>
-                        <div class="garbage-fill">填充度：82%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-yellow" style="width: 82%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:50:15</div>
-                    </div>
-                    <div class="garbage-item alert">
-                        <div class="garbage-location">花都区秀全小学</div>
-                        <div class="garbage-fill">填充度：98%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-red" style="width: 98%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:45:00</div>
-                    </div>
-                    <div class="garbage-item">
-                        <div class="garbage-location">增城区新塘广场</div>
-                        <div class="garbage-fill">填充度：55%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-green" style="width: 55%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:40:30</div>
-                    </div>
-                    <div class="garbage-item warning">
-                        <div class="garbage-location">从化区第三中学</div>
-                        <div class="garbage-fill">填充度：87%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-yellow" style="width: 87%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:35:15</div>
-                    </div>
-                    <div class="garbage-item">
-                        <div class="garbage-location">南沙区黄阁镇政府</div>
-                        <div class="garbage-fill">填充度：48%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-green" style="width: 48%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:30:00</div>
-                    </div>
-                    <div class="garbage-item alert">
-                        <div class="garbage-location">天河区珠江新城地铁站</div>
-                        <div class="garbage-fill">填充度：91%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-red" style="width: 91%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:25:30</div>
-                    </div>
-                    <div class="garbage-item">
-                        <div class="garbage-location">越秀区广州塔景区</div>
-                        <div class="garbage-fill">填充度：65%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-green" style="width: 65%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:20:15</div>
-                    </div>
-                    <div class="garbage-item alert">
-                        <div class="garbage-location">海珠区广州大剧院</div>
-                        <div class="garbage-fill">填充度：96%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-red" style="width: 96%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:15:00</div>
-                    </div>
-                    <div class="garbage-item warning">
-                        <div class="garbage-location">天河区天河公园</div>
-                        <div class="garbage-fill">填充度：83%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-yellow" style="width: 83%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:10:30</div>
-                    </div>
-                    <div class="garbage-item">
-                        <div class="garbage-location">白云区白云万达广场</div>
-                        <div class="garbage-fill">填充度：52%</div>
-                        <div class="fill-bar">
-                            <div class="fill-progress fill-green" style="width: 52%"></div>
-                        </div>
-                        <div class="garbage-time">2026-01-15 15:05:15</div>
-                    </div>
                 </div>
             </div>
 
-            <!-- 环卫船监管 -->
             <div id="sanitation-ships-tab" class="tab-content">
                 <div class="content-header">
                     <h3>⛴️ 环卫船监管</h3>
-                    <div class="content-actions">
-                        <input type="text" placeholder="搜索船只编号..." class="search-input">
-                        <button class="action-btn">搜索</button>
-                    </div>
-                </div>
-                <div class="map-section">
-                    <div id="ship-map" class="map-container"></div>
                 </div>
                 <div class="data-table-container">
                     <table class="data-table">
@@ -1731,370 +575,86 @@
                             <tr>
                                 <th>船只编号</th>
                                 <th>船只类型</th>
-                                <th>当前水域</th>
+                                <th>当前位置</th>
                                 <th>状态</th>
-                                <th>作业时间</th>
-                                <th>处理量</th>
-                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>粤环卫船001</td>
-                                <td>垃圾打捞船</td>
-                                <td>珠江广州大桥水域</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>4h 20m</td>
-                                <td>12.5吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
+                                <td>船-001</td>
+                                <td>打捞船</td>
+                                <td>珠江河段</td>
+                                <td><span class="status-working">作业中</span></td>
                             </tr>
                             <tr>
-                                <td>粤环卫船002</td>
-                                <td>油污清理船</td>
-                                <td>珠江琶洲水域</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>3h 45m</td>
-                                <td>8.2吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤环卫船003</td>
-                                <td>水面保洁船</td>
-                                <td>珠江天字码头水域</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>5h 10m</td>
-                                <td>15.8吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤环卫船004</td>
-                                <td>垃圾转运船</td>
-                                <td>珠江猎德大桥水域</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>0.0吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤环卫船005</td>
-                                <td>水上吸污船</td>
-                                <td>珠江白鹅潭水域</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>2h 30m</td>
-                                <td>6.7吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤环卫船006</td>
-                                <td>水面保洁船</td>
-                                <td>珠江大学城水域</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>0h 0m</td>
-                                <td>0.0吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤环卫船007</td>
-                                <td>垃圾打捞船</td>
-                                <td>珠江黄埔港水域</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>4h 50m</td>
-                                <td>14.2吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤环卫船008</td>
-                                <td>油污清理船</td>
-                                <td>珠江南沙港区水域</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0h 0m</td>
-                                <td>0.0吨</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
+                                <td>船-002</td>
+                                <td>保洁船</td>
+                                <td>XX河</td>
+                                <td><span class="status-idle">待命</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 焚烧厂监管 -->
             <div id="incineration-plants-tab" class="tab-content">
                 <div class="content-header">
                     <h3>🏭 焚烧厂监管</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增焚烧厂</button>
-                    </div>
                 </div>
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>焚烧厂名称</th>
-                                <th>地址</th>
-                                <th>处理能力</th>
-                                <th>今日处理量</th>
-                                <th>本月累计</th>
+                                <th>位置</th>
+                                <th>日处理量</th>
                                 <th>状态</th>
-                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>天河区垃圾焚烧厂</td>
-                                <td>天河区大观路</td>
-                                <td>1000吨/日</td>
-                                <td>850吨</td>
-                                <td>25,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
+                                <td>XX焚烧厂</td>
+                                <td>XX区</td>
+                                <td>500吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
                             </tr>
                             <tr>
-                                <td>越秀区垃圾焚烧厂</td>
-                                <td>越秀区广园西路</td>
-                                <td>800吨/日</td>
-                                <td>720吨</td>
-                                <td>21,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>海珠区垃圾焚烧厂</td>
-                                <td>海珠区新滘东路</td>
-                                <td>1200吨/日</td>
-                                <td>1080吨</td>
-                                <td>30,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>荔湾区垃圾焚烧厂</td>
-                                <td>荔湾区芳村大道</td>
-                                <td>600吨/日</td>
-                                <td>540吨</td>
-                                <td>15,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>白云区垃圾焚烧厂</td>
-                                <td>白云区江高镇</td>
-                                <td>1500吨/日</td>
-                                <td>1350吨</td>
-                                <td>40,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>黄埔区垃圾焚烧厂</td>
-                                <td>黄埔区永和大道</td>
-                                <td>900吨/日</td>
-                                <td>810吨</td>
-                                <td>24,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>番禺区垃圾焚烧厂</td>
-                                <td>番禺区石楼镇</td>
-                                <td>1100吨/日</td>
-                                <td>990吨</td>
-                                <td>28,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>花都区垃圾焚烧厂</td>
-                                <td>花都区炭步镇</td>
-                                <td>700吨/日</td>
-                                <td>630吨</td>
-                                <td>18,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>南沙区垃圾焚烧厂</td>
-                                <td>南沙区黄阁镇</td>
-                                <td>950吨/日</td>
-                                <td>870吨</td>
-                                <td>26,000吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>从化区垃圾焚烧厂</td>
-                                <td>从化区太平镇</td>
-                                <td>650吨/日</td>
-                                <td>590吨</td>
-                                <td>17,500吨</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td><button class="btn-sm">详情</button></td>
+                                <td>YY焚烧厂</td>
+                                <td>YY区</td>
+                                <td>600吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 餐厨企业 -->
             <div id="kitchen-waste-tab" class="tab-content">
                 <div class="content-header">
-                    <h3>🍽️ 餐厨企业监管</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增企业</button>
-                    </div>
+                    <h3>🍽️ 餐厨企业</h3>
                 </div>
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>企业名称</th>
-                                <th>地址</th>
-                                <th>负责人</th>
-                                <th>联系电话</th>
+                                <th>位置</th>
                                 <th>日处理量</th>
-                                <th>资质等级</th>
-                                <th>操作</th>
+                                <th>状态</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>天河餐饮集团</td>
-                                <td>天河区天河路385号</td>
-                                <td>张三</td>
-                                <td>13800138000</td>
-                                <td>5吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
+                                <td>XX餐厨处理厂</td>
+                                <td>XX区</td>
+                                <td>100吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
                             </tr>
                             <tr>
-                                <td>越秀大酒店</td>
-                                <td>越秀区北京路268号</td>
-                                <td>李四</td>
-                                <td>13900139000</td>
-                                <td>12吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>海珠海鲜餐厅</td>
-                                <td>海珠区江南大道123号</td>
-                                <td>王五</td>
-                                <td>13700137000</td>
-                                <td>3吨</td>
-                                <td>B级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>荔湾职工食堂</td>
-                                <td>荔湾区芳村大道88号</td>
-                                <td>赵六</td>
-                                <td>13600136000</td>
-                                <td>8吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>白云美食城</td>
-                                <td>白云区广园路567号</td>
-                                <td>孙七</td>
-                                <td>13500135000</td>
-                                <td>20吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>黄埔区政府食堂</td>
-                                <td>黄埔区开创大道333号</td>
-                                <td>周八</td>
-                                <td>13400134000</td>
-                                <td>6吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>番禺农家乐餐厅</td>
-                                <td>番禺区石楼镇莲花路12号</td>
-                                <td>吴九</td>
-                                <td>13300133000</td>
-                                <td>4吨</td>
-                                <td>B级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>花都国际大酒店</td>
-                                <td>花都区秀全路288号</td>
-                                <td>郑十</td>
-                                <td>13200132000</td>
-                                <td>15吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>增城美食广场</td>
-                                <td>增城区新塘镇港口大道399号</td>
-                                <td>王十一</td>
-                                <td>13100131000</td>
-                                <td>18吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>从化农家菜</td>
-                                <td>从化区街口街河滨路45号</td>
-                                <td>李十二</td>
-                                <td>13000130000</td>
-                                <td>2吨</td>
-                                <td>C级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>南沙海鲜城</td>
-                                <td>南沙区黄阁镇黄阁大道128号</td>
-                                <td>周十三</td>
-                                <td>13600136000</td>
-                                <td>22吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>黄埔工业区食堂</td>
-                                <td>黄埔区科学城科珠路99号</td>
-                                <td>吴十四</td>
-                                <td>13500135000</td>
-                                <td>10吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>广州塔旋转餐厅</td>
-                                <td>海珠区广州塔433米高空</td>
-                                <td>郑十五</td>
-                                <td>13400134000</td>
-                                <td>8吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">详情</button></td>
+                                <td>YY餐厨处理厂</td>
+                                <td>YY区</td>
+                                <td>80吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -2102,2385 +662,308 @@
             </div>
         </div>
 
-        <!-- 应用维护模块 -->
         <div id="application-maintenance-module" class="module-content">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="garbage-bins-maintenance">🗑️ 垃圾桶维护</button>
-                <button class="tab-btn" data-tab="public-toilets">🚻 公厕维护</button>
-                <button class="tab-btn" data-tab="sanitation-vehicles">🚛 环卫车辆</button>
-                <button class="tab-btn" data-tab="patrol-devices">👮 巡更仪</button>
-                <button class="tab-btn" data-tab="kitchen-merchants">🍽️ 餐厨商户</button>
-                <button class="tab-btn" data-tab="warning-parameters">⚠️ 预警参数</button>
+            <div class="content-header">
+                <h3>🔧 应用维护</h3>
             </div>
-
-            <!-- 垃圾桶维护 -->
-            <div id="garbage-bins-maintenance-tab" class="tab-content active">
-                <div class="content-header">
-                    <h3>🗑️ 垃圾桶维护</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增垃圾桶</button>
-                        <button class="action-btn">批量导入</button>
-                    </div>
+            <div class="maintenance-grid">
+                <div class="maintenance-card">
+                    <h4>设备维护</h4>
+                    <p>设备定期维护与保养</p><button class="btn-primary">查看详情</button>
                 </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>垃圾桶编号</th>
-                                <th>位置</th>
-                                <th>类型</th>
-                                <th>状态</th>
-                                <th>安装时间</th>
-                                <th>最后维护</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>GB-001</td>
-                                <td>XX街道XX小区</td>
-                                <td>可回收</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-12-15</td>
-                                <td>2026-01-10</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-002</td>
-                                <td>XX街道XX小区</td>
-                                <td>厨余垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-12-15</td>
-                                <td>2026-01-10</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-003</td>
-                                <td>YY路商业街</td>
-                                <td>其他垃圾</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>2023-11-20</td>
-                                <td>2026-01-05</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-004</td>
-                                <td>ZZ大道购物中心</td>
-                                <td>可回收</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-10-18</td>
-                                <td>2026-01-08</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-005</td>
-                                <td>ZZ大道购物中心</td>
-                                <td>厨余垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-10-18</td>
-                                <td>2026-01-08</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-006</td>
-                                <td>ZZ大道购物中心</td>
-                                <td>其他垃圾</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>2023-10-18</td>
-                                <td>2026-01-01</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-007</td>
-                                <td>AA路公交站</td>
-                                <td>其他垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-12-05</td>
-                                <td>2026-01-12</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-008</td>
-                                <td>BB公园</td>
-                                <td>可回收</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-11-15</td>
-                                <td>2026-01-03</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-009</td>
-                                <td>BB公园</td>
-                                <td>其他垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-11-15</td>
-                                <td>2026-01-03</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-010</td>
-                                <td>CC医院</td>
-                                <td>有害垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-09-20</td>
-                                <td>2026-01-06</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-011</td>
-                                <td>DD中学</td>
-                                <td>可回收垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-12-10</td>
-                                <td>2026-01-14</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-012</td>
-                                <td>DD中学</td>
-                                <td>厨余垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-12-10</td>
-                                <td>2026-01-14</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-013</td>
-                                <td>DD中学</td>
-                                <td>其他垃圾</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>2023-12-10</td>
-                                <td>2026-01-05</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-014</td>
-                                <td>EE地铁站</td>
-                                <td>可回收垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-10-25</td>
-                                <td>2026-01-13</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GB-015</td>
-                                <td>EE地铁站</td>
-                                <td>其他垃圾</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>2023-10-25</td>
-                                <td>2026-01-13</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="maintenance-card">
+                    <h4>系统设置</h4>
+                    <p>系统参数配置管理</p><button class="btn-primary">查看详情</button>
                 </div>
-            </div>
-
-            <!-- 公厕维护 -->
-            <div id="public-toilets-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🚻 公厕维护</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增公厕</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>公厕名称</th>
-                                <th>位置</th>
-                                <th>类型</th>
-                                <th>状态</th>
-                                <th>保洁员</th>
-                                <th>开放时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>XX街道公厕</td>
-                                <td>XX街道XX号</td>
-                                <td>普通公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>李四</td>
-                                <td>06:00-22:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>YY路公厕</td>
-                                <td>YY路YY号</td>
-                                <td>星级公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>王五</td>
-                                <td>05:30-23:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>ZZ公园公厕</td>
-                                <td>ZZ公园北门</td>
-                                <td>生态公厕</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>赵六</td>
-                                <td>06:30-21:00</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>AA商场公厕</td>
-                                <td>AA商场3楼</td>
-                                <td>商场公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>孙七</td>
-                                <td>09:00-22:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>BB医院公厕</td>
-                                <td>BB医院门诊楼</td>
-                                <td>医疗公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>周八</td>
-                                <td>24小时</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>CC地铁公厕</td>
-                                <td>CC地铁站</td>
-                                <td>地铁公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>吴九</td>
-                                <td>06:00-23:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>DD公园公厕</td>
-                                <td>DD公园南门</td>
-                                <td>生态公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>郑十</td>
-                                <td>05:30-22:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>EE公交枢纽公厕</td>
-                                <td>EE公交枢纽</td>
-                                <td>普通公厕</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>王十一</td>
-                                <td>06:00-23:00</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>FF购物广场公厕</td>
-                                <td>FF购物广场B1层</td>
-                                <td>商场公厕</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>李十二</td>
-                                <td>10:00-22:30</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 环卫车辆 -->
-            <div id="sanitation-vehicles-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🚛 环卫车辆</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增车辆</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>车辆编号</th>
-                                <th>车辆类型</th>
-                                <th>品牌</th>
-                                <th>型号</th>
-                                <th>状态</th>
-                                <th>驾驶员</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>粤A-12345</td>
-                                <td>环卫清运车</td>
-                                <td>东风</td>
-                                <td>EQ1110GSZ3G</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>张三</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-67890</td>
-                                <td>道路清扫车</td>
-                                <td>福田</td>
-                                <td>BJ5162TXS-1</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>李四</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-24680</td>
-                                <td>高压清洗车</td>
-                                <td>解放</td>
-                                <td>CA1163P1K2L2E5A80</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>王五</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-13579</td>
-                                <td>洒水车</td>
-                                <td>重汽</td>
-                                <td>ZZ1167N461DF1</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>赵六</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-97531</td>
-                                <td>餐厨清运车</td>
-                                <td>东风</td>
-                                <td>EQ5160TCAC</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>孙七</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-86420</td>
-                                <td>垃圾转运车</td>
-                                <td>福田</td>
-                                <td>BJ5162ZLJ-G1</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>周八</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-36925</td>
-                                <td>吸粪车</td>
-                                <td>东风</td>
-                                <td>EQ1141KJ</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>吴九</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-14725</td>
-                                <td>扫路车</td>
-                                <td>宇通</td>
-                                <td>YTZ5070TSL20D5</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>郑十</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-25836</td>
-                                <td>雾炮车</td>
-                                <td>福田</td>
-                                <td>BJ5162TDY-FB</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>王十一</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-36947</td>
-                                <td>垃圾压缩车</td>
-                                <td>东风</td>
-                                <td>EQ5120ZYS5</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>李十二</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>粤A-47058</td>
-                                <td>多功能抑尘车</td>
-                                <td>重汽</td>
-                                <td>ZZ5257TDYV404GF1</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>周十三</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 巡更仪 -->
-            <div id="patrol-devices-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>👮 巡更仪</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增巡更仪</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>巡更仪编号</th>
-                                <th>使用人员</th>
-                                <th>类型</th>
-                                <th>状态</th>
-                                <th>电量</th>
-                                <th>最后使用时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>PD-001</td>
-                                <td>王五</td>
-                                <td>手持巡更仪</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>85%</td>
-                                <td>2026-01-15 09:30</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-002</td>
-                                <td>赵六</td>
-                                <td>智能巡更棒</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>72%</td>
-                                <td>2026-01-15 08:45</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-003</td>
-                                <td>孙七</td>
-                                <td>手持巡更仪</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>90%</td>
-                                <td>2026-01-15 10:15</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-004</td>
-                                <td>周八</td>
-                                <td>智能巡更棒</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>15%</td>
-                                <td>2026-01-15 07:30</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-005</td>
-                                <td>吴九</td>
-                                <td>手持巡更仪</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>65%</td>
-                                <td>2026-01-15 09:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-006</td>
-                                <td>郑十</td>
-                                <td>智能巡更棒</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>88%</td>
-                                <td>2026-01-15 10:45</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-007</td>
-                                <td>王十一</td>
-                                <td>手持巡更仪</td>
-                                <td><span class="status status-alarm">故障</span></td>
-                                <td>20%</td>
-                                <td>2026-01-15 08:30</td>
-                                <td><button class="btn-sm btn-warning">维修</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-008</td>
-                                <td>李十二</td>
-                                <td>智能巡更棒</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>92%</td>
-                                <td>2026-01-15 11:15</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>PD-009</td>
-                                <td>周十三</td>
-                                <td>手持巡更仪</td>
-                                <td><span class="status status-normal">正常</span></td>
-                                <td>75%</td>
-                                <td>2026-01-15 09:00</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 餐厨商户 -->
-            <div id="kitchen-merchants-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🍽️ 餐厨商户</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增商户</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>商户名称</th>
-                                <th>地址</th>
-                                <th>负责人</th>
-                                <th>联系电话</th>
-                                <th>日处理量</th>
-                                <th>资质等级</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>XX餐厅</td>
-                                <td>XX街道XX号</td>
-                                <td>赵六</td>
-                                <td>13900139000</td>
-                                <td>5吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>YY大酒店</td>
-                                <td>YY路YY号</td>
-                                <td>钱七</td>
-                                <td>13800138000</td>
-                                <td>12吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>ZZ美食城</td>
-                                <td>ZZ区ZZ路</td>
-                                <td>孙八</td>
-                                <td>13700137000</td>
-                                <td>20吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>AA小吃店</td>
-                                <td>AA街道AA号</td>
-                                <td>周九</td>
-                                <td>13600136000</td>
-                                <td>2吨</td>
-                                <td>B级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>BB火锅城</td>
-                                <td>BB路BB号</td>
-                                <td>吴十</td>
-                                <td>13500135000</td>
-                                <td>8吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>CC快餐店</td>
-                                <td>CC区CC路</td>
-                                <td>郑十一</td>
-                                <td>13400134000</td>
-                                <td>4吨</td>
-                                <td>B级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>DD西餐厅</td>
-                                <td>DD街道DD号</td>
-                                <td>王十二</td>
-                                <td>13300133000</td>
-                                <td>6吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>EE火锅城</td>
-                                <td>EE路EE号</td>
-                                <td>周十三</td>
-                                <td>13200132000</td>
-                                <td>15吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>FF快餐连锁</td>
-                                <td>FF区FF路</td>
-                                <td>吴十四</td>
-                                <td>13100131000</td>
-                                <td>8吨</td>
-                                <td>B级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>GG海鲜餐厅</td>
-                                <td>GG街道GG号</td>
-                                <td>郑十五</td>
-                                <td>13000130000</td>
-                                <td>18吨</td>
-                                <td>A级</td>
-                                <td><button class="btn-sm">维护</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 预警参数 -->
-            <div id="warning-parameters-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>⚠️ 预警参数</h3>
-                </div>
-                <div class="parameter-form">
-                    <div class="form-group">
-                        <label>车辆停留报警时间(分钟)</label>
-                        <input type="number" value="30">
-                    </div>
-                    <div class="form-group">
-                        <label>垃圾桶满溢报警阈值(%)</label>
-                        <input type="number" value="85">
-                    </div>
-                    <div class="form-group">
-                        <label>车辆超速报警阈值(km/h)</label>
-                        <input type="number" value="40">
-                    </div>
-                    <div class="form-group">
-                        <label>车辆偏离路线报警距离(米)</label>
-                        <input type="number" value="100">
-                    </div>
-                    <div class="form-group">
-                        <label>设备离线报警时间(分钟)</label>
-                        <input type="number" value="15">
-                    </div>
-                    <div class="form-actions">
-                        <button class="btn-primary">保存设置</button>
-                    </div>
+                <div class="maintenance-card">
+                    <h4>数据维护</h4>
+                    <p>数据备份与恢复</p><button class="btn-primary">查看详情</button>
                 </div>
             </div>
         </div>
 
-        <!-- 统计分析模块 -->
         <div id="statistical-analysis-module" class="module-content">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="incineration-records">🏭 焚烧厂记录</button>
-                <button class="tab-btn" data-tab="garbage-collection">🗑️ 垃圾清运</button>
-                <button class="tab-btn" data-tab="kitchen-collection">🍽️ 餐厨收运</button>
-                <button class="tab-btn" data-tab="kitchen-problems">⚠️ 餐厨问题</button>
-                <button class="tab-btn" data-tab="vehicle-operation">🚛 车辆运行</button>
-                <button class="tab-btn" data-tab="alarm-statistics">📊 报警统计</button>
+            <div class="content-header">
+                <h3>📊 统计分析</h3>
             </div>
-
-            <!-- 焚烧厂记录 -->
-            <div id="incineration-records-tab" class="tab-content active">
-                <div class="content-header">
-                    <h3>🏭 焚烧厂记录</h3>
+            <div class="bar-chart">
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 80%"></div>
+                    <div class="chart-label">周一</div>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">850吨</div>
-                        <div class="stat-label">今日处理量</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">25,000吨</div>
-                        <div class="stat-label">本月处理量</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">96.5%</div>
-                        <div class="stat-label">设备运行率</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">4</div>
-                        <div class="stat-label">在运焚烧厂</div>
-                    </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 85%"></div>
+                    <div class="chart-label">周二</div>
                 </div>
-                <!-- 焚烧厂处理量趋势图 -->
-                <div class="chart-container">
-                    <h4>焚烧厂处理量趋势（近7天）</h4>
-                    <div class="bar-chart">
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 75%;"></div>
-                            <div class="chart-label">10日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 82%;"></div>
-                            <div class="chart-label">11日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 78%;"></div>
-                            <div class="chart-label">12日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 88%;"></div>
-                            <div class="chart-label">13日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 92%;"></div>
-                            <div class="chart-label">14日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 100%;"></div>
-                            <div class="chart-label">15日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 95%;"></div>
-                            <div class="chart-label">16日</div>
-                        </div>
-                    </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 90%"></div>
+                    <div class="chart-label">周三</div>
                 </div>
-            </div>
-
-            <!-- 垃圾清运 -->
-            <div id="garbage-collection-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🗑️ 垃圾清运统计</h3>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 75%"></div>
+                    <div class="chart-label">周四</div>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">456吨</div>
-                        <div class="stat-label">今日清运量</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">12,000吨</div>
-                        <div class="stat-label">本月清运量</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">98.7%</div>
-                        <div class="stat-label">清运完成率</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">125</div>
-                        <div class="stat-label">参与清运车辆</div>
-                    </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 95%"></div>
+                    <div class="chart-label">周五</div>
                 </div>
-                <!-- 垃圾清运类型分布 -->
-                <div class="chart-container">
-                    <h4>垃圾清运类型分布</h4>
-                    <div class="pie-chart-container">
-                        <div class="pie-chart">
-                            <div class="pie-slice" style="--percentage: 60; --color: #27ae60;"></div>
-                            <div class="pie-slice" style="--percentage: 25; --color: #3498db;"></div>
-                            <div class="pie-slice" style="--percentage: 10; --color: #f39c12;"></div>
-                            <div class="pie-slice" style="--percentage: 5; --color: #e74c3c;"></div>
-                        </div>
-                        <div class="pie-legend">
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #27ae60;"></div>
-                                <div class="legend-text">可回收垃圾 60%</div>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #3498db;"></div>
-                                <div class="legend-text">其他垃圾 25%</div>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #f39c12;"></div>
-                                <div class="legend-text">厨余垃圾 10%</div>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #e74c3c;"></div>
-                                <div class="legend-text">有害垃圾 5%</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 60%"></div>
+                    <div class="chart-label">周六</div>
                 </div>
-            </div>
-
-            <!-- 餐厨收运 -->
-            <div id="kitchen-collection-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🍽️ 餐厨收运统计</h3>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">85吨</div>
-                        <div class="stat-label">今日收运量</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">2,200吨</div>
-                        <div class="stat-label">本月收运量</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">78</div>
-                        <div class="stat-label">收运商户数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">20</div>
-                        <div class="stat-label">收运车辆数</div>
-                    </div>
-                </div>
-                <!-- 餐厨收运趋势图 -->
-                <div class="chart-container">
-                    <h4>餐厨收运趋势（近7天）</h4>
-                    <div class="bar-chart">
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 65%;"></div>
-                            <div class="chart-label">10日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 72%;"></div>
-                            <div class="chart-label">11日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 68%;"></div>
-                            <div class="chart-label">12日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 78%;"></div>
-                            <div class="chart-label">13日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 82%;"></div>
-                            <div class="chart-label">14日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 100%;"></div>
-                            <div class="chart-label">15日</div>
-                        </div>
-                        <div class="chart-item">
-                            <div class="chart-bar" style="height: 90%;"></div>
-                            <div class="chart-label">16日</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 餐厨问题 -->
-            <div id="kitchen-problems-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>⚠️ 餐厨问题统计</h3>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">12</div>
-                        <div class="stat-label">今日问题数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">285</div>
-                        <div class="stat-label">本月问题数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">92.5%</div>
-                        <div class="stat-label">问题解决率</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">4</div>
-                        <div class="stat-label">未解决问题</div>
-                    </div>
-                </div>
-                <!-- 餐厨问题类型分布 -->
-                <div class="chart-container">
-                    <h4>餐厨问题类型分布</h4>
-                    <div class="bar-chart horizontal">
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 75%;"></div>
-                            <div class="chart-label horizontal">收集不及时 75%</div>
-                        </div>
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 45%;"></div>
-                            <div class="chart-label horizontal">设备故障 45%</div>
-                        </div>
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 30%;"></div>
-                            <div class="chart-label horizontal">分类错误 30%</div>
-                        </div>
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 20%;"></div>
-                            <div class="chart-label horizontal">台账缺失 20%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 车辆运行 -->
-            <div id="vehicle-operation-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🚛 车辆运行统计</h3>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">145</div>
-                        <div class="stat-label">总车辆数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">120</div>
-                        <div class="stat-label">在线车辆数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">82.8%</div>
-                        <div class="stat-label">车辆在线率</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">25</div>
-                        <div class="stat-label">维护中车辆</div>
-                    </div>
-                </div>
-                <!-- 车辆状态分布 -->
-                <div class="chart-container">
-                    <h4>车辆状态分布</h4>
-                    <div class="pie-chart-container">
-                        <div class="pie-chart">
-                            <div class="pie-slice" style="--percentage: 70; --color: #27ae60;"></div>
-                            <div class="pie-slice" style="--percentage: 20; --color: #3498db;"></div>
-                            <div class="pie-slice" style="--percentage: 10; --color: #f39c12;"></div>
-                        </div>
-                        <div class="pie-legend">
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #27ae60;"></div>
-                                <div class="legend-text">作业中 70%</div>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #3498db;"></div>
-                                <div class="legend-text">待命 20%</div>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #f39c12;"></div>
-                                <div class="legend-text">维护中 10%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 报警统计 -->
-            <div id="alarm-statistics-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>📊 报警统计</h3>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">45</div>
-                        <div class="stat-label">今日报警数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">1,200</div>
-                        <div class="stat-label">本月报警数</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">98.2%</div>
-                        <div class="stat-label">报警处理率</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">2</div>
-                        <div class="stat-label">未处理报警</div>
-                    </div>
-                </div>
-                <!-- 报警类型分布 -->
-                <div class="chart-container">
-                    <h4>报警类型分布</h4>
-                    <div class="bar-chart horizontal">
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 85%;"></div>
-                            <div class="chart-label horizontal">垃圾桶满溢 85%</div>
-                        </div>
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 65%;"></div>
-                            <div class="chart-label horizontal">车辆停留超时 65%</div>
-                        </div>
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 45%;"></div>
-                            <div class="chart-label horizontal">设备故障 45%</div>
-                        </div>
-                        <div class="chart-item horizontal">
-                            <div class="chart-bar horizontal" style="width: 30%;"></div>
-                            <div class="chart-label horizontal">暴露垃圾 30%</div>
-                        </div>
-                    </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 55%"></div>
+                    <div class="chart-label">周日</div>
                 </div>
             </div>
         </div>
 
-        <!-- 排班管理模块 -->
         <div id="scheduling-management-module" class="module-content">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="shifts">⏰ 班次管理</button>
-                <button class="tab-btn" data-tab="scheduling">📅 排班管理</button>
-            </div>
-
-            <!-- 班次管理 -->
-            <div id="shifts-tab" class="tab-content active">
-                <div class="content-header">
-                    <h3>⏰ 班次管理</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增班次</button>
-                    </div>
+            <div class="schedule-calendar">
+                <div class="calendar-header">
+                    <button class="calendar-nav-btn">←</button>
+                    <div class="calendar-title">2026年1月</div>
+                    <button class="calendar-nav-btn">→</button>
                 </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>班次名称</th>
-                                <th>开始时间</th>
-                                <th>结束时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>白班</td>
-                                <td>08:00</td>
-                                <td>18:00</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>夜班</td>
-                                <td>18:00</td>
-                                <td>08:00</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="calendar-weekdays">
+                    <div class="weekday">日</div>
+                    <div class="weekday">一</div>
+                    <div class="weekday">二</div>
+                    <div class="weekday">三</div>
+                    <div class="weekday">四</div>
+                    <div class="weekday">五</div>
+                    <div class="weekday">六</div>
                 </div>
-            </div>
-
-            <!-- 排班管理 -->
-            <div id="scheduling-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>📅 排班管理</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">导出排班</button>
-                        <button class="action-btn">批量排班</button>
+                <div class="calendar-days">
+                    <div class="calendar-day other-month">
+                        <div class="day-number">29</div>
                     </div>
-                </div>
-                <div class="schedule-calendar">
-                    <!-- 日历头部 -->
-                    <div class="calendar-header">
-                        <button class="calendar-nav-btn" id="prev-month">‹ 上一月</button>
-                        <div class="calendar-title" id="current-month">2026年1月</div>
-                        <button class="calendar-nav-btn" id="next-month">下一月 ›</button>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">30</div>
                     </div>
-                    <!-- 日历主体 -->
-                    <div class="calendar-body">
-                        <!-- 星期标题 -->
-                        <div class="calendar-weekdays">
-                            <div class="weekday">日</div>
-                            <div class="weekday">一</div>
-                            <div class="weekday">二</div>
-                            <div class="weekday">三</div>
-                            <div class="weekday">四</div>
-                            <div class="weekday">五</div>
-                            <div class="weekday">六</div>
-                        </div>
-                        <!-- 日期网格 -->
-                        <div class="calendar-days" id="calendar-days">
-                            <!-- 日历内容将通过JavaScript动态生成 -->
-                        </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">31</div>
                     </div>
-                </div>
-                <!-- 排班详情 -->
-                <div class="schedule-details">
-                    <h4>今日排班（2026-01-15）</h4>
-                    <div class="shift-details">
-                        <div class="shift-info">
-                            <h5>白班（08:00-18:00）</h5>
-                            <div class="shift-staff">
-                                <span class="staff-tag">张三</span>
-                                <span class="staff-tag">李四</span>
-                                <span class="staff-tag">王五</span>
-                            </div>
-                        </div>
-                        <div class="shift-info">
-                            <h5>夜班（18:00-08:00）</h5>
-                            <div class="shift-staff">
-                                <span class="staff-tag">赵六</span>
-                                <span class="staff-tag">孙七</span>
-                            </div>
-                        </div>
+                    <div class="calendar-day">
+                        <div class="day-number">1</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">2</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">3</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">5</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">6</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">7</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">8</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">9</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">10</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">11</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">12</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">13</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">14</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">15</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day today">
+                        <div class="day-number">16</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">17</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">19</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">20</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">21</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">22</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">23</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">24</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">25</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">26</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">27</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">28</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">29</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">30</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">31</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">5</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">6</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 作业规划模块 -->
         <div id="operation-planning-module" class="module-content">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="operation-plans">🗺️ 作业规划</button>
-                <button class="tab-btn" data-tab="collection-times">⏰ 收运时间</button>
+            <div class="content-header">
+                <h3>🗺️ 作业规划</h3>
             </div>
-
-            <!-- 作业规划 -->
-            <div id="operation-plans-tab" class="tab-content active">
-                <div class="content-header">
-                    <h3>🗺️ 作业规划</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">新增规划</button>
-                    </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🗺️</div>
+                    <div class="stat-value">56</div>
+                    <div class="stat-label">作业路线</div>
                 </div>
-                <div class="map-section">
-                    <div id="operation-map" class="map-container"></div>
+                <div class="stat-card">
+                    <div class="stat-icon">📍</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">作业区域</div>
                 </div>
-            </div>
-
-            <!-- 收运时间 -->
-            <div id="collection-times-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>⏰ 收运时间管理</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">批量修改</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>区域</th>
-                                <th>首次收运时间</th>
-                                <th>二次收运时间</th>
-                                <th>三次收运时间</th>
-                                <th>负责人</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>XX街道</td>
-                                <td>08:00-10:00</td>
-                                <td>16:00-18:00</td>
-                                <td>20:00-22:00</td>
-                                <td>张三</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>YY路</td>
-                                <td>07:30-09:30</td>
-                                <td>15:30-17:30</td>
-                                <td>19:30-21:30</td>
-                                <td>李四</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>ZZ大道</td>
-                                <td>09:00-11:00</td>
-                                <td>17:00-19:00</td>
-                                <td>-</td>
-                                <td>王五</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>AA街道</td>
-                                <td>08:30-10:30</td>
-                                <td>16:30-18:30</td>
-                                <td>-</td>
-                                <td>赵六</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>BB区</td>
-                                <td>07:00-09:00</td>
-                                <td>15:00-17:00</td>
-                                <td>19:00-21:00</td>
-                                <td>孙七</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>CC路</td>
-                                <td>08:30-10:30</td>
-                                <td>16:30-18:30</td>
-                                <td>-</td>
-                                <td>周八</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>DD区</td>
-                                <td>07:30-09:30</td>
-                                <td>15:30-17:30</td>
-                                <td>20:30-22:30</td>
-                                <td>吴九</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                            <tr>
-                                <td>EE街道</td>
-                                <td>09:00-11:00</td>
-                                <td>17:00-19:00</td>
-                                <td>-</td>
-                                <td>郑十</td>
-                                <td><button class="btn-sm">编辑</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">规划完成率</div>
                 </div>
             </div>
         </div>
 
-        <!-- 报警中心模块 -->
         <div id="alarm-center-module" class="module-content">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="pending-events">⚠️ 待处理事件</button>
-                <button class="tab-btn" data-tab="alarm-records">📋 报警记录</button>
+            <div class="content-header">
+                <h3>⚠️ 报警中心</h3>
             </div>
-
-            <!-- 待处理事件 -->
-            <div id="pending-events-tab" class="tab-content active">
-                <div class="content-header">
-                    <h3>⚠️ 待处理事件</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">批量处理</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>报警类型</th>
-                                <th>发生地点</th>
-                                <th>发生时间</th>
-                                <th>设备</th>
-                                <th>优先级</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>车辆停留超时</td>
-                                <td>XX街道</td>
-                                <td>2026-01-15 16:30</td>
-                                <td>粤A-12345</td>
-                                <td><span class="status status-alarm">高</span></td>
-                                <td>
-                                    <button class="btn-sm">自行解决</button>
-                                    <button class="btn-sm">发短信</button>
-                                    <button class="btn-sm">忽略</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>垃圾桶满溢</td>
-                                <td>YY路商业街</td>
-                                <td>2026-01-15 16:45</td>
-                                <td>GB-003</td>
-                                <td><span class="status status-alarm">高</span></td>
-                                <td>
-                                    <button class="btn-sm">自行解决</button>
-                                    <button class="btn-sm">发短信</button>
-                                    <button class="btn-sm">忽略</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>暴露垃圾</td>
-                                <td>ZZ大道</td>
-                                <td>2026-01-15 16:20</td>
-                                <td>-</td>
-                                <td><span class="status status-working">中</span></td>
-                                <td>
-                                    <button class="btn-sm">自行解决</button>
-                                    <button class="btn-sm">发短信</button>
-                                    <button class="btn-sm">忽略</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>车辆离线</td>
-                                <td>AA路</td>
-                                <td>2026-01-15 16:10</td>
-                                <td>粤A-67890</td>
-                                <td><span class="status status-alarm">高</span></td>
-                                <td>
-                                    <button class="btn-sm">自行解决</button>
-                                    <button class="btn-sm">发短信</button>
-                                    <button class="btn-sm">忽略</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>设备故障</td>
-                                <td>BB公园</td>
-                                <td>2026-01-15 16:05</td>
-                                <td>PD-004</td>
-                                <td><span class="status status-working">中</span></td>
-                                <td>
-                                    <button class="btn-sm">自行解决</button>
-                                    <button class="btn-sm">发短信</button>
-                                    <button class="btn-sm">忽略</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>垃圾桶满溢</td>
-                                <td>CC医院</td>
-                                <td>2026-01-15 15:55</td>
-                                <td>GB-010</td>
-                                <td><span class="status status-alarm">高</span></td>
-                                <td>
-                                    <button class="btn-sm">自行解决</button>
-                                    <button class="btn-sm">发短信</button>
-                                    <button class="btn-sm">忽略</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 报警记录 -->
-            <div id="alarm-records-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>📋 报警记录</h3>
-                    <div class="content-actions">
-                        <button class="action-btn">导出记录</button>
-                    </div>
-                </div>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>报警类型</th>
-                                <th>发生地点</th>
-                                <th>发生时间</th>
-                                <th>处理方式</th>
-                                <th>处理结果</th>
-                                <th>处理人</th>
-                                <th>处理时间</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>暴露垃圾</td>
-                                <td>XX街道</td>
-                                <td>2026-01-15 10:30</td>
-                                <td>发短信</td>
-                                <td>已处理</td>
-                                <td>张三</td>
-                                <td>2026-01-15 11:00</td>
-                            </tr>
-                            <tr>
-                                <td>垃圾桶满溢</td>
-                                <td>YY路</td>
-                                <td>2026-01-15 14:30</td>
-                                <td>自行解决</td>
-                                <td>已处理</td>
-                                <td>李四</td>
-                                <td>2026-01-15 15:00</td>
-                            </tr>
-                            <tr>
-                                <td>车辆停留超时</td>
-                                <td>ZZ大道</td>
-                                <td>2026-01-15 09:15</td>
-                                <td>发短信</td>
-                                <td>已处理</td>
-                                <td>王五</td>
-                                <td>2026-01-15 09:45</td>
-                            </tr>
-                            <tr>
-                                <td>设备故障</td>
-                                <td>AA区</td>
-                                <td>2026-01-15 08:45</td>
-                                <td>自行解决</td>
-                                <td>已处理</td>
-                                <td>赵六</td>
-                                <td>2026-01-15 10:30</td>
-                            </tr>
-                            <tr>
-                                <td>垃圾桶满溢</td>
-                                <td>BB街道</td>
-                                <td>2026-01-15 07:30</td>
-                                <td>自行解决</td>
-                                <td>已处理</td>
-                                <td>孙七</td>
-                                <td>2026-01-15 08:15</td>
-                            </tr>
-                            <tr>
-                                <td>车辆离线</td>
-                                <td>CC路</td>
-                                <td>2026-01-14 17:45</td>
-                                <td>发短信</td>
-                                <td>已处理</td>
-                                <td>周八</td>
-                                <td>2026-01-14 18:30</td>
-                            </tr>
-                            <tr>
-                                <td>暴露垃圾</td>
-                                <td>DD区</td>
-                                <td>2026-01-14 16:20</td>
-                                <td>自行解决</td>
-                                <td>已处理</td>
-                                <td>吴九</td>
-                                <td>2026-01-14 17:00</td>
-                            </tr>
-                            <tr>
-                                <td>车辆停留超时</td>
-                                <td>EE路</td>
-                                <td>2026-01-14 15:30</td>
-                                <td>发短信</td>
-                                <td>已处理</td>
-                                <td>郑十</td>
-                                <td>2026-01-14 16:00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>告警类型</th>
+                            <th>发生地点</th>
+                            <th>发生时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>垃圾桶满溢</td>
+                            <td>天河区天河路</td>
+                            <td>2026-01-15 16:20</td>
+                            <td><span class="status-alarm">待处理</span></td>
+                            <td><button class="btn-sm">处理</button></td>
+                        </tr>
+                        <tr>
+                            <td>车辆故障</td>
+                            <td>越秀区北京路</td>
+                            <td>2026-01-15 15:30</td>
+                            <td><span class="status-processing">处理中</span></td>
+                            <td><button class="btn-sm">跟踪</button></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- 轨迹监管模块 -->
         <div id="trajectory-supervision-module" class="module-content">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="vehicle-status">🚛 车辆状态</button>
-                <button class="tab-btn" data-tab="alarm-trajectory">⚠️ 告警轨迹</button>
-                <button class="tab-btn" data-tab="planning-supervision">🗺️ 规划监管</button>
+            <div class="content-header">
+                <h3>🗺️ 轨迹监管</h3>
             </div>
-
-            <!-- 车辆状态 -->
-            <div id="vehicle-status-tab" class="tab-content active">
-                <div class="content-header">
-                    <h3>🚛 车辆状态</h3>
-                    <div class="content-actions">
-                        <input type="text" placeholder="搜索车辆..." class="search-input">
-                        <button class="action-btn">搜索</button>
-                    </div>
-                </div>
-                <div class="map-section">
-                    <div id="track-vehicle-map" class="map-container"></div>
-                </div>
-                <div class="status-stats">
-                    <div class="stat-card">
-                        <div class="stat-value">120</div>
-                        <div class="stat-label">在线车辆</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">25</div>
-                        <div class="stat-label">离线车辆</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">15</div>
-                        <div class="stat-label">告警车辆</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">105</div>
-                        <div class="stat-label">正常运行</div>
-                    </div>
-                </div>
-                <div class="table-section">
-                    <h3>车辆列表</h3>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>车牌号码</th>
-                                <th>车辆类型</th>
-                                <th>当前位置</th>
-                                <th>运行状态</th>
-                                <th>速度</th>
-                                <th>作业时长</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>粤A-12345</td>
-                                <td>垃圾收集车</td>
-                                <td>天河区天河路</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>25 km/h</td>
-                                <td>2h 30m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-23456</td>
-                                <td>路面清扫车</td>
-                                <td>越秀区北京路</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>15 km/h</td>
-                                <td>3h 15m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-34567</td>
-                                <td>高压冲洗车</td>
-                                <td>海珠区江南大道</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>20 km/h</td>
-                                <td>1h 45m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-45678</td>
-                                <td>落叶清扫车</td>
-                                <td>荔湾区上下九路</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0 km/h</td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-56789</td>
-                                <td>粪便清运车</td>
-                                <td>白云区白云大道</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>30 km/h</td>
-                                <td>4h 10m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-67890</td>
-                                <td>多功能抑尘车</td>
-                                <td>黄埔区开发大道</td>
-                                <td><span class="status status-maintenance">维护中</span></td>
-                                <td>0 km/h</td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-78901</td>
-                                <td>垃圾收集车</td>
-                                <td>番禺区市桥街道</td>
-                                <td><span class="status status-working">作业中</span></td>
-                                <td>22 km/h</td>
-                                <td>3h 45m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>粤A-89012</td>
-                                <td>路面清扫车</td>
-                                <td>花都区秀全街道</td>
-                                <td><span class="status status-idle">待命</span></td>
-                                <td>0 km/h</td>
-                                <td>0h 0m</td>
-                                <td>
-                                    <button class="btn-sm">详情</button>
-                                    <button class="btn-sm">轨迹</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 告警轨迹 -->
-            <div id="alarm-trajectory-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>⚠️ 告警轨迹</h3>
-                    <div class="content-actions">
-                        <select class="filter-select">
-                            <option value="all">全部告警</option>
-                            <option value="overloading">超载告警</option>
-                            <option value="speeding">超速告警</option>
-                            <option value="off-route">偏离路线</option>
-                            <option value="idle">长时间怠速</option>
-                        </select>
-                        <select class="filter-select">
-                            <option value="all">全部时间</option>
-                            <option value="today">今天</option>
-                            <option value="yesterday">昨天</option>
-                            <option value="week">本周</option>
-                            <option value="month">本月</option>
-                        </select>
-                        <button class="action-btn">筛选</button>
-                    </div>
-                </div>
-                <div class="map-section">
-                    <div id="alarm-track-map" class="map-container"></div>
-                </div>
-                <div class="alarm-list">
-                    <h3>告警记录</h3>
-                    <div class="alarm-items">
-                        <div class="alarm-item">
-                            <div class="alarm-info">
-                                <div class="alarm-type">⚠️ 超载告警</div>
-                                <div class="alarm-vehicle">粤A-12345 - 垃圾收集车</div>
-                                <div class="alarm-location">天河区天河路天河城附近</div>
-                                <div class="alarm-time">2026-01-15 14:30:25</div>
-                            </div>
-                            <div class="alarm-status status-warning">未处理</div>
-                        </div>
-                        <div class="alarm-item">
-                            <div class="alarm-info">
-                                <div class="alarm-type">⚠️ 超速告警</div>
-                                <div class="alarm-vehicle">粤A-56789 - 粪便清运车</div>
-                                <div class="alarm-location">白云区白云大道</div>
-                                <div class="alarm-time">2026-01-15 14:15:40</div>
-                            </div>
-                            <div class="alarm-status status-danger">紧急</div>
-                        </div>
-                        <div class="alarm-item">
-                            <div class="alarm-info">
-                                <div class="alarm-type">⚠️ 偏离路线</div>
-                                <div class="alarm-vehicle">粤A-34567 - 高压冲洗车</div>
-                                <div class="alarm-location">海珠区滨江路</div>
-                                <div class="alarm-time">2026-01-15 13:50:12</div>
-                            </div>
-                            <div class="alarm-status status-warning">未处理</div>
-                        </div>
-                        <div class="alarm-item">
-                            <div class="alarm-info">
-                                <div class="alarm-type">⚠️ 长时间怠速</div>
-                                <div class="alarm-vehicle">粤A-78901 - 垃圾收集车</div>
-                                <div class="alarm-location">番禺区市桥街道</div>
-                                <div class="alarm-time">2026-01-15 13:25:36</div>
-                            </div>
-                            <div class="alarm-status status-success">已处理</div>
-                        </div>
-                        <div class="alarm-item">
-                            <div class="alarm-info">
-                                <div class="alarm-type">⚠️ 超载告警</div>
-                                <div class="alarm-vehicle">粤A-23456 - 路面清扫车</div>
-                                <div class="alarm-location">越秀区北京路</div>
-                                <div class="alarm-time">2026-01-15 13:00:05</div>
-                            </div>
-                            <div class="alarm-status status-success">已处理</div>
-                        </div>
-                        <div class="alarm-item">
-                            <div class="alarm-info">
-                                <div class="alarm-type">⚠️ 超速告警</div>
-                                <div class="alarm-vehicle">粤A-89012 - 路面清扫车</div>
-                                <div class="alarm-location">花都区秀全街道</div>
-                                <div class="alarm-time">2026-01-15 12:35:28</div>
-                            </div>
-                            <div class="alarm-status status-warning">未处理</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 规划监管 -->
-            <div id="planning-supervision-tab" class="tab-content">
-                <div class="content-header">
-                    <h3>🗺️ 规划路线监管</h3>
-                    <div class="content-actions">
-                        <select class="filter-select">
-                            <option value="all">全部区域</option>
-                            <option value="tianhe">天河区</option>
-                            <option value="yuexiu">越秀区</option>
-                            <option value="haizhu">海珠区</option>
-                            <option value="baiyun">白云区</option>
-                        </select>
-                        <select class="filter-select">
-                            <option value="all">全部路线</option>
-                            <option value="garbage-collection">垃圾收集</option>
-                            <option value="road-cleaning">路面清扫</option>
-                            <option value="high-pressure-washing">高压冲洗</option>
-                        </select>
-                        <button class="action-btn">查看</button>
-                    </div>
-                </div>
-                <div class="map-section">
-                    <div id="planning-map" class="map-container"></div>
-                </div>
-                <div class="planning-info">
-                    <div class="planning-column">
-                        <h3>规划路线</h3>
-                        <div class="route-list">
-                            <div class="route-item">
-                                <div class="route-name">垃圾收集路线A</div>
-                                <div class="route-area">天河区天河路沿线</div>
-                                <div class="route-length">长度：15.2 km</div>
-                                <div class="route-vehicles">分配车辆：3辆</div>
-                                <div class="route-status">状态：<span class="status status-working">执行中</span></div>
-                            </div>
-                            <div class="route-item">
-                                <div class="route-name">路面清扫路线B</div>
-                                <div class="route-area">越秀区北京路步行街</div>
-                                <div class="route-length">长度：8.5 km</div>
-                                <div class="route-vehicles">分配车辆：2辆</div>
-                                <div class="route-status">状态：<span class="status status-working">执行中</span></div>
-                            </div>
-                            <div class="route-item">
-                                <div class="route-name">高压冲洗路线C</div>
-                                <div class="route-area">海珠区江南大道</div>
-                                <div class="route-length">长度：12.3 km</div>
-                                <div class="route-vehicles">分配车辆：2辆</div>
-                                <div class="route-status">状态：<span class="status status-idle">待执行</span></div>
-                            </div>
-                            <div class="route-item">
-                                <div class="route-name">垃圾收集路线D</div>
-                                <div class="route-area">白云区白云大道</div>
-                                <div class="route-length">长度：18.7 km</div>
-                                <div class="route-vehicles">分配车辆：4辆</div>
-                                <div class="route-status">状态：<span class="status status-working">执行中</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="planning-column">
-                        <h3>规划区域</h3>
-                        <div class="area-list">
-                            <div class="area-item">
-                                <div class="area-name">天河区中心区域</div>
-                                <div class="area-responsibility">负责人：张三</div>
-                                <div class="area-vehicles">车辆数：15辆</div>
-                                <div class="area-time">作业时间：06:00-22:00</div>
-                            </div>
-                            <div class="area-item">
-                                <div class="area-name">越秀区老城区</div>
-                                <div class="area-responsibility">负责人：李四</div>
-                                <div class="area-vehicles">车辆数：12辆</div>
-                                <div class="area-time">作业时间：05:30-21:30</div>
-                            </div>
-                            <div class="area-item">
-                                <div class="area-name">海珠区滨江区域</div>
-                                <div class="area-responsibility">负责人：王五</div>
-                                <div class="area-vehicles">车辆数：10辆</div>
-                                <div class="area-time">作业时间：06:00-22:00</div>
-                            </div>
-                            <div class="area-item">
-                                <div class="area-name">白云区北部区域</div>
-                                <div class="area-responsibility">负责人：赵六</div>
-                                <div class="area-vehicles">车辆数：8辆</div>
-                                <div class="area-time">作业时间：06:30-21:00</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="map-section">
+                <div class="map-container">🚛 车辆轨迹地图</div>
+                <div class="map-controls">
+                    <button class="map-btn active">全部车辆</button>
+                    <button class="map-btn">作业车辆</button>
+                    <button class="map-btn">待命车辆</button>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p>&copy; 2026 智慧环卫管理系统. 实时数据更新中... <span id="current-time"></span></p>
+            <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
         </footer>
     </div>
 
-    <script>
-        // 页面加载动画
-        window.addEventListener('load', function() {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 0.5s ease';
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
-        });
-
-        // 地图控制按钮切换
-        const mapBtns = document.querySelectorAll('.map-btn');
-        mapBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                mapBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                // 这里可以添加地图图层切换逻辑
-                console.log('切换到：', this.textContent);
-            });
-        });
-
-        // 垃圾桶点击事件
-        const garbageItems = document.querySelectorAll('.garbage-item');
-        garbageItems.forEach(item => {
-            item.addEventListener('click', function() {
-                this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 150);
-                // 这里可以添加垃圾桶详情逻辑
-                const location = this.querySelector('.garbage-location').textContent;
-                console.log('查看垃圾桶：', location);
-            });
-        });
-
-        // 车辆点击事件
-        const vehicleItems = document.querySelectorAll('.vehicle-item');
-        vehicleItems.forEach(item => {
-            item.addEventListener('click', function() {
-                this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 150);
-                // 这里可以添加车辆详情逻辑
-                const number = this.querySelector('.vehicle-number').textContent;
-                console.log('查看车辆：', number);
-            });
-        });
-
-        // 数字动画效果
-        function animateNumbers() {
-            const metricValues = document.querySelectorAll('.metric-value, .stat-value');
-            metricValues.forEach(value => {
-                const text = value.textContent;
-                if (text.includes('%')) {
-                    const target = parseFloat(text);
-                    let current = 0;
-                    const increment = target / 50;
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            value.textContent = target + '%';
-                            clearInterval(timer);
-                        } else {
-                            value.textContent = Math.floor(current) + '%';
-                        }
-                    }, 30);
-                } else if (text.includes('m')) {
-                    const target = parseInt(text);
-                    let current = 0;
-                    const increment = target / 50;
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            value.textContent = target + 'm';
-                            clearInterval(timer);
-                        } else {
-                            value.textContent = Math.floor(current) + 'm';
-                        }
-                    }, 30);
-                } else if (text.includes(',')) {
-                    const target = parseInt(text.replace(',', ''));
-                    let current = 0;
-                    const increment = target / 50;
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            value.textContent = target.toLocaleString();
-                            clearInterval(timer);
-                        } else {
-                            value.textContent = Math.floor(current).toLocaleString();
-                        }
-                    }, 30);
-                } else {
-                    const target = parseInt(text);
-                    let current = 0;
-                    const increment = target / 50;
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            value.textContent = target;
-                            clearInterval(timer);
-                        } else {
-                            value.textContent = Math.floor(current);
-                        }
-                    }, 30);
-                }
-            });
-        }
-
-        // 页面加载完成后执行数字动画
-        setTimeout(animateNumbers, 500);
-
-        // 实时更新时间
-        function updateTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleString('zh-CN');
-            document.getElementById('current-time').textContent = timeStr;
-        }
-
-        setInterval(updateTime, 1000);
-        updateTime();
-
-        // 排班日历功能
-        let currentDate = new Date();
-
-        // 生成日历
-        function generateCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            
-            // 更新月份标题
-            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
-            document.getElementById('current-month').textContent = `${year}年${monthNames[month]}`;
-            
-            const calendarDays = document.getElementById('calendar-days');
-            calendarDays.innerHTML = '';
-            
-            // 获取当月第一天和最后一天
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            
-            // 获取当月第一天是星期几
-            const startDay = firstDay.getDay();
-            
-            // 生成前一个月的日期
-            const prevMonthDays = new Date(year, month, 0).getDate();
-            for (let i = startDay - 1; i >= 0; i--) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day other-month';
-                day.innerHTML = `<div class="day-number">${prevMonthDays - i}</div>`;
-                calendarDays.appendChild(day);
-            }
-            
-            // 生成当月的日期
-            for (let i = 1; i <= lastDay.getDate(); i++) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day';
-                
-                // 判断是否是今天
-                const today = new Date();
-                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                    day.classList.add('today');
-                }
-                
-                // 判断是否有排班
-                const hasShift = Math.random() > 0.3; // 70%的概率有排班
-                if (hasShift) {
-                    day.classList.add('has-shift');
-                    const shiftType = Math.random() > 0.5 ? 'morning' : 'afternoon';
-                    const shiftText = shiftType === 'morning' ? '白班' : '夜班';
-                    day.innerHTML = `<div class="day-number">${i}</div><div class="shift-marker ${shiftType}">${shiftText}</div>`;
-                } else {
-                    day.innerHTML = `<div class="day-number">${i}</div>`;
-                }
-                
-                calendarDays.appendChild(day);
-            }
-            
-            // 生成下个月的日期
-            const totalDays = startDay + lastDay.getDate();
-            const nextMonthDays = 42 - totalDays; // 6行7列 = 42个格子
-            for (let i = 1; i <= nextMonthDays; i++) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day other-month';
-                day.innerHTML = `<div class="day-number">${i}</div>`;
-                calendarDays.appendChild(day);
-            }
-        }
-        
-        // 月份切换
-        document.getElementById('prev-month').addEventListener('click', function() {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            generateCalendar();
-        });
-        
-        document.getElementById('next-month').addEventListener('click', function() {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            generateCalendar();
-        });
-        
-        // 地图初始化函数
-        function initMap(mapId, centerLng, centerLat, zoom = 12) {
-            // 检查BMap对象是否存在
-            if (typeof BMap === 'undefined') {
-                return null;
-            }
-            
-            try {
-                // 创建地图实例
-                const map = new BMap.Map(mapId);
-                // 创建点坐标
-                const point = new BMap.Point(centerLng, centerLat);
-                // 初始化地图，设置中心点坐标和地图级别
-                map.centerAndZoom(point, zoom);
-                // 添加地图控件
-                map.addControl(new BMap.NavigationControl());
-                map.addControl(new BMap.ScaleControl());
-                map.addControl(new BMap.OverviewMapControl());
-                map.addControl(new BMap.MapTypeControl());
-                // 启用滚轮缩放
-                map.enableScrollWheelZoom(true);
-                
-                return map;
-            } catch (error) {
-                console.error('地图初始化失败:', error);
-                return null;
-            }
-        }
-
-        // 添加车辆标记
-        function addVehicleMarker(map, lng, lat, vehicleNo, vehicleType, status) {
-            // 检查BMap对象是否存在
-            if (typeof BMap === 'undefined' || !map) {
-                return null;
-            }
-            
-            try {
-                const point = new BMap.Point(lng, lat);
-                
-                // 根据车辆状态选择图标
-                let iconUrl;
-                let color;
-                
-                if (status === '作业中') {
-                    color = '#27ae60';
-                } else if (status === '待命') {
-                    color = '#3498db';
-                } else if (status === '维护中') {
-                    color = '#f39c12';
-                } else {
-                    color = '#95a5a6';
-                }
-                
-                // 创建自定义图标
-                const icon = new BMap.Icon('https://api.map.baidu.com/img/markers.png', new BMap.Size(23, 25), {
-                    offset: new BMap.Size(10, 25), // 设置图片偏移
-                    imageOffset: new BMap.Size(0, 0 - (status === '作业中' ? 0 : status === '待命' ? 25 : status === '维护中' ? 50 : 75)) // 设置图片偏移
-                });
-                
-                // 创建标记
-                const marker = new BMap.Marker(point, {icon: icon});
-                
-                // 添加信息窗口
-                const infoWindow = new BMap.InfoWindow(`
-                    <div class="map-info-window">
-                        <h4>${vehicleNo}</h4>
-                        <p>类型：${vehicleType}</p>
-                        <p>状态：<span class="status status-${status === '作业中' ? 'working' : status === '待命' ? 'idle' : 'maintenance'}">${status}</span></p>
-                    </div>
-                `);
-                
-                marker.addEventListener('click', function() {
-                    map.openInfoWindow(infoWindow, point);
-                });
-                
-                // 添加标记到地图
-                map.addOverlay(marker);
-                
-                return marker;
-            } catch (error) {
-                console.error('添加车辆标记失败:', error);
-                return null;
-            }
-        }
-
-        // 初始化车辆监管地图
-        function initVehicleMap() {
-            if (typeof BMap === 'undefined') return;
-            
-            const map = initMap('vehicle-map', 113.264385, 23.12911);
-            
-            // 添加车辆标记
-            addVehicleMarker(map, 113.264385, 23.12911, '粤A-12345', '环卫清运车', '作业中');
-            addVehicleMarker(map, 113.254385, 23.13911, '粤A-67890', '道路清扫车', '作业中');
-            addVehicleMarker(map, 113.274385, 23.11911, '粤A-24680', '高压清洗车', '作业中');
-            addVehicleMarker(map, 113.244385, 23.14911, '粤A-13579', '洒水车', '作业中');
-            addVehicleMarker(map, 113.284385, 23.15911, '粤A-97531', '餐厨清运车', '待命');
-            addVehicleMarker(map, 113.234385, 23.10911, '粤A-86420', '垃圾转运车', '维护中');
-            addVehicleMarker(map, 113.294385, 23.16911, '粤A-36925', '吸粪车', '作业中');
-            addVehicleMarker(map, 113.224385, 23.17911, '粤A-14725', '扫路车', '待命');
-            addVehicleMarker(map, 113.304385, 23.18911, '粤A-95135', '垃圾压缩车', '作业中');
-            addVehicleMarker(map, 113.214385, 23.19911, '粤A-75395', '雾炮车', '维护中');
-            addVehicleMarker(map, 113.314385, 23.20911, '粤A-65432', '自卸车', '作业中');
-            addVehicleMarker(map, 113.204385, 23.21911, '粤A-25845', '侧装压缩车', '待命');
-            addVehicleMarker(map, 113.324385, 23.22911, '粤A-36987', '护栏清洗车', '作业中');
-            addVehicleMarker(map, 113.194385, 23.23911, '粤A-45678', '扫雪车', '待命');
-            addVehicleMarker(map, 113.334385, 23.24911, '粤A-56789', '落叶清扫车', '作业中');
-            addVehicleMarker(map, 113.184385, 23.25911, '粤A-67891', '粪便清运车', '作业中');
-            addVehicleMarker(map, 113.344385, 23.26911, '粤A-78912', '多功能抑尘车', '维护中');
-            addVehicleMarker(map, 113.174385, 23.27911, '粤A-89123', '路面养护车', '待命');
-            addVehicleMarker(map, 113.354385, 23.28911, '粤A-91234', '垃圾收集车', '作业中');
-            addVehicleMarker(map, 113.164385, 23.29911, '粤A-12346', '高压冲洗车', '作业中');
-        }
-
-        // 初始化垃圾桶地图
-        function initGarbageMap() {
-            if (typeof BMap === 'undefined') return;
-            
-            const map = initMap('garbage-map', 113.264385, 23.12911);
-            
-            // 添加垃圾桶标记
-            const garbagePoints = [
-                {lng: 113.264385, lat: 23.12911, location: '天河区天河路天河城', fill: 95},
-                {lng: 113.254385, lat: 23.13911, location: '越秀区北京路步行街', fill: 85},
-                {lng: 113.274385, lat: 23.11911, location: '海珠区江南大道广百新一城', fill: 92},
-                {lng: 113.244385, lat: 23.14911, location: '荔湾区上下九路公交站', fill: 88},
-                {lng: 113.284385, lat: 23.15911, location: '白云区白云山公园', fill: 45},
-                {lng: 113.234385, lat: 23.10911, location: '黄埔区中山大学附属医院', fill: 60},
-                {lng: 113.294385, lat: 23.16911, location: '番禺区大学城华南理工大学', fill: 82},
-                {lng: 113.224385, lat: 23.17911, location: '花都区秀全小学', fill: 98},
-                {lng: 113.304385, lat: 23.18911, location: '增城区新塘广场', fill: 55},
-                {lng: 113.214385, lat: 23.19911, location: '从化区第三中学', fill: 87},
-                {lng: 113.314385, lat: 23.20911, location: '南沙区黄阁镇政府', fill: 48},
-                {lng: 113.204385, lat: 23.21911, location: '天河区珠江新城地铁站', fill: 91},
-                {lng: 113.324385, lat: 23.22911, location: '越秀区广州塔景区', fill: 65},
-                {lng: 113.194385, lat: 23.23911, location: '海珠区广州大剧院', fill: 96},
-                {lng: 113.334385, lat: 23.24911, location: '天河区天河公园', fill: 83},
-                {lng: 113.184385, lat: 23.25911, location: '白云区白云万达广场', fill: 52}
-            ];
-            
-            garbagePoints.forEach(point => {
-                const markerPoint = new BMap.Point(point.lng, point.lat);
-                
-                // 根据填充度选择颜色
-                let color;
-                if (point.fill < 70) {
-                    color = '#27ae60';
-                } else if (point.fill < 90) {
-                    color = '#f39c12';
-                } else {
-                    color = '#e74c3c';
-                }
-                
-                // 创建圆形标记
-                const circle = new BMap.Circle(markerPoint, 5, {
-                    strokeColor: color,
-                    strokeWeight: 2,
-                    strokeOpacity: 0.8,
-                    fillColor: color,
-                    fillOpacity: 0.6
-                });
-                
-                // 添加信息窗口
-                const infoWindow = new BMap.InfoWindow(`
-                    <div class="map-info-window">
-                        <h4>垃圾桶</h4>
-                        <p>位置：${point.location}</p>
-                        <p>填充度：${point.fill}%</p>
-                        <p>状态：${point.fill < 70 ? '正常' : point.fill < 90 ? '警告' : '报警'}</p>
-                    </div>
-                `);
-                
-                circle.addEventListener('click', function() {
-                    map.openInfoWindow(infoWindow, markerPoint);
-                });
-                
-                map.addOverlay(circle);
-            });
-        }
-
-        // 初始化作业规划地图
-        function initOperationMap() {
-            if (typeof BMap === 'undefined') return;
-            
-            const map = initMap('operation-map', 113.264385, 23.12911);
-            
-            // 添加作业区域
-            const areaPoints = [
-                new BMap.Point(113.254385, 23.11911),
-                new BMap.Point(113.274385, 23.11911),
-                new BMap.Point(113.274385, 23.13911),
-                new BMap.Point(113.254385, 23.13911)
-            ];
-            
-            const area = new BMap.Polygon(areaPoints, {
-                strokeColor: '#3498db',
-                strokeWeight: 2,
-                strokeOpacity: 0.8,
-                fillColor: '#3498db',
-                fillOpacity: 0.2
-            });
-            
-            map.addOverlay(area);
-            
-            // 添加作业路线
-            const routePoints = [
-                new BMap.Point(113.254385, 23.12911),
-                new BMap.Point(113.264385, 23.12911),
-                new BMap.Point(113.274385, 23.12911),
-                new BMap.Point(113.274385, 23.13911)
-            ];
-            
-            const route = new BMap.Polyline(routePoints, {
-                strokeColor: '#27ae60',
-                strokeWeight: 3,
-                strokeOpacity: 0.8
-            });
-            
-            map.addOverlay(route);
-            
-            // 添加收运点
-            routePoints.forEach((point, index) => {
-                const marker = new BMap.Marker(point);
-                map.addOverlay(marker);
-                
-                const infoWindow = new BMap.InfoWindow(`
-                    <div class="map-info-window">
-                        <h4>收运点${index + 1}</h4>
-                        <p>预计到达时间：08:${(15 + index * 10).toString().padStart(2, '0')}</p>
-                        <p>预计收集量：${2 + index * 0.5}吨</p>
-                    </div>
-                `);
-                
-                marker.addEventListener('click', function() {
-                    map.openInfoWindow(infoWindow, point);
-                });
-            });
-        }
-
-        // 初始化轨迹监管地图
-        function initTrackMaps() {
-            if (typeof BMap === 'undefined') return;
-            
-            // 车辆状态地图
-            const vehicleMap = initMap('track-vehicle-map', 113.264385, 23.12911);
-            addVehicleMarker(vehicleMap, 113.264385, 23.12911, '粤A-12345', '环卫清运车', '作业中');
-            addVehicleMarker(vehicleMap, 113.254385, 23.13911, '粤A-67890', '道路清扫车', '作业中');
-            addVehicleMarker(vehicleMap, 113.274385, 23.11911, '粤A-24680', '高压清洗车', '作业中');
-            
-            // 告警轨迹地图
-            const alarmMap = initMap('alarm-track-map', 113.264385, 23.12911);
-            
-            // 添加告警轨迹
-            const alarmRoute = new BMap.Polyline([
-                new BMap.Point(113.244385, 23.14911),
-                new BMap.Point(113.254385, 23.13911),
-                new BMap.Point(113.264385, 23.12911)
-            ], {
-                strokeColor: '#e74c3c',
-                strokeWeight: 3,
-                strokeOpacity: 0.8
-            });
-            
-            alarmMap.addOverlay(alarmRoute);
-            
-            // 规划监管地图
-            const planningMap = initMap('planning-map', 113.264385, 23.12911);
-            
-            // 添加规划区域
-            const planningArea = new BMap.Polygon([
-                new BMap.Point(113.234385, 23.10911),
-                new BMap.Point(113.284385, 23.10911),
-                new BMap.Point(113.284385, 23.15911),
-                new BMap.Point(113.234385, 23.15911)
-            ], {
-                strokeColor: '#f39c12',
-                strokeWeight: 2,
-                strokeOpacity: 0.8,
-                fillColor: '#f39c12',
-                fillOpacity: 0.2
-            });
-            
-            planningMap.addOverlay(planningArea);
-        }
-
-        // 初始化所有地图
-        function initAllMaps() {
-            initVehicleMap();
-            initGarbageMap();
-            initOperationMap();
-            initTrackMaps();
-        }
-
-        // 模块切换功能
-        const moduleBtns = document.querySelectorAll('.module-btn');
-        const moduleContents = document.querySelectorAll('.module-content');
-        
-        moduleBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const moduleId = this.dataset.module;
-                
-                // 更新按钮状态
-                moduleBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // 更新模块内容
-                moduleContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(`${moduleId}-module`).classList.add('active');
-            });
-        });
-        
-        // 标签页切换功能
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tabId = this.dataset.tab;
-                const moduleContent = this.closest('.module-content');
-                
-                // 更新当前模块内的按钮状态
-                moduleContent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // 更新当前模块内的标签页内容
-                moduleContent.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                moduleContent.querySelector(`#${tabId}-tab`).classList.add('active');
-                
-                // 如果是地图相关的标签页，重新初始化地图
-                if (moduleContent.id === 'online-supervision-module' && tabId === 'vehicles') {
-                    initVehicleMap();
-                } else if (moduleContent.id === 'online-supervision-module' && tabId === 'garbage-bins') {
-                    initGarbageMap();
-                } else if (moduleContent.id === 'operation-planning-module' && tabId === 'operation-plans') {
-                    initOperationMap();
-                } else if (moduleContent.id === 'trajectory-supervision-module' && tabId === 'vehicle-status') {
-                    initTrackMaps();
-                }
-            });
-        });
-        
-        // 页面加载完成后初始化地图
-        window.addEventListener('load', function() {
-            // 检查百度地图API是否加载成功
-            if (typeof BMap !== 'undefined') {
-                try {
-                    initAllMaps();
-                } catch (error) {
-                    console.error('地图初始化错误:', error);
-                    // 如果初始化失败，显示模拟地图
-                    showMockMaps();
-                }
-            } else {
-                // 如果API加载失败，显示模拟地图
-                showMockMaps();
-            }
-        });
-        
-        // 显示模拟地图
-        function showMockMaps() {
-            const mapContainers = document.querySelectorAll('.map-container');
-            mapContainers.forEach(container => {
-                container.innerHTML = `
-                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #e3f2fd; color: #1976d2;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 4em; margin-bottom: 15px;">🗺️</div>
-                            <div style="font-size: 1.2em; margin-bottom: 10px;">模拟地图界面</div>
-                            <div style="margin-bottom: 20px;">显示城市区域和监管对象分布</div>
-                            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;">
-                                <div style="background: rgba(39, 174, 96, 0.2); padding: 10px 20px; border-radius: 8px;">
-                                    <div style="font-weight: bold;">🚛 车辆监管</div>
-                                    <div>15辆在线车辆</div>
-                                </div>
-                                <div style="background: rgba(243, 156, 18, 0.2); padding: 10px 20px; border-radius: 8px;">
-                                    <div style="font-weight: bold;">🗑️ 垃圾桶</div>
-                                    <div>45个垃圾桶监控点</div>
-                                </div>
-                                <div style="background: rgba(52, 152, 219, 0.2); padding: 10px 20px; border-radius: 8px;">
-                                    <div style="font-weight: bold;">🏭 焚烧厂</div>
-                                    <div>8个焚烧厂</div>
-                                </div>
-                            </div>
-                            <div style="font-size: 0.8em; color: #757575; margin-top: 30px;">
-                                提示：需要在<head>标签中替换为有效的百度地图API密钥以启用真实地图功能
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // 初始化日历
-        generateCalendar();
-
-        // 模拟垃圾桶填充度变化
-        function updateFillLevels() {
-            const fillProgresses = document.querySelectorAll('.fill-progress');
-            fillProgresses.forEach(progress => {
-                const currentWidth = parseInt(progress.style.width);
-                const newWidth = Math.min(100, currentWidth + Math.random() * 2);
-                progress.style.width = newWidth + '%';
-                
-                // 更新填充度文本
-                const garbageItem = progress.closest('.garbage-item');
-                const fillText = garbageItem.querySelector('.garbage-fill');
-                fillText.textContent = `填充度：${Math.round(newWidth)}%`;
-                
-                // 更新颜色
-                progress.className = 'fill-progress';
-                if (newWidth < 70) {
-                    progress.classList.add('fill-green');
-                    garbageItem.className = 'garbage-item';
-                } else if (newWidth < 90) {
-                    progress.classList.add('fill-yellow');
-                    garbageItem.className = 'garbage-item warning';
-                } else {
-                    progress.classList.add('fill-red');
-                    garbageItem.className = 'garbage-item alert';
-                }
-            });
-        }
-
-        // 每30秒更新一次填充度
-        setInterval(updateFillLevels, 30000);
-
-
-    </script>
+    <script src="assets/js/common.js"></script>
 </body>
+
 </html>
