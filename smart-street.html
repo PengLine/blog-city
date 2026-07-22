@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧街面 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -91,7 +93,8 @@
             font-size: 0.9em;
         }
 
-        .traffic-btn:hover, .traffic-btn.active {
+        .traffic-btn:hover,
+        .traffic-btn.active {
             background: #3498db;
             color: white;
             transform: translateY(-2px);
@@ -145,9 +148,17 @@
             box-shadow: 0 0 20px currentColor;
         }
 
-        .status-red { background: #e74c3c; }
-        .status-yellow { background: #f39c12; }
-        .status-green { background: #27ae60; }
+        .status-red {
+            background: #e74c3c;
+        }
+
+        .status-yellow {
+            background: #f39c12;
+        }
+
+        .status-green {
+            background: #27ae60;
+        }
 
         .parking-monitor {
             background: white;
@@ -283,7 +294,8 @@
             color: #2c3e50;
         }
 
-        .inspect-time, .inspect-location {
+        .inspect-time,
+        .inspect-location {
             color: #7f8c8d;
             font-size: 0.9em;
             margin-bottom: 5px;
@@ -336,6 +348,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -400,12 +413,43 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>商家名称</th><th>地址</th><th>负责人</th><th>联系电话</th><th>状态</th><th>操作</th></tr>
+                            <tr>
+                                <th>商家名称</th>
+                                <th>地址</th>
+                                <th>负责人</th>
+                                <th>联系电话</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>XX超市</td><td>XX街道123号</td><td>张三</td><td>13800138000</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">维护</button><button class="btn-sm btn-warning">处罚</button><button class="btn-sm">记录</button></td></tr>
-                            <tr><td>YY餐厅</td><td>YY路456号</td><td>李四</td><td>13900139000</td><td><span class="status-warning">需整改</span></td><td><button class="btn-sm">维护</button><button class="btn-sm btn-warning">处罚</button><button class="btn-sm">记录</button></td></tr>
-                            <tr><td>ZZ服装店</td><td>ZZ大道789号</td><td>王五</td><td>13700137000</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">维护</button><button class="btn-sm btn-warning">处罚</button><button class="btn-sm">记录</button></td></tr>
+                            <tr>
+                                <td>XX超市</td>
+                                <td>XX街道123号</td>
+                                <td>张三</td>
+                                <td>13800138000</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">维护</button><button
+                                        class="btn-sm btn-warning">处罚</button><button class="btn-sm">记录</button></td>
+                            </tr>
+                            <tr>
+                                <td>YY餐厅</td>
+                                <td>YY路456号</td>
+                                <td>李四</td>
+                                <td>13900139000</td>
+                                <td><span class="status-warning">需整改</span></td>
+                                <td><button class="btn-sm">维护</button><button
+                                        class="btn-sm btn-warning">处罚</button><button class="btn-sm">记录</button></td>
+                            </tr>
+                            <tr>
+                                <td>ZZ服装店</td>
+                                <td>ZZ大道789号</td>
+                                <td>王五</td>
+                                <td>13700137000</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">维护</button><button
+                                        class="btn-sm btn-warning">处罚</button><button class="btn-sm">记录</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -420,8 +464,24 @@
                     </div>
                 </div>
                 <div class="camera-grid">
-                    <div class="camera-item"><div class="camera-video">📹 视频流播放</div><div class="camera-info"><div class="camera-name">XX街道摄像头1号</div><div class="camera-location">XX街道123号</div><div class="camera-actions"><button class="btn-sm">控制</button><button class="btn-sm">截图</button><button class="btn-sm">录像</button></div></div></div>
-                    <div class="camera-item"><div class="camera-video">📹 视频流播放</div><div class="camera-info"><div class="camera-name">YY路摄像头2号</div><div class="camera-location">YY路456号</div><div class="camera-actions"><button class="btn-sm">控制</button><button class="btn-sm">截图</button><button class="btn-sm">录像</button></div></div></div>
+                    <div class="camera-item">
+                        <div class="camera-video">📹 视频流播放</div>
+                        <div class="camera-info">
+                            <div class="camera-name">XX街道摄像头1号</div>
+                            <div class="camera-location">XX街道123号</div>
+                            <div class="camera-actions"><button class="btn-sm">控制</button><button
+                                    class="btn-sm">截图</button><button class="btn-sm">录像</button></div>
+                        </div>
+                    </div>
+                    <div class="camera-item">
+                        <div class="camera-video">📹 视频流播放</div>
+                        <div class="camera-info">
+                            <div class="camera-name">YY路摄像头2号</div>
+                            <div class="camera-location">YY路456号</div>
+                            <div class="camera-actions"><button class="btn-sm">控制</button><button
+                                    class="btn-sm">截图</button><button class="btn-sm">录像</button></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -436,12 +496,41 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>告警类型</th><th>发生地点</th><th>发生时间</th><th>状态</th><th>处理方式</th><th>操作</th></tr>
+                            <tr>
+                                <th>告警类型</th>
+                                <th>发生地点</th>
+                                <th>发生时间</th>
+                                <th>状态</th>
+                                <th>处理方式</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>乱堆物料</td><td>XX街道123号</td><td>2026-01-15 10:30</td><td><span class="status-alarm">待处理</span></td><td>-</td><td><button class="btn-sm">处理</button><button class="btn-sm btn-warning">忽略</button><button class="btn-sm">查看</button></td></tr>
-                            <tr><td>出店经营</td><td>YY路456号</td><td>2026-01-15 09:15</td><td><span class="status-processing">处理中</span></td><td>自行解决</td><td><button class="btn-sm">跟踪</button><button class="btn-sm">结案</button></td></tr>
-                            <tr><td>非机动车乱停放</td><td>ZZ大道789号</td><td>2026-01-15 08:45</td><td><span class="status-completed">已结案</span></td><td>短信通知</td><td><button class="btn-sm">详情</button></td></tr>
+                            <tr>
+                                <td>乱堆物料</td>
+                                <td>XX街道123号</td>
+                                <td>2026-01-15 10:30</td>
+                                <td><span class="status-alarm">待处理</span></td>
+                                <td>-</td>
+                                <td><button class="btn-sm">处理</button><button
+                                        class="btn-sm btn-warning">忽略</button><button class="btn-sm">查看</button></td>
+                            </tr>
+                            <tr>
+                                <td>出店经营</td>
+                                <td>YY路456号</td>
+                                <td>2026-01-15 09:15</td>
+                                <td><span class="status-processing">处理中</span></td>
+                                <td>自行解决</td>
+                                <td><button class="btn-sm">跟踪</button><button class="btn-sm">结案</button></td>
+                            </tr>
+                            <tr>
+                                <td>非机动车乱停放</td>
+                                <td>ZZ大道789号</td>
+                                <td>2026-01-15 08:45</td>
+                                <td><span class="status-completed">已结案</span></td>
+                                <td>短信通知</td>
+                                <td><button class="btn-sm">详情</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -449,9 +538,18 @@
 
             <div id="maintenance-tab" class="tab-content">
                 <div class="maintenance-grid">
-                    <div class="maintenance-card"><h4>商家黑名单</h4><p>处罚次数较多的商家列表</p><button class="btn-primary">查看详情</button></div>
-                    <div class="maintenance-card"><h4>流动商贩</h4><p>重点商贩管理与标记</p><button class="btn-primary">查看详情</button></div>
-                    <div class="maintenance-card"><h4>政策法规</h4><p>维护与上下架管理</p><button class="btn-primary">查看详情</button></div>
+                    <div class="maintenance-card">
+                        <h4>商家黑名单</h4>
+                        <p>处罚次数较多的商家列表</p><button class="btn-primary">查看详情</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>流动商贩</h4>
+                        <p>重点商贩管理与标记</p><button class="btn-primary">查看详情</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>政策法规</h4>
+                        <p>维护与上下架管理</p><button class="btn-primary">查看详情</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -475,11 +573,32 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>物业公司</th><th>负责人</th><th>联系电话</th><th>营业期限</th><th>资质等级</th><th>操作</th></tr>
+                            <tr>
+                                <th>物业公司</th>
+                                <th>负责人</th>
+                                <th>联系电话</th>
+                                <th>营业期限</th>
+                                <th>资质等级</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>XX物业公司</td><td>李四</td><td>13900139000</td><td>2020-2030</td><td>一级</td><td><button class="btn-sm">维护</button></td></tr>
-                            <tr><td>YY物业公司</td><td>王五</td><td>13700137000</td><td>2021-2031</td><td>二级</td><td><button class="btn-sm">维护</button></td></tr>
+                            <tr>
+                                <td>XX物业公司</td>
+                                <td>李四</td>
+                                <td>13900139000</td>
+                                <td>2020-2030</td>
+                                <td>一级</td>
+                                <td><button class="btn-sm">维护</button></td>
+                            </tr>
+                            <tr>
+                                <td>YY物业公司</td>
+                                <td>王五</td>
+                                <td>13700137000</td>
+                                <td>2021-2031</td>
+                                <td>二级</td>
+                                <td><button class="btn-sm">维护</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -496,11 +615,32 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>小区名称</th><th>所属物业</th><th>楼栋数量</th><th>总户数</th><th>责任队员</th><th>操作</th></tr>
+                            <tr>
+                                <th>小区名称</th>
+                                <th>所属物业</th>
+                                <th>楼栋数量</th>
+                                <th>总户数</th>
+                                <th>责任队员</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>XX花园</td><td>XX物业公司</td><td>10栋</td><td>500户</td><td>赵六</td><td><button class="btn-sm">维护</button></td></tr>
-                            <tr><td>YY小区</td><td>YY物业公司</td><td>8栋</td><td>300户</td><td>孙七</td><td><button class="btn-sm">维护</button></td></tr>
+                            <tr>
+                                <td>XX花园</td>
+                                <td>XX物业公司</td>
+                                <td>10栋</td>
+                                <td>500户</td>
+                                <td>赵六</td>
+                                <td><button class="btn-sm">维护</button></td>
+                            </tr>
+                            <tr>
+                                <td>YY小区</td>
+                                <td>YY物业公司</td>
+                                <td>8栋</td>
+                                <td>300户</td>
+                                <td>孙七</td>
+                                <td><button class="btn-sm">维护</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -515,8 +655,26 @@
                     </div>
                 </div>
                 <div class="inspect-list">
-                    <div class="inspect-item"><div class="inspect-info"><div class="inspect-title">XX花园1栋巡查</div><div class="inspect-time">2026-01-15 09:00</div><div class="inspect-location">XX花园1栋</div></div><div class="inspect-actions"><button class="btn-sm">无需检查</button><button class="btn-sm btn-warning">存在问题</button><button class="btn-sm btn-success">不存在问题</button></div></div>
-                    <div class="inspect-item"><div class="inspect-info"><div class="inspect-title">XX花园2栋巡查</div><div class="inspect-time">2026-01-15 09:30</div><div class="inspect-location">XX花园2栋</div></div><div class="inspect-actions"><button class="btn-sm">无需检查</button><button class="btn-sm btn-warning">存在问题</button><button class="btn-sm btn-success">不存在问题</button></div></div>
+                    <div class="inspect-item">
+                        <div class="inspect-info">
+                            <div class="inspect-title">XX花园1栋巡查</div>
+                            <div class="inspect-time">2026-01-15 09:00</div>
+                            <div class="inspect-location">XX花园1栋</div>
+                        </div>
+                        <div class="inspect-actions"><button class="btn-sm">无需检查</button><button
+                                class="btn-sm btn-warning">存在问题</button><button
+                                class="btn-sm btn-success">不存在问题</button></div>
+                    </div>
+                    <div class="inspect-item">
+                        <div class="inspect-info">
+                            <div class="inspect-title">XX花园2栋巡查</div>
+                            <div class="inspect-time">2026-01-15 09:30</div>
+                            <div class="inspect-location">XX花园2栋</div>
+                        </div>
+                        <div class="inspect-actions"><button class="btn-sm">无需检查</button><button
+                                class="btn-sm btn-warning">存在问题</button><button
+                                class="btn-sm btn-success">不存在问题</button></div>
+                    </div>
                 </div>
             </div>
 
@@ -529,14 +687,38 @@
                     </div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">管辖小区数</div></div>
-                    <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">物业公司数</div></div>
-                    <div class="stat-card"><div class="stat-value">56</div><div class="stat-label">楼栋总数</div></div>
-                    <div class="stat-card"><div class="stat-value">2,345</div><div class="stat-label">住户总数</div></div>
-                    <div class="stat-card"><div class="stat-value">15</div><div class="stat-label">今日报修数</div></div>
-                    <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">今日巡查数</div></div>
-                    <div class="stat-card"><div class="stat-value">95%</div><div class="stat-label">问题解决率</div></div>
-                    <div class="stat-card"><div class="stat-value">4.2</div><div class="stat-label">平均服务评分</div></div>
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">管辖小区数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">物业公司数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">56</div>
+                        <div class="stat-label">楼栋总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2,345</div>
+                        <div class="stat-label">住户总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">今日报修数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">今日巡查数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">95%</div>
+                        <div class="stat-label">问题解决率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">4.2</div>
+                        <div class="stat-label">平均服务评分</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -546,18 +728,48 @@
                 <h3>🏗️ 工地管理</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">🏗️</div><div class="stat-value">23</div><div class="stat-label">在建工地</div></div>
-                <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-value">5</div><div class="stat-label">违规工地</div></div>
-                <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value">18</div><div class="stat-label">合规工地</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏗️</div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">在建工地</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">违规工地</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">合规工地</div>
+                </div>
             </div>
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>工地名称</th><th>位置</th><th>状态</th><th>开工日期</th><th>预计完工</th></tr>
+                        <tr>
+                            <th>工地名称</th>
+                            <th>位置</th>
+                            <th>状态</th>
+                            <th>开工日期</th>
+                            <th>预计完工</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>XX商业大厦</td><td>XX大道123号</td><td><span class="status-normal">施工中</span></td><td>2025-06-01</td><td>2026-12-31</td></tr>
-                        <tr><td>YY小区二期</td><td>YY路456号</td><td><span class="status-warning">待整改</span></td><td>2025-08-15</td><td>2026-09-30</td></tr>
+                        <tr>
+                            <td>XX商业大厦</td>
+                            <td>XX大道123号</td>
+                            <td><span class="status-normal">施工中</span></td>
+                            <td>2025-06-01</td>
+                            <td>2026-12-31</td>
+                        </tr>
+                        <tr>
+                            <td>YY小区二期</td>
+                            <td>YY路456号</td>
+                            <td><span class="status-warning">待整改</span></td>
+                            <td>2025-08-15</td>
+                            <td>2026-09-30</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -579,16 +791,34 @@
                     <div class="signal-control">
                         <h3>🚦 信号灯状态</h3>
                         <div class="signal-grid">
-                            <div class="signal-item"><div class="signal-status status-green"></div><div>XX路口</div></div>
-                            <div class="signal-item"><div class="signal-status status-yellow"></div><div>YY路口</div></div>
-                            <div class="signal-item"><div class="signal-status status-red"></div><div>ZZ路口</div></div>
-                            <div class="signal-item"><div class="signal-status status-green"></div><div>AA路口</div></div>
+                            <div class="signal-item">
+                                <div class="signal-status status-green"></div>
+                                <div>XX路口</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-status status-yellow"></div>
+                                <div>YY路口</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-status status-red"></div>
+                                <div>ZZ路口</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-status status-green"></div>
+                                <div>AA路口</div>
+                            </div>
                         </div>
                     </div>
                     <div class="parking-monitor">
                         <h3>🅿️ 违停监控</h3>
-                        <div class="parking-item"><div class="parking-location">XX大道违章停车</div><div class="parking-time">2026-01-15 10:30</div></div>
-                        <div class="parking-item"><div class="parking-location">YY路违章停车</div><div class="parking-time">2026-01-15 10:25</div></div>
+                        <div class="parking-item">
+                            <div class="parking-location">XX大道违章停车</div>
+                            <div class="parking-time">2026-01-15 10:30</div>
+                        </div>
+                        <div class="parking-item">
+                            <div class="parking-location">YY路违章停车</div>
+                            <div class="parking-time">2026-01-15 10:25</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -601,4 +831,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

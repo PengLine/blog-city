@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧环卫 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -55,9 +57,17 @@
             transition: width 0.3s ease;
         }
 
-        .fill-green { background: #27ae60; }
-        .fill-yellow { background: #f39c12; }
-        .fill-red { background: #e74c3c; }
+        .fill-green {
+            background: #27ae60;
+        }
+
+        .fill-yellow {
+            background: #f39c12;
+        }
+
+        .fill-red {
+            background: #e74c3c;
+        }
 
         .main-content {
             display: grid;
@@ -104,7 +114,8 @@
             font-size: 0.9em;
         }
 
-        .map-btn:hover, .map-btn.active {
+        .map-btn:hover,
+        .map-btn.active {
             background: #27ae60;
             color: white;
             transform: translateY(-2px);
@@ -124,7 +135,8 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .garbage-status h3, .vehicle-monitor h3 {
+        .garbage-status h3,
+        .vehicle-monitor h3 {
             margin-bottom: 20px;
             color: #2c3e50;
             font-size: 1.3em;
@@ -143,8 +155,13 @@
             background: #e9ecef;
         }
 
-        .garbage-item.warning { border-left-color: #f39c12; }
-        .garbage-item.alert { border-left-color: #e74c3c; }
+        .garbage-item.warning {
+            border-left-color: #f39c12;
+        }
+
+        .garbage-item.alert {
+            border-left-color: #e74c3c;
+        }
 
         .garbage-location {
             font-weight: bold;
@@ -376,6 +393,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -433,11 +451,31 @@
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">🚛</div><div class="stat-value">1,234</div><div class="stat-label">环卫车辆总数</div></div>
-                <div class="stat-card"><div class="stat-icon">🗑️</div><div class="stat-value">77,234</div><div class="stat-label">垃圾桶总数</div></div>
-                <div class="stat-card"><div class="stat-icon">⛴️</div><div class="stat-value">23</div><div class="stat-label">环卫船只总数</div></div>
-                <div class="stat-card"><div class="stat-icon">🏭</div><div class="stat-value">18</div><div class="stat-label">焚烧厂总数</div></div>
-                <div class="stat-card"><div class="stat-icon">🍽️</div><div class="stat-value">5,678</div><div class="stat-label">餐厨企业总数</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚛</div>
+                    <div class="stat-value">1,234</div>
+                    <div class="stat-label">环卫车辆总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🗑️</div>
+                    <div class="stat-value">77,234</div>
+                    <div class="stat-label">垃圾桶总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⛴️</div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">环卫船只总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏭</div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">焚烧厂总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🍽️</div>
+                    <div class="stat-value">5,678</div>
+                    <div class="stat-label">餐厨企业总数</div>
+                </div>
             </div>
 
             <div id="vehicles-tab" class="tab-content active">
@@ -451,12 +489,40 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>车辆编号</th><th>车辆类型</th><th>当前位置</th><th>状态</th><th>运行时间</th><th>操作</th></tr>
+                            <tr>
+                                <th>车辆编号</th>
+                                <th>车辆类型</th>
+                                <th>当前位置</th>
+                                <th>状态</th>
+                                <th>运行时间</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>粤A-12345</td><td>环卫清运车</td><td>天河区天河路</td><td><span class="status-working">作业中</span></td><td>4h 30m</td><td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td></tr>
-                            <tr><td>粤A-67890</td><td>道路清扫车</td><td>越秀区北京路</td><td><span class="status-working">作业中</span></td><td>3h 15m</td><td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td></tr>
-                            <tr><td>粤A-24680</td><td>高压清洗车</td><td>海珠区江南大道</td><td><span class="status-working">作业中</span></td><td>5h 20m</td><td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td></tr>
+                            <tr>
+                                <td>粤A-12345</td>
+                                <td>环卫清运车</td>
+                                <td>天河区天河路</td>
+                                <td><span class="status-working">作业中</span></td>
+                                <td>4h 30m</td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td>
+                            </tr>
+                            <tr>
+                                <td>粤A-67890</td>
+                                <td>道路清扫车</td>
+                                <td>越秀区北京路</td>
+                                <td><span class="status-working">作业中</span></td>
+                                <td>3h 15m</td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td>
+                            </tr>
+                            <tr>
+                                <td>粤A-24680</td>
+                                <td>高压清洗车</td>
+                                <td>海珠区江南大道</td>
+                                <td><span class="status-working">作业中</span></td>
+                                <td>5h 20m</td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">轨迹</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -475,19 +541,25 @@
                     <div class="garbage-item alert">
                         <div class="garbage-location">天河区天河路天河城</div>
                         <div class="garbage-fill">填充度：95%</div>
-                        <div class="fill-bar"><div class="fill-progress fill-red" style="width: 95%"></div></div>
+                        <div class="fill-bar">
+                            <div class="fill-progress fill-red" style="width: 95%"></div>
+                        </div>
                         <div class="garbage-time">2026-01-15 16:20:30</div>
                     </div>
                     <div class="garbage-item warning">
                         <div class="garbage-location">越秀区北京路步行街</div>
                         <div class="garbage-fill">填充度：85%</div>
-                        <div class="fill-bar"><div class="fill-progress fill-yellow" style="width: 85%"></div></div>
+                        <div class="fill-bar">
+                            <div class="fill-progress fill-yellow" style="width: 85%"></div>
+                        </div>
                         <div class="garbage-time">2026-01-15 16:15:45</div>
                     </div>
                     <div class="garbage-item">
                         <div class="garbage-location">白云区白云山公园</div>
                         <div class="garbage-fill">填充度：45%</div>
-                        <div class="fill-bar"><div class="fill-progress fill-green" style="width: 45%"></div></div>
+                        <div class="fill-bar">
+                            <div class="fill-progress fill-green" style="width: 45%"></div>
+                        </div>
                         <div class="garbage-time">2026-01-15 16:00:00</div>
                     </div>
                 </div>
@@ -500,11 +572,26 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>船只编号</th><th>船只类型</th><th>当前位置</th><th>状态</th></tr>
+                            <tr>
+                                <th>船只编号</th>
+                                <th>船只类型</th>
+                                <th>当前位置</th>
+                                <th>状态</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>船-001</td><td>打捞船</td><td>珠江河段</td><td><span class="status-working">作业中</span></td></tr>
-                            <tr><td>船-002</td><td>保洁船</td><td>XX河</td><td><span class="status-idle">待命</span></td></tr>
+                            <tr>
+                                <td>船-001</td>
+                                <td>打捞船</td>
+                                <td>珠江河段</td>
+                                <td><span class="status-working">作业中</span></td>
+                            </tr>
+                            <tr>
+                                <td>船-002</td>
+                                <td>保洁船</td>
+                                <td>XX河</td>
+                                <td><span class="status-idle">待命</span></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -517,11 +604,26 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>焚烧厂名称</th><th>位置</th><th>日处理量</th><th>状态</th></tr>
+                            <tr>
+                                <th>焚烧厂名称</th>
+                                <th>位置</th>
+                                <th>日处理量</th>
+                                <th>状态</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>XX焚烧厂</td><td>XX区</td><td>500吨</td><td><span class="status-normal">正常运行</span></td></tr>
-                            <tr><td>YY焚烧厂</td><td>YY区</td><td>600吨</td><td><span class="status-normal">正常运行</span></td></tr>
+                            <tr>
+                                <td>XX焚烧厂</td>
+                                <td>XX区</td>
+                                <td>500吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
+                            </tr>
+                            <tr>
+                                <td>YY焚烧厂</td>
+                                <td>YY区</td>
+                                <td>600吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -534,11 +636,26 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>企业名称</th><th>位置</th><th>日处理量</th><th>状态</th></tr>
+                            <tr>
+                                <th>企业名称</th>
+                                <th>位置</th>
+                                <th>日处理量</th>
+                                <th>状态</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>XX餐厨处理厂</td><td>XX区</td><td>100吨</td><td><span class="status-normal">正常运行</span></td></tr>
-                            <tr><td>YY餐厨处理厂</td><td>YY区</td><td>80吨</td><td><span class="status-normal">正常运行</span></td></tr>
+                            <tr>
+                                <td>XX餐厨处理厂</td>
+                                <td>XX区</td>
+                                <td>100吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
+                            </tr>
+                            <tr>
+                                <td>YY餐厨处理厂</td>
+                                <td>YY区</td>
+                                <td>80吨</td>
+                                <td><span class="status-normal">正常运行</span></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -550,9 +667,18 @@
                 <h3>🔧 应用维护</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>设备维护</h4><p>设备定期维护与保养</p><button class="btn-primary">查看详情</button></div>
-                <div class="maintenance-card"><h4>系统设置</h4><p>系统参数配置管理</p><button class="btn-primary">查看详情</button></div>
-                <div class="maintenance-card"><h4>数据维护</h4><p>数据备份与恢复</p><button class="btn-primary">查看详情</button></div>
+                <div class="maintenance-card">
+                    <h4>设备维护</h4>
+                    <p>设备定期维护与保养</p><button class="btn-primary">查看详情</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>系统设置</h4>
+                    <p>系统参数配置管理</p><button class="btn-primary">查看详情</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>数据维护</h4>
+                    <p>数据备份与恢复</p><button class="btn-primary">查看详情</button>
+                </div>
             </div>
         </div>
 
@@ -561,13 +687,34 @@
                 <h3>📊 统计分析</h3>
             </div>
             <div class="bar-chart">
-                <div class="chart-item"><div class="chart-bar" style="height: 80%"></div><div class="chart-label">周一</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 85%"></div><div class="chart-label">周二</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 90%"></div><div class="chart-label">周三</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 75%"></div><div class="chart-label">周四</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 95%"></div><div class="chart-label">周五</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 60%"></div><div class="chart-label">周六</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 55%"></div><div class="chart-label">周日</div></div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 80%"></div>
+                    <div class="chart-label">周一</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 85%"></div>
+                    <div class="chart-label">周二</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 90%"></div>
+                    <div class="chart-label">周三</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 75%"></div>
+                    <div class="chart-label">周四</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 95%"></div>
+                    <div class="chart-label">周五</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 60%"></div>
+                    <div class="chart-label">周六</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 55%"></div>
+                    <div class="chart-label">周日</div>
+                </div>
             </div>
         </div>
 
@@ -579,49 +726,162 @@
                     <button class="calendar-nav-btn">→</button>
                 </div>
                 <div class="calendar-weekdays">
-                    <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div><div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday">六</div>
+                    <div class="weekday">日</div>
+                    <div class="weekday">一</div>
+                    <div class="weekday">二</div>
+                    <div class="weekday">三</div>
+                    <div class="weekday">四</div>
+                    <div class="weekday">五</div>
+                    <div class="weekday">六</div>
                 </div>
                 <div class="calendar-days">
-                    <div class="calendar-day other-month"><div class="day-number">29</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">30</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">31</div></div>
-                    <div class="calendar-day"><div class="day-number">1</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">2</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">3</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">4</div></div>
-                    <div class="calendar-day"><div class="day-number">5</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">6</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">7</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">8</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">9</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">10</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">11</div></div>
-                    <div class="calendar-day"><div class="day-number">12</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">13</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">14</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">15</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day today"><div class="day-number">16</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">17</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">18</div></div>
-                    <div class="calendar-day"><div class="day-number">19</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">20</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">21</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">22</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">23</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">24</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">25</div></div>
-                    <div class="calendar-day"><div class="day-number">26</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">27</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">28</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">29</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day"><div class="day-number">30</div><div class="shift-marker morning">早班</div></div>
-                    <div class="calendar-day"><div class="day-number">31</div><div class="shift-marker afternoon">午班</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">1</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">2</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">3</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">4</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">5</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">6</div></div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">29</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">30</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">31</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">1</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">2</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">3</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">5</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">6</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">7</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">8</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">9</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">10</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">11</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">12</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">13</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">14</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">15</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day today">
+                        <div class="day-number">16</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">17</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">19</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">20</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">21</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">22</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">23</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">24</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">25</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">26</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">27</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">28</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">29</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">30</div>
+                        <div class="shift-marker morning">早班</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">31</div>
+                        <div class="shift-marker afternoon">午班</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">5</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">6</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -631,9 +891,21 @@
                 <h3>🗺️ 作业规划</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">🗺️</div><div class="stat-value">56</div><div class="stat-label">作业路线</div></div>
-                <div class="stat-card"><div class="stat-icon">📍</div><div class="stat-value">12</div><div class="stat-label">作业区域</div></div>
-                <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value">98%</div><div class="stat-label">规划完成率</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">🗺️</div>
+                    <div class="stat-value">56</div>
+                    <div class="stat-label">作业路线</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📍</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">作业区域</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">规划完成率</div>
+                </div>
             </div>
         </div>
 
@@ -644,11 +916,29 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>告警类型</th><th>发生地点</th><th>发生时间</th><th>状态</th><th>操作</th></tr>
+                        <tr>
+                            <th>告警类型</th>
+                            <th>发生地点</th>
+                            <th>发生时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>垃圾桶满溢</td><td>天河区天河路</td><td>2026-01-15 16:20</td><td><span class="status-alarm">待处理</span></td><td><button class="btn-sm">处理</button></td></tr>
-                        <tr><td>车辆故障</td><td>越秀区北京路</td><td>2026-01-15 15:30</td><td><span class="status-processing">处理中</span></td><td><button class="btn-sm">跟踪</button></td></tr>
+                        <tr>
+                            <td>垃圾桶满溢</td>
+                            <td>天河区天河路</td>
+                            <td>2026-01-15 16:20</td>
+                            <td><span class="status-alarm">待处理</span></td>
+                            <td><button class="btn-sm">处理</button></td>
+                        </tr>
+                        <tr>
+                            <td>车辆故障</td>
+                            <td>越秀区北京路</td>
+                            <td>2026-01-15 15:30</td>
+                            <td><span class="status-processing">处理中</span></td>
+                            <td><button class="btn-sm">跟踪</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -675,4 +965,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

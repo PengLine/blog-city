@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧停车 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -194,6 +196,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -205,10 +208,26 @@
         </header>
 
         <div class="parking-stats">
-            <div class="parking-stat-card"><div class="parking-stat-icon">🅿️</div><div class="parking-stat-value">56</div><div class="parking-stat-label">停车场数量</div></div>
-            <div class="parking-stat-card"><div class="parking-stat-icon">🚗</div><div class="parking-stat-value">12,345</div><div class="parking-stat-label">总车位数量</div></div>
-            <div class="parking-stat-card"><div class="parking-stat-icon">✅</div><div class="parking-stat-value">68%</div><div class="parking-stat-label">使用率</div></div>
-            <div class="parking-stat-card"><div class="parking-stat-icon">💰</div><div class="parking-stat-value">¥123,456</div><div class="parking-stat-label">今日收入</div></div>
+            <div class="parking-stat-card">
+                <div class="parking-stat-icon">🅿️</div>
+                <div class="parking-stat-value">56</div>
+                <div class="parking-stat-label">停车场数量</div>
+            </div>
+            <div class="parking-stat-card">
+                <div class="parking-stat-icon">🚗</div>
+                <div class="parking-stat-value">12,345</div>
+                <div class="parking-stat-label">总车位数量</div>
+            </div>
+            <div class="parking-stat-card">
+                <div class="parking-stat-icon">✅</div>
+                <div class="parking-stat-value">68%</div>
+                <div class="parking-stat-label">使用率</div>
+            </div>
+            <div class="parking-stat-card">
+                <div class="parking-stat-icon">💰</div>
+                <div class="parking-stat-value">¥123,456</div>
+                <div class="parking-stat-label">今日收入</div>
+            </div>
         </div>
 
         <div class="parking-map">
@@ -229,21 +248,72 @@
             </div>
             <div class="lot-grid">
                 <div class="lot-card">
-                    <div class="lot-header"><div class="lot-name">XX购物中心停车场</div><span class="lot-status status-normal">正常</span></div>
-                    <div class="lot-info"><div><div class="lot-value">1,234</div><div class="lot-label">总车位</div></div><div><div class="lot-value">856</div><div class="lot-label">已占用</div></div><div><div class="lot-value">378</div><div class="lot-label">空余</div></div></div>
-                    <div class="lot-progress"><div class="lot-fill high" style="width: 70%"></div></div>
+                    <div class="lot-header">
+                        <div class="lot-name">XX购物中心停车场</div><span class="lot-status status-normal">正常</span>
+                    </div>
+                    <div class="lot-info">
+                        <div>
+                            <div class="lot-value">1,234</div>
+                            <div class="lot-label">总车位</div>
+                        </div>
+                        <div>
+                            <div class="lot-value">856</div>
+                            <div class="lot-label">已占用</div>
+                        </div>
+                        <div>
+                            <div class="lot-value">378</div>
+                            <div class="lot-label">空余</div>
+                        </div>
+                    </div>
+                    <div class="lot-progress">
+                        <div class="lot-fill high" style="width: 70%"></div>
+                    </div>
                     <button class="btn-primary">查看详情</button>
                 </div>
                 <div class="lot-card">
-                    <div class="lot-header"><div class="lot-name">YY商业广场停车场</div><span class="lot-status status-normal">正常</span></div>
-                    <div class="lot-info"><div><div class="lot-value">856</div><div class="lot-label">总车位</div></div><div><div class="lot-value">428</div><div class="lot-label">已占用</div></div><div><div class="lot-value">428</div><div class="lot-label">空余</div></div></div>
-                    <div class="lot-progress"><div class="lot-fill medium" style="width: 50%"></div></div>
+                    <div class="lot-header">
+                        <div class="lot-name">YY商业广场停车场</div><span class="lot-status status-normal">正常</span>
+                    </div>
+                    <div class="lot-info">
+                        <div>
+                            <div class="lot-value">856</div>
+                            <div class="lot-label">总车位</div>
+                        </div>
+                        <div>
+                            <div class="lot-value">428</div>
+                            <div class="lot-label">已占用</div>
+                        </div>
+                        <div>
+                            <div class="lot-value">428</div>
+                            <div class="lot-label">空余</div>
+                        </div>
+                    </div>
+                    <div class="lot-progress">
+                        <div class="lot-fill medium" style="width: 50%"></div>
+                    </div>
                     <button class="btn-primary">查看详情</button>
                 </div>
                 <div class="lot-card">
-                    <div class="lot-header"><div class="lot-name">ZZ地铁站停车场</div><span class="lot-status status-normal">正常</span></div>
-                    <div class="lot-info"><div><div class="lot-value">567</div><div class="lot-label">总车位</div></div><div><div class="lot-value">170</div><div class="lot-label">已占用</div></div><div><div class="lot-value">397</div><div class="lot-label">空余</div></div></div>
-                    <div class="lot-progress"><div class="lot-fill low" style="width: 30%"></div></div>
+                    <div class="lot-header">
+                        <div class="lot-name">ZZ地铁站停车场</div><span class="lot-status status-normal">正常</span>
+                    </div>
+                    <div class="lot-info">
+                        <div>
+                            <div class="lot-value">567</div>
+                            <div class="lot-label">总车位</div>
+                        </div>
+                        <div>
+                            <div class="lot-value">170</div>
+                            <div class="lot-label">已占用</div>
+                        </div>
+                        <div>
+                            <div class="lot-value">397</div>
+                            <div class="lot-label">空余</div>
+                        </div>
+                    </div>
+                    <div class="lot-progress">
+                        <div class="lot-fill low" style="width: 30%"></div>
+                    </div>
                     <button class="btn-primary">查看详情</button>
                 </div>
             </div>
@@ -256,11 +326,29 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>停车场名称</th><th>位置</th><th>总车位</th><th>状态</th><th>操作</th></tr>
+                        <tr>
+                            <th>停车场名称</th>
+                            <th>位置</th>
+                            <th>总车位</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>XX购物中心停车场</td><td>XX大道123号</td><td>1,234</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
-                        <tr><td>YY商业广场停车场</td><td>YY路456号</td><td>856</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
+                        <tr>
+                            <td>XX购物中心停车场</td>
+                            <td>XX大道123号</td>
+                            <td>1,234</td>
+                            <td><span class="status-normal">正常</span></td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                        </tr>
+                        <tr>
+                            <td>YY商业广场停车场</td>
+                            <td>YY路456号</td>
+                            <td>856</td>
+                            <td><span class="status-normal">正常</span></td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -271,9 +359,18 @@
                 <h3>💰 收费管理</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>计费规则</h4><p>设置停车场计费标准</p><button class="btn-primary">配置</button></div>
-                <div class="maintenance-card"><h4>优惠政策</h4><p>设置优惠活动和折扣</p><button class="btn-primary">配置</button></div>
-                <div class="maintenance-card"><h4>收费统计</h4><p>查看收费数据统计</p><button class="btn-primary">查看</button></div>
+                <div class="maintenance-card">
+                    <h4>计费规则</h4>
+                    <p>设置停车场计费标准</p><button class="btn-primary">配置</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>优惠政策</h4>
+                    <p>设置优惠活动和折扣</p><button class="btn-primary">配置</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>收费统计</h4>
+                    <p>查看收费数据统计</p><button class="btn-primary">查看</button>
+                </div>
             </div>
         </div>
 
@@ -282,9 +379,18 @@
                 <h3>📊 数据分析</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>使用率分析</h4><p>停车场使用情况分析</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>收入统计</h4><p>收入数据统计分析</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>高峰时段</h4><p>停车高峰时段分析</p><button class="btn-primary">查看分析</button></div>
+                <div class="maintenance-card">
+                    <h4>使用率分析</h4>
+                    <p>停车场使用情况分析</p><button class="btn-primary">查看分析</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>收入统计</h4>
+                    <p>收入数据统计分析</p><button class="btn-primary">查看分析</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>高峰时段</h4>
+                    <p>停车高峰时段分析</p><button class="btn-primary">查看分析</button>
+                </div>
             </div>
         </div>
 
@@ -295,4 +401,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

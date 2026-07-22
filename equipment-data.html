@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>设备+数据 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -190,6 +192,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -201,97 +204,212 @@
         </header>
 
         <div class="device-overview">
-            <div class="device-card"><div class="device-icon">🔧</div><div class="device-value">12,345</div><div class="device-label">设备总数</div></div>
-            <div class="device-card"><div class="device-icon">✅</div><div class="device-value">98%</div><div class="device-label">在线率</div></div>
-            <div class="device-card"><div class="device-icon">⚠️</div><div class="device-value">23</div><div class="device-label">故障设备</div></div>
-            <div class="device-card"><div class="device-icon">📊</div><div class="device-value">10TB</div><div class="device-label">数据量</div></div>
+            <div class="device-card">
+                <div class="device-icon">🔧</div>
+                <div class="device-value">12,345</div>
+                <div class="device-label">设备总数</div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">✅</div>
+                <div class="device-value">98%</div>
+                <div class="device-label">在线率</div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">⚠️</div>
+                <div class="device-value">23</div>
+                <div class="device-label">故障设备</div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">📊</div>
+                <div class="device-value">10TB</div>
+                <div class="device-label">数据量</div>
+            </div>
         </div>
 
         <div class="device-grid">
             <div class="device-item">
-                <div class="device-header"><div class="device-name">传感器设备</div><span class="device-status status-normal">在线</span></div>
-                <div class="device-info"><div><div class="info-label">数量</div><div class="info-value">5,678</div></div><div><div class="info-label">故障率</div><div class="info-value">1.2%</div></div></div>
-            </div>
-            <div class="device-item">
-                <div class="device-header"><div class="device-name">监控设备</div><span class="device-status status-normal">在线</span></div>
-                <div class="device-info"><div><div class="info-label">数量</div><div class="info-value">3,456</div></div><div><div class="info-label">故障率</div><div class="info-value">0.8%</div></div></div>
-            </div>
-            <div class="device-item">
-                <div class="device-header"><div class="device-name">控制设备</div><span class="device-status status-warning">部分离线</span></div>
-                <div class="device-info"><div><div class="info-label">数量</div><div class="info-value">2,345</div></div><div><div class="info-label">故障率</div><div class="info-value">2.5%</div></div></div>
-            </div>
-            <div class="device-item">
-                <div class="device-header"><div class="device-name">网关设备</div><span class="device-status status-normal">在线</span></div>
-                <div class="device-info"><div><div class="info-label">数量</div><div class="info-value">866</div></div><div><div class="info-label">故障率</div><div class="info-value">0.5%</div></div></div>
-        </div>
-
-        <div class="module-nav">
-            <button class="module-btn active" data-module="device-management">🔧 设备管理</button>
-            <button class="module-btn" data-module="data-monitor">📊 数据监控</button>
-            <button class="module-btn" data-module="data-analysis">📈 数据分析</button>
-            <button class="module-btn" data-module="system-integration">🔗 系统集成</button>
-        </div>
-
-        <div id="device-management-module" class="module-content active">
-            <div class="content-header">
-                <h3>🔧 设备管理</h3>
-            </div>
-            <div class="data-table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr><th>设备编号</th><th>设备名称</th><th>设备类型</th><th>状态</th><th>操作</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>DEV-001</td><td>温度传感器</td><td>传感器</td><td><span class="status-normal">在线</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td></tr>
-                        <tr><td>DEV-002</td><td>监控摄像头</td><td>监控</td><td><span class="status-normal">在线</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td></tr>
-                        <tr><td>DEV-003</td><td>智能控制器</td><td>控制</td><td><span class="status-alarm">离线</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="data-monitor-module" class="module-content">
-            <div class="data-flow-section">
-                <h3>📊 数据流向监控</h3>
-                <div class="data-flow">
-                    <div class="data-node"><div class="node-icon">📡</div><div class="node-label">设备采集</div></div>
-                    <div class="data-arrow">→</div>
-                    <div class="data-node"><div class="node-icon">☁️</div><div class="node-label">数据传输</div></div>
-                    <div class="data-arrow">→</div>
-                    <div class="data-node"><div class="node-icon">💾</div><div class="node-label">数据存储</div></div>
-                    <div class="data-arrow">→</div>
-                    <div class="data-node"><div class="node-icon">📈</div><div class="node-label">数据分析</div></div>
+                <div class="device-header">
+                    <div class="device-name">传感器设备</div><span class="device-status status-normal">在线</span>
+                </div>
+                <div class="device-info">
+                    <div>
+                        <div class="info-label">数量</div>
+                        <div class="info-value">5,678</div>
+                    </div>
+                    <div>
+                        <div class="info-label">故障率</div>
+                        <div class="info-value">1.2%</div>
+                    </div>
                 </div>
             </div>
+            <div class="device-item">
+                <div class="device-header">
+                    <div class="device-name">监控设备</div><span class="device-status status-normal">在线</span>
+                </div>
+                <div class="device-info">
+                    <div>
+                        <div class="info-label">数量</div>
+                        <div class="info-value">3,456</div>
+                    </div>
+                    <div>
+                        <div class="info-label">故障率</div>
+                        <div class="info-value">0.8%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="device-item">
+                <div class="device-header">
+                    <div class="device-name">控制设备</div><span class="device-status status-warning">部分离线</span>
+                </div>
+                <div class="device-info">
+                    <div>
+                        <div class="info-label">数量</div>
+                        <div class="info-value">2,345</div>
+                    </div>
+                    <div>
+                        <div class="info-label">故障率</div>
+                        <div class="info-value">2.5%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="device-item">
+                <div class="device-header">
+                    <div class="device-name">网关设备</div><span class="device-status status-normal">在线</span>
+                </div>
+                <div class="device-info">
+                    <div>
+                        <div class="info-label">数量</div>
+                        <div class="info-value">866</div>
+                    </div>
+                    <div>
+                        <div class="info-label">故障率</div>
+                        <div class="info-value">0.5%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-nav">
+                <button class="module-btn active" data-module="device-management">🔧 设备管理</button>
+                <button class="module-btn" data-module="data-monitor">📊 数据监控</button>
+                <button class="module-btn" data-module="data-analysis">📈 数据分析</button>
+                <button class="module-btn" data-module="system-integration">🔗 系统集成</button>
+            </div>
+
+            <div id="device-management-module" class="module-content active">
+                <div class="content-header">
+                    <h3>🔧 设备管理</h3>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>设备编号</th>
+                                <th>设备名称</th>
+                                <th>设备类型</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>DEV-001</td>
+                                <td>温度传感器</td>
+                                <td>传感器</td>
+                                <td><span class="status-normal">在线</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
+                            </tr>
+                            <tr>
+                                <td>DEV-002</td>
+                                <td>监控摄像头</td>
+                                <td>监控</td>
+                                <td><span class="status-normal">在线</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
+                            </tr>
+                            <tr>
+                                <td>DEV-003</td>
+                                <td>智能控制器</td>
+                                <td>控制</td>
+                                <td><span class="status-alarm">离线</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="data-monitor-module" class="module-content">
+                <div class="data-flow-section">
+                    <h3>📊 数据流向监控</h3>
+                    <div class="data-flow">
+                        <div class="data-node">
+                            <div class="node-icon">📡</div>
+                            <div class="node-label">设备采集</div>
+                        </div>
+                        <div class="data-arrow">→</div>
+                        <div class="data-node">
+                            <div class="node-icon">☁️</div>
+                            <div class="node-label">数据传输</div>
+                        </div>
+                        <div class="data-arrow">→</div>
+                        <div class="data-node">
+                            <div class="node-icon">💾</div>
+                            <div class="node-label">数据存储</div>
+                        </div>
+                        <div class="data-arrow">→</div>
+                        <div class="data-node">
+                            <div class="node-icon">📈</div>
+                            <div class="node-label">数据分析</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="data-analysis-module" class="module-content">
+                <div class="content-header">
+                    <h3>📈 数据分析</h3>
+                </div>
+                <div class="maintenance-grid">
+                    <div class="maintenance-card">
+                        <h4>设备状态分析</h4>
+                        <p>设备运行状态统计</p><button class="btn-primary">查看分析</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>数据趋势分析</h4>
+                        <p>数据采集趋势分析</p><button class="btn-primary">查看分析</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>故障预警</h4>
+                        <p>设备故障预测分析</p><button class="btn-primary">查看预警</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="system-integration-module" class="module-content">
+                <div class="content-header">
+                    <h3>🔗 系统集成</h3>
+                </div>
+                <div class="maintenance-grid">
+                    <div class="maintenance-card">
+                        <h4>API接口</h4>
+                        <p>对外API接口管理</p><button class="btn-primary">配置</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>数据同步</h4>
+                        <p>数据同步配置</p><button class="btn-primary">配置</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>第三方集成</h4>
+                        <p>第三方系统集成</p><button class="btn-primary">配置</button>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
+            </footer>
         </div>
 
-        <div id="data-analysis-module" class="module-content">
-            <div class="content-header">
-                <h3>📈 数据分析</h3>
-            </div>
-            <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>设备状态分析</h4><p>设备运行状态统计</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>数据趋势分析</h4><p>数据采集趋势分析</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>故障预警</h4><p>设备故障预测分析</p><button class="btn-primary">查看预警</button></div>
-            </div>
-        </div>
-
-        <div id="system-integration-module" class="module-content">
-            <div class="content-header">
-                <h3>🔗 系统集成</h3>
-            </div>
-            <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>API接口</h4><p>对外API接口管理</p><button class="btn-primary">配置</button></div>
-                <div class="maintenance-card"><h4>数据同步</h4><p>数据同步配置</p><button class="btn-primary">配置</button></div>
-                <div class="maintenance-card"><h4>第三方集成</h4><p>第三方系统集成</p><button class="btn-primary">配置</button></div>
-            </div>
-        </div>
-
-        <footer>
-            <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
-        </footer>
-    </div>
-
-    <script src="assets/js/common.js"></script>
+        <script src="assets/js/common.js"></script>
 </body>
+
 </html>

@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>综合指挥 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -243,6 +245,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -307,23 +310,75 @@
             <div class="dispatch-panel">
                 <h3>📡 指挥调度面板</h3>
                 <div class="dispatch-grid">
-                    <div class="dispatch-item"><div class="dispatch-icon">🚒</div><div class="dispatch-label">消防</div><div class="dispatch-count">23</div></div>
-                    <div class="dispatch-item"><div class="dispatch-icon">🚑</div><div class="dispatch-label">医疗</div><div class="dispatch-count">15</div></div>
-                    <div class="dispatch-item"><div class="dispatch-icon">👮</div><div class="dispatch-label">公安</div><div class="dispatch-count">45</div></div>
-                    <div class="dispatch-item"><div class="dispatch-icon">🚛</div><div class="dispatch-label">环卫</div><div class="dispatch-count">12</div></div>
-                    <div class="dispatch-item"><div class="dispatch-icon">⛑️</div><div class="dispatch-label">应急</div><div class="dispatch-count">8</div></div>
-                    <div class="dispatch-item"><div class="dispatch-icon">⚡</div><div class="dispatch-label">电力</div><div class="dispatch-count">6</div></div>
+                    <div class="dispatch-item">
+                        <div class="dispatch-icon">🚒</div>
+                        <div class="dispatch-label">消防</div>
+                        <div class="dispatch-count">23</div>
+                    </div>
+                    <div class="dispatch-item">
+                        <div class="dispatch-icon">🚑</div>
+                        <div class="dispatch-label">医疗</div>
+                        <div class="dispatch-count">15</div>
+                    </div>
+                    <div class="dispatch-item">
+                        <div class="dispatch-icon">👮</div>
+                        <div class="dispatch-label">公安</div>
+                        <div class="dispatch-count">45</div>
+                    </div>
+                    <div class="dispatch-item">
+                        <div class="dispatch-icon">🚛</div>
+                        <div class="dispatch-label">环卫</div>
+                        <div class="dispatch-count">12</div>
+                    </div>
+                    <div class="dispatch-item">
+                        <div class="dispatch-icon">⛑️</div>
+                        <div class="dispatch-label">应急</div>
+                        <div class="dispatch-count">8</div>
+                    </div>
+                    <div class="dispatch-item">
+                        <div class="dispatch-icon">⚡</div>
+                        <div class="dispatch-label">电力</div>
+                        <div class="dispatch-count">6</div>
+                    </div>
                 </div>
             </div>
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>事件编号</th><th>事件类型</th><th>发生地点</th><th>状态</th><th>调度部门</th><th>操作</th></tr>
+                        <tr>
+                            <th>事件编号</th>
+                            <th>事件类型</th>
+                            <th>发生地点</th>
+                            <th>状态</th>
+                            <th>调度部门</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>JC-20260115001</td><td>交通事故</td><td>XX大道与YY路交叉口</td><td><span class="status-alarm">待处理</span></td><td>交警</td><td><button class="btn-sm">调度</button><button class="btn-sm">跟踪</button></td></tr>
-                        <tr><td>JC-20260115002</td><td>道路积水</td><td>ZZ路隧道</td><td><span class="status-processing">处理中</span></td><td>排水部门</td><td><button class="btn-sm">调度</button><button class="btn-sm">跟踪</button></td></tr>
-                        <tr><td>JC-20260115003</td><td>路灯故障</td><td>AA路</td><td><span class="status-completed">已结案</span></td><td>照明部门</td><td><button class="btn-sm">详情</button></td></tr>
+                        <tr>
+                            <td>JC-20260115001</td>
+                            <td>交通事故</td>
+                            <td>XX大道与YY路交叉口</td>
+                            <td><span class="status-alarm">待处理</span></td>
+                            <td>交警</td>
+                            <td><button class="btn-sm">调度</button><button class="btn-sm">跟踪</button></td>
+                        </tr>
+                        <tr>
+                            <td>JC-20260115002</td>
+                            <td>道路积水</td>
+                            <td>ZZ路隧道</td>
+                            <td><span class="status-processing">处理中</span></td>
+                            <td>排水部门</td>
+                            <td><button class="btn-sm">调度</button><button class="btn-sm">跟踪</button></td>
+                        </tr>
+                        <tr>
+                            <td>JC-20260115003</td>
+                            <td>路灯故障</td>
+                            <td>AA路</td>
+                            <td><span class="status-completed">已结案</span></td>
+                            <td>照明部门</td>
+                            <td><button class="btn-sm">详情</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -334,19 +389,53 @@
                 <h3>🚨 应急响应</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">🚨</div><div class="stat-value">5</div><div class="stat-label">待响应事件</div></div>
-                <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value">2</div><div class="stat-label">火情事件</div></div>
-                <div class="stat-card"><div class="stat-icon">💧</div><div class="stat-value">3</div><div class="stat-label">水情事件</div></div>
-                <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-value">0</div><div class="stat-label">重大事件</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚨</div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">待响应事件</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">火情事件</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">水情事件</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">重大事件</div>
+                </div>
             </div>
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>事件类型</th><th>发生地点</th><th>严重程度</th><th>响应状态</th><th>操作</th></tr>
+                        <tr>
+                            <th>事件类型</th>
+                            <th>发生地点</th>
+                            <th>严重程度</th>
+                            <th>响应状态</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>交通拥堵</td><td>XX大道</td><td><span class="status-warning">中等</span></td><td>待响应</td><td><button class="btn-sm">响应</button></td></tr>
-                        <tr><td>井盖丢失</td><td>YY路</td><td><span class="status-alarm">高</span></td><td>待响应</td><td><button class="btn-sm">响应</button></td></tr>
+                        <tr>
+                            <td>交通拥堵</td>
+                            <td>XX大道</td>
+                            <td><span class="status-warning">中等</span></td>
+                            <td>待响应</td>
+                            <td><button class="btn-sm">响应</button></td>
+                        </tr>
+                        <tr>
+                            <td>井盖丢失</td>
+                            <td>YY路</td>
+                            <td><span class="status-alarm">高</span></td>
+                            <td>待响应</td>
+                            <td><button class="btn-sm">响应</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -357,12 +446,36 @@
                 <h3>📦 资源管理</h3>
             </div>
             <div class="resource-status">
-                <div class="resource-card"><div class="resource-icon">🚒</div><div class="resource-value">45</div><div class="resource-label">消防车辆</div></div>
-                <div class="resource-card"><div class="resource-icon">🚑</div><div class="resource-value">28</div><div class="resource-label">急救车辆</div></div>
-                <div class="resource-card"><div class="resource-icon">👮</div><div class="resource-value">120</div><div class="resource-label">警务人员</div></div>
-                <div class="resource-card"><div class="resource-icon">🛠️</div><div class="resource-value">85</div><div class="resource-label">应急设备</div></div>
-                <div class="resource-card"><div class="resource-icon">⛑️</div><div class="resource-value">56</div><div class="resource-label">救援物资</div></div>
-                <div class="resource-card"><div class="resource-icon">🏥</div><div class="resource-value">32</div><div class="resource-label">医疗机构</div></div>
+                <div class="resource-card">
+                    <div class="resource-icon">🚒</div>
+                    <div class="resource-value">45</div>
+                    <div class="resource-label">消防车辆</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">🚑</div>
+                    <div class="resource-value">28</div>
+                    <div class="resource-label">急救车辆</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">👮</div>
+                    <div class="resource-value">120</div>
+                    <div class="resource-label">警务人员</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">🛠️</div>
+                    <div class="resource-value">85</div>
+                    <div class="resource-label">应急设备</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">⛑️</div>
+                    <div class="resource-value">56</div>
+                    <div class="resource-label">救援物资</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">🏥</div>
+                    <div class="resource-value">32</div>
+                    <div class="resource-label">医疗机构</div>
+                </div>
             </div>
         </div>
 
@@ -375,10 +488,34 @@
                 </div>
             </div>
             <div class="video-wall">
-                <div class="video-item"><div class="video-content">📹 实时监控画面</div><div class="video-info"><div class="video-name">XX大道监控点</div><div class="video-status">在线</div></div></div>
-                <div class="video-item"><div class="video-content">📹 实时监控画面</div><div class="video-info"><div class="video-name">YY路监控点</div><div class="video-status">在线</div></div></div>
-                <div class="video-item"><div class="video-content">📹 实时监控画面</div><div class="video-info"><div class="video-name">ZZ广场监控点</div><div class="video-status">在线</div></div></div>
-                <div class="video-item"><div class="video-content">📹 实时监控画面</div><div class="video-info"><div class="video-name">AA隧道监控点</div><div class="video-status">在线</div></div></div>
+                <div class="video-item">
+                    <div class="video-content">📹 实时监控画面</div>
+                    <div class="video-info">
+                        <div class="video-name">XX大道监控点</div>
+                        <div class="video-status">在线</div>
+                    </div>
+                </div>
+                <div class="video-item">
+                    <div class="video-content">📹 实时监控画面</div>
+                    <div class="video-info">
+                        <div class="video-name">YY路监控点</div>
+                        <div class="video-status">在线</div>
+                    </div>
+                </div>
+                <div class="video-item">
+                    <div class="video-content">📹 实时监控画面</div>
+                    <div class="video-info">
+                        <div class="video-name">ZZ广场监控点</div>
+                        <div class="video-status">在线</div>
+                    </div>
+                </div>
+                <div class="video-item">
+                    <div class="video-content">📹 实时监控画面</div>
+                    <div class="video-info">
+                        <div class="video-name">AA隧道监控点</div>
+                        <div class="video-status">在线</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -387,9 +524,18 @@
                 <h3>💡 决策支持</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>数据分析报告</h4><p>每日运营数据分析汇总</p><button class="btn-primary">查看报告</button></div>
-                <div class="maintenance-card"><h4>趋势预测</h4><p>基于历史数据的趋势分析</p><button class="btn-primary">查看预测</button></div>
-                <div class="maintenance-card"><h4>应急预案</h4><p>各类突发事件应急预案</p><button class="btn-primary">查看预案</button></div>
+                <div class="maintenance-card">
+                    <h4>数据分析报告</h4>
+                    <p>每日运营数据分析汇总</p><button class="btn-primary">查看报告</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>趋势预测</h4>
+                    <p>基于历史数据的趋势分析</p><button class="btn-primary">查看预测</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>应急预案</h4>
+                    <p>各类突发事件应急预案</p><button class="btn-primary">查看预案</button>
+                </div>
             </div>
         </div>
 
@@ -400,4 +546,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

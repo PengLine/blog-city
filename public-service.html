@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>公共服务 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -86,7 +88,8 @@
             font-size: 0.9em;
         }
 
-        .map-btn:hover, .map-btn.active {
+        .map-btn:hover,
+        .map-btn.active {
             background: #9b59b6;
             color: white;
             transform: translateY(-2px);
@@ -517,6 +520,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -592,12 +596,36 @@
         </div>
 
         <div class="service-grid">
-            <div class="service-item"><div class="service-item-icon">🏥</div><div class="service-item-title">医疗服务</div><div class="service-item-desc">提供便捷的医疗咨询和预约服务</div></div>
-            <div class="service-item"><div class="service-item-icon">🏫</div><div class="service-item-title">教育服务</div><div class="service-item-desc">教育资源查询和在线预约</div></div>
-            <div class="service-item"><div class="service-item-icon">🏭</div><div class="service-item-title">政务服务</div><div class="service-item-desc">在线政务办理服务</div></div>
-            <div class="service-item"><div class="service-item-icon">🚌</div><div class="service-item-title">交通服务</div><div class="service-item-desc">公共交通信息查询</div></div>
-            <div class="service-item"><div class="service-item-icon">🏠</div><div class="service-item-title">住房服务</div><div class="service-item-desc">住房信息和租赁服务</div></div>
-            <div class="service-item"><div class="service-item-icon">💰</div><div class="service-item-title">金融服务</div><div class="service-item-desc">金融咨询和便民服务</div></div>
+            <div class="service-item">
+                <div class="service-item-icon">🏥</div>
+                <div class="service-item-title">医疗服务</div>
+                <div class="service-item-desc">提供便捷的医疗咨询和预约服务</div>
+            </div>
+            <div class="service-item">
+                <div class="service-item-icon">🏫</div>
+                <div class="service-item-title">教育服务</div>
+                <div class="service-item-desc">教育资源查询和在线预约</div>
+            </div>
+            <div class="service-item">
+                <div class="service-item-icon">🏭</div>
+                <div class="service-item-title">政务服务</div>
+                <div class="service-item-desc">在线政务办理服务</div>
+            </div>
+            <div class="service-item">
+                <div class="service-item-icon">🚌</div>
+                <div class="service-item-title">交通服务</div>
+                <div class="service-item-desc">公共交通信息查询</div>
+            </div>
+            <div class="service-item">
+                <div class="service-item-icon">🏠</div>
+                <div class="service-item-title">住房服务</div>
+                <div class="service-item-desc">住房信息和租赁服务</div>
+            </div>
+            <div class="service-item">
+                <div class="service-item-icon">💰</div>
+                <div class="service-item-title">金融服务</div>
+                <div class="service-item-desc">金融咨询和便民服务</div>
+            </div>
         </div>
 
         <div class="module-nav">
@@ -629,14 +657,55 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>服务名称</th><th>服务类型</th><th>所属站点</th><th>状态</th><th>操作</th></tr>
+                            <tr>
+                                <th>服务名称</th>
+                                <th>服务类型</th>
+                                <th>所属站点</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>医疗健康咨询</td><td>医疗服务</td><td>XX社区卫生服务中心</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button class="btn-sm btn-warning">暂停</button></td></tr>
-                            <tr><td>教育资源查询</td><td>教育服务</td><td>YY教育局服务站</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button class="btn-sm btn-warning">暂停</button></td></tr>
-                            <tr><td>政务事项办理</td><td>政务服务</td><td>ZZ政务服务中心</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button class="btn-sm btn-warning">暂停</button></td></tr>
-                            <tr><td>交通出行咨询</td><td>交通服务</td><td>XX交通服务站</td><td><span class="status-warning">维护中</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button class="btn-sm btn-success">恢复</button></td></tr>
-                            <tr><td>住房租赁服务</td><td>住房服务</td><td>YY住房保障中心</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button class="btn-sm btn-warning">暂停</button></td></tr>
+                            <tr>
+                                <td>医疗健康咨询</td>
+                                <td>医疗服务</td>
+                                <td>XX社区卫生服务中心</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button
+                                        class="btn-sm btn-warning">暂停</button></td>
+                            </tr>
+                            <tr>
+                                <td>教育资源查询</td>
+                                <td>教育服务</td>
+                                <td>YY教育局服务站</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button
+                                        class="btn-sm btn-warning">暂停</button></td>
+                            </tr>
+                            <tr>
+                                <td>政务事项办理</td>
+                                <td>政务服务</td>
+                                <td>ZZ政务服务中心</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button
+                                        class="btn-sm btn-warning">暂停</button></td>
+                            </tr>
+                            <tr>
+                                <td>交通出行咨询</td>
+                                <td>交通服务</td>
+                                <td>XX交通服务站</td>
+                                <td><span class="status-warning">维护中</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button
+                                        class="btn-sm btn-success">恢复</button></td>
+                            </tr>
+                            <tr>
+                                <td>住房租赁服务</td>
+                                <td>住房服务</td>
+                                <td>YY住房保障中心</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">编辑</button><button
+                                        class="btn-sm btn-warning">暂停</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -654,12 +723,40 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>站点名称</th><th>地址</th><th>服务类型</th><th>负责人</th><th>状态</th><th>操作</th></tr>
+                            <tr>
+                                <th>站点名称</th>
+                                <th>地址</th>
+                                <th>服务类型</th>
+                                <th>负责人</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>XX社区卫生服务中心</td><td>XX街道123号</td><td>医疗服务</td><td>张医生</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
-                            <tr><td>YY教育局服务站</td><td>YY路456号</td><td>教育服务</td><td>李主任</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
-                            <tr><td>ZZ政务服务中心</td><td>ZZ大道789号</td><td>政务服务</td><td>王科长</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
+                            <tr>
+                                <td>XX社区卫生服务中心</td>
+                                <td>XX街道123号</td>
+                                <td>医疗服务</td>
+                                <td>张医生</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                            </tr>
+                            <tr>
+                                <td>YY教育局服务站</td>
+                                <td>YY路456号</td>
+                                <td>教育服务</td>
+                                <td>李主任</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                            </tr>
+                            <tr>
+                                <td>ZZ政务服务中心</td>
+                                <td>ZZ大道789号</td>
+                                <td>政务服务</td>
+                                <td>王科长</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -671,12 +768,36 @@
                     <button class="btn-primary">新增类型</button>
                 </div>
                 <div class="service-grid">
-                    <div class="service-item"><div class="service-item-icon">🏥</div><div class="service-item-title">医疗服务</div><div class="service-item-desc">12 项服务</div></div>
-                    <div class="service-item"><div class="service-item-icon">🏫</div><div class="service-item-title">教育服务</div><div class="service-item-desc">8 项服务</div></div>
-                    <div class="service-item"><div class="service-item-icon">🏭</div><div class="service-item-title">政务服务</div><div class="service-item-desc">15 项服务</div></div>
-                    <div class="service-item"><div class="service-item-icon">🚌</div><div class="service-item-title">交通服务</div><div class="service-item-desc">6 项服务</div></div>
-                    <div class="service-item"><div class="service-item-icon">🏠</div><div class="service-item-title">住房服务</div><div class="service-item-desc">5 项服务</div></div>
-                    <div class="service-item"><div class="service-item-icon">💰</div><div class="service-item-title">金融服务</div><div class="service-item-desc">4 项服务</div></div>
+                    <div class="service-item">
+                        <div class="service-item-icon">🏥</div>
+                        <div class="service-item-title">医疗服务</div>
+                        <div class="service-item-desc">12 项服务</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-item-icon">🏫</div>
+                        <div class="service-item-title">教育服务</div>
+                        <div class="service-item-desc">8 项服务</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-item-icon">🏭</div>
+                        <div class="service-item-title">政务服务</div>
+                        <div class="service-item-desc">15 项服务</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-item-icon">🚌</div>
+                        <div class="service-item-title">交通服务</div>
+                        <div class="service-item-desc">6 项服务</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-item-icon">🏠</div>
+                        <div class="service-item-title">住房服务</div>
+                        <div class="service-item-desc">5 项服务</div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-item-icon">💰</div>
+                        <div class="service-item-title">金融服务</div>
+                        <div class="service-item-desc">4 项服务</div>
+                    </div>
                 </div>
             </div>
 
@@ -685,10 +806,26 @@
                     <h3>⏰ 服务时间设置</h3>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon">🌞</div><div class="stat-value">8:00</div><div class="stat-label">开始时间</div></div>
-                    <div class="stat-card"><div class="stat-icon">🌙</div><div class="stat-value">18:00</div><div class="stat-label">结束时间</div></div>
-                    <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value">7天</div><div class="stat-label">服务天数</div></div>
-                    <div class="stat-card"><div class="stat-icon">☕</div><div class="stat-value">1小时</div><div class="stat-label">午休时间</div></div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌞</div>
+                        <div class="stat-value">8:00</div>
+                        <div class="stat-label">开始时间</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌙</div>
+                        <div class="stat-value">18:00</div>
+                        <div class="stat-label">结束时间</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value">7天</div>
+                        <div class="stat-label">服务天数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">☕</div>
+                        <div class="stat-value">1小时</div>
+                        <div class="stat-label">午休时间</div>
+                    </div>
                 </div>
                 <button class="btn-primary">修改服务时间</button>
             </div>
@@ -713,13 +850,52 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>姓名</th><th>职位</th><th>所属站点</th><th>服务类型</th><th>状态</th><th>操作</th></tr>
+                            <tr>
+                                <th>姓名</th>
+                                <th>职位</th>
+                                <th>所属站点</th>
+                                <th>服务类型</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>张三</td><td>医疗服务专员</td><td>XX社区卫生服务中心</td><td>医疗服务</td><td><span class="status-normal">在职</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button class="btn-sm">考核</button></td></tr>
-                            <tr><td>李四</td><td>教育服务主管</td><td>YY教育局服务站</td><td>教育服务</td><td><span class="status-normal">在职</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button class="btn-sm">考核</button></td></tr>
-                            <tr><td>王五</td><td>政务办事员</td><td>ZZ政务服务中心</td><td>政务服务</td><td><span class="status-normal">在职</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button class="btn-sm">考核</button></td></tr>
-                            <tr><td>赵六</td><td>交通服务专员</td><td>XX交通服务站</td><td>交通服务</td><td><span class="status-warning">请假</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button class="btn-sm">考核</button></td></tr>
+                            <tr>
+                                <td>张三</td>
+                                <td>医疗服务专员</td>
+                                <td>XX社区卫生服务中心</td>
+                                <td>医疗服务</td>
+                                <td><span class="status-normal">在职</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button
+                                        class="btn-sm">考核</button></td>
+                            </tr>
+                            <tr>
+                                <td>李四</td>
+                                <td>教育服务主管</td>
+                                <td>YY教育局服务站</td>
+                                <td>教育服务</td>
+                                <td><span class="status-normal">在职</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button
+                                        class="btn-sm">考核</button></td>
+                            </tr>
+                            <tr>
+                                <td>王五</td>
+                                <td>政务办事员</td>
+                                <td>ZZ政务服务中心</td>
+                                <td>政务服务</td>
+                                <td><span class="status-normal">在职</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button
+                                        class="btn-sm">考核</button></td>
+                            </tr>
+                            <tr>
+                                <td>赵六</td>
+                                <td>交通服务专员</td>
+                                <td>XX交通服务站</td>
+                                <td>交通服务</td>
+                                <td><span class="status-warning">请假</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">排班</button><button
+                                        class="btn-sm">考核</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -733,12 +909,32 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>角色名称</th><th>权限描述</th><th>人员数量</th><th>操作</th></tr>
+                            <tr>
+                                <th>角色名称</th>
+                                <th>权限描述</th>
+                                <th>人员数量</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>服务专员</td><td>基础服务操作权限</td><td>156</td><td><button class="btn-sm">编辑</button><button class="btn-sm">权限设置</button></td></tr>
-                            <tr><td>服务主管</td><td>团队管理和服务监督</td><td>23</td><td><button class="btn-sm">编辑</button><button class="btn-sm">权限设置</button></td></tr>
-                            <tr><td>站点管理员</td><td>站点全面管理权限</td><td>12</td><td><button class="btn-sm">编辑</button><button class="btn-sm">权限设置</button></td></tr>
+                            <tr>
+                                <td>服务专员</td>
+                                <td>基础服务操作权限</td>
+                                <td>156</td>
+                                <td><button class="btn-sm">编辑</button><button class="btn-sm">权限设置</button></td>
+                            </tr>
+                            <tr>
+                                <td>服务主管</td>
+                                <td>团队管理和服务监督</td>
+                                <td>23</td>
+                                <td><button class="btn-sm">编辑</button><button class="btn-sm">权限设置</button></td>
+                            </tr>
+                            <tr>
+                                <td>站点管理员</td>
+                                <td>站点全面管理权限</td>
+                                <td>12</td>
+                                <td><button class="btn-sm">编辑</button><button class="btn-sm">权限设置</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -752,12 +948,40 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>培训名称</th><th>培训类型</th><th>开始时间</th><th>状态</th><th>报名人数</th><th>操作</th></tr>
+                            <tr>
+                                <th>培训名称</th>
+                                <th>培训类型</th>
+                                <th>开始时间</th>
+                                <th>状态</th>
+                                <th>报名人数</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>服务礼仪培训</td><td>服务技能</td><td>2026-01-20</td><td><span class="status-processing">报名中</span></td><td>45</td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
-                            <tr><td>政务办理流程</td><td>业务知识</td><td>2026-01-25</td><td><span class="status-processing">报名中</span></td><td>32</td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
-                            <tr><td>急救知识培训</td><td>技能培训</td><td>2026-02-01</td><td><span class="status-normal">未开始</span></td><td>0</td><td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td></tr>
+                            <tr>
+                                <td>服务礼仪培训</td>
+                                <td>服务技能</td>
+                                <td>2026-01-20</td>
+                                <td><span class="status-processing">报名中</span></td>
+                                <td>45</td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                            </tr>
+                            <tr>
+                                <td>政务办理流程</td>
+                                <td>业务知识</td>
+                                <td>2026-01-25</td>
+                                <td><span class="status-processing">报名中</span></td>
+                                <td>32</td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                            </tr>
+                            <tr>
+                                <td>急救知识培训</td>
+                                <td>技能培训</td>
+                                <td>2026-02-01</td>
+                                <td><span class="status-normal">未开始</span></td>
+                                <td>0</td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -774,26 +998,54 @@
                 </div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-value">12</div><div class="stat-label">待处理</div></div>
-                <div class="stat-card"><div class="stat-icon">🔄</div><div class="stat-value">23</div><div class="stat-label">处理中</div></div>
-                <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value">156</div><div class="stat-label">已完成</div></div>
-                <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value">92%</div><div class="stat-label">完成率</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">待处理</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">处理中</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">完成率</div>
+                </div>
             </div>
             <div class="workorder-item">
-                <div class="workorder-header"><div class="workorder-title">工单 #WO20260115001</div><span class="workorder-status status-alarm">待处理</span></div>
-                <div class="workorder-info"><span>服务类型：医疗咨询</span><span>创建时间：2026-01-15 16:30</span><span>优先级：高</span></div>
+                <div class="workorder-header">
+                    <div class="workorder-title">工单 #WO20260115001</div><span
+                        class="workorder-status status-alarm">待处理</span>
+                </div>
+                <div class="workorder-info"><span>服务类型：医疗咨询</span><span>创建时间：2026-01-15 16:30</span><span>优先级：高</span>
+                </div>
                 <div class="feedback-content">用户咨询关于慢性病门诊预约流程</div>
                 <button class="btn-sm">立即处理</button>
             </div>
             <div class="workorder-item">
-                <div class="workorder-header"><div class="workorder-title">工单 #WO20260115002</div><span class="workorder-status status-processing">处理中</span></div>
-                <div class="workorder-info"><span>服务类型：政务办理</span><span>创建时间：2026-01-15 15:20</span><span>优先级：中</span></div>
+                <div class="workorder-header">
+                    <div class="workorder-title">工单 #WO20260115002</div><span
+                        class="workorder-status status-processing">处理中</span>
+                </div>
+                <div class="workorder-info"><span>服务类型：政务办理</span><span>创建时间：2026-01-15 15:20</span><span>优先级：中</span>
+                </div>
                 <div class="feedback-content">用户申请办理营业执照变更</div>
                 <button class="btn-sm">跟踪进度</button>
             </div>
             <div class="workorder-item">
-                <div class="workorder-header"><div class="workorder-title">工单 #WO20260115003</div><span class="workorder-status status-completed">已完成</span></div>
-                <div class="workorder-info"><span>服务类型：教育咨询</span><span>创建时间：2026-01-15 14:10</span><span>优先级：低</span></div>
+                <div class="workorder-header">
+                    <div class="workorder-title">工单 #WO20260115003</div><span
+                        class="workorder-status status-completed">已完成</span>
+                </div>
+                <div class="workorder-info"><span>服务类型：教育咨询</span><span>创建时间：2026-01-15 14:10</span><span>优先级：低</span>
+                </div>
                 <div class="feedback-content">用户咨询义务教育入学政策</div>
                 <button class="btn-sm">查看详情</button>
             </div>
@@ -811,60 +1063,197 @@
                     <button class="calendar-nav-btn">→</button>
                 </div>
                 <div class="calendar-weekdays">
-                    <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div><div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday">六</div>
+                    <div class="weekday">日</div>
+                    <div class="weekday">一</div>
+                    <div class="weekday">二</div>
+                    <div class="weekday">三</div>
+                    <div class="weekday">四</div>
+                    <div class="weekday">五</div>
+                    <div class="weekday">六</div>
                 </div>
                 <div class="calendar-days">
-                    <div class="calendar-day other-month"><div class="day-number">29</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">30</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">31</div></div>
-                    <div class="calendar-day"><div class="day-number">1</div><div class="booking-marker">3个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">2</div><div class="booking-marker">5个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">3</div><div class="booking-marker">2个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">4</div></div>
-                    <div class="calendar-day"><div class="day-number">5</div><div class="booking-marker">4个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">6</div><div class="booking-marker">6个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">7</div><div class="booking-marker">3个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">8</div><div class="booking-marker">5个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">9</div><div class="booking-marker">4个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">10</div><div class="booking-marker">2个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">11</div></div>
-                    <div class="calendar-day"><div class="day-number">12</div><div class="booking-marker">5个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">13</div><div class="booking-marker">7个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">14</div><div class="booking-marker">4个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">15</div><div class="booking-marker">6个预约</div></div>
-                    <div class="calendar-day today"><div class="day-number">16</div><div class="booking-marker">8个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">17</div><div class="booking-marker">3个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">18</div></div>
-                    <div class="calendar-day"><div class="day-number">19</div><div class="booking-marker">4个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">20</div><div class="booking-marker">5个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">21</div><div class="booking-marker">3个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">22</div><div class="booking-marker">6个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">23</div><div class="booking-marker">4个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">24</div><div class="booking-marker">2个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">25</div></div>
-                    <div class="calendar-day"><div class="day-number">26</div><div class="booking-marker">5个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">27</div><div class="booking-marker">6个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">28</div><div class="booking-marker">4个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">29</div><div class="booking-marker">3个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">30</div><div class="booking-marker">5个预约</div></div>
-                    <div class="calendar-day"><div class="day-number">31</div><div class="booking-marker">2个预约</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">1</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">2</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">3</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">4</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">5</div></div>
-                    <div class="calendar-day other-month"><div class="day-number">6</div></div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">29</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">30</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">31</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">1</div>
+                        <div class="booking-marker">3个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">2</div>
+                        <div class="booking-marker">5个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">3</div>
+                        <div class="booking-marker">2个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">5</div>
+                        <div class="booking-marker">4个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">6</div>
+                        <div class="booking-marker">6个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">7</div>
+                        <div class="booking-marker">3个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">8</div>
+                        <div class="booking-marker">5个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">9</div>
+                        <div class="booking-marker">4个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">10</div>
+                        <div class="booking-marker">2个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">11</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">12</div>
+                        <div class="booking-marker">5个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">13</div>
+                        <div class="booking-marker">7个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">14</div>
+                        <div class="booking-marker">4个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">15</div>
+                        <div class="booking-marker">6个预约</div>
+                    </div>
+                    <div class="calendar-day today">
+                        <div class="day-number">16</div>
+                        <div class="booking-marker">8个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">17</div>
+                        <div class="booking-marker">3个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">19</div>
+                        <div class="booking-marker">4个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">20</div>
+                        <div class="booking-marker">5个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">21</div>
+                        <div class="booking-marker">3个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">22</div>
+                        <div class="booking-marker">6个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">23</div>
+                        <div class="booking-marker">4个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">24</div>
+                        <div class="booking-marker">2个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">25</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">26</div>
+                        <div class="booking-marker">5个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">27</div>
+                        <div class="booking-marker">6个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">28</div>
+                        <div class="booking-marker">4个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">29</div>
+                        <div class="booking-marker">3个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">30</div>
+                        <div class="booking-marker">5个预约</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">31</div>
+                        <div class="booking-marker">2个预约</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">5</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">6</div>
+                    </div>
                 </div>
             </div>
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>预约人</th><th>服务类型</th><th>预约时间</th><th>状态</th><th>操作</th></tr>
+                        <tr>
+                            <th>预约人</th>
+                            <th>服务类型</th>
+                            <th>预约时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>张先生</td><td>医疗预约</td><td>2026-01-16 09:00</td><td><span class="status-normal">已确认</span></td><td><button class="btn-sm">详情</button><button class="btn-sm btn-warning">取消</button></td></tr>
-                        <tr><td>李女士</td><td>政务办理</td><td>2026-01-16 10:00</td><td><span class="status-normal">已确认</span></td><td><button class="btn-sm">详情</button><button class="btn-sm btn-warning">取消</button></td></tr>
-                        <tr><td>王同学</td><td>教育咨询</td><td>2026-01-16 14:00</td><td><span class="status-processing">待确认</span></td><td><button class="btn-sm">详情</button><button class="btn-sm btn-success">确认</button></td></tr>
+                        <tr>
+                            <td>张先生</td>
+                            <td>医疗预约</td>
+                            <td>2026-01-16 09:00</td>
+                            <td><span class="status-normal">已确认</span></td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm btn-warning">取消</button></td>
+                        </tr>
+                        <tr>
+                            <td>李女士</td>
+                            <td>政务办理</td>
+                            <td>2026-01-16 10:00</td>
+                            <td><span class="status-normal">已确认</span></td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm btn-warning">取消</button></td>
+                        </tr>
+                        <tr>
+                            <td>王同学</td>
+                            <td>教育咨询</td>
+                            <td>2026-01-16 14:00</td>
+                            <td><span class="status-processing">待确认</span></td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm btn-success">确认</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -875,20 +1264,78 @@
                 <h3>💬 服务评价</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-value">4.8</div><div class="stat-label">平均评分</div></div>
-                <div class="stat-card"><div class="stat-icon">👍</div><div class="stat-value">95%</div><div class="stat-label">好评率</div></div>
-                <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value">2,345</div><div class="stat-label">评价总数</div></div>
-                <div class="stat-card"><div class="stat-icon">💬</div><div class="stat-value">345</div><div class="stat-label">待回复</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">平均评分</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👍</div>
+                    <div class="stat-value">95%</div>
+                    <div class="stat-label">好评率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value">2,345</div>
+                    <div class="stat-label">评价总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-value">345</div>
+                    <div class="stat-label">待回复</div>
+                </div>
             </div>
             <div class="feedback-section">
                 <h3>最新评价</h3>
                 <div class="feedback-list">
-                    <div class="feedback-item"><div class="feedback-header"><div class="feedback-name">用户A</div><div class="feedback-time">2026-01-15 16:30</div></div><div class="feedback-content">服务态度很好，效率很高，非常满意！</div><div class="feedback-rating">⭐⭐⭐⭐⭐</div></div>
-                    <div class="feedback-item"><div class="feedback-header"><div class="feedback-name">用户B</div><div class="feedback-time">2026-01-15 15:20</div></div><div class="feedback-content">希望能增加更多服务项目，比如线上办理功能。</div><div class="feedback-rating">⭐⭐⭐⭐</div></div>
-                    <div class="feedback-item"><div class="feedback-header"><div class="feedback-name">用户C</div><div class="feedback-time">2026-01-15 14:10</div></div><div class="feedback-content">办事流程很清晰，工作人员讲解详细，点赞！</div><div class="feedback-rating">⭐⭐⭐⭐⭐</div></div>
-                    <div class="feedback-item"><div class="feedback-header"><div class="feedback-name">用户D</div><div class="feedback-time">2026-01-15 13:00</div></div><div class="feedback-content">等待时间有点长，建议增加更多服务窗口。</div><div class="feedback-rating">⭐⭐⭐</div></div>
-                    <div class="feedback-item"><div class="feedback-header"><div class="feedback-name">用户E</div><div class="feedback-time">2026-01-15 11:30</div></div><div class="feedback-content">预约系统很方便，不用排队，太棒了！</div><div class="feedback-rating">⭐⭐⭐⭐⭐</div></div>
-                    <div class="feedback-item"><div class="feedback-header"><div class="feedback-name">用户F</div><div class="feedback-time">2026-01-15 10:15</div></div><div class="feedback-content">服务人员很专业，问题都得到了很好的解答。</div><div class="feedback-rating">⭐⭐⭐⭐⭐</div></div>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-name">用户A</div>
+                            <div class="feedback-time">2026-01-15 16:30</div>
+                        </div>
+                        <div class="feedback-content">服务态度很好，效率很高，非常满意！</div>
+                        <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-name">用户B</div>
+                            <div class="feedback-time">2026-01-15 15:20</div>
+                        </div>
+                        <div class="feedback-content">希望能增加更多服务项目，比如线上办理功能。</div>
+                        <div class="feedback-rating">⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-name">用户C</div>
+                            <div class="feedback-time">2026-01-15 14:10</div>
+                        </div>
+                        <div class="feedback-content">办事流程很清晰，工作人员讲解详细，点赞！</div>
+                        <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-name">用户D</div>
+                            <div class="feedback-time">2026-01-15 13:00</div>
+                        </div>
+                        <div class="feedback-content">等待时间有点长，建议增加更多服务窗口。</div>
+                        <div class="feedback-rating">⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-name">用户E</div>
+                            <div class="feedback-time">2026-01-15 11:30</div>
+                        </div>
+                        <div class="feedback-content">预约系统很方便，不用排队，太棒了！</div>
+                        <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="feedback-name">用户F</div>
+                            <div class="feedback-time">2026-01-15 10:15</div>
+                        </div>
+                        <div class="feedback-content">服务人员很专业，问题都得到了很好的解答。</div>
+                        <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -898,19 +1345,56 @@
                 <h3>📊 数据分析</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value">12,345</div><div class="stat-label">本月服务量</div></div>
-                <div class="stat-card"><div class="stat-icon">📉</div><div class="stat-value">+12.5%</div><div class="stat-label">同比增长</div></div>
-                <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-value">98%</div><div class="stat-label">满意度</div></div>
-                <div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-value">8分钟</div><div class="stat-label">平均响应</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-value">12,345</div>
+                    <div class="stat-label">本月服务量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📉</div>
+                    <div class="stat-value">+12.5%</div>
+                    <div class="stat-label">同比增长</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">满意度</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-value">8分钟</div>
+                    <div class="stat-label">平均响应</div>
+                </div>
             </div>
             <div class="bar-chart">
-                <div class="chart-item"><div class="chart-bar" style="height: 70%"></div><div class="chart-label">周一</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 85%"></div><div class="chart-label">周二</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 90%"></div><div class="chart-label">周三</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 80%"></div><div class="chart-label">周四</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 95%"></div><div class="chart-label">周五</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 65%"></div><div class="chart-label">周六</div></div>
-                <div class="chart-item"><div class="chart-bar" style="height: 55%"></div><div class="chart-label">周日</div></div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 70%"></div>
+                    <div class="chart-label">周一</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 85%"></div>
+                    <div class="chart-label">周二</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 90%"></div>
+                    <div class="chart-label">周三</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 80%"></div>
+                    <div class="chart-label">周四</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 95%"></div>
+                    <div class="chart-label">周五</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 65%"></div>
+                    <div class="chart-label">周六</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-bar" style="height: 55%"></div>
+                    <div class="chart-label">周日</div>
+                </div>
             </div>
             <div class="booking-form">
                 <h3>📋 服务数据分析报告</h3>
@@ -948,4 +1432,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

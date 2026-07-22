@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>平台架构 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -41,7 +43,12 @@
             background: #0080ff;
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             color: #00d4ff;
         }
 
@@ -171,6 +178,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -237,10 +245,26 @@
         </div>
 
         <div class="component-grid">
-            <div class="component-card"><div class="component-icon">☁️</div><div class="component-title">云原生架构</div><div class="component-desc">基于云平台的弹性伸缩架构</div></div>
-            <div class="component-card"><div class="component-icon">🔗</div><div class="component-title">微服务架构</div><div class="component-desc">模块化、松耦合的服务设计</div></div>
-            <div class="component-card"><div class="component-icon">🛡️</div><div class="component-title">安全架构</div><div class="component-desc">多层次安全防护体系</div></div>
-            <div class="component-card"><div class="component-icon">🔄</div><div class="component-title">数据同步</div><div class="component-desc">实时数据同步与备份</div></div>
+            <div class="component-card">
+                <div class="component-icon">☁️</div>
+                <div class="component-title">云原生架构</div>
+                <div class="component-desc">基于云平台的弹性伸缩架构</div>
+            </div>
+            <div class="component-card">
+                <div class="component-icon">🔗</div>
+                <div class="component-title">微服务架构</div>
+                <div class="component-desc">模块化、松耦合的服务设计</div>
+            </div>
+            <div class="component-card">
+                <div class="component-icon">🛡️</div>
+                <div class="component-title">安全架构</div>
+                <div class="component-desc">多层次安全防护体系</div>
+            </div>
+            <div class="component-card">
+                <div class="component-icon">🔄</div>
+                <div class="component-title">数据同步</div>
+                <div class="component-desc">实时数据同步与备份</div>
+            </div>
         </div>
 
         <div class="module-nav">
@@ -254,14 +278,38 @@
             <div class="architecture-section">
                 <h3>🗂️ 功能模块</h3>
                 <div class="tech-stack">
-                    <div class="tech-item"><div class="tech-name">数字城管</div><div class="tech-desc">城市事件管理</div></div>
-                    <div class="tech-item"><div class="tech-name">智慧环卫</div><div class="tech-desc">环境卫生管理</div></div>
-                    <div class="tech-item"><div class="tech-name">智慧市政</div><div class="tech-desc">市政设施管理</div></div>
-                    <div class="tech-item"><div class="tech-name">智慧照明</div><div class="tech-desc">城市照明控制</div></div>
-                    <div class="tech-item"><div class="tech-name">智慧排水</div><div class="tech-desc">排水系统监控</div></div>
-                    <div class="tech-item"><div class="tech-name">智慧停车</div><div class="tech-desc">停车场管理</div></div>
-                    <div class="tech-item"><div class="tech-name">综合指挥</div><div class="tech-desc">多部门协同</div></div>
-                    <div class="tech-item"><div class="tech-name">公共服务</div><div class="tech-desc">公共资源管理</div></div>
+                    <div class="tech-item">
+                        <div class="tech-name">数字城管</div>
+                        <div class="tech-desc">城市事件管理</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">智慧环卫</div>
+                        <div class="tech-desc">环境卫生管理</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">智慧市政</div>
+                        <div class="tech-desc">市政设施管理</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">智慧照明</div>
+                        <div class="tech-desc">城市照明控制</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">智慧排水</div>
+                        <div class="tech-desc">排水系统监控</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">智慧停车</div>
+                        <div class="tech-desc">停车场管理</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">综合指挥</div>
+                        <div class="tech-desc">多部门协同</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">公共服务</div>
+                        <div class="tech-desc">公共资源管理</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -270,12 +318,30 @@
             <div class="architecture-section">
                 <h3>💻 技术栈</h3>
                 <div class="tech-stack">
-                    <div class="tech-item"><div class="tech-name">前端框架</div><div class="tech-desc">Vue 3 + TypeScript</div></div>
-                    <div class="tech-item"><div class="tech-name">UI组件</div><div class="tech-desc">Element Plus</div></div>
-                    <div class="tech-item"><div class="tech-name">后端框架</div><div class="tech-desc">Spring Boot</div></div>
-                    <div class="tech-item"><div class="tech-name">数据库</div><div class="tech-desc">MySQL + Redis</div></div>
-                    <div class="tech-item"><div class="tech-name">消息队列</div><div class="tech-desc">RabbitMQ</div></div>
-                    <div class="tech-item"><div class="tech-name">容器化</div><div class="tech-desc">Docker + Kubernetes</div></div>
+                    <div class="tech-item">
+                        <div class="tech-name">前端框架</div>
+                        <div class="tech-desc">Vue 3 + TypeScript</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">UI组件</div>
+                        <div class="tech-desc">Element Plus</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">后端框架</div>
+                        <div class="tech-desc">Spring Boot</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">数据库</div>
+                        <div class="tech-desc">MySQL + Redis</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">消息队列</div>
+                        <div class="tech-desc">RabbitMQ</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">容器化</div>
+                        <div class="tech-desc">Docker + Kubernetes</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -284,10 +350,22 @@
             <div class="architecture-section">
                 <h3>🛡️ 安全架构</h3>
                 <div class="tech-stack">
-                    <div class="tech-item"><div class="tech-name">身份认证</div><div class="tech-desc">JWT + OAuth2</div></div>
-                    <div class="tech-item"><div class="tech-name">权限管理</div><div class="tech-desc">RBAC</div></div>
-                    <div class="tech-item"><div class="tech-name">数据加密</div><div class="tech-desc">AES + SSL</div></div>
-                    <div class="tech-item"><div class="tech-name">安全审计</div><div class="tech-desc">日志记录</div></div>
+                    <div class="tech-item">
+                        <div class="tech-name">身份认证</div>
+                        <div class="tech-desc">JWT + OAuth2</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">权限管理</div>
+                        <div class="tech-desc">RBAC</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">数据加密</div>
+                        <div class="tech-desc">AES + SSL</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">安全审计</div>
+                        <div class="tech-desc">日志记录</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -296,10 +374,22 @@
             <div class="architecture-section">
                 <h3>🚀 部署方案</h3>
                 <div class="tech-stack">
-                    <div class="tech-item"><div class="tech-name">云平台</div><div class="tech-desc">公有云/私有云</div></div>
-                    <div class="tech-item"><div class="tech-name">CI/CD</div><div class="tech-desc">自动化部署</div></div>
-                    <div class="tech-item"><div class="tech-name">监控告警</div><div class="tech-desc">Prometheus + Grafana</div></div>
-                    <div class="tech-item"><div class="tech-name">容灾备份</div><div class="tech-desc">多地域备份</div></div>
+                    <div class="tech-item">
+                        <div class="tech-name">云平台</div>
+                        <div class="tech-desc">公有云/私有云</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">CI/CD</div>
+                        <div class="tech-desc">自动化部署</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">监控告警</div>
+                        <div class="tech-desc">Prometheus + Grafana</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-name">容灾备份</div>
+                        <div class="tech-desc">多地域备份</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -311,4 +401,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

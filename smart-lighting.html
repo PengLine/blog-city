@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧照明 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -201,6 +203,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -246,10 +249,26 @@
         </div>
 
         <div class="lighting-grid">
-            <div class="lighting-card"><div class="lighting-icon">💡</div><div class="lighting-count">8,567</div><div class="lighting-label">主干道路灯</div></div>
-            <div class="lighting-card"><div class="lighting-icon">🌟</div><div class="lighting-count">2,345</div><div class="lighting-label">景观照明</div></div>
-            <div class="lighting-card"><div class="lighting-icon">🏮</div><div class="lighting-count">1,234</div><div class="lighting-label">庭院灯</div></div>
-            <div class="lighting-card"><div class="lighting-icon">🚦</div><div class="lighting-count">199</div><div class="lighting-label">交通信号灯</div></div>
+            <div class="lighting-card">
+                <div class="lighting-icon">💡</div>
+                <div class="lighting-count">8,567</div>
+                <div class="lighting-label">主干道路灯</div>
+            </div>
+            <div class="lighting-card">
+                <div class="lighting-icon">🌟</div>
+                <div class="lighting-count">2,345</div>
+                <div class="lighting-label">景观照明</div>
+            </div>
+            <div class="lighting-card">
+                <div class="lighting-icon">🏮</div>
+                <div class="lighting-count">1,234</div>
+                <div class="lighting-label">庭院灯</div>
+            </div>
+            <div class="lighting-card">
+                <div class="lighting-icon">🚦</div>
+                <div class="lighting-count">199</div>
+                <div class="lighting-label">交通信号灯</div>
+            </div>
         </div>
 
         <div class="module-nav">
@@ -263,12 +282,30 @@
             <div class="smart-controls">
                 <h3>🎛️ 智能控制</h3>
                 <div class="control-grid">
-                    <div class="control-item"><div class="control-icon">🌙</div><div class="control-label">夜间模式</div></div>
-                    <div class="control-item"><div class="control-icon">☀️</div><div class="control-label">日间模式</div></div>
-                    <div class="control-item"><div class="control-icon">🌆</div><div class="control-label">黄昏模式</div></div>
-                    <div class="control-item"><div class="control-icon">🌃</div><div class="control-label">午夜模式</div></div>
-                    <div class="control-item"><div class="control-icon">🔆</div><div class="control-label">亮度调节</div></div>
-                    <div class="control-item"><div class="control-icon">📱</div><div class="control-label">远程控制</div></div>
+                    <div class="control-item">
+                        <div class="control-icon">🌙</div>
+                        <div class="control-label">夜间模式</div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">☀️</div>
+                        <div class="control-label">日间模式</div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">🌆</div>
+                        <div class="control-label">黄昏模式</div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">🌃</div>
+                        <div class="control-label">午夜模式</div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">🔆</div>
+                        <div class="control-label">亮度调节</div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">📱</div>
+                        <div class="control-label">远程控制</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -280,11 +317,29 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>路灯编号</th><th>位置</th><th>故障类型</th><th>状态</th><th>操作</th></tr>
+                        <tr>
+                            <th>路灯编号</th>
+                            <th>位置</th>
+                            <th>故障类型</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>L-001</td><td>XX路123号</td><td>不亮</td><td><span class="status-alarm">待处理</span></td><td><button class="btn-sm">维修</button></td></tr>
-                        <tr><td>L-002</td><td>YY路456号</td><td>闪烁</td><td><span class="status-processing">处理中</span></td><td><button class="btn-sm">跟踪</button></td></tr>
+                        <tr>
+                            <td>L-001</td>
+                            <td>XX路123号</td>
+                            <td>不亮</td>
+                            <td><span class="status-alarm">待处理</span></td>
+                            <td><button class="btn-sm">维修</button></td>
+                        </tr>
+                        <tr>
+                            <td>L-002</td>
+                            <td>YY路456号</td>
+                            <td>闪烁</td>
+                            <td><span class="status-processing">处理中</span></td>
+                            <td><button class="btn-sm">跟踪</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -294,9 +349,13 @@
             <div class="energy-stats">
                 <h3>📊 能耗监控</h3>
                 <div>今日用电量：12,345 kWh</div>
-                <div class="energy-bar"><div class="energy-fill" style="width: 75%">75%</div></div>
+                <div class="energy-bar">
+                    <div class="energy-fill" style="width: 75%">75%</div>
+                </div>
                 <div>本月节约电量：45,678 kWh</div>
-                <div class="energy-bar"><div class="energy-fill" style="width: 35%">35% 节能率</div></div>
+                <div class="energy-bar">
+                    <div class="energy-fill" style="width: 35%">35% 节能率</div>
+                </div>
             </div>
         </div>
 
@@ -305,9 +364,18 @@
                 <h3>📅 调度管理</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>定时开关</h4><p>设置路灯开关时间</p><button class="btn-primary">配置</button></div>
-                <div class="maintenance-card"><h4>节假日模式</h4><p>节假日特殊照明方案</p><button class="btn-primary">配置</button></div>
-                <div class="maintenance-card"><h4>天气联动</h4><p>根据天气自动调节</p><button class="btn-primary">配置</button></div>
+                <div class="maintenance-card">
+                    <h4>定时开关</h4>
+                    <p>设置路灯开关时间</p><button class="btn-primary">配置</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>节假日模式</h4>
+                    <p>节假日特殊照明方案</p><button class="btn-primary">配置</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>天气联动</h4>
+                    <p>根据天气自动调节</p><button class="btn-primary">配置</button>
+                </div>
             </div>
         </div>
 
@@ -318,4 +386,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

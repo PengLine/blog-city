@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数字城管 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -172,6 +174,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -183,17 +186,45 @@
         </header>
 
         <div class="dashboard-overview">
-            <div class="overview-card"><div class="overview-icon">📊</div><div class="overview-value">12,345</div><div class="overview-label">今日事件</div></div>
-            <div class="overview-card"><div class="overview-icon">✅</div><div class="overview-value">95%</div><div class="overview-label">处理完成率</div></div>
-            <div class="overview-card"><div class="overview-icon">⏱️</div><div class="overview-value">8分钟</div><div class="overview-label">平均响应时间</div></div>
-            <div class="overview-card"><div class="overview-icon">👥</div><div class="overview-value">234</div><div class="overview-label">在线人员</div></div>
+            <div class="overview-card">
+                <div class="overview-icon">📊</div>
+                <div class="overview-value">12,345</div>
+                <div class="overview-label">今日事件</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon">✅</div>
+                <div class="overview-value">95%</div>
+                <div class="overview-label">处理完成率</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon">⏱️</div>
+                <div class="overview-value">8分钟</div>
+                <div class="overview-label">平均响应时间</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon">👥</div>
+                <div class="overview-value">234</div>
+                <div class="overview-label">在线人员</div>
+            </div>
         </div>
 
         <div class="quick-actions">
-            <button class="action-btn"><div class="action-icon">➕</div><div class="action-label">上报事件</div></button>
-            <button class="action-btn"><div class="action-icon">🔍</div><div class="action-label">查询事件</div></button>
-            <button class="action-btn"><div class="action-icon">📋</div><div class="action-label">任务列表</div></button>
-            <button class="action-btn"><div class="action-icon">📈</div><div class="action-label">统计报表</div></button>
+            <button class="action-btn">
+                <div class="action-icon">➕</div>
+                <div class="action-label">上报事件</div>
+            </button>
+            <button class="action-btn">
+                <div class="action-icon">🔍</div>
+                <div class="action-label">查询事件</div>
+            </button>
+            <button class="action-btn">
+                <div class="action-icon">📋</div>
+                <div class="action-label">任务列表</div>
+            </button>
+            <button class="action-btn">
+                <div class="action-icon">📈</div>
+                <div class="action-label">统计报表</div>
+            </button>
         </div>
 
         <div class="module-nav">
@@ -214,25 +245,67 @@
             <div id="pending-tab" class="tab-content active">
                 <div class="recent-cases">
                     <h3>⏳ 待处理案件</h3>
-                    <div class="case-item"><div class="case-info"><div class="case-title">占道经营</div><div class="case-location">XX街道123号</div><div class="case-time">2026-01-15 16:30</div></div><span class="case-status status-alarm">待处理</span></div>
-                    <div class="case-item"><div class="case-info"><div class="case-title">违章停车</div><div class="case-location">YY路456号</div><div class="case-time">2026-01-15 16:25</div></div><span class="case-status status-alarm">待处理</span></div>
-                    <div class="case-item"><div class="case-info"><div class="case-title">垃圾堆积</div><div class="case-location">ZZ大道789号</div><div class="case-time">2026-01-15 16:20</div></div><span class="case-status status-alarm">待处理</span></div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">占道经营</div>
+                            <div class="case-location">XX街道123号</div>
+                            <div class="case-time">2026-01-15 16:30</div>
+                        </div><span class="case-status status-alarm">待处理</span>
+                    </div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">违章停车</div>
+                            <div class="case-location">YY路456号</div>
+                            <div class="case-time">2026-01-15 16:25</div>
+                        </div><span class="case-status status-alarm">待处理</span>
+                    </div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">垃圾堆积</div>
+                            <div class="case-location">ZZ大道789号</div>
+                            <div class="case-time">2026-01-15 16:20</div>
+                        </div><span class="case-status status-alarm">待处理</span>
+                    </div>
                 </div>
             </div>
 
             <div id="processing-tab" class="tab-content">
                 <div class="recent-cases">
                     <h3>🔄 处理中案件</h3>
-                    <div class="case-item"><div class="case-info"><div class="case-title">道路破损</div><div class="case-location">AA路321号</div><div class="case-time">2026-01-15 10:00</div></div><span class="case-status status-processing">处理中</span></div>
-                    <div class="case-item"><div class="case-info"><div class="case-title">井盖丢失</div><div class="case-location">BB路654号</div><div class="case-time">2026-01-15 09:30</div></div><span class="case-status status-processing">处理中</span></div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">道路破损</div>
+                            <div class="case-location">AA路321号</div>
+                            <div class="case-time">2026-01-15 10:00</div>
+                        </div><span class="case-status status-processing">处理中</span>
+                    </div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">井盖丢失</div>
+                            <div class="case-location">BB路654号</div>
+                            <div class="case-time">2026-01-15 09:30</div>
+                        </div><span class="case-status status-processing">处理中</span>
+                    </div>
                 </div>
             </div>
 
             <div id="completed-tab" class="tab-content">
                 <div class="recent-cases">
                     <h3>✅ 已完成案件</h3>
-                    <div class="case-item"><div class="case-info"><div class="case-title">路灯故障</div><div class="case-location">CC路987号</div><div class="case-time">2026-01-15 08:00</div></div><span class="case-status status-completed">已完成</span></div>
-                    <div class="case-item"><div class="case-info"><div class="case-title">绿化带修剪</div><div class="case-location">DD路654号</div><div class="case-time">2026-01-14 16:00</div></div><span class="case-status status-completed">已完成</span></div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">路灯故障</div>
+                            <div class="case-location">CC路987号</div>
+                            <div class="case-time">2026-01-15 08:00</div>
+                        </div><span class="case-status status-completed">已完成</span>
+                    </div>
+                    <div class="case-item">
+                        <div class="case-info">
+                            <div class="case-title">绿化带修剪</div>
+                            <div class="case-location">DD路654号</div>
+                            <div class="case-time">2026-01-14 16:00</div>
+                        </div><span class="case-status status-completed">已完成</span>
+                    </div>
                 </div>
             </div>
 
@@ -240,13 +313,48 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>案件编号</th><th>案件类型</th><th>发生地点</th><th>状态</th><th>创建时间</th><th>操作</th></tr>
+                            <tr>
+                                <th>案件编号</th>
+                                <th>案件类型</th>
+                                <th>发生地点</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>CA-20260115001</td><td>占道经营</td><td>XX街道123号</td><td><span class="status-alarm">待处理</span></td><td>2026-01-15 16:30</td><td><button class="btn-sm">处理</button><button class="btn-sm">详情</button></td></tr>
-                            <tr><td>CA-20260115002</td><td>违章停车</td><td>YY路456号</td><td><span class="status-alarm">待处理</span></td><td>2026-01-15 16:25</td><td><button class="btn-sm">处理</button><button class="btn-sm">详情</button></td></tr>
-                            <tr><td>CA-20260115003</td><td>道路破损</td><td>AA路321号</td><td><span class="status-processing">处理中</span></td><td>2026-01-15 10:00</td><td><button class="btn-sm">跟踪</button><button class="btn-sm">详情</button></td></tr>
-                            <tr><td>CA-20260115004</td><td>路灯故障</td><td>CC路987号</td><td><span class="status-completed">已完成</span></td><td>2026-01-15 08:00</td><td><button class="btn-sm">详情</button></td></tr>
+                            <tr>
+                                <td>CA-20260115001</td>
+                                <td>占道经营</td>
+                                <td>XX街道123号</td>
+                                <td><span class="status-alarm">待处理</span></td>
+                                <td>2026-01-15 16:30</td>
+                                <td><button class="btn-sm">处理</button><button class="btn-sm">详情</button></td>
+                            </tr>
+                            <tr>
+                                <td>CA-20260115002</td>
+                                <td>违章停车</td>
+                                <td>YY路456号</td>
+                                <td><span class="status-alarm">待处理</span></td>
+                                <td>2026-01-15 16:25</td>
+                                <td><button class="btn-sm">处理</button><button class="btn-sm">详情</button></td>
+                            </tr>
+                            <tr>
+                                <td>CA-20260115003</td>
+                                <td>道路破损</td>
+                                <td>AA路321号</td>
+                                <td><span class="status-processing">处理中</span></td>
+                                <td>2026-01-15 10:00</td>
+                                <td><button class="btn-sm">跟踪</button><button class="btn-sm">详情</button></td>
+                            </tr>
+                            <tr>
+                                <td>CA-20260115004</td>
+                                <td>路灯故障</td>
+                                <td>CC路987号</td>
+                                <td><span class="status-completed">已完成</span></td>
+                                <td>2026-01-15 08:00</td>
+                                <td><button class="btn-sm">详情</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -260,11 +368,32 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>工单编号</th><th>工单类型</th><th>负责人</th><th>状态</th><th>创建时间</th><th>操作</th></tr>
+                        <tr>
+                            <th>工单编号</th>
+                            <th>工单类型</th>
+                            <th>负责人</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>WO-20260115001</td><td>设施维修</td><td>张三</td><td><span class="status-processing">处理中</span></td><td>2026-01-15 09:00</td><td><button class="btn-sm">处理</button></td></tr>
-                        <tr><td>WO-20260115002</td><td>保洁任务</td><td>李四</td><td><span class="status-normal">待分配</span></td><td>2026-01-15 10:00</td><td><button class="btn-sm">分配</button></td></tr>
+                        <tr>
+                            <td>WO-20260115001</td>
+                            <td>设施维修</td>
+                            <td>张三</td>
+                            <td><span class="status-processing">处理中</span></td>
+                            <td>2026-01-15 09:00</td>
+                            <td><button class="btn-sm">处理</button></td>
+                        </tr>
+                        <tr>
+                            <td>WO-20260115002</td>
+                            <td>保洁任务</td>
+                            <td>李四</td>
+                            <td><span class="status-normal">待分配</span></td>
+                            <td>2026-01-15 10:00</td>
+                            <td><button class="btn-sm">分配</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -275,9 +404,21 @@
                 <h3>📊 绩效考核</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">👤</div><div class="stat-value">234</div><div class="stat-label">考核人员</div></div>
-                <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-value">4.8</div><div class="stat-label">平均评分</div></div>
-                <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-value">98%</div><div class="stat-label">优秀率</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-value">234</div>
+                    <div class="stat-label">考核人员</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">平均评分</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">优秀率</div>
+                </div>
             </div>
         </div>
 
@@ -286,9 +427,18 @@
                 <h3>⚙️ 系统设置</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>用户管理</h4><p>管理系统用户和权限</p><button class="btn-primary">进入管理</button></div>
-                <div class="maintenance-card"><h4>角色配置</h4><p>配置用户角色和权限</p><button class="btn-primary">进入配置</button></div>
-                <div class="maintenance-card"><h4>系统参数</h4><p>配置系统运行参数</p><button class="btn-primary">进入配置</button></div>
+                <div class="maintenance-card">
+                    <h4>用户管理</h4>
+                    <p>管理系统用户和权限</p><button class="btn-primary">进入管理</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>角色配置</h4>
+                    <p>配置用户角色和权限</p><button class="btn-primary">进入配置</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>系统参数</h4>
+                    <p>配置系统运行参数</p><button class="btn-primary">进入配置</button>
+                </div>
             </div>
         </div>
 
@@ -299,4 +449,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

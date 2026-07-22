@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧排水 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -194,6 +196,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -241,22 +244,30 @@
 
         <div class="monitor-grid">
             <div class="monitor-card">
-                <div class="monitor-header"><div class="monitor-title">XX泵站</div><span class="monitor-status status-normal">运行正常</span></div>
+                <div class="monitor-header">
+                    <div class="monitor-title">XX泵站</div><span class="monitor-status status-normal">运行正常</span>
+                </div>
                 <div class="monitor-value">3.2m</div>
                 <div class="monitor-label">水位高度</div>
             </div>
             <div class="monitor-card">
-                <div class="monitor-header"><div class="monitor-title">YY泵站</div><span class="monitor-status status-warning">水位偏高</span></div>
+                <div class="monitor-header">
+                    <div class="monitor-title">YY泵站</div><span class="monitor-status status-warning">水位偏高</span>
+                </div>
                 <div class="monitor-value">4.8m</div>
                 <div class="monitor-label">水位高度</div>
             </div>
             <div class="monitor-card">
-                <div class="monitor-header"><div class="monitor-title">ZZ泵站</div><span class="monitor-status status-normal">运行正常</span></div>
+                <div class="monitor-header">
+                    <div class="monitor-title">ZZ泵站</div><span class="monitor-status status-normal">运行正常</span>
+                </div>
                 <div class="monitor-value">2.5m</div>
                 <div class="monitor-label">水位高度</div>
             </div>
             <div class="monitor-card">
-                <div class="monitor-header"><div class="monitor-title">AA泵站</div><span class="monitor-status status-alarm">紧急</span></div>
+                <div class="monitor-header">
+                    <div class="monitor-title">AA泵站</div><span class="monitor-status status-alarm">紧急</span>
+                </div>
                 <div class="monitor-value">5.5m</div>
                 <div class="monitor-label">水位高度</div>
             </div>
@@ -273,12 +284,30 @@
             <div class="chart-box">
                 <h3>📊 各泵站水位监测</h3>
                 <div class="water-level-chart">
-                    <div><div class="water-bar" style="height: 60%"></div><div class="water-label">XX泵站</div></div>
-                    <div><div class="water-bar warning" style="height: 85%"></div><div class="water-label">YY泵站</div></div>
-                    <div><div class="water-bar" style="height: 50%"></div><div class="water-label">ZZ泵站</div></div>
-                    <div><div class="water-bar danger" style="height: 95%"></div><div class="water-label">AA泵站</div></div>
-                    <div><div class="water-bar" style="height: 45%"></div><div class="water-label">BB泵站</div></div>
-                    <div><div class="water-bar" style="height: 55%"></div><div class="water-label">CC泵站</div></div>
+                    <div>
+                        <div class="water-bar" style="height: 60%"></div>
+                        <div class="water-label">XX泵站</div>
+                    </div>
+                    <div>
+                        <div class="water-bar warning" style="height: 85%"></div>
+                        <div class="water-label">YY泵站</div>
+                    </div>
+                    <div>
+                        <div class="water-bar" style="height: 50%"></div>
+                        <div class="water-label">ZZ泵站</div>
+                    </div>
+                    <div>
+                        <div class="water-bar danger" style="height: 95%"></div>
+                        <div class="water-label">AA泵站</div>
+                    </div>
+                    <div>
+                        <div class="water-bar" style="height: 45%"></div>
+                        <div class="water-label">BB泵站</div>
+                    </div>
+                    <div>
+                        <div class="water-bar" style="height: 55%"></div>
+                        <div class="water-label">CC泵站</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -290,11 +319,29 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>泵站名称</th><th>位置</th><th>状态</th><th>水位</th><th>操作</th></tr>
+                        <tr>
+                            <th>泵站名称</th>
+                            <th>位置</th>
+                            <th>状态</th>
+                            <th>水位</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>XX泵站</td><td>XX区XX路</td><td><span class="status-normal">运行正常</span></td><td>3.2m</td><td><button class="btn-sm">详情</button><button class="btn-sm">控制</button></td></tr>
-                        <tr><td>YY泵站</td><td>YY区YY路</td><td><span class="status-warning">水位偏高</span></td><td>4.8m</td><td><button class="btn-sm">详情</button><button class="btn-sm">控制</button></td></tr>
+                        <tr>
+                            <td>XX泵站</td>
+                            <td>XX区XX路</td>
+                            <td><span class="status-normal">运行正常</span></td>
+                            <td>3.2m</td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm">控制</button></td>
+                        </tr>
+                        <tr>
+                            <td>YY泵站</td>
+                            <td>YY区YY路</td>
+                            <td><span class="status-warning">水位偏高</span></td>
+                            <td>4.8m</td>
+                            <td><button class="btn-sm">详情</button><button class="btn-sm">控制</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -305,9 +352,21 @@
                 <h3>🌧️ 防汛预警</h3>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-value">3</div><div class="stat-label">当前预警</div></div>
-                <div class="stat-card"><div class="stat-icon">🌧️</div><div class="stat-value">中雨</div><div class="stat-label">天气状况</div></div>
-                <div class="stat-card"><div class="stat-icon">💧</div><div class="stat-value">23mm</div><div class="stat-label">累计雨量</div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">当前预警</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌧️</div>
+                    <div class="stat-value">中雨</div>
+                    <div class="stat-label">天气状况</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-value">23mm</div>
+                    <div class="stat-label">累计雨量</div>
+                </div>
             </div>
         </div>
 
@@ -316,9 +375,18 @@
                 <h3>📊 数据分析</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>水位趋势分析</h4><p>泵站水位变化趋势</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>降雨量统计</h4><p>降雨数据统计分析</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>预警历史</h4><p>历史预警记录查询</p><button class="btn-primary">查看记录</button></div>
+                <div class="maintenance-card">
+                    <h4>水位趋势分析</h4>
+                    <p>泵站水位变化趋势</p><button class="btn-primary">查看分析</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>降雨量统计</h4>
+                    <p>降雨数据统计分析</p><button class="btn-primary">查看分析</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>预警历史</h4>
+                    <p>历史预警记录查询</p><button class="btn-primary">查看记录</button>
+                </div>
             </div>
         </div>
 
@@ -329,4 +397,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>

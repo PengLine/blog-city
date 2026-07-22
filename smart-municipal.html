@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧市政 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
@@ -225,6 +227,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -263,10 +266,30 @@
         </div>
 
         <div class="facility-grid">
-            <div class="facility-card"><div class="facility-icon">🛣️</div><div class="facility-title">道路设施</div><div class="facility-count">5,678</div><div class="facility-desc">道路、桥梁、隧道等</div></div>
-            <div class="facility-card"><div class="facility-icon">💧</div><div class="facility-title">排水设施</div><div class="facility-count">3,456</div><div class="facility-desc">管网、泵站、井盖等</div></div>
-            <div class="facility-card"><div class="facility-icon">💡</div><div class="facility-title">照明设施</div><div class="facility-count">2,345</div><div class="facility-desc">路灯、景观灯等</div></div>
-            <div class="facility-card"><div class="facility-icon">🌳</div><div class="facility-title">绿化设施</div><div class="facility-count">866</div><div class="facility-desc">公园、绿化带等</div></div>
+            <div class="facility-card">
+                <div class="facility-icon">🛣️</div>
+                <div class="facility-title">道路设施</div>
+                <div class="facility-count">5,678</div>
+                <div class="facility-desc">道路、桥梁、隧道等</div>
+            </div>
+            <div class="facility-card">
+                <div class="facility-icon">💧</div>
+                <div class="facility-title">排水设施</div>
+                <div class="facility-count">3,456</div>
+                <div class="facility-desc">管网、泵站、井盖等</div>
+            </div>
+            <div class="facility-card">
+                <div class="facility-icon">💡</div>
+                <div class="facility-title">照明设施</div>
+                <div class="facility-count">2,345</div>
+                <div class="facility-desc">路灯、景观灯等</div>
+            </div>
+            <div class="facility-card">
+                <div class="facility-icon">🌳</div>
+                <div class="facility-title">绿化设施</div>
+                <div class="facility-count">866</div>
+                <div class="facility-desc">公园、绿化带等</div>
+            </div>
         </div>
 
         <div class="module-nav">
@@ -295,11 +318,32 @@
                 <div class="data-table-container">
                     <table class="data-table">
                         <thead>
-                            <tr><th>设施编号</th><th>设施名称</th><th>设施类型</th><th>位置</th><th>状态</th><th>操作</th></tr>
+                            <tr>
+                                <th>设施编号</th>
+                                <th>设施名称</th>
+                                <th>设施类型</th>
+                                <th>位置</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>FS-001</td><td>XX路路灯</td><td>照明设施</td><td>XX路123号</td><td><span class="status-normal">正常</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td></tr>
-                            <tr><td>FS-002</td><td>YY桥</td><td>桥梁设施</td><td>YY路</td><td><span class="status-warning">待维护</span></td><td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td></tr>
+                            <tr>
+                                <td>FS-001</td>
+                                <td>XX路路灯</td>
+                                <td>照明设施</td>
+                                <td>XX路123号</td>
+                                <td><span class="status-normal">正常</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
+                            </tr>
+                            <tr>
+                                <td>FS-002</td>
+                                <td>YY桥</td>
+                                <td>桥梁设施</td>
+                                <td>YY路</td>
+                                <td><span class="status-warning">待维护</span></td>
+                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -310,9 +354,18 @@
                     <h3>➕ 添加设施</h3>
                 </div>
                 <div class="maintenance-grid">
-                    <div class="maintenance-card"><h4>道路设施</h4><p>添加道路、桥梁等设施</p><button class="btn-primary">添加</button></div>
-                    <div class="maintenance-card"><h4>排水设施</h4><p>添加管网、井盖等设施</p><button class="btn-primary">添加</button></div>
-                    <div class="maintenance-card"><h4>照明设施</h4><p>添加路灯、景观灯等</p><button class="btn-primary">添加</button></div>
+                    <div class="maintenance-card">
+                        <h4>道路设施</h4>
+                        <p>添加道路、桥梁等设施</p><button class="btn-primary">添加</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>排水设施</h4>
+                        <p>添加管网、井盖等设施</p><button class="btn-primary">添加</button>
+                    </div>
+                    <div class="maintenance-card">
+                        <h4>照明设施</h4>
+                        <p>添加路灯、景观灯等</p><button class="btn-primary">添加</button>
+                    </div>
                 </div>
             </div>
 
@@ -321,10 +374,26 @@
                     <h3>📁 设施分类</h3>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon">🛣️</div><div class="stat-value">5,678</div><div class="stat-label">道路设施</div></div>
-                    <div class="stat-card"><div class="stat-icon">💧</div><div class="stat-value">3,456</div><div class="stat-label">排水设施</div></div>
-                    <div class="stat-card"><div class="stat-icon">💡</div><div class="stat-value">2,345</div><div class="stat-label">照明设施</div></div>
-                    <div class="stat-card"><div class="stat-icon">🌳</div><div class="stat-value">866</div><div class="stat-label">绿化设施</div></div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛣️</div>
+                        <div class="stat-value">5,678</div>
+                        <div class="stat-label">道路设施</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-value">3,456</div>
+                        <div class="stat-label">排水设施</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💡</div>
+                        <div class="stat-value">2,345</div>
+                        <div class="stat-label">照明设施</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌳</div>
+                        <div class="stat-value">866</div>
+                        <div class="stat-label">绿化设施</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -333,9 +402,30 @@
             <div class="inspection-section">
                 <h3>🔍 巡检任务列表</h3>
                 <div class="inspection-list">
-                    <div class="inspection-item"><div class="inspection-header"><div class="inspection-title">XX路段巡检</div><span class="inspection-status status-processing">进行中</span></div><div class="inspection-info">负责人：张三</div><div class="inspection-info">时间：2026-01-15 09:00</div></div>
-                    <div class="inspection-item"><div class="inspection-header"><div class="inspection-title">YY桥巡检</div><span class="inspection-status status-alarm">待执行</span></div><div class="inspection-info">负责人：李四</div><div class="inspection-info">时间：2026-01-15 14:00</div></div>
-                    <div class="inspection-item"><div class="inspection-header"><div class="inspection-title">ZZ公园巡检</div><span class="inspection-status status-completed">已完成</span></div><div class="inspection-info">负责人：王五</div><div class="inspection-info">时间：2026-01-14 16:00</div></div>
+                    <div class="inspection-item">
+                        <div class="inspection-header">
+                            <div class="inspection-title">XX路段巡检</div><span
+                                class="inspection-status status-processing">进行中</span>
+                        </div>
+                        <div class="inspection-info">负责人：张三</div>
+                        <div class="inspection-info">时间：2026-01-15 09:00</div>
+                    </div>
+                    <div class="inspection-item">
+                        <div class="inspection-header">
+                            <div class="inspection-title">YY桥巡检</div><span
+                                class="inspection-status status-alarm">待执行</span>
+                        </div>
+                        <div class="inspection-info">负责人：李四</div>
+                        <div class="inspection-info">时间：2026-01-15 14:00</div>
+                    </div>
+                    <div class="inspection-item">
+                        <div class="inspection-header">
+                            <div class="inspection-title">ZZ公园巡检</div><span
+                                class="inspection-status status-completed">已完成</span>
+                        </div>
+                        <div class="inspection-info">负责人：王五</div>
+                        <div class="inspection-info">时间：2026-01-14 16:00</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -347,11 +437,32 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>维修编号</th><th>设施名称</th><th>维修类型</th><th>负责人</th><th>状态</th><th>操作</th></tr>
+                        <tr>
+                            <th>维修编号</th>
+                            <th>设施名称</th>
+                            <th>维修类型</th>
+                            <th>负责人</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>WX-001</td><td>XX路路灯</td><td>故障维修</td><td>张三</td><td><span class="status-processing">进行中</span></td><td><button class="btn-sm">跟踪</button></td></tr>
-                        <tr><td>WX-002</td><td>YY桥护栏</td><td>维护保养</td><td>李四</td><td><span class="status-completed">已完成</span></td><td><button class="btn-sm">详情</button></td></tr>
+                        <tr>
+                            <td>WX-001</td>
+                            <td>XX路路灯</td>
+                            <td>故障维修</td>
+                            <td>张三</td>
+                            <td><span class="status-processing">进行中</span></td>
+                            <td><button class="btn-sm">跟踪</button></td>
+                        </tr>
+                        <tr>
+                            <td>WX-002</td>
+                            <td>YY桥护栏</td>
+                            <td>维护保养</td>
+                            <td>李四</td>
+                            <td><span class="status-completed">已完成</span></td>
+                            <td><button class="btn-sm">详情</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -364,11 +475,32 @@
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
-                        <tr><th>工单编号</th><th>工单类型</th><th>关联设施</th><th>状态</th><th>创建时间</th><th>操作</th></tr>
+                        <tr>
+                            <th>工单编号</th>
+                            <th>工单类型</th>
+                            <th>关联设施</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><td>GD-20260115001</td><td>维修工单</td><td>XX路路灯</td><td><span class="status-processing">处理中</span></td><td>2026-01-15 09:00</td><td><button class="btn-sm">处理</button></td></tr>
-                        <tr><td>GD-20260115002</td><td>巡检工单</td><td>YY桥</td><td><span class="status-normal">待分配</span></td><td>2026-01-15 10:00</td><td><button class="btn-sm">分配</button></td></tr>
+                        <tr>
+                            <td>GD-20260115001</td>
+                            <td>维修工单</td>
+                            <td>XX路路灯</td>
+                            <td><span class="status-processing">处理中</span></td>
+                            <td>2026-01-15 09:00</td>
+                            <td><button class="btn-sm">处理</button></td>
+                        </tr>
+                        <tr>
+                            <td>GD-20260115002</td>
+                            <td>巡检工单</td>
+                            <td>YY桥</td>
+                            <td><span class="status-normal">待分配</span></td>
+                            <td>2026-01-15 10:00</td>
+                            <td><button class="btn-sm">分配</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -379,9 +511,18 @@
                 <h3>📊 数据分析</h3>
             </div>
             <div class="maintenance-grid">
-                <div class="maintenance-card"><h4>设施状态分析</h4><p>各类设施运行状态统计</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>维修趋势分析</h4><p>维修工单趋势统计</p><button class="btn-primary">查看分析</button></div>
-                <div class="maintenance-card"><h4>巡检覆盖率</h4><p>巡检任务完成情况</p><button class="btn-primary">查看分析</button></div>
+                <div class="maintenance-card">
+                    <h4>设施状态分析</h4>
+                    <p>各类设施运行状态统计</p><button class="btn-primary">查看分析</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>维修趋势分析</h4>
+                    <p>维修工单趋势统计</p><button class="btn-primary">查看分析</button>
+                </div>
+                <div class="maintenance-card">
+                    <h4>巡检覆盖率</h4>
+                    <p>巡检任务完成情况</p><button class="btn-primary">查看分析</button>
+                </div>
             </div>
         </div>
 
@@ -392,4 +533,5 @@
 
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>
