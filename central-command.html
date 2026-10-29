@@ -3743,8 +3743,12 @@
                     const same = totals.filter(d => d.wd === wd);
                     return same.length ? meanOf(same, d => d.n) : recentMean;
                 };
-                const predictTotal = start => Math.max(1,
-                    Math.round(recentMean * 0.55 + weekdayMean(new Date(start).getDay()) * 0.45));
+                const mean28 = Math.max(1, meanOf(totals, d => d.n));
+                /* 同星期相对系数 × 近 7 日水平，保留星期节律，便于区分高/低风险日 */
+                const predictTotal = function (start) {
+                    const factor = weekdayMean(new Date(start).getDay()) / mean28;
+                    return Math.max(1, Math.round(recentMean * factor));
+                };
 
                 const days = [];
                 for (let i = 1; i <= 7; i++) {
@@ -3752,8 +3756,8 @@
                     const total = predictTotal(start);
                     const ratio = total / recentMean;
                     days.push({
-                        start: start, total: total, wd: new Date(start).getDay(),
-                        risk: ratio >= 1.12 ? '高' : (ratio <= 0.92 ? '低' : '中')
+                        start: start, total: total, wd: new Date(start).getDay(), ratio: ratio,
+                        risk: ratio >= 1.05 ? '高' : (ratio <= 0.95 ? '低' : '中')
                     });
                 }
 
@@ -3763,11 +3767,12 @@
                 const lowAt = forecastHour.indexOf(Math.min.apply(null, forecastHour));
                 const mape = backtestMape(totals);
                 const highRisk = days.filter(d => d.risk === '高');
+                const lowRisk = days.filter(d => d.risk === '低');
                 const weekSum = sumOf(days, d => d.total);
 
                 setText('dcf-scope', '基准 ' + ymd(TODAY0) + ' · 样本 28 日');
-                setHTML('dcf-note', '预测模型：近 7 日逐小时均值 × 明日预测总量（近 7 日均值与同星期均值加权）；'
-                    + '逐日预测同口径，回测误差为同星期均值模型的 MAPE，仅供参考调度排班。');
+                setHTML('dcf-note', '预测模型：近 7 日逐小时均值 × 明日预测总量（按同星期相对水平修正）；'
+                    + '逐日预测同口径，风险等级按预测量与近 7 日均值偏差划分（≥+5% 高、≤-5% 低），仅供参考调度排班。');
                 $('dcf-kv').innerHTML = kvHTML([
                     ['明日预测接警', tomorrow.total + ' 起', '#9b59b6'],
                     ['近 7 日均值', meanOf(recent, d => d.n).toFixed(1) + ' 起'],
@@ -3818,7 +3823,10 @@
                     highRisk.length
                         ? '<span class="warn-line">未来 7 日有 <b>' + highRisk.length + '</b> 天为高风险（'
                         + highRisk.map(d => md(d.start)).join('、') + '），建议提前核对预案、车辆与物资储备。</span>'
-                        : '未来 7 日预测接警量均在正常波动区间，按常规值班即可。',
+                        : (lowRisk.length
+                            ? '未来 7 日无高风险日，其中 <b>' + lowRisk.length + '</b> 天（'
+                            + lowRisk.map(d => md(d.start)).join('、') + '）预测低于均值 5% 以上，可安排轮休与设备保养。'
+                            : '未来 7 日预测接警量均在正常波动区间，按常规值班即可。'),
                     typePairs.length
                         ? '近 7 日高等级事件集中在 <b>' + SC.esc(typePairs[0][0]) + '</b>（' + typePairs[0][1]
                         + ' 起），建议将该类型纳入下周专项巡查。'
