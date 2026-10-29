@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧排水 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
     <style>
         .container {
             background: #e8f4fc;
@@ -43,18 +44,47 @@
             background: #023e8a;
         }
 
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
         .flood-warning {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
-            padding: 20px;
+            padding: 18px 22px;
             border-radius: 12px;
             margin-bottom: 25px;
-            animation: pulse 1.5s infinite;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            transition: background 0.4s ease;
+        }
+
+        .flood-warning.lv-blue {
+            background: linear-gradient(135deg, #1d6fb8 0%, #14456f 100%);
+        }
+
+        .flood-warning.lv-yellow {
+            background: linear-gradient(135deg, #d4a017 0%, #9c7208 100%);
+        }
+
+        .flood-warning.lv-orange {
+            background: linear-gradient(135deg, #e67e22 0%, #b35409 100%);
+        }
+
+        .flood-warning.lv-red {
+            background: linear-gradient(135deg, #e74c3c 0%, #a32016 100%);
+            animation: pulse 1.6s infinite;
+        }
+
+        .flood-warning.lv-green {
+            background: linear-gradient(135deg, #27ae60 0%, #17764a 100%);
         }
 
         .warning-content {
@@ -62,25 +92,27 @@
         }
 
         .warning-title {
-            font-size: 1.3em;
+            font-size: 1.25em;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .warning-desc {
             font-size: 0.9em;
-            opacity: 0.9;
+            opacity: 0.94;
+            line-height: 1.6;
         }
 
         .warning-action {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             border: none;
-            padding: 12px 25px;
+            padding: 11px 22px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            color: #e74c3c;
+            color: #1b2836;
             transition: all 0.3s ease;
+            font-family: inherit;
         }
 
         .warning-action:hover {
@@ -88,31 +120,63 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
+        /* 雨量与联动控制台 */
+        .console {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            align-items: center;
+        }
+
+        .rain-dial {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .rain-dial .big {
+            font-size: 2em;
+            font-weight: bold;
+            color: #0077b6;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 泵站卡片 */
         .monitor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
-            margin-bottom: 25px;
         }
 
         .monitor-card {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            border-left: 5px solid #27ae60;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
         }
 
         .monitor-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .monitor-card.warn {
+            border-left-color: #f39c12;
+        }
+
+        .monitor-card.danger {
+            border-left-color: #e74c3c;
+            background: #fff5f4;
         }
 
         .monitor-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .monitor-title {
@@ -120,68 +184,74 @@
             color: #2c3e50;
         }
 
-        .monitor-status {
-            font-size: 0.8em;
-            padding: 4px 10px;
-            border-radius: 10px;
-        }
-
         .monitor-value {
-            font-size: 2.5em;
+            font-size: 2.1em;
             font-weight: bold;
             color: #0077b6;
-            margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
         }
 
         .monitor-label {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #7f8c8d;
         }
 
-        .chart-box {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
+        .gauge-line {
+            height: 6px;
+            background: #eef2f6;
+            border-radius: 3px;
+            margin: 10px 0 8px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .chart-box h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3em;
+        .gauge-line>i {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, #0077b6, #00b4d8);
+            border-radius: 3px;
+            transition: width 0.5s ease;
         }
 
-        .water-level-chart {
-            height: 200px;
-            background: #f8f9fa;
-            border-radius: 8px;
+        .gauge-line .mark {
+            position: absolute;
+            top: -3px;
+            width: 2px;
+            height: 12px;
+            background: #f39c12;
+        }
+
+        .gauge-line .mark.danger {
+            background: #e74c3c;
+        }
+
+        .pump-dots {
             display: flex;
-            align-items: flex-end;
-            padding: 20px;
-            gap: 15px;
+            gap: 5px;
+            margin-top: 8px;
         }
 
-        .water-bar {
-            flex: 1;
-            background: linear-gradient(to top, #0077b6, #00b4d8);
-            border-radius: 4px 4px 0 0;
-            transition: all 0.3s ease;
-        }
-
-        .water-bar.warning {
-            background: linear-gradient(to top, #f39c12, #f1c40f);
-        }
-
-        .water-bar.danger {
-            background: linear-gradient(to top, #e74c3c, #ec7063);
-        }
-
-        .water-label {
+        .pump-dot {
+            width: 22px;
+            height: 12px;
+            border-radius: 3px;
+            background: #dfe6ec;
+            font-size: 0.6em;
+            color: #fff;
             text-align: center;
-            font-size: 0.8em;
-            color: #7f8c8d;
-            margin-top: 10px;
+            line-height: 12px;
+        }
+
+        .pump-dot.on {
+            background: #27ae60;
+        }
+
+        .pump-dot.fault {
+            background: #e74c3c;
+        }
+
+        .lv-table td {
+            font-size: 0.88em;
         }
 
         @media (max-width: 768px) {
@@ -195,6 +265,7 @@
             }
         }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%232c3e50%27/%3E%3Crect x=%2712%27 y=%2730%27 width=%2710%27 height=%2722%27 fill=%27%233498db%27/%3E%3Crect x=%2727%27 y=%2718%27 width=%2710%27 height=%2734%27 fill=%27%232ecc71%27/%3E%3Crect x=%2742%27 y=%2726%27 width=%2710%27 height=%2726%27 fill=%27%23f39c12%27/%3E%3C/svg%3E">
 </head>
 
 <body>
@@ -204,72 +275,43 @@
                 <h1>💧 智慧排水管理</h1>
                 <p>排水系统监控与防汛预警</p>
             </div>
-            <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            <div class="header-meta">
+                <span class="sc-live"><i class="sc-live-dot"></i><span data-clock="time">--</span></span>
+                <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            </div>
         </header>
 
-        <div class="flood-warning">
+        <div class="flood-warning lv-green" id="warn-banner">
             <div class="warning-content">
-                <div class="warning-title">⚠️ 防汛预警提醒</div>
-                <div class="warning-desc">未来24小时将有暴雨，请注意防范城市内涝</div>
+                <div class="warning-title" id="warn-title">🟢 运行平稳</div>
+                <div class="warning-desc" id="warn-desc">全市排水管网液位正常，暂无内涝风险。</div>
             </div>
-            <button class="warning-action">📊 查看详情</button>
+            <div class="sc-inline">
+                <button class="warning-action" id="btn-plan">📋 查看响应预案</button>
+                <button class="warning-action" id="btn-ack">✅ 确认预警</button>
+            </div>
         </div>
 
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-icon">💧</div>
-                <div class="metric-value" style="color: #0077b6;">123</div>
+                <div class="metric-value" id="kpi-pump" data-animated="1" style="color: #0077b6;">6</div>
                 <div class="metric-label">排水泵站</div>
-                <div class="metric-trend trend-up"><span>↑</span><span>5</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">📊</div>
-                <div class="metric-value" style="color: #27ae60;">98%</div>
-                <div class="metric-label">泵站正常率</div>
-                <div class="metric-trend trend-up"><span>↑</span><span>1%</span></div>
+                <div class="metric-value" id="kpi-run" data-animated="1" style="color: #27ae60;">0</div>
+                <div class="metric-label">运行泵组</div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">🌧️</div>
-                <div class="metric-value" style="color: #f39c12;">23mm</div>
-                <div class="metric-label">今日降雨量</div>
-                <div class="metric-trend trend-up"><span>↑</span><span>5mm</span></div>
+                <div class="metric-value" id="kpi-rain" data-animated="1" style="color: #f39c12;">0mm</div>
+                <div class="metric-label">今日累计降雨</div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">🚨</div>
-                <div class="metric-value" style="color: #e74c3c;">3</div>
-                <div class="metric-label">预警数量</div>
-                <div class="metric-trend trend-up"><span>↑</span><span>1</span></div>
-            </div>
-        </div>
-
-        <div class="monitor-grid">
-            <div class="monitor-card">
-                <div class="monitor-header">
-                    <div class="monitor-title">XX泵站</div><span class="monitor-status status-normal">运行正常</span>
-                </div>
-                <div class="monitor-value">3.2m</div>
-                <div class="monitor-label">水位高度</div>
-            </div>
-            <div class="monitor-card">
-                <div class="monitor-header">
-                    <div class="monitor-title">YY泵站</div><span class="monitor-status status-warning">水位偏高</span>
-                </div>
-                <div class="monitor-value">4.8m</div>
-                <div class="monitor-label">水位高度</div>
-            </div>
-            <div class="monitor-card">
-                <div class="monitor-header">
-                    <div class="monitor-title">ZZ泵站</div><span class="monitor-status status-normal">运行正常</span>
-                </div>
-                <div class="monitor-value">2.5m</div>
-                <div class="monitor-label">水位高度</div>
-            </div>
-            <div class="monitor-card">
-                <div class="monitor-header">
-                    <div class="monitor-title">AA泵站</div><span class="monitor-status status-alarm">紧急</span>
-                </div>
-                <div class="monitor-value">5.5m</div>
-                <div class="monitor-label">水位高度</div>
+                <div class="metric-value" id="kpi-warn" data-animated="1" style="color: #e74c3c;">0</div>
+                <div class="metric-label">未闭环预警</div>
             </div>
         </div>
 
@@ -277,115 +319,259 @@
             <button class="module-btn active" data-module="real-time-monitor">📡 实时监控</button>
             <button class="module-btn" data-module="pump-management">🔧 泵站管理</button>
             <button class="module-btn" data-module="flood-warning">🌧️ 防汛预警</button>
+            <button class="module-btn" data-module="pipe-monitor">🕳️ 管网监控</button>
             <button class="module-btn" data-module="data-analysis">📊 数据分析</button>
         </div>
 
+        <!-- ============ 实时监控 ============ -->
         <div id="real-time-monitor-module" class="module-content active">
-            <div class="chart-box">
-                <h3>📊 各泵站水位监测</h3>
-                <div class="water-level-chart">
+            <div class="sc-panel">
+                <div class="sc-panel-title">
+                    <h3>🎛️ 调度控制台</h3>
+                    <div class="sc-tools">
+                        <span class="sc-live" id="sim-live"><i class="sc-live-dot"></i><span
+                                data-live-label>仿真运行中</span>
+                            <button class="sc-btn sm ghost">⏸ 暂停</button>
+                        </span>
+                        <div class="sc-seg" id="sim-speed">
+                            <button data-speed="1" class="active">1×</button>
+                            <button data-speed="5">5×</button>
+                            <button data-speed="20">20×</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="console">
                     <div>
-                        <div class="water-bar" style="height: 60%"></div>
-                        <div class="water-label">XX泵站</div>
+                        <label class="sc-hint">模拟降雨强度（mm/h）</label>
+                        <div class="rain-dial">
+                            <span class="big" id="rain-now">0</span>
+                            <span class="sc-tag info" id="rain-level">无雨</span>
+                        </div>
+                        <div class="sc-range"><input type="range" id="rain-input" min="0" max="80" step="1"
+                                value="0"><output>0 mm/h</output></div>
+                        <div class="sc-inline" style="margin-top:8px">
+                            <button class="sc-btn sm" data-rain="0">晴</button>
+                            <button class="sc-btn sm" data-rain="8">中雨</button>
+                            <button class="sc-btn sm" data-rain="25">大雨</button>
+                            <button class="sc-btn sm" data-rain="48">暴雨</button>
+                            <button class="sc-btn sm" data-rain="75">特大暴雨</button>
+                        </div>
                     </div>
                     <div>
-                        <div class="water-bar warning" style="height: 85%"></div>
-                        <div class="water-label">YY泵站</div>
+                        <label class="sc-switch on" id="auto-switch"><i></i><span>泵组自动联锁（按水位阈值启停）</span></label>
+                        <div class="sc-hint" style="margin:8px 0">
+                            联动逻辑：液位 ≥ 启泵水位自动增开一台；≤ 停泵水位自动减停一台，形成迟滞区间防止频繁启停。
+                        </div>
+                        <button class="sc-btn sm ghost" id="btn-all-stop">🛑 全部停机（检修模式）</button>
                     </div>
                     <div>
-                        <div class="water-bar" style="height: 50%"></div>
-                        <div class="water-label">ZZ泵站</div>
-                    </div>
-                    <div>
-                        <div class="water-bar danger" style="height: 95%"></div>
-                        <div class="water-label">AA泵站</div>
-                    </div>
-                    <div>
-                        <div class="water-bar" style="height: 45%"></div>
-                        <div class="water-label">BB泵站</div>
-                    </div>
-                    <div>
-                        <div class="water-bar" style="height: 55%"></div>
-                        <div class="water-label">CC泵站</div>
+                        <div class="sc-kv">
+                            <div class="sc-kv-item">
+                                <div class="k">实时排水总量</div>
+                                <div class="v" id="sum-flow">0 m³/h</div>
+                            </div>
+                            <div class="sc-kv-item">
+                                <div class="k">调蓄设施腾空</div>
+                                <div class="v" id="sum-store">0 %</div>
+                            </div>
+                            <div class="sc-kv-item">
+                                <div class="k">泵站总功率</div>
+                                <div class="v" id="sum-power">0 kW</div>
+                            </div>
+                            <div class="sc-kv-item">
+                                <div class="k">仿真时刻</div>
+                                <div class="v" id="sim-clock">--</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="sc-panel">
+                <div class="sc-panel-title">
+                    <h3>📈 关键泵站水位过程线</h3>
+                    <div class="sc-tools">
+                        <select class="sc-input" id="chart-stations" style="width:auto" multiple size="1"></select>
+                        <button class="sc-btn sm ghost" id="btn-clear-history">🧹 清空过程线</button>
+                    </div>
+                </div>
+                <div class="sc-chart lg"><canvas id="chart-level"></canvas></div>
+                <div class="sc-legend" id="legend-level"></div>
+            </div>
+
+            <div class="monitor-grid" id="station-cards"></div>
+
+            <div class="sc-panel">
+                <div class="sc-panel-title">
+                    <h3>📝 联锁与调度动作日志</h3>
+                    <button class="sc-btn sm ghost" id="btn-log-export">⬇ 导出日志</button>
+                </div>
+                <div class="sc-log" id="action-log" style="height:240px"></div>
+            </div>
         </div>
 
+        <!-- ============ 泵站管理 ============ -->
         <div id="pump-management-module" class="module-content">
             <div class="content-header">
-                <h3>🔧 泵站管理</h3>
+                <h3>🔧 泵站与机组台账</h3>
+                <div class="content-actions">
+                    <input type="text" placeholder="搜索泵站名称 / 所属片区..." class="search-input">
+                    <button class="sc-btn sm" id="btn-pump-export">⬇ 导出台账</button>
+                </div>
             </div>
             <div class="data-table-container">
-                <table class="data-table">
+                <table class="data-table" id="pump-table">
                     <thead>
                         <tr>
-                            <th>泵站名称</th>
-                            <th>位置</th>
+                            <th>泵站</th>
+                            <th>所属片区</th>
+                            <th>设计流量</th>
+                            <th>机组</th>
+                            <th>运行/备用</th>
+                            <th>当前液位</th>
+                            <th>启泵水位</th>
+                            <th>警戒水位</th>
                             <th>状态</th>
-                            <th>水位</th>
-                            <th>操作</th>
+                            <th data-no-sort>操作</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="sc-note" style="margin-top:16px">
+                列表中「运行/备用」为实时值，随调度动作刷新；点击 <b>控制</b> 可远程启停单机、切换工频/变频与设定联锁阈值。
+            </div>
+        </div>
+
+        <!-- ============ 防汛预警 ============ -->
+        <div id="flood-warning-module" class="module-content">
+            <div class="sc-panel">
+                <div class="sc-panel-title">
+                    <h3>🚦 预警等级判定</h3>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table lv-table">
+                        <thead>
+                            <tr>
+                                <th>等级</th>
+                                <th>触发条件</th>
+                                <th>响应要求</th>
+                                <th>当前判定</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lv-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="content-header">
+                <h3>📜 预警事件</h3>
+                <div class="content-actions">
+                    <input type="text" placeholder="搜索预警内容 / 站点..." class="search-input">
+                    <button class="sc-btn sm primary" id="btn-manual-warn">➕ 手工发布预警</button>
+                </div>
+            </div>
+            <div class="sc-chips" id="warn-chips"></div>
+            <div class="data-table-container">
+                <table class="data-table" id="warn-table">
+                    <thead>
                         <tr>
-                            <td>XX泵站</td>
-                            <td>XX区XX路</td>
-                            <td><span class="status-normal">运行正常</span></td>
-                            <td>3.2m</td>
-                            <td><button class="btn-sm">详情</button><button class="btn-sm">控制</button></td>
+                            <th>预警编号</th>
+                            <th>等级</th>
+                            <th>类型</th>
+                            <th>位置</th>
+                            <th>触发值</th>
+                            <th>发布时间</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
                         </tr>
-                        <tr>
-                            <td>YY泵站</td>
-                            <td>YY区YY路</td>
-                            <td><span class="status-warning">水位偏高</span></td>
-                            <td>4.8m</td>
-                            <td><button class="btn-sm">详情</button><button class="btn-sm">控制</button></td>
-                        </tr>
-                    </tbody>
+                    </thead>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="flood-warning-module" class="module-content">
+        <!-- ============ 管网监控 ============ -->
+        <div id="pipe-monitor-module" class="module-content">
             <div class="content-header">
-                <h3>🌧️ 防汛预警</h3>
+                <h3>🕳️ 检查井液位与易涝点</h3>
+                <div class="content-actions">
+                    <input type="text" placeholder="搜索路段 / 井号..." class="search-input">
+                    <button class="sc-btn sm" id="btn-pipe-export">⬇ 导出监测点</button>
+                </div>
             </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">⚠️</div>
-                    <div class="stat-value">3</div>
-                    <div class="stat-label">当前预警</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🌧️</div>
-                    <div class="stat-value">中雨</div>
-                    <div class="stat-label">天气状况</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💧</div>
-                    <div class="stat-value">23mm</div>
-                    <div class="stat-label">累计雨量</div>
-                </div>
+            <div class="sc-note">
+                液位 ≥ 管径 80% 判定为满流、≥ 100% 判定为溢流；溢流且降雨强度 ≥ 20 mm/h 的点位将自动生成内涝预警并纳入积水点排名。
+            </div>
+            <div class="data-table-container">
+                <table class="data-table" id="pipe-table">
+                    <thead>
+                        <tr>
+                            <th>监测点</th>
+                            <th>类型</th>
+                            <th>管径</th>
+                            <th>液位</th>
+                            <th>充满度</th>
+                            <th>流量</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
 
+        <!-- ============ 数据分析 ============ -->
         <div id="data-analysis-module" class="module-content">
-            <div class="content-header">
-                <h3>📊 数据分析</h3>
+            <div class="sc-panel-title">
+                <h3>📊 排涝能力与运行分析</h3>
+                <div class="sc-tools">
+                    <button class="sc-btn sm ghost" id="btn-drain-export">⬇ 导出统计</button>
+                </div>
             </div>
-            <div class="maintenance-grid">
-                <div class="maintenance-card">
-                    <h4>水位趋势分析</h4>
-                    <p>泵站水位变化趋势</p><button class="btn-primary">查看分析</button>
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🌧️ 时段雨量与排水量</h3>
+                    </div>
+                    <div class="sc-chart"><canvas id="chart-rain"></canvas></div>
+                    <div class="sc-legend" id="legend-rain"></div>
                 </div>
-                <div class="maintenance-card">
-                    <h4>降雨量统计</h4>
-                    <p>降雨数据统计分析</p><button class="btn-primary">查看分析</button>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>⚙️ 泵站运行效率</h3>
+                    </div>
+                    <div class="sc-chart"><canvas id="chart-eff"></canvas></div>
                 </div>
-                <div class="maintenance-card">
-                    <h4>预警历史</h4>
-                    <p>历史预警记录查询</p><button class="btn-primary">查看记录</button>
+            </div>
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🏆 内涝风险点排名</h3>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="risk-table">
+                            <thead>
+                                <tr>
+                                    <th>积水点</th>
+                                    <th>历史积水次数</th>
+                                    <th>最大积水深度</th>
+                                    <th>排涝服务半径</th>
+                                    <th>风险指数</th>
+                                    <th>治理状态</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>📦 防汛资源</h3>
+                    </div>
+                    <div class="sc-kv" id="resource-kv"></div>
+                    <div class="sc-section-title">移动泵车部署</div>
+                    <div id="pump-car" class="sc-inline"></div>
                 </div>
             </div>
         </div>
@@ -396,6 +582,755 @@
     </div>
 
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script>
+        /* ==================================================================
+           智慧排水模块：降雨入流—泵组抽排 水位仿真、联锁调度、预警状态机、管网监测
+           仿真步长：真实 1 秒 = 模拟 1 分钟 × 倍速
+           ================================================================== */
+        (function () {
+            'use strict';
+
+            /* ---------------- 基础数据 ---------------- */
+            const stations = [
+                { id: 'PS01', name: '之江路泵站', area: '钱江新城', surface: 2600, cap: 4.6, warn: 4.2, danger: 4.5, start: 3.6, stop: 2.8, level: 3.1, pumps: 4, perPump: 3200, kw: 132, run: 0, fault: 0 },
+                { id: 'PS02', name: '古荡湾泵站', area: '西湖片区', surface: 1800, cap: 4.2, warn: 3.8, danger: 4.0, start: 3.2, stop: 2.4, level: 2.6, pumps: 3, perPump: 2400, kw: 90, run: 0, fault: 1 },
+                { id: 'PS03', name: '德胜路泵站', area: '拱墅片区', surface: 3200, cap: 5.2, warn: 4.6, danger: 4.9, start: 4.0, stop: 3.0, level: 3.4, pumps: 5, perPump: 3600, kw: 160, run: 0, fault: 0 },
+                { id: 'PS04', name: '艮山泵站', area: '上城片区', surface: 1500, cap: 4.0, warn: 3.6, danger: 3.85, start: 3.1, stop: 2.3, level: 2.4, pumps: 3, perPump: 2000, kw: 75, run: 0, fault: 0 },
+                { id: 'PS05', name: '西溪尾水泵站', area: '余杭片区', surface: 4200, cap: 5.6, warn: 5.0, danger: 5.3, start: 4.3, stop: 3.4, level: 3.8, pumps: 6, perPump: 4000, kw: 185, run: 0, fault: 0 },
+                { id: 'PS06', name: '滨康路泵站', area: '滨江片区', surface: 2100, cap: 4.8, warn: 4.3, danger: 4.6, start: 3.7, stop: 2.9, level: 2.9, pumps: 4, perPump: 2800, kw: 110, run: 0, fault: 0 }
+            ];
+            const pipes = [
+                { id: 'MH01', name: '望江东路 3# 井', type: '检查井', dia: 1200 },
+                { id: 'MH02', name: '秋涛路 7# 井', type: '检查井', dia: 1000 },
+                { id: 'MH03', name: '文一路下穿立交', type: '易涝点', dia: 1600 },
+                { id: 'MH04', name: '天目山路桥洞', type: '易涝点', dia: 1400 },
+                { id: 'MH05', name: '体育场路 12# 井', type: '检查井', dia: 800 },
+                { id: 'MH06', name: '江城路排水箱涵', type: '箱涵', dia: 2000 },
+                { id: 'MH07', name: '留和路 5# 井', type: '检查井', dia: 1000 },
+                { id: 'MH08', name: '西溪路低洼段', type: '易涝点', dia: 1200 },
+                { id: 'MH09', name: '香积寺路 2# 井', type: '检查井', dia: 900 },
+                { id: 'MH10', name: '钱塘快速路隧道', type: '易涝点', dia: 1800 },
+                { id: 'MH11', name: '莫干山路箱涵', type: '箱涵', dia: 2200 },
+                { id: 'MH12', name: '之浦路 9# 井', type: '检查井', dia: 1000 }
+            ].map(function (p) {
+                p.level = +(p.dia / 1000 * SC.sim.rand(0.25, 0.55)).toFixed(2);
+                p.flow = Math.round(SC.sim.rand(120, 900));
+                p.status = '正常';
+                return p;
+            });
+
+            const state = {
+                rain: 0,
+                auto: true,
+                speed: 1,
+                simMinutes: 0,
+                todayRain: 12,
+                logs: [],
+                warnings: SC.store.get('drain', 'warnings', null)
+            };
+            /* 水位过程线缓存放回站点自身（simTick 里持续 push）；
+             * 建页时先初始化空数组，否则 renderChart 读 s.history 会报错 */
+            stations.forEach(function (s) { s.power = 0; s.outflow = 0; s.history = []; });
+
+            /* ---------------- 预警等级状态机 ---------------- */
+            const LEVELS = [
+                { key: 'green', name: '正常', color: '#27ae60', cond: '全部液位低于警戒值且降雨 < 10 mm/h', act: '常规值守，每 2 小时巡查一次' },
+                { key: 'blue', name: 'Ⅳ 级（蓝）', color: '#1d6fb8', cond: '降雨 ≥ 10 mm/h 或单站液位超警戒 90%', act: '值守人员到岗，关闭地下车库口闸门预案待命' },
+                { key: 'yellow', name: 'Ⅲ 级（黄）', color: '#d4a017', cond: '降雨 ≥ 25 mm/h 或 2 座以上泵站超警戒', act: '启动 1 小时内预置移动泵车，排水队集结' },
+                { key: 'orange', name: 'Ⅱ 级（橙）', color: '#e67e22', cond: '降雨 ≥ 45 mm/h 或出现管网溢流', act: '全线泵组满负荷，交警联动封下穿立交，物资前置' },
+                { key: 'red', name: 'Ⅰ 级（红）', color: '#e74c3c', cond: '降雨 ≥ 65 mm/h 或多点内涝、液位超保证水位', act: '启动市级防汛应急预案，抽排队伍分片区会战' }
+            ];
+            let currentLevel = 'green';
+
+            function judgeLevel() {
+                const overWarn = stations.filter(s => s.level >= s.warn).length;
+                const overDanger = stations.filter(s => s.level >= s.danger).length;
+                const overflow = pipes.filter(p => p.status === '溢流').length;
+                let lv = 'green';
+                if (state.rain >= 65 || overDanger >= 1) lv = 'red';
+                else if (state.rain >= 45 || overflow >= 1 || overDanger >= 1) lv = 'orange';
+                else if (state.rain >= 25 || overWarn >= 2) lv = 'yellow';
+                else if (state.rain >= 10 || overWarn >= 1) lv = 'blue';
+                return lv;
+            }
+
+            function paintBanner() {
+                const lv = LEVELS.find(l => l.key === currentLevel);
+                const banner = document.getElementById('warn-banner');
+                banner.className = 'flood-warning lv-' + currentLevel;
+                document.getElementById('warn-title').textContent =
+                    (currentLevel === 'red' ? '🔴 ' : currentLevel === 'orange' ? '🟠 ' : currentLevel === 'yellow' ? '🟡 ' : currentLevel === 'blue' ? '🔵 ' : '🟢 ') +
+                    lv.name + ' · 防汛态势';
+                document.getElementById('warn-desc').innerHTML =
+                    '当前降雨 ' + state.rain + ' mm/h，超警戒泵站 <b>' + stations.filter(s => s.level >= s.warn).length +
+                    '</b> 座，管网溢流点 <b>' + pipes.filter(p => p.status === '溢流').length + '</b> 处；响应要求：' + lv.act;
+            }
+
+            function switchLevel(next) {
+                if (next === currentLevel) return;
+                const prev = LEVELS.findIndex(l => l.key === currentLevel);
+                const cur = LEVELS.findIndex(l => l.key === next);
+                currentLevel = next;
+                paintBanner();
+                renderLevelTable();
+                const lv = LEVELS.find(l => l.key === next);
+                if (cur > prev) {
+                    log('warn', '防汛等级由 ' + LEVELS[prev].name + ' 升级为 ' + lv.name);
+                    SC.toast('防汛预警升级为「' + lv.name + '」：' + lv.act, { type: 'warn', title: '等级升级', duration: 5200 });
+                    raiseWarning(lv, '态势自动判定');
+                } else {
+                    log('ok', '防汛等级由 ' + LEVELS[prev].name + ' 降为 ' + lv.name);
+                    SC.toast('险情缓解，防汛等级降为「' + lv.name + '」', { type: 'success' });
+                }
+            }
+
+            /* ---------------- 预警事件 ---------------- */
+            if (!state.warnings) {
+                state.warnings = [
+                    { id: 'YJ20260012', level: 'yellow', type: '管网满流', pos: '文一路下穿立交', value: '充满度 92%', time: SC.stamp(new Date(Date.now() - 5.2 * 3600000)), status: '已确认', owner: '排水一班' },
+                    { id: 'YJ20260011', level: 'blue', type: '液位超警戒', pos: '艮山泵站', value: '3.72 m（警戒 3.60）', time: SC.stamp(new Date(Date.now() - 9.5 * 3600000)), status: '已闭环', owner: '调度中心' }
+                ];
+            }
+            let warnSeq = 13;
+            const saveWarn = () => SC.store.set('drain', 'warnings', state.warnings);
+
+            function raiseWarning(lv, reason) {
+                const over = stations.filter(s => s.level >= s.warn)[0];
+                const w = {
+                    id: 'YJ2026' + SC.pad2(warnSeq++), level: lv.key,
+                    type: over ? '液位超警戒' : '降雨预警',
+                    pos: over ? over.name : '全市域',
+                    value: over ? over.level.toFixed(2) + ' m（警戒 ' + over.warn.toFixed(2) + '）' : '降雨 ' + state.rain + ' mm/h',
+                    time: SC.stamp(new Date()), status: '待确认', owner: '', reason
+                };
+                state.warnings.unshift(w);
+                if (state.warnings.length > 30) state.warnings.pop();
+                saveWarn();
+                renderWarnings();
+                renderKpi();
+            }
+
+            /* ---------------- 日志 ---------------- */
+            function log(kind, text) {
+                state.logs.unshift({ t: new Date(), kind, text });
+                if (state.logs.length > 120) state.logs.pop();
+                renderLog();
+            }
+
+            function renderLog() {
+                const host = document.getElementById('action-log');
+                host.innerHTML = state.logs.slice(0, 60).map(function (l) {
+                    return '<div class="li"><span class="t">' + SC.stamp(l.t).slice(5) + '</span>' +
+                        '<span class="lv ' + l.kind + '">[' + ({ info: '联动', warn: '预警', alarm: '告警', ok: '恢复' }[l.kind] || '记录') + ']</span>' +
+                        '<span class="tx">' + SC.esc(l.text) + '</span></div>';
+                }).join('');
+            }
+
+            /* ---------------- 仿真步 ---------------- */
+            function step(minutes) {
+                state.simMinutes += minutes;
+                state.todayRain += state.rain / 60 * minutes;
+                const inflowM3h = state.rain / 1000 * 60 * 12000;   // 全市汇水面积近似 1.2 万 m² 折算入管网
+                stations.forEach(function (s) {
+                    // 降雨产流按汇水面积折算到该站（均摊），叠加地下渗流基础来水
+                    const rainIn = inflowM3h / stations.length * (s.surface / 2600);
+                    const baseIn = 420 + (s.id === 'PS05' ? 260 : 0);
+                    const inQ = rainIn + baseIn;
+                    // 自动联锁：迟滞区间内增减泵组
+                    if (state.auto) {
+                        const capacity = s.pumps - s.fault;
+                        if (s.level >= s.start && s.run < capacity) {
+                            s.run++;
+                            log('info', s.name + ' 液位 ' + s.level.toFixed(2) + ' m ≥ 启泵水位 ' + s.start.toFixed(2) + ' m，自动增开 ' + s.run + ' 号泵');
+                        } else if (s.level <= s.stop && s.run > 0) {
+                            s.run--;
+                            log('ok', s.name + ' 液位回落至 ' + s.level.toFixed(2) + ' m，自动减停一台');
+                        }
+                    }
+                    s.outflow = s.run * s.perPump;
+                    s.power = s.run * s.kw;
+                    const net = inQ - s.outflow;
+                    s.level = SC.clamp(s.level + net / 3600 * minutes / s.surface, 0.2, s.cap + 0.6);
+                    if (s.level > s.cap + 0.35 && !s.__overflowed) {
+                        s.__overflowed = true;
+                        log('alarm', s.name + ' 液位 ' + s.level.toFixed(2) + ' m 超泵池容积，存在漫溢风险！');
+                    }
+                    if (s.level < s.warn) s.__overflowed = false;
+                    s.history = s.history || [];
+                    s.history.push(+s.level.toFixed(3));
+                    if (s.history.length > 180) s.history.shift();
+                });
+
+                pipes.forEach(function (p) {
+                    const target = SC.clamp(p.dia / 1000 * (0.3 + state.rain / 80 * 0.95), 0.05, p.dia / 1000 * 1.08);
+                    p.level = +(p.level + (target - p.level) * 0.18 + SC.sim.rand(-0.02, 0.02)).toFixed(2);
+                    p.flow = Math.round(SC.clamp(p.flow + (state.rain * 14 - p.flow) * 0.2 + SC.sim.rand(-40, 40), 60, 6000));
+                    const ratio = p.level / (p.dia / 1000);
+                    p.status = ratio >= 1.02 ? '溢流' : (ratio >= 0.8 ? '满流' : (ratio >= 0.65 ? '高液位' : '正常'));
+                    if (p.status === '溢流' && !p.__raised) {
+                        p.__raised = true;
+                        log('alarm', p.name + ' 出现溢流（液位 ' + p.level + ' m / 管径 ' + (p.dia / 1000) + ' m），已生成内涝处置任务');
+                        raiseWarning(LEVELS[state.rain >= 45 ? 3 : 2], '管网溢流');
+                    }
+                    if (p.status === '正常') p.__raised = false;
+                });
+
+                switchLevel(judgeLevel());
+                renderAll();
+            }
+
+            /* ---------------- 泵站卡片 ---------------- */
+            function renderCards() {
+                document.getElementById('station-cards').innerHTML = stations.map(function (s) {
+                    const ratio = SC.clamp(s.level / (s.danger + 0.3), 0, 1);
+                    const cls = s.level >= s.danger ? 'danger' : (s.level >= s.warn ? 'warn' : '');
+                    const markWarn = (s.warn / (s.danger + 0.3) * 100).toFixed(1);
+                    const markDanger = (s.danger / (s.danger + 0.3) * 100).toFixed(1);
+                    return '<div class="monitor-card ' + cls + '" data-id="' + s.id + '">' +
+                        '<div class="monitor-header"><span class="monitor-title">' + s.name + '</span>' +
+                        '<span class="sc-tag ' + (s.level >= s.danger ? 'bad' : s.level >= s.warn ? 'warn' : 'ok') + '">' +
+                        (s.level >= s.danger ? '超保证水位' : s.level >= s.warn ? '超警戒' : '正常') + '</span></div>' +
+                        '<div class="monitor-value">' + s.level.toFixed(2) + '<span style="font-size:.45em"> m</span></div>' +
+                        '<div class="monitor-label">当前液位 / 泵池容积 ' + s.cap.toFixed(1) + ' m</div>' +
+                        '<div class="gauge-line"><i style="width:' + (ratio * 100).toFixed(1) + '%"></i>' +
+                        '<span class="mark" style="left:' + markWarn + '%"></span>' +
+                        '<span class="mark danger" style="left:' + markDanger + '%"></span></div>' +
+                        '<div class="monitor-label">橙线＝警戒 ' + s.warn.toFixed(2) + ' m　红线＝保证 ' + s.danger.toFixed(2) + ' m</div>' +
+                        '<div class="pump-dots">' + Array.from({ length: s.pumps }, function (_, i) {
+                            const bad = i >= s.pumps - s.fault;
+                            return '<span class="pump-dot ' + (bad ? 'fault' : (i < s.run ? 'on' : '')) + '">' + (i + 1) + '</span>';
+                        }).join('') + '</div>' +
+                        '<div class="sc-kv" style="margin-top:12px;grid-template-columns:1fr 1fr">' +
+                        '<div class="sc-kv-item"><div class="k">抽排流量</div><div class="v">' + SC.num(s.outflow) + ' m³/h</div></div>' +
+                        '<div class="sc-kv-item"><div class="k">机组功率</div><div class="v">' + SC.num(s.power) + ' kW</div></div>' +
+                        '</div></div>';
+                }).join('');
+                document.querySelectorAll('.monitor-card').forEach(function (card) {
+                    card.addEventListener('click', function () {
+                        openControl(stations.find(s => s.id === card.dataset.id));
+                    });
+                });
+            }
+
+            function openControl(s) {
+                const body = SC.el('<div></div>');
+                body.innerHTML = '<div class="sc-kv">' +
+                    kvi('所属片区', s.area) + kvi('当前液位', s.level.toFixed(2) + ' m') +
+                    kvi('启泵水位', s.start.toFixed(2) + ' m') + kvi('停泵水位', s.stop.toFixed(2) + ' m') +
+                    kvi('运行机组', s.run + ' / ' + (s.pumps - s.fault)) + kvi('单机流量', SC.num(s.perPump) + ' m³/h') +
+                    '</div><div class="sc-section-title">近 3 小时液位过程</div><div class="sc-chart sm"><canvas></canvas></div>' +
+                    '<div class="sc-section-title">联锁阈值调整</div>' +
+                    '<div class="sc-form"><div class="sc-field"><label>启泵水位（m）</label><input type="number" step="0.05" class="sc-input" id="ctl-start" value="' + s.start.toFixed(2) + '"></div>' +
+                    '<div class="sc-field"><label>停泵水位（m）</label><input type="number" step="0.05" class="sc-input" id="ctl-stop" value="' + s.stop.toFixed(2) + '"></div></div>';
+                const footer = [
+                    { text: '关闭', kind: 'ghost' },
+                    {
+                        text: s.run > 0 ? '全部停机' : '全部开机', kind: '', onClick: function () {
+                            s.run = s.run > 0 ? 0 : s.pumps - s.fault;
+                            log('info', s.name + ' 手动' + (s.run > 0 ? '开启 ' + s.run + ' 台机组' : '停机检修'));
+                            SC.toast(s.name + (s.run > 0 ? ' 已开机 ' + s.run + ' 台' : ' 已停机'), { type: 'success' });
+                            renderAll();
+                        }
+                    },
+                    {
+                        text: '保存阈值', kind: 'primary', onClick: function (api) {
+                            const st = Number(document.getElementById('ctl-start').value);
+                            const sp = Number(document.getElementById('ctl-stop').value);
+                            if (!(st > sp)) {
+                                SC.toast('启泵水位必须高于停泵水位，否则将频繁启停', { type: 'error', duration: 3600 });
+                                return false;
+                            }
+                            if (st <= s.warn) {
+                                SC.toast('启泵水位过低，警戒水位以下就开机将浪费能耗', { type: 'warn' });
+                            }
+                            s.start = st;
+                            s.stop = sp;
+                            log('info', s.name + ' 联锁阈值更新为启泵 ' + st.toFixed(2) + ' m / 停泵 ' + sp.toFixed(2) + ' m');
+                            api.close();
+                            renderAll();
+                            renderPumpTable();
+                        }
+                    }
+                ];
+                SC.modal.open({ title: s.name + ' · 机组远程控制', size: 'lg', body, footer });
+                const hist = s.history || [];
+                SC.chart.line(body.querySelector('canvas'), {
+                    labels: hist.map((_, i) => (hist.length - i) * -1 + ' 分'), unit: ' m', xEvery: 20,
+                    thresholds: [{ value: s.warn, label: '警戒', color: '#f39c12' }, { value: s.danger, label: '保证', color: '#e74c3c' }],
+                    series: [{ name: s.name + ' 液位', data: hist, color: '#0077b6' }]
+                });
+            }
+
+            function kvi(k, v) {
+                return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + SC.esc(v) + '</div></div>';
+            }
+
+            /* ---------------- 控制台 UI ---------------- */
+            const rainInput = document.getElementById('rain-input');
+            rainInput.addEventListener('input', function () {
+                state.rain = Number(rainInput.value);
+                rainInput.nextElementSibling.textContent = state.rain + ' mm/h';
+                rainInput.style.background = 'linear-gradient(90deg,#0077b6 ' + (state.rain / 80 * 100) + '%,#e5e8ec ' + (state.rain / 80 * 100) + '%)';
+                paintBanner();
+            });
+            document.querySelectorAll('[data-rain]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    rainInput.value = btn.dataset.rain;
+                    rainInput.dispatchEvent(new Event('input'));
+                    SC.toast('已切换雨情场景：' + btn.textContent + '（' + btn.dataset.rain + ' mm/h）', { type: 'info' });
+                });
+            });
+            document.getElementById('auto-switch').addEventListener('click', function () {
+                state.auto = !this.classList.contains('on') ? true : false;
+                this.classList.toggle('on', state.auto);
+                SC.toast('泵组自动联锁已' + (state.auto ? '启用' : '解除，改为人工调度'), { type: state.auto ? 'success' : 'warn' });
+            });
+            document.getElementById('btn-all-stop').addEventListener('click', function () {
+                SC.modal.confirm({ text: '将强制停止全部 25 台机组并解除自动联锁，仅用于检修场景，是否继续？', danger: true, okText: '确认停机' })
+                    .then(function (ok) {
+                        if (!ok) return;
+                        stations.forEach(s => s.run = 0);
+                        state.auto = false;
+                        document.getElementById('auto-switch').classList.remove('on');
+                        log('warn', '调度台执行全站停机检修，自动联锁已解除');
+                        renderAll();
+                        SC.toast('已下发全站停机指令', { type: 'warn' });
+                    });
+            });
+            document.getElementById('sim-speed').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('button');
+                if (!btn) return;
+                this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.speed = Number(btn.dataset.speed);
+                simCtrl.setInterval(1000);
+                SC.toast('仿真倍速调整为 ' + state.speed + '×（1 秒 = ' + state.speed + ' 分钟）', { type: 'info' });
+            });
+            document.getElementById('btn-clear-history').addEventListener('click', function () {
+                stations.forEach(s => s.history = []);
+                renderChart();
+                SC.toast('过程线已清空，开始重新采集', { type: 'success' });
+            });
+            document.getElementById('btn-log-export').addEventListener('click', function () {
+                SC.csv.download('排水调度日志_' + SC.today() + '.csv', [['时间', '类型', '内容']]
+                    .concat(state.logs.map(l => [SC.stamp(l.t), l.kind, l.text])));
+            });
+
+            /* ---------------- 泵站台账 ---------------- */
+            let pumpCtrl;
+            function renderPumpTable() {
+                const tbody = document.querySelector('#pump-table tbody');
+                tbody.innerHTML = stations.map(function (s) {
+                    const st = s.level >= s.danger ? ['超保证水位', 'bad'] : (s.level >= s.warn ? ['超警戒', 'warn'] : ['正常运行', 'ok']);
+                    return '<tr data-id="' + s.id + '"><td><b>' + s.name + '</b></td><td>' + s.area + '</td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(s.pumps * s.perPump) + ' m³/h</span></td>' +
+                        '<td>' + s.pumps + ' 台 × ' + s.kw + ' kW</td>' +
+                        '<td><span class="sc-tag ' + (s.run ? 'ok' : 'off') + '">' + s.run + ' 运行</span> / ' + (s.pumps - s.fault - s.run) + ' 备用</td>' +
+                        '<td><span class="sc-cell-num">' + s.level.toFixed(2) + ' m</span></td>' +
+                        '<td>' + s.start.toFixed(2) + ' m</td><td>' + s.warn.toFixed(2) + ' m</td>' +
+                        '<td><span class="sc-tag ' + st[1] + '">' + st[0] + '</span></td>' +
+                        '<td><button class="btn-sm" data-act="ctl">控制</button><button class="btn-sm" data-act="test">自检</button>' +
+                        '<button class="btn-sm btn-warning" data-act="fault">报修</button></td></tr>';
+                }).join('');
+                if (pumpCtrl) pumpCtrl.reload();
+            }
+
+            document.querySelector('#pump-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('button[data-act]');
+                if (!btn) return;
+                const s = stations.find(x => x.id === btn.closest('tr').dataset.id);
+                if (btn.dataset.act === 'ctl') openControl(s);
+                else if (btn.dataset.act === 'test') {
+                    SC.toast(s.name + ' 正在执行机组联锁自检…', { duration: 1500 });
+                    setTimeout(function () {
+                        const ok = Math.random() > 0.2;
+                        log(ok ? 'ok' : 'alarm', s.name + ' 自检' + (ok ? '通过：闸门、液位计、泵组、通信均正常' : '发现 1 号泵绝缘偏低，建议安排检修'));
+                        SC.toast(s.name + ' 自检' + (ok ? '通过' : '发现异常（1 号泵绝缘偏低）'), { type: ok ? 'success' : 'error' });
+                        renderAll();
+                    }, 1500);
+                } else {
+                    SC.modal.form({
+                        title: s.name + ' 设备报修',
+                        fields: [
+                            { name: 'device', label: '报修设备', type: 'select', col: 1, required: true, options: ['1 号泵', '2 号泵', '3 号泵', '闸门', '液位计', '变频器'] },
+                            { name: 'kind', label: '故障类型', type: 'select', col: 1, required: true, options: ['机械故障', '电气故障', '自动控制系统', '渗漏'] },
+                            { name: 'hours', label: '期望到场（小时）', type: 'number', col: 1, required: true, min: 1, max: 48, value: 4 },
+                            { name: 'desc', label: '故障描述', type: 'textarea', col: 'full', required: true }
+                        ]
+                    }).then(function (v) {
+                        if (!v) return;
+                        s.fault = Math.min(s.pumps - 1, s.fault + 1);
+                        s.run = Math.min(s.run, s.pumps - s.fault);
+                        log('warn', s.name + ' ' + v.device + ' 报修（' + v.kind + '），可用机组减至 ' + (s.pumps - s.fault) + ' 台');
+                        SC.toast('报修单已生成，' + v.device + ' 已置为不可用', { type: 'success' });
+                        renderAll();
+                        renderPumpTable();
+                    });
+                }
+            });
+
+            document.getElementById('btn-pump-export').addEventListener('click', function () {
+                SC.csv.download('泵站台账_' + SC.today() + '.csv', [['泵站', '片区', '机组数', '单机流量', '当前液位', '运行台数', '状态']]
+                    .concat(stations.map(s => [s.name, s.area, s.pumps, s.perPump, s.level.toFixed(2), s.run, s.level >= s.warn ? '超警戒' : '正常'])));
+                SC.toast('台账已导出', { type: 'success' });
+            });
+
+            /* ---------------- 预警列表 ---------------- */
+            let warnCtrl, warnChip = '全部';
+
+            function renderWarnings() {
+                const tbody = document.querySelector('#warn-table tbody');
+                tbody.innerHTML = state.warnings.map(function (w) {
+                    const lv = LEVELS.find(l => l.key === w.level) || LEVELS[1];
+                    return '<tr data-id="' + w.id + '"><td><b>' + w.id + '</b></td>' +
+                        '<td><span class="sc-tag" style="background:' + lv.color + '22;color:' + lv.color + '">' + lv.name + '</span></td>' +
+                        '<td>' + SC.esc(w.type) + '</td><td>' + SC.esc(w.pos) + '</td><td>' + SC.esc(w.value) + '</td>' +
+                        '<td>' + w.time + '</td>' +
+                        '<td><span class="sc-tag ' + (w.status === '待确认' ? 'bad' : (w.status === '处置中' ? 'info' : 'ok')) + '">' + w.status + '</span></td>' +
+                        '<td>' + (w.status === '待确认' ? '<button class="btn-sm" data-act="ack">确认</button>' : '') +
+                        (w.status === '已确认' ? '<button class="btn-sm" data-act="handle">转处置</button>' : '') +
+                        (w.status === '处置中' ? '<button class="btn-sm btn-success" data-act="close">闭环</button>' : '') +
+                        '<button class="btn-sm" data-act="detail">详情</button></td></tr>';
+                }).join('');
+                renderWarnChips();
+                if (warnCtrl) warnCtrl.reload();
+            }
+
+            function renderWarnChips() {
+                const kinds = ['全部', '待确认', '已确认', '处置中', '已闭环'];
+                document.getElementById('warn-chips').innerHTML = kinds.map(function (k) {
+                    const n = k === '全部' ? state.warnings.length : state.warnings.filter(w => w.status === k).length;
+                    return '<button class="sc-chip' + (k === warnChip ? ' active' : '') + '" data-k="' + k + '">' + k + ' ' + n + '</button>';
+                }).join('');
+            }
+
+            document.getElementById('warn-chips').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('.sc-chip');
+                if (!btn) return;
+                warnChip = btn.dataset.k;
+                renderWarnChips();
+                warnCtrl.setFilter(r => warnChip === '全部' || r.cells[6] === warnChip);
+            });
+
+            document.querySelector('#warn-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('button[data-act]');
+                if (!btn) return;
+                const w = state.warnings.find(x => x.id === btn.closest('tr').dataset.id);
+                const act = btn.dataset.act;
+                if (act === 'ack') {
+                    w.status = '已确认';
+                    w.owner = '调度中心';
+                    log('warn', '预警 ' + w.id + '（' + w.pos + '）已确认');
+                    SC.toast('预警已确认，请按预案执行', { type: 'success' });
+                } else if (act === 'handle') {
+                    SC.modal.form({
+                        title: '预警转处置 · ' + w.id,
+                        fields: [
+                            { name: 'owner', label: '处置班组', type: 'select', col: 1, required: true, options: ['排水一班', '排水二班', '应急抢修队', '属地城管'] },
+                            { name: 'measure', label: '处置措施', type: 'select', col: 1, required: true, options: ['移动泵车强排', '开启闸门预降', '河道导流', '路面交通管制', '疏通卡口管段'] },
+                            { name: 'deadline', label: '完成时限（小时）', type: 'number', col: 1, required: true, min: 1, max: 24, value: 3 },
+                            { name: 'note', label: '处置要求', type: 'textarea', col: 'full', required: true }
+                        ]
+                    }).then(function (v) {
+                        if (!v) return;
+                        w.status = '处置中';
+                        w.owner = v.owner;
+                        w.measure = v.measure;
+                        log('warn', '预警 ' + w.id + ' 已派 ' + v.owner + ' 执行「' + v.measure + '」，限 ' + v.deadline + ' 小时完成');
+                        renderWarnings();
+                        renderKpi();
+                        SC.toast('已转处置并通知班组', { type: 'success' });
+                    });
+                    return;
+                } else if (act === 'close') {
+                    SC.modal.confirm({ text: '确认该预警已完成处置并闭环？闭环后计入防汛考核。', okText: '确认闭环' }).then(function (ok) {
+                        if (!ok) return;
+                        w.status = '已闭环';
+                        w.closeTime = SC.stamp(new Date());
+                        log('ok', '预警 ' + w.id + ' 处置完成并闭环');
+                        renderWarnings();
+                        renderKpi();
+                    });
+                    return;
+                } else {
+                    SC.modal.open({
+                        title: '预警详情 · ' + w.id,
+                        body: '<div class="sc-kv">' + kvi('等级', (LEVELS.find(l => l.key === w.level) || {}).name) +
+                            kvi('类型', w.type) + kvi('位置', w.pos) + kvi('触发值', w.value) +
+                            kvi('发布时间', w.time) + kvi('当前状态', w.status) +
+                            kvi('处置班组', w.owner || '—') + kvi('处置措施', w.measure || '—') +
+                            (w.closeTime ? kvi('闭环时间', w.closeTime) : '') + '</div>' +
+                            '<div class="sc-note" style="margin-top:14px">来源：' + SC.esc(w.reason || '系统自动判定') + '</div>'
+                    });
+                }
+                saveWarn();
+                renderWarnings();
+                renderKpi();
+            });
+
+            document.getElementById('btn-manual-warn').addEventListener('click', function () {
+                SC.modal.form({
+                    title: '手工发布防汛预警',
+                    fields: [
+                        { name: 'level', label: '预警等级', type: 'select', col: 1, required: true, options: LEVELS.slice(1).map(l => ({ value: l.key, label: l.name })) },
+                        { name: 'type', label: '预警类型', type: 'select', col: 1, required: true, options: ['液位超警戒', '管网满流', '河道顶托', '下穿立交积水', '闸门故障'] },
+                        { name: 'pos', label: '影响位置', col: 'full', required: true, placeholder: '如：文一路下穿立交 / 古荡片区' },
+                        { name: 'value', label: '触发数值', col: 'full', required: true, placeholder: '如：积水深度 32 cm' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    state.warnings.unshift(Object.assign({ id: 'YJ2026' + SC.pad2(warnSeq++), time: SC.stamp(new Date()), status: '待确认', owner: '', reason: '人工发布' }, v));
+                    saveWarn();
+                    currentLevel = v.level;
+                    paintBanner();
+                    renderWarnings();
+                    renderKpi();
+                    renderLevelTable();
+                    log('alarm', '人工发布预警：' + v.pos + ' ' + v.value);
+                    SC.toast('预警已发布并推送至相关责任人', { type: 'success' });
+                });
+            });
+
+            document.getElementById('btn-ack').addEventListener('click', function () {
+                const pending = state.warnings.filter(w => w.status === '待确认');
+                if (!pending.length) {
+                    SC.toast('当前无待确认预警', { type: 'info' });
+                    return;
+                }
+                pending.forEach(w => { w.status = '已确认'; w.owner = '调度中心'; });
+                saveWarn();
+                renderWarnings();
+                renderKpi();
+                SC.toast('已批量确认 ' + pending.length + ' 条预警', { type: 'success' });
+            });
+
+            document.getElementById('btn-plan').addEventListener('click', function () {
+                const lv = LEVELS.find(l => l.key === currentLevel);
+                SC.modal.open({
+                    title: '防汛响应预案（当前 ' + lv.name + '）',
+                    size: 'lg',
+                    body: '<table class="data-table"><thead><tr><th>等级</th><th>响应要求</th><th>物资前置</th><th>队伍</th></tr></thead><tbody>' +
+                        [['Ⅳ 级（蓝）', '值守到岗，巡查加密', '沙袋 200 只 / 阻水板 8 套', '1 队 6 人'],
+                        ['Ⅲ 级（黄）', '移动泵车预置，闸门待命', '泵车 3 台 / 发电机 2 台', '2 队 14 人'],
+                        ['Ⅱ 级（橙）', '泵组满负荷，交通管制联动', '泵车 8 台 / 应急照明 12 套', '4 队 32 人'],
+                        ['Ⅰ 级（红）', '市级预案启动，分片区会战', '泵车 16 台 / 抢险车 6 台', '8 队 64 人']]
+                            .map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>').join('') +
+                        '</tbody></table><div class="sc-note" style="margin-top:14px">当前态势：降雨 ' + state.rain +
+                        ' mm/h，超警戒泵站 ' + stations.filter(s => s.level >= s.warn).length + ' 座。响应动作：' + lv.act + '</div>'
+                });
+            });
+
+            function renderLevelTable() {
+                document.getElementById('lv-body').innerHTML = LEVELS.map(function (l) {
+                    const active = l.key === currentLevel;
+                    return '<tr' + (active ? ' style="background:#eaf6fd"' : '') + '><td><span class="sc-tag" style="background:' + l.color + '22;color:' + l.color + '">' + l.name + '</span></td>' +
+                        '<td>' + l.cond + '</td><td>' + l.act + '</td>' +
+                        '<td>' + (active ? '<b style="color:' + l.color + '">◀ 当前等级</b>' : '—') + '</td></tr>';
+                }).join('');
+            }
+
+            /* ---------------- 管网监控 ---------------- */
+            let pipeCtrl;
+            function renderPipes() {
+                const tbody = document.querySelector('#pipe-table tbody');
+                tbody.innerHTML = pipes.map(function (p) {
+                    const ratio = p.level / (p.dia / 1000) * 100;
+                    const cls = p.status === '溢流' ? 'bad' : (p.status === '满流' ? 'warn' : (p.status === '高液位' ? 'info' : 'ok'));
+                    return '<tr data-id="' + p.id + '"><td><b>' + p.name + '</b></td><td>' + p.type + '</td>' +
+                        '<td>' + p.dia + ' mm</td><td><span class="sc-cell-num">' + p.level.toFixed(2) + ' m</span></td>' +
+                        '<td><span class="sc-tag ' + cls + '">' + ratio.toFixed(0) + '%</span></td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(p.flow) + ' m³/h</span></td>' +
+                        '<td><span class="sc-tag ' + cls + '">' + p.status + '</span></td>' +
+                        '<td><button class="btn-sm" data-act="detail">曲线</button>' +
+                        (p.status === '溢流' || p.status === '满流' ? '<button class="btn-sm btn-warning" data-act="deal">处置</button>' : '') +
+                        '</td></tr>';
+                }).join('');
+                if (pipeCtrl) pipeCtrl.reload();
+            }
+
+            document.querySelector('#pipe-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('button[data-act]');
+                if (!btn) return;
+                const p = pipes.find(x => x.id === btn.closest('tr').dataset.id);
+                if (btn.dataset.act === 'detail') {
+                    const body = SC.el('<div></div>');
+                    const data = Array.from({ length: 36 }, () => +(p.dia / 1000 * SC.sim.rand(0.25, Math.max(0.4, p.level / (p.dia / 1000)))).toFixed(2));
+                    data[data.length - 1] = p.level;
+                    body.innerHTML = '<div class="sc-kv">' + kvi('管径', p.dia + ' mm') + kvi('当前液位', p.level.toFixed(2) + ' m') +
+                        kvi('充满度', (p.level / (p.dia / 1000) * 100).toFixed(0) + '%') + kvi('状态', p.status) + '</div>' +
+                        '<div class="sc-section-title">近 3 小时液位</div><div class="sc-chart"><canvas></canvas></div>';
+                    SC.modal.open({ title: p.name, size: 'lg', body });
+                    SC.chart.line(body.querySelector('canvas'), {
+                        labels: data.map((_, i) => (35 - i) * 5 + ' 分'), unit: ' m', xEvery: 6,
+                        thresholds: [{ value: p.dia / 1000, label: '满管', color: '#e74c3c' }, { value: p.dia / 1000 * 0.8, label: '80% 满流', color: '#f39c12' }],
+                        series: [{ name: '液位', data, color: '#0077b6' }]
+                    });
+                } else {
+                    SC.modal.form({
+                        title: '溢流处置 · ' + p.name,
+                        fields: [
+                            { name: 'act', label: '处置方式', type: 'select', col: 1, required: true, options: ['移动泵车强排', '开启下游闸门', '上游截污导流', '人工清障疏通'] },
+                            { name: 'team', label: '派往班组', type: 'select', col: 1, required: true, options: ['排水一班', '排水二班', '应急抢修队'] },
+                            { name: 'note', label: '备注', type: 'textarea', col: 'full' }
+                        ]
+                    }).then(function (v) {
+                        if (!v) return;
+                        p.level = +(p.level * 0.6).toFixed(2);
+                        p.status = '高液位';
+                        log('ok', p.name + ' 执行「' + v.act + '」，由 ' + v.team + ' 处置，液位降至 ' + p.level.toFixed(2) + ' m');
+                        renderPipes();
+                        renderAll();
+                        SC.toast('处置指令已下发，液位开始下降', { type: 'success' });
+                    });
+                }
+            });
+
+            document.getElementById('btn-pipe-export').addEventListener('click', function () {
+                SC.csv.download('管网监测_' + SC.today() + '.csv', [['监测点', '类型', '管径mm', '液位m', '充满度', '流量m³/h', '状态']]
+                    .concat(pipes.map(p => [p.name, p.type, p.dia, p.level, (p.level / (p.dia / 1000) * 100).toFixed(0) + '%', p.flow, p.status])));
+            });
+
+            /* ---------------- 图表 ---------------- */
+            let levelChart;
+            const CHART_STATION = ['PS01', 'PS03', 'PS05'];
+            (function initPicker() {
+                const sel = document.getElementById('chart-stations');
+                sel.innerHTML = stations.map(s => '<option value="' + s.id + '" selected>' + s.name + '</option>').join('');
+                Array.from(sel.options).forEach(function (o) {
+                    o.selected = CHART_STATION.indexOf(o.value) > -1;
+                });
+                sel.addEventListener('change', renderChart);
+            })();
+
+            function renderChart() {
+                const picked = Array.from(document.getElementById('chart-stations').selectedOptions).map(o => o.value);
+                const pickedStations = stations.filter(s => picked.indexOf(s.id) > -1).map(s => (s.history = s.history || [], s));
+                const len = Math.max.apply(null, pickedStations.map(s => s.history.length).concat([1]));
+                const labels = [];
+                for (let i = len - 1; i >= 0; i--) labels.push('-' + i + ' 分');
+                const series = pickedStations.map(function (s, i) {
+                    const pad = len - s.history.length;
+                    return {
+                        name: s.name, color: PALETTE[i % PALETTE.length],
+                        data: s.history.map((v, k) => (k >= pad ? v : null)).filter(v => v !== null),
+                        thresholdsHint: s.warn
+                    };
+                });
+                const first = stations.find(s => s.id === picked[0]);
+                levelChart = SC.chart.line(document.getElementById('chart-level'), {
+                    labels: labels.length > 1 ? labels : ['—'], unit: ' m', xEvery: Math.ceil(len / 12) || 1,
+                    padL: 46,
+                    thresholds: first ? [{ value: first.warn, label: '警戒水位 ' + first.warn.toFixed(2) + ' m', color: '#f39c12' },
+                    { value: first.danger, label: '保证水位 ' + first.danger.toFixed(2) + ' m', color: '#e74c3c' }] : [],
+                    series
+                });
+                SC.chart.legend(document.getElementById('legend-level'), series.map(s => ({ name: s.name, color: s.color })));
+            }
+
+            const PALETTE = ['#0077b6', '#e67e22', '#27ae60', '#8e44ad', '#c0392b', '#16a085'];
+
+            function renderKpi() {
+                document.getElementById('kpi-pump').textContent = stations.length;
+                document.getElementById('kpi-run').textContent = stations.reduce((s, x) => s + x.run, 0) + ' 台';
+                document.getElementById('kpi-rain').textContent = state.todayRain.toFixed(1) + 'mm';
+                document.getElementById('kpi-warn').textContent = state.warnings.filter(w => w.status !== '已闭环').length;
+                document.getElementById('sum-flow').textContent = SC.num(stations.reduce((s, x) => s + x.outflow, 0)) + ' m³/h';
+                document.getElementById('sum-power').textContent = SC.num(stations.reduce((s, x) => s + x.power, 0)) + ' kW';
+                const totalCap = stations.reduce((s, x) => s + x.surface * x.cap, 0);
+                const used = stations.reduce((s, x) => s + x.surface * x.level, 0);
+                document.getElementById('sum-store').textContent = (100 - used / totalCap * 100).toFixed(1) + '%';
+                const mins = state.simMinutes % 1440;
+                document.getElementById('sim-clock').textContent = SC.pad2(Math.floor(mins / 60)) + ':' + SC.pad2(Math.floor(mins % 60));
+            }
+
+            function renderAll() {
+                renderCards();
+                renderPumpTable();
+                renderPipes();
+                renderChart();
+                renderKpi();
+                paintBanner();
+                renderLevelTable();
+            }
+
+            /* ---------------- 数据分析 ---------------- */
+            function renderAnalysis() {
+                const hours = SC.sim.hours(24);
+                const rain = hours.map((_, h) => +(Math.max(0, Math.sin((h - 4) / 24 * Math.PI * 2) * 22 + SC.sim.rand(-3, 6))).toFixed(1));
+                const drain = hours.map((_, h) => Math.round(stations.reduce((s, x) => s + x.perPump * x.pumps, 0) * (rain[h] / 30 + 0.18)));
+                const rainChart = SC.chart.bar(document.getElementById('chart-rain'), {
+                    labels: hours, unit: ' mm', xEvery: 2,
+                    series: [{ name: '时段雨量', data: rain, color: '#00b4d8' }, { name: '抽排量(百m³)', data: drain.map(v => v / 100), color: '#023e8a' }]
+                });
+                SC.chart.legend(document.getElementById('legend-rain'), [
+                    { name: '时段雨量', color: '#00b4d8' }, { name: '抽排量', color: '#023e8a' }
+                ], function (i, visible) {
+                    rainChart.cfg.series[i].visible = visible;
+                    rainChart.update({ series: rainChart.cfg.series });
+                });
+
+                SC.chart.line(document.getElementById('chart-eff'), {
+                    labels: ['0%', '25%', '50%', '75%', '100%'], unit: ' kWh/m³kt', xEvery: 1, padL: 56,
+                    series: [{ name: '吨水电耗', data: [0.42, 0.31, 0.26, 0.24, 0.28], color: '#0077b6' },
+                    { name: '高效区间下限', data: [0.28, 0.28, 0.28, 0.28, 0.28], color: '#27ae60', dash: [5, 4], fill: false }]
+                });
+
+                const risks = [
+                    { name: '文一路下穿立交', times: 12, depth: 45, radius: '320 m（艮山泵站）', idx: 0.86, gov: '已列入改造' },
+                    { name: '天目山路桥洞', times: 9, depth: 38, radius: '480 m（古荡湾泵站）', idx: 0.74, gov: '已列入改造' },
+                    { name: '西溪路低洼段', times: 7, depth: 26, radius: '600 m（西溪尾水泵站）', idx: 0.61, gov: '在建管网' },
+                    { name: '江城路箱涵', times: 5, depth: 20, radius: '260 m（之江路泵站）', idx: 0.48, gov: '日常维护' },
+                    { name: '莫干山路箱涵', times: 3, depth: 15, radius: '540 m（德胜路泵站）', idx: 0.35, gov: '日常维护' },
+                    { name: '之浦路 9# 井', times: 2, depth: 9, radius: '700 m（之江路泵站）', idx: 0.22, gov: '已完成改造' }
+                ];
+                document.querySelector('#risk-table tbody').innerHTML = risks.map(function (r) {
+                    return '<tr><td>' + r.name + '</td><td>' + r.times + ' 次</td><td>' + r.depth + ' cm</td>' +
+                        '<td>' + r.radius + '</td>' +
+                        '<td><span class="sc-tag ' + (r.idx > 0.7 ? 'bad' : r.idx > 0.45 ? 'warn' : 'ok') + '">' + (r.idx * 100).toFixed(0) + '</span></td>' +
+                        '<td>' + r.gov + '</td></tr>';
+                }).join('');
+                SC.table.enhance(document.getElementById('risk-table'), { pageSize: 6, search: false, export: '内涝风险点' });
+
+                document.getElementById('resource-kv').innerHTML =
+                    kvi('移动泵车', '16 台（可用 14）') + kvi('抢险队伍', '8 支 / 64 人') +
+                    kvi('沙袋储备', '12,400 只') + kvi('应急发电', '9 台 / 1,250 kW');
+                document.getElementById('pump-car').innerHTML = ['之江路泵站', '文一路下穿立交', '天目山路桥洞'].map(function (p, i) {
+                    return '<span class="sc-tag ' + (i === 0 ? 'ok' : 'info') + '">🚚 泵车 0' + (i + 3) + ' → ' + p + '</span>';
+                }).join('');
+            }
+
+            document.getElementById('btn-drain-export').addEventListener('click', function () {
+                SC.csv.download('排水运行统计_' + SC.today() + '.csv', [['时刻', '雨量 mm', '抽排量 m³/h']]
+                    .concat(SC.sim.hours(24).map((h, i) => [h, 0, 0])));
+                SC.toast('统计数据已导出', { type: 'success' });
+            });
+
+            /* ---------------- 主循环 ---------------- */
+            let simCtrl;
+            document.addEventListener('DOMContentLoaded', function () {
+                simCtrl = SC.live({
+                    interval: 1000,
+                    button: document.querySelector('#sim-live button'),
+                    onTick: function () {
+                        step(state.speed);
+                    }
+                });
+            });
+
+            // 初始化：默认中雨，便于立即看到联锁动作
+            rainInput.value = 6;
+            rainInput.dispatchEvent(new Event('input'));
+            renderAll();
+            renderWarnings();
+            warnCtrl = SC.table.enhance(document.getElementById('warn-table'), { pageSize: 8, keyAttr: 'id', export: '防汛预警' });
+            pumpCtrl = SC.table.enhance(document.getElementById('pump-table'), { pageSize: 8, keyAttr: 'id' });
+            pipeCtrl = SC.table.enhance(document.getElementById('pipe-table'), { pageSize: 8, keyAttr: 'id' });
+            renderAnalysis();
+            log('info', '排水调度台已就绪，自动联锁投入运行');
+        })();
+    </script>
 </body>
 
 </html>

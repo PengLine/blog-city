@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数字城管 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
     <style>
         .container {
             background: #f0f4f8;
@@ -70,10 +71,11 @@
         }
 
         .overview-value {
-            font-size: 2.5em;
+            font-size: 2.2em;
             font-weight: bold;
-            color: #00d4ff;
+            color: #0080ff;
             margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
         }
 
         .overview-label {
@@ -81,98 +83,215 @@
             color: #7f8c8d;
         }
 
+        .overview-sub {
+            font-size: 0.78em;
+            color: #b2bec3;
+            margin-top: 6px;
+        }
+
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
 
         .action-btn {
             background: white;
-            border: 2px solid #00d4ff;
-            padding: 20px;
+            border: none;
             border-radius: 12px;
+            padding: 18px;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            text-align: center;
+            font-family: inherit;
         }
 
         .action-btn:hover {
-            background: #00d4ff;
-            color: white;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 128, 255, 0.25);
         }
 
         .action-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            margin-bottom: 8px;
         }
 
         .action-label {
-            font-weight: bold;
-        }
-
-        .recent-cases {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
-        }
-
-        .recent-cases h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3em;
-        }
-
-        .case-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #ecf0f1;
-            transition: all 0.3s ease;
-        }
-
-        .case-item:hover {
-            background: #f8f9fa;
-        }
-
-        .case-info {
-            flex: 1;
-        }
-
-        .case-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .case-location {
             font-size: 0.9em;
-            color: #7f8c8d;
+            color: #2c3e50;
+            font-weight: bold;
         }
 
-        .case-time {
+        /* 案件态势 */
+        .map-wrap {
+            position: relative;
+            height: 330px;
+            background: #eef4fb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .map-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-tip {
+            position: absolute;
+            pointer-events: none;
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 0.76em;
+            line-height: 1.55;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 4;
+        }
+
+        .map-legend {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
             font-size: 0.8em;
+            color: #5b6b7b;
+            margin-top: 12px;
+        }
+
+        .map-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .map-legend i {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* SLA 提醒 */
+        .sla-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            max-height: 330px;
+            overflow-y: auto;
+        }
+
+        .sla-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 9px 12px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 3px solid #00d4ff;
+            font-size: 0.84em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sla-item:hover {
+            background: #eef4fb;
+            transform: translateX(2px);
+        }
+
+        .sla-item.warn {
+            border-left-color: #f39c12;
+            background: #fffaf0;
+        }
+
+        .sla-item.late {
+            border-left-color: #e74c3c;
+            background: #fef3f2;
+        }
+
+        .sla-item .sx {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sla-item .cd {
+            font-variant-numeric: tabular-nums;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* 倒计时单元 */
+        .cd-box {
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .cd-box.late {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .cd-box.soon {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        /* 时间轴事件计数 */
+        .tl-badge {
+            display: inline-block;
+            min-width: 20px;
+            text-align: center;
+            background: #ecf0f1;
+            border-radius: 10px;
+            font-size: 0.75em;
+            padding: 1px 6px;
+            color: #5b6b7b;
+        }
+
+        /* 权限矩阵 */
+        .perm-table td {
+            padding: 10px 12px;
+        }
+
+        .perm-table th {
+            text-align: center;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            font-size: 0.8em;
+        }
+
+        .flow-node {
+            background: #eef4fb;
+            border: 1px solid #d6e6f7;
+            border-radius: 16px;
+            padding: 5px 12px;
+            color: #2c3e50;
+        }
+
+        .flow-node.hot {
+            background: #0080ff;
+            color: white;
+            border-color: #0080ff;
+        }
+
+        .flow-arrow {
             color: #95a5a6;
         }
 
-        .case-status {
-            padding: 5px 15px;
-            border-radius: 12px;
-            font-size: 0.9em;
-        }
-
         @media (max-width: 768px) {
-            .case-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+            .map-wrap {
+                height: 260px;
             }
         }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%232c3e50%27/%3E%3Crect x=%2712%27 y=%2730%27 width=%2710%27 height=%2722%27 fill=%27%233498db%27/%3E%3Crect x=%2727%27 y=%2718%27 width=%2710%27 height=%2734%27 fill=%27%232ecc71%27/%3E%3Crect x=%2742%27 y=%2726%27 width=%2710%27 height=%2726%27 fill=%27%23f39c12%27/%3E%3C/svg%3E">
 </head>
 
 <body>
@@ -180,7 +299,7 @@
         <header>
             <div>
                 <h1>🏠 数字城管</h1>
-                <p>城市整体运行状态监控与管理</p>
+                <p>城市运行事件 · 全周期闭环处置与绩效考核</p>
             </div>
             <a href="index.html" class="nav-btn">🔙 返回主页面</a>
         </header>
@@ -188,40 +307,44 @@
         <div class="dashboard-overview">
             <div class="overview-card">
                 <div class="overview-icon">📊</div>
-                <div class="overview-value">12,345</div>
-                <div class="overview-label">今日事件</div>
+                <div class="overview-value" id="kpi-new">0</div>
+                <div class="overview-label">今日受案</div>
+                <div class="overview-sub" id="kpi-new-sub">自动识别 0 · 人工上报 0</div>
             </div>
             <div class="overview-card">
                 <div class="overview-icon">✅</div>
-                <div class="overview-value">95%</div>
-                <div class="overview-label">处理完成率</div>
+                <div class="overview-value" id="kpi-rate">0%</div>
+                <div class="overview-label">按期结案率</div>
+                <div class="overview-sub" id="kpi-rate-sub">在办 0 · 已结 0</div>
             </div>
             <div class="overview-card">
                 <div class="overview-icon">⏱️</div>
-                <div class="overview-value">8分钟</div>
-                <div class="overview-label">平均响应时间</div>
+                <div class="overview-value" id="kpi-avg">0</div>
+                <div class="overview-label">平均处置时长（小时）</div>
+                <div class="overview-sub" id="kpi-avg-sub">签收中位 0 分钟</div>
             </div>
             <div class="overview-card">
-                <div class="overview-icon">👥</div>
-                <div class="overview-value">234</div>
-                <div class="overview-label">在线人员</div>
+                <div class="overview-icon">⚠️</div>
+                <div class="overview-value" id="kpi-over">0</div>
+                <div class="overview-label">临期与逾期</div>
+                <div class="overview-sub" id="kpi-over-sub">临期 0 · 逾期 0 · 督办 0</div>
             </div>
         </div>
 
         <div class="quick-actions">
-            <button class="action-btn">
+            <button class="action-btn" id="qa-report">
                 <div class="action-icon">➕</div>
                 <div class="action-label">上报事件</div>
             </button>
-            <button class="action-btn">
+            <button class="action-btn" id="qa-query">
                 <div class="action-icon">🔍</div>
                 <div class="action-label">查询事件</div>
             </button>
-            <button class="action-btn">
+            <button class="action-btn" id="qa-task">
                 <div class="action-icon">📋</div>
                 <div class="action-label">任务列表</div>
             </button>
-            <button class="action-btn">
+            <button class="action-btn" id="qa-report-doc">
                 <div class="action-icon">📈</div>
                 <div class="action-label">统计报表</div>
             </button>
@@ -229,215 +352,368 @@
 
         <div class="module-nav">
             <button class="module-btn active" data-module="case-management">📋 案件管理</button>
-            <button class="module-btn" data-module="work-order">📝 工单管理</button>
+            <button class="module-btn" data-module="work-order">📝 指挥派遣</button>
             <button class="module-btn" data-module="performance">📊 绩效考核</button>
             <button class="module-btn" data-module="system-settings">⚙️ 系统设置</button>
         </div>
 
         <div id="case-management-module" class="module-content active">
-            <div class="module-tabs">
-                <button class="tab-btn active" data-tab="pending">⏳ 待处理</button>
-                <button class="tab-btn" data-tab="processing">🔄 处理中</button>
-                <button class="tab-btn" data-tab="completed">✅ 已完成</button>
-                <button class="tab-btn" data-tab="all">📊 全部案件</button>
-            </div>
-
-            <div id="pending-tab" class="tab-content active">
-                <div class="recent-cases">
-                    <h3>⏳ 待处理案件</h3>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">占道经营</div>
-                            <div class="case-location">XX街道123号</div>
-                            <div class="case-time">2026-01-15 16:30</div>
-                        </div><span class="case-status status-alarm">待处理</span>
-                    </div>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">违章停车</div>
-                            <div class="case-location">YY路456号</div>
-                            <div class="case-time">2026-01-15 16:25</div>
-                        </div><span class="case-status status-alarm">待处理</span>
-                    </div>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">垃圾堆积</div>
-                            <div class="case-location">ZZ大道789号</div>
-                            <div class="case-time">2026-01-15 16:20</div>
-                        </div><span class="case-status status-alarm">待处理</span>
-                    </div>
+            <div class="content-header">
+                <h3>📋 案件管理</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="case-search" placeholder="搜索案卷号 / 地址 / 事件描述…">
+                    <button class="sc-btn" id="btn-batch-assign">📤 批量派遣</button>
+                    <button class="sc-btn primary" id="btn-new-case">＋ 上报事件</button>
                 </div>
             </div>
 
-            <div id="processing-tab" class="tab-content">
-                <div class="recent-cases">
-                    <h3>🔄 处理中案件</h3>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">道路破损</div>
-                            <div class="case-location">AA路321号</div>
-                            <div class="case-time">2026-01-15 10:00</div>
-                        </div><span class="case-status status-processing">处理中</span>
+            <div class="sc-split">
+                <div>
+                    <div class="module-tabs">
+                        <button class="tab-btn active" data-tab="pending">⏳ 待处理 <span class="tl-badge"
+                                id="cnt-pending">0</span></button>
+                        <button class="tab-btn" data-tab="processing">🔄 处置中 <span class="tl-badge"
+                                id="cnt-processing">0</span></button>
+                        <button class="tab-btn" data-tab="completed">✅ 已结案 <span class="tl-badge"
+                                id="cnt-completed">0</span></button>
+                        <button class="tab-btn" data-tab="all">📊 全部案卷 <span class="tl-badge"
+                                id="cnt-all">0</span></button>
                     </div>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">井盖丢失</div>
-                            <div class="case-location">BB路654号</div>
-                            <div class="case-time">2026-01-15 09:30</div>
-                        </div><span class="case-status status-processing">处理中</span>
+
+                    <div id="pending-tab" class="tab-content active">
+                        <div class="data-table-container">
+                            <table class="data-table" id="tbl-pending">
+                                <thead>
+                                    <tr>
+                                        <th>案卷编号</th>
+                                        <th>事件</th>
+                                        <th>地址</th>
+                                        <th>来源</th>
+                                        <th>等级</th>
+                                        <th>SLA 剩余</th>
+                                        <th data-no-sort>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
+
+                    <div id="processing-tab" class="tab-content">
+                        <div class="data-table-container">
+                            <table class="data-table" id="tbl-processing">
+                                <thead>
+                                    <tr>
+                                        <th>案卷编号</th>
+                                        <th>事件</th>
+                                        <th>承办单位</th>
+                                        <th>责任人</th>
+                                        <th>状态</th>
+                                        <th>SLA 剩余</th>
+                                        <th data-no-sort>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="completed-tab" class="tab-content">
+                        <div class="data-table-container">
+                            <table class="data-table" id="tbl-completed">
+                                <thead>
+                                    <tr>
+                                        <th>案卷编号</th>
+                                        <th>事件</th>
+                                        <th>承办单位</th>
+                                        <th>耗时</th>
+                                        <th>按期</th>
+                                        <th>满意度</th>
+                                        <th data-no-sort>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="all-tab" class="tab-content">
+                        <div class="sc-chips" id="case-chips"></div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="tbl-all">
+                                <thead>
+                                    <tr>
+                                        <th>案卷编号</th>
+                                        <th>事件</th>
+                                        <th>大类</th>
+                                        <th>地址</th>
+                                        <th>来源</th>
+                                        <th>承办单位</th>
+                                        <th>状态</th>
+                                        <th>上报时间</th>
+                                        <th data-no-sort>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>城区事件分布</h3>
+                        <span class="sc-hint" id="map-hint">悬停查看案卷，点击打开处置面板</span>
+                    </div>
+                    <div class="map-wrap">
+                        <canvas id="case-map"></canvas>
+                        <div class="map-tip" id="map-tip"></div>
+                    </div>
+                    <div class="map-legend">
+                        <span><i style="background:#e74c3c"></i>待处理</span>
+                        <span><i style="background:#f39c12"></i>处置中</span>
+                        <span><i style="background:#00b4d8"></i>待核查</span>
+                        <span><i style="background:#27ae60"></i>已结案</span>
+                        <span><i style="background:#8e44ad"></i>逾期督办</span>
+                    </div>
+
+                    <div class="sc-panel-title" style="margin-top:22px">
+                        <h3>⏰ 临期与逾期督办</h3>
+                        <button class="sc-btn sm ghost" id="btn-nudge-all">📣 全部催办</button>
+                    </div>
+                    <div class="sla-list" id="sla-alerts"></div>
                 </div>
             </div>
 
-            <div id="completed-tab" class="tab-content">
-                <div class="recent-cases">
-                    <h3>✅ 已完成案件</h3>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">路灯故障</div>
-                            <div class="case-location">CC路987号</div>
-                            <div class="case-time">2026-01-15 08:00</div>
-                        </div><span class="case-status status-completed">已完成</span>
+            <div class="sc-split-2" style="margin-top:22px">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>近 24 小时受案与结案</h3>
                     </div>
-                    <div class="case-item">
-                        <div class="case-info">
-                            <div class="case-title">绿化带修剪</div>
-                            <div class="case-location">DD路654号</div>
-                            <div class="case-time">2026-01-14 16:00</div>
-                        </div><span class="case-status status-completed">已完成</span>
+                    <div class="sc-chart">
+                        <canvas id="c-trend"></canvas>
                     </div>
+                    <div id="l-trend"></div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>发现来源构成</h3>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-source"></canvas>
+                    </div>
+                    <div id="l-source"></div>
                 </div>
             </div>
 
-            <div id="all-tab" class="tab-content">
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>案件编号</th>
-                                <th>案件类型</th>
-                                <th>发生地点</th>
-                                <th>状态</th>
-                                <th>创建时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>CA-20260115001</td>
-                                <td>占道经营</td>
-                                <td>XX街道123号</td>
-                                <td><span class="status-alarm">待处理</span></td>
-                                <td>2026-01-15 16:30</td>
-                                <td><button class="btn-sm">处理</button><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>CA-20260115002</td>
-                                <td>违章停车</td>
-                                <td>YY路456号</td>
-                                <td><span class="status-alarm">待处理</span></td>
-                                <td>2026-01-15 16:25</td>
-                                <td><button class="btn-sm">处理</button><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>CA-20260115003</td>
-                                <td>道路破损</td>
-                                <td>AA路321号</td>
-                                <td><span class="status-processing">处理中</span></td>
-                                <td>2026-01-15 10:00</td>
-                                <td><button class="btn-sm">跟踪</button><button class="btn-sm">详情</button></td>
-                            </tr>
-                            <tr>
-                                <td>CA-20260115004</td>
-                                <td>路灯故障</td>
-                                <td>CC路987号</td>
-                                <td><span class="status-completed">已完成</span></td>
-                                <td>2026-01-15 08:00</td>
-                                <td><button class="btn-sm">详情</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="sc-panel" style="margin-top:22px">
+                <div class="sc-panel-title">
+                    <h3>处置流水</h3>
+                    <div class="sc-inline">
+                        <span class="sc-live"><span class="sc-live-dot"></span><span data-live-label>实时</span>
+                            <button class="sc-btn sm ghost" id="live-btn">⏸ 暂停</button></span>
+                        <button class="sc-btn sm ghost" id="btn-log-export">⬇ 导出流水</button>
+                    </div>
                 </div>
+                <div class="sc-log" id="case-log"></div>
             </div>
         </div>
 
         <div id="work-order-module" class="module-content">
             <div class="content-header">
-                <h3>📝 工单管理</h3>
+                <h3>📝 指挥派遣</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="wo-search" placeholder="搜索工单号 / 责任人…">
+                    <button class="sc-btn" id="btn-wo-export">⬇ 导出工单</button>
+                </div>
             </div>
+
+            <div class="sc-note">
+                工单由案卷立案后按《派遣规则表》自动生成，也可在案件列表中手动改派。签收后进入处置计时，
+                反馈需附处置说明与前后对比照片；核查不通过将退回处置并计入承办单位绩效。
+            </div>
+
             <div class="data-table-container">
-                <table class="data-table">
+                <table class="data-table" id="wo-table">
                     <thead>
                         <tr>
-                            <th>工单编号</th>
-                            <th>工单类型</th>
-                            <th>负责人</th>
+                            <th>工单号</th>
+                            <th>关联案卷</th>
+                            <th>任务</th>
+                            <th>承办单位</th>
+                            <th>责任人</th>
+                            <th>要求完成</th>
+                            <th>签收时限</th>
                             <th>状态</th>
-                            <th>创建时间</th>
-                            <th>操作</th>
+                            <th data-no-sort>操作</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>WO-20260115001</td>
-                            <td>设施维修</td>
-                            <td>张三</td>
-                            <td><span class="status-processing">处理中</span></td>
-                            <td>2026-01-15 09:00</td>
-                            <td><button class="btn-sm">处理</button></td>
-                        </tr>
-                        <tr>
-                            <td>WO-20260115002</td>
-                            <td>保洁任务</td>
-                            <td>李四</td>
-                            <td><span class="status-normal">待分配</span></td>
-                            <td>2026-01-15 10:00</td>
-                            <td><button class="btn-sm">分配</button></td>
-                        </tr>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
+            </div>
+
+            <div class="sc-split" style="margin-top:22px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>人员负载</h3>
+                        <span class="sc-hint">在办工单数 / 逾期数</span>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-load"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>部门待办 TOP</h3>
+                    </div>
+                    <div id="dept-todo" class="attn-list"></div>
+                </div>
             </div>
         </div>
 
         <div id="performance-module" class="module-content">
             <div class="content-header">
                 <h3>📊 绩效考核</h3>
+                <div class="sc-inline">
+                    <div class="sc-seg" id="pf-period">
+                        <button data-days="7">近 7 天</button>
+                        <button class="active" data-days="30">近 30 天</button>
+                        <button data-days="90">近 90 天</button>
+                    </div>
+                    <button class="sc-btn primary" id="btn-pf-report">📄 生成考核报表</button>
+                </div>
             </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">👤</div>
-                    <div class="stat-value">234</div>
-                    <div class="stat-label">考核人员</div>
+
+            <div class="sc-kv" id="pf-kv"></div>
+
+            <div class="sc-split" style="margin-top:20px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>承办单位综合得分</h3>
+                        <span class="sc-hint">按期结案 40% + 处置时效 25% + 质量(退单) 20% + 满意度 15%</span>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-dept-score"></canvas>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-value">4.8</div>
-                    <div class="stat-label">平均评分</div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>市民满意度</h3>
+                    </div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-satisfy"></canvas>
+                    </div>
+                    <div class="sc-section-title">案件大类构成</div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-cat-pie"></canvas>
+                    </div>
+                    <div id="l-cat-pie"></div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🏆</div>
-                    <div class="stat-value">98%</div>
-                    <div class="stat-label">优秀率</div>
-                </div>
+            </div>
+
+            <div class="sc-section-title">考核排名明细</div>
+            <div class="data-table-container">
+                <table class="data-table" id="pf-table">
+                    <thead>
+                        <tr>
+                            <th>名次</th>
+                            <th>承办单位</th>
+                            <th>受案量</th>
+                            <th>已结案</th>
+                            <th>按期结案率</th>
+                            <th>平均耗时</th>
+                            <th>退回重办</th>
+                            <th>满意度</th>
+                            <th>综合得分</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-section-title">30 天处置时效趋势</div>
+            <div class="sc-chart">
+                <canvas id="c-pf-trend"></canvas>
             </div>
         </div>
 
         <div id="system-settings-module" class="module-content">
             <div class="content-header">
                 <h3>⚙️ 系统设置</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-add-rule">＋ 新增派遣规则</button>
+                    <button class="sc-btn ghost" id="btn-reset">⟲ 重置演示数据</button>
+                </div>
             </div>
-            <div class="maintenance-grid">
-                <div class="maintenance-card">
-                    <h4>用户管理</h4>
-                    <p>管理系统用户和权限</p><button class="btn-primary">进入管理</button>
+
+            <div class="sc-section-title">立案与派遣标准（影响 SLA 倒计时）</div>
+            <div class="data-table-container">
+                <table class="data-table" id="sla-table">
+                    <thead>
+                        <tr>
+                            <th>事件等级</th>
+                            <th>签收时限</th>
+                            <th>处置时限</th>
+                            <th>临期提醒</th>
+                            <th>督办规则</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-section-title">派遣规则表（大类 → 承办单位）</div>
+            <div class="data-table-container">
+                <table class="data-table" id="rule-table">
+                    <thead>
+                        <tr>
+                            <th>事件大类</th>
+                            <th>适用小类</th>
+                            <th>承办单位</th>
+                            <th>协办单位</th>
+                            <th>匹配案卷</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-section-title">处置流程</div>
+            <div class="flow-diagram" id="flow-view"></div>
+
+            <div class="sc-split" style="margin-top:22px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>角色权限矩阵</h3>
+                        <button class="sc-btn sm" id="btn-perm-save">保存权限</button>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table perm-table" id="perm-table">
+                            <thead>
+                                <tr>
+                                    <th>角色</th>
+                                    <th>上报</th>
+                                    <th>立案</th>
+                                    <th>派遣</th>
+                                    <th>处置反馈</th>
+                                    <th>核查结案</th>
+                                    <th>考核查看</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="maintenance-card">
-                    <h4>角色配置</h4>
-                    <p>配置用户角色和权限</p><button class="btn-primary">进入配置</button>
-                </div>
-                <div class="maintenance-card">
-                    <h4>系统参数</h4>
-                    <p>配置系统运行参数</p><button class="btn-primary">进入配置</button>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>数据字典</h3>
+                        <button class="sc-btn sm" id="btn-add-cat">＋ 新增大类</button>
+                    </div>
+                    <div id="dict-view"></div>
                 </div>
             </div>
         </div>
@@ -448,6 +724,1619 @@
     </div>
 
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script>
+        /* ==========================================================================
+           数字城管：案卷全生命周期
+           状态机流转 + SLA 双计时（签收/处置）+ 城区态势地图 + 指挥派遣 + 加权绩效 + 规则配置
+           ========================================================================== */
+        (function () {
+            'use strict';
+
+            const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+            const NS = 'dcm';
+
+            /* ---------------- 0. 稳定伪随机：刷新后案卷台账保持一致 ---------------- */
+            let seed = 20260428;
+            function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+            function ri(min, max) { return Math.floor(min + rnd() * (max - min + 1)); }
+            function rp(arr) { return arr[Math.floor(rnd() * arr.length)]; }
+            /** 按权重挑选：items 为字符串数组，wf 返回权重 */
+            function rw(items, wf) {
+                const w = items.map(x => Math.max(0, wf(x)));
+                const total = w.reduce((a, b) => a + b, 0);
+                let r = rnd() * total;
+                for (let i = 0; i < items.length; i++) { r -= w[i]; if (r <= 0) return items[i]; }
+                return items[items.length - 1];
+            }
+
+            /* ---------------- 1. 业务字典与立案标准 ---------------- */
+            const CATS = [
+                { name: '市容环境', color: '#e67e22', subs: ['道路污染', '垃圾满溢', '乱堆杂物', '公厕脏污', '绿地脏乱', '乱贴乱画'] },
+                { name: '街面秩序', color: '#3498db', subs: ['占道经营', '无证摊点', '出店经营', '乱挂横幅', '车辆乱停放'] },
+                { name: '宣传广告', color: '#9b59b6', subs: ['违规广告牌', '小广告乱贴', '招牌破损', '灯箱缺字'] },
+                { name: '园林绿化', color: '#27ae60', subs: ['行道树倒伏', '绿地缺损', '苗木枯死', '护栏损坏'] },
+                { name: '市政设施', color: '#16a085', subs: ['路面破损', '井盖缺失', '路灯不亮', '人行道板翘起', '盲道占用'] },
+                { name: '供水排水', color: '#00b4d8', subs: ['管网跑漏', '雨水口堵塞', '积水点', '水域漂浮物'] }
+            ];
+            const SOURCES = ['热线12345', '视频AI识别', '网格员巡查', '物联传感器', '小程序随手拍', '部门自报案'];
+            const AUTO_SOURCE = ['视频AI识别', '物联传感器'];
+            const LEVELS = ['紧急', '重要', '一般'];
+            const ZONES = ['城东片区', '城西片区', '江南片区', '江北片区', '高新片区', '滨江片区'];
+            const ROADS = ['人民路', '建设大道', '中山南路', '环城东路', '望江街', '科技园一路', '江滨西路', '文化巷', '解放北路', '长虹大道', '南湖路', '站前广场'];
+            const SPOTS = ['128 号门前', '公交站东侧', '地下通道口', '小区北门', '菜市场出口', '天桥下方', '滨河绿道', '写字楼背面', '学校大门口', '地铁 B 口外'];
+            const DEPTS = [
+                { name: '城管执法局', officers: ['周敏', '李国强', '陈伟', '赵磊', '孙建华'] },
+                { name: '市政园林中心', officers: ['吴桂芳', '郑海峰', '冯磊', '曹颖'] },
+                { name: '住建局', officers: ['卢建国', '谢东', '韩梅'] },
+                { name: '环卫中心', officers: ['程利', '邓超', '许晴', '姚远'] },
+                { name: '水务集团', officers: ['范斌', '石磊', '谭雨'] },
+                { name: '交警大队', officers: ['贾涛', '金鹏', '袁媛'] },
+                { name: '生态环境分局', officers: ['陆敏', '洪波', '戴望'] }
+            ];
+            /** 派遣规则：大类 -> 承办 / 协办 */
+            const DEFAULT_RULES = [
+                { cat: '市容环境', subs: '全部', dept: '环卫中心', second: '城管执法局', enabled: true },
+                { cat: '街面秩序', subs: '全部', dept: '城管执法局', second: '交警大队', enabled: true },
+                { cat: '宣传广告', subs: '全部', dept: '城管执法局', second: '住建局', enabled: true },
+                { cat: '园林绿化', subs: '全部', dept: '市政园林中心', second: '', enabled: true },
+                { cat: '市政设施', subs: '井盖缺失、路面破损', dept: '住建局', second: '市政园林中心', enabled: true },
+                { cat: '供水排水', subs: '全部', dept: '水务集团', second: '环卫中心', enabled: true }
+            ];
+            /** 立案与处置标准（小时）：签收时限 / 处置时限 / 临期提醒阈值 */
+            const DEFAULT_SLA = {
+                '紧急': { sign: 0.5, deal: 4, warn: 1, rule: '逾期即督办并通报分管领导' },
+                '重要': { sign: 1, deal: 12, warn: 2, rule: '逾期 30 分钟自动升级督办' },
+                '一般': { sign: 2, deal: 24, warn: 4, rule: '逾期 2 小时升级督办' }
+            };
+            const DEFAULT_PERMS = [
+                { role: '指挥坐席', p: [1, 1, 1, 0, 0, 1] },
+                { role: '网格员', p: [1, 0, 0, 0, 0, 0] },
+                { role: '承办部门', p: [1, 0, 0, 1, 0, 1] },
+                { role: '核查专员', p: [0, 0, 0, 0, 1, 1] },
+                { role: '监督考核', p: [0, 0, 0, 0, 1, 1] }
+            ];
+            const PERM_COLS = ['上报', '立案', '派遣', '处置反馈', '核查结案', '考核查看'];
+            const FLOW = ['上报', '立案', '派遣', '签收', '处置反馈', '核查', '结案'];
+            /** 状态 -> 标签配色 */
+            const TAG = {
+                '待立案': 'bad', '已立案': 'warn', '已派遣': 'info', '处置中': 'info',
+                '待核查': '', '已结案': 'ok', '已退回': 'bad', '督办': 'bad'
+            };
+            const OPEN_ST = ['待立案', '已立案', '已派遣', '处置中', '待核查', '已退回', '督办'];
+
+            let RULES = SC.store.get(NS, 'rules', null) || JSON.parse(JSON.stringify(DEFAULT_RULES));
+            let SLA = SC.store.get(NS, 'sla', null) || JSON.parse(JSON.stringify(DEFAULT_SLA));
+            let PERMS = SC.store.get(NS, 'perms', null) || JSON.parse(JSON.stringify(DEFAULT_PERMS));
+            const DICT_EXTRA = SC.store.get(NS, 'dict', []) || [];
+
+            function slaOf(level) { return SLA[level] || SLA['一般']; }
+            function catColor(cat) { const c = CATS.filter(x => x.name === cat)[0]; return c ? c.color : '#7f8c8d'; }
+            function deptRule(cat) { return RULES.filter(r => r.cat === cat && r.enabled)[0] || RULES[0]; }
+            function officersOf(dept) { const d = DEPTS.filter(x => x.name === dept)[0]; return d ? d.officers : DEPTS[0].officers; }
+
+            /* ---------------- 2. 案卷模型 ---------------- */
+            let caseSeq = 0;
+            function makeId(t) {
+                const d = new Date(t);
+                return 'CG' + d.getFullYear() + SC.pad2(d.getMonth() + 1) + SC.pad2(d.getDate()) +
+                    '-' + String(++caseSeq).padStart(4, '0');
+            }
+            function woIdOf(c) { return 'GD' + c.id.slice(2); }
+
+            /** 依案卷时间戳重算两个 SLA 节点 */
+            function stamp2(c) {
+                const s = slaOf(c.level);
+                c.dueAt = c.createdAt + s.deal * HOUR;
+                if (c.dispatchAt) c.signDueAt = c.dispatchAt + s.sign * HOUR;
+            }
+
+            /** 生成一条案卷；t 为上报时间，force 可指定关键属性 */
+            function makeCase(t, force) {
+                const f = force || {};
+                const cat = f.cat || rw(CATS.map(c => c.name), n => (n === '市容环境' ? 26 : n === '街面秩序' ? 22 : 12));
+                const subs = (CATS.filter(c => c.name === cat)[0] || CATS[0]).subs;
+                const sub = f.sub || rp(subs);
+                const level = f.level || rw(LEVELS, l => (l === '紧急' ? 12 : l === '重要' ? 33 : 55));
+                const rule = deptRule(cat);
+                const c = {
+                    id: makeId(t),
+                    cat: cat, sub: sub,
+                    title: f.title || (sub + '（' + rp(ROADS) + '）'),
+                    addr: rp(ROADS) + rp(SPOTS),
+                    zone: f.zone || rp(ZONES),
+                    source: f.source || rw(SOURCES, s => (s === '热线12345' ? 24 : s === '视频AI识别' ? 21 : s === '网格员巡查' ? 19 : s === '物联传感器' ? 12 : s === '小程序随手拍' ? 15 : 9)),
+                    level: level,
+                    status: f.status || '待立案',
+                    dept: rule.dept, second: rule.second,
+                    officer: '',
+                    createdAt: t,
+                    dispatchAt: 0, signAt: 0, feedAt: 0, closedAt: 0,
+                    durationH: 0, onTime: true, score: 0, backCount: 0,
+                    escalated: false, photos: ri(1, 4),
+                    x: Number(rnd().toFixed(4)), y: Number(rnd().toFixed(4)),
+                    desc: '', timeline: []
+                };
+                c.timeline.push({ t: t, act: '上报', by: c.source, note: c.addr });
+                stamp2(c);
+                if (f.dispatched) advanceTo(c, f.dispatched);
+                return c;
+            }
+
+            /** 把案卷一次性推进到某个成熟状态（用于生成历史台账） */
+            function advanceTo(c, until) {
+                const steps = ['已立案', '已派遣', '处置中', '待核查', '已结案'];
+                const idx = steps.indexOf(until);
+                if (idx < 0) return c;
+                c.timeline = [{ t: c.createdAt, act: '上报', by: c.source, note: c.addr }];
+                c.status = '待立案'; c.note = '';
+                c.dispatchAt = 0; c.signAt = 0; c.feedAt = 0; c.closedAt = 0;
+                const s = slaOf(c.level);
+                const tDispatch = c.createdAt + ri(3, 18) * MIN;
+                const tSign = tDispatch + (rnd() < 0.78 ? ri(4, 42) * MIN : ri(65, 190) * MIN);
+                const tFeed = Math.max(tSign + 25 * MIN, tSign + s.deal * HOUR * (0.28 + 0.62 * rnd()));
+                const tClose = tFeed + ri(20, 180) * MIN;
+                const at = [c.createdAt + ri(1, 8) * MIN, tDispatch, tSign, tFeed, tClose];
+                for (let i = 0; i <= idx; i++) doAction(c, steps[i], { silent: true, at: at[i] });
+                return c;
+            }
+
+            /* ---------------- 3. 状态机核心动作 ---------------- */
+            /** kind: 已立案(立案) / 已派遣(派遣) / 处置中(签收) / 待核查(反馈) / 已结案(核查通过) / 已退回(退回) / 督办(催办) */
+            function doAction(c, kind, opt) {
+                const o = opt || {};
+                const now = o.at || Date.now();
+                const by = o.by || '指挥坐席';
+                let act = '';
+                if (kind === '已立案') {
+                    c.status = '已立案'; act = '立案';
+                } else if (kind === '已派遣') {
+                    const rule = deptRule(c.cat);
+                    c.dept = o.dept || c.dept || rule.dept;
+                    c.second = o.second !== undefined ? o.second : c.second;
+                    c.officer = o.officer || rp(officersOf(c.dept));
+                    c.dispatchAt = now; act = '派遣';
+                } else if (kind === '处置中') {
+                    c.signAt = now; c.status = '处置中'; act = '签收';
+                } else if (kind === '待核查') {
+                    c.feedAt = now; c.status = '待核查'; act = '处置反馈';
+                    c.note = o.note === undefined ? (c.sub + '已处置完毕，现场恢复整洁') : o.note;
+                    c.photos = Math.max(c.photos, o.photos || 2);
+                } else if (kind === '已结案') {
+                    c.closedAt = now; c.status = '已结案'; act = '核查结案';
+                    c.durationH = Math.max(0.1, (now - c.createdAt) / HOUR);
+                    c.onTime = now <= c.dueAt + 1 * MIN;
+                    c.score = o.score || (c.onTime ? ri(4, 5) : ri(2, 4));
+                    c.escalated = false;
+                } else if (kind === '已退回') {
+                    c.backCount++; c.status = '已退回'; act = '核查退回';
+                    c.feedAt = 0; c.closedAt = 0;
+                    c.note = o.note || '现场未清理到位，照片与上报点位不一致';
+                    if (c.backCount >= 2 || isLate(c, now)) c.escalated = true;
+                } else if (kind === '督办') {
+                    c.escalated = true; act = '催办督办';
+                } else if (kind === '改派') {
+                    c.dept = o.dept || c.dept; c.officer = o.officer || c.officer;
+                    c.dispatchAt = now; stamp2(c); c.status = '已派遣'; act = '改派';
+                } else if (kind === '重新处置') {
+                    c.status = '处置中'; act = '重新处置';
+                } else if (kind === '立案确认') {
+                    c.status = '已立案'; act = '立案';
+                }
+                if (act) c.timeline.push({ t: now, act: act, by: by, note: o.note || '' });
+                if (act) c.timeline = c.timeline.filter(t => t.act);
+                stamp2(c);
+                if (!o.silent) save();
+                return c;
+            }
+
+            /** 状态流转后继动作集合，驱动表格操作列 */
+            function nextActions(c) {
+                if (c.status === '待立案') return ['立案', '不予立案'];
+                if (c.status === '已立案') return ['派遣'];
+                if (c.status === '已派遣') return ['签收', '改派'];
+                if (c.status === '处置中') return ['反馈'];
+                if (c.status === '待核查') return ['核查结案', '退回重办'];
+                if (c.status === '已退回') return ['重新处置'];
+                if (c.status === '督办') return ['催办'];
+                return [];
+            }
+            /** 显示态：逾期或标记督办的在办案卷统一显示为「督办」 */
+            function viewStatus(c, now) {
+                if (c.status === '已结案') return '已结案';
+                if (c.escalated || isLate(c, now || Date.now())) return '督办';
+                return c.status;
+            }
+            function isLate(c, now) {
+                return c.status !== '已结案' && (now || Date.now()) > c.dueAt;
+            }
+            /** 剩余时限（负值表示逾期），分钟 */
+            function leftMin(c, now) {
+                return Math.round(((c.dueAt - (now || Date.now())) / MIN));
+            }
+            function fmtLeft(m) {
+                const neg = m < 0, a = Math.abs(m);
+                const t = a >= 60 ? Math.floor(a / 60) + 'h' + SC.pad2(a % 60) : a + 'm';
+                return (neg ? '-' : '') + t;
+            }
+
+            /* ---------------- 4. 台账生成与持久化 ---------------- */
+            function buildCases() {
+                const out = [];
+                const now = Date.now();
+                const perDay = [16, 14, 18, 12, 20, 15, 17, 13, 19, 16, 14, 21, 15, 12];
+                for (let d = perDay.length - 1; d >= 0; d--) {
+                    const dayAgo = now - d * DAY;
+                    for (let i = 0; i < perDay[d]; i++) {
+                        const t = dayAgo - ri(0, 20) * HOUR - ri(0, 59) * MIN;
+                        if (t > now) continue;
+                        let until = '已结案';
+                        const age = (now - t) / HOUR;
+                        if (age < 1.5) until = rp(['待立案', '已立案', '已派遣', '处置中']);
+                        else if (age < 6) until = rp(['已派遣', '处置中', '待核查', '已结案']);
+                        else if (age < 30) until = rnd() < 0.14 ? rp(['待核查', '已退回']) : '已结案';
+                        const c = makeCase(t, { status: '待立案' });
+                        if (until === '待核查') {
+                            advanceTo(c, '待核查');
+                        } else if (until === '已退回') {
+                            advanceTo(c, '待核查');
+                            doAction(c, '已退回', { silent: true, at: t + ri(6, 20) * HOUR, by: '核查专员', note: '现场未清理到位，照片与上报点位不一致' });
+                        } else {
+                            advanceTo(c, until);
+                        }
+                        if (rnd() < 0.12) c.backCount = 1;
+                        out.push(c);
+                    }
+                }
+                // 少量历史逾期样本
+                out.forEach(function (c) {
+                    if (c.status !== '已结案' && rnd() < 0.1) c.escalated = true;
+                });
+                return out;
+            }
+
+            let cases = SC.store.get(NS, 'cases', null);
+            if (!cases || !cases.length || !cases[0].timeline) {
+                caseSeq = 0;
+                cases = buildCases().sort((a, b) => b.createdAt - a.createdAt);
+            } else {
+                cases.forEach(function (c) { if (!c.timeline) c.timeline = [{ t: c.createdAt, act: '上报', by: c.source, note: '' }]; });
+            }
+            const maxSeq = cases.reduce((m, c) => Math.max(m, Number(String(c.id).split('-')[1] || 0)), 0);
+            caseSeq = Math.max(caseSeq, maxSeq);
+            function save() { SC.store.set(NS, 'cases', cases); }
+            save();
+
+            function byId(id) { return cases.filter(c => c.id === id)[0] || null; }
+            function openCases(now) {
+                return cases.filter(c => c.status !== '已结案' && c.status !== '不予立案');
+            }
+
+            /* ---------------- 5. 处置流水日志 ---------------- */
+            const logs = [];
+            function log(text, level) {
+                logs.unshift({ t: Date.now(), text: text, lv: level || 'info' });
+                if (logs.length > 60) logs.pop();
+                paintLogs();
+            }
+            function paintLogs() {
+                const host = document.getElementById('case-log');
+                if (!host) return;
+                host.innerHTML = logs.slice(0, 24).map(l =>
+                    '<div class="li"><span class="t">' + SC.stamp(new Date(l.t), true).slice(11) + '</span>' +
+                    '<span class="lv ' + l.lv + '">' + ({ info: '流转', ok: '结案', warn: '临期', alarm: '逾期' }[l.lv] || '流转') + '</span>' +
+                    '<span class="tx">' + SC.esc(l.text) + '</span></div>').join('') ||
+                    '<div class="li"><span class="tx">暂无流水</span></div>';
+            }
+
+            /* ---------------- 6. 顶部指标 ---------------- */
+            function renderKpi() {
+                const now = Date.now();
+                const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+                const today = cases.filter(c => c.createdAt >= t0.getTime());
+                const auto = today.filter(c => AUTO_SOURCE.indexOf(c.source) > -1).length;
+                const done = cases.filter(c => c.status === '已结案');
+                const inhand = openCases(now);
+                const onTimeDone = done.filter(c => c.onTime).length;
+                const rate = done.length ? onTimeDone / done.length * 100 : 0;
+                const dur = done.length ? done.reduce((s, c) => s + c.durationH, 0) / done.length : 0;
+                const signed = cases.filter(c => c.signAt && c.dispatchAt);
+                const signMed = median(signed.map(c => (c.signAt - c.dispatchAt) / MIN));
+                const soon = inhand.filter(c => { const m = leftMin(c, now); return m > 0 && m <= slaOf(c.level).warn * 60; }).length;
+                const late = inhand.filter(c => leftMin(c, now) <= 0).length;
+                const supers = inhand.filter(c => c.escalated).length;
+
+                document.getElementById('kpi-new').textContent = SC.num(today.length);
+                document.getElementById('kpi-new-sub').textContent = '自动发现 ' + auto + ' · 人工上报 ' + (today.length - auto);
+                document.getElementById('kpi-rate').textContent = SC.pct(rate);
+                document.getElementById('kpi-rate-sub').textContent = '在办 ' + inhand.length + ' · 已结 ' + done.length;
+                document.getElementById('kpi-avg').textContent = SC.num(dur, 1);
+                document.getElementById('kpi-avg-sub').textContent = '签收中位 ' + (isFinite(signMed) ? SC.num(signMed) : '--') + ' 分钟 · 共 ' + cases.length + ' 件';
+                document.getElementById('kpi-over').textContent = SC.num(late + soon);
+                document.getElementById('kpi-over-sub').textContent = '临期 ' + soon + ' · 逾期 ' + late + ' · 督办 ' + supers;
+            }
+            function median(arr) {
+                if (!arr.length) return NaN;
+                const s = arr.slice().sort((a, b) => a - b);
+                return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+            }
+
+            /* ---------------- 7. 案卷列表（4 张标签页） ---------------- */
+            const ctrls = {};
+            let chipState = null;
+
+            function hoursText(h) {
+                if (!isFinite(h) || h <= 0) return '--';
+                const m = Math.round(h * 60);
+                return m >= 60 ? Math.floor(m / 60) + ' 小时' + (m % 60 ? ' ' + (m % 60) + ' 分' : '') : m + ' 分';
+            }
+            function cdCell(c, now) {
+                const m = leftMin(c, now);
+                const warn = slaOf(c.level).warn * 60;
+                const cls = m <= 0 ? 'late' : (m <= warn ? 'soon' : '');
+                return '<td><span class="cd-box ' + cls + '" data-cd="' + SC.esc(c.id) + '">' + fmtLeft(m) + '</span>' +
+                    '<div class="sc-hint" style="font-size:.72em">' + SC.stamp(new Date(c.dueAt)).slice(5) + ' 止</div></td>';
+            }
+            function levelTag(l) {
+                return '<span class="sc-tag ' + (l === '紧急' ? 'bad' : l === '重要' ? 'warn' : 'off') + '">' + l + '</span>';
+            }
+            function actBtns(c) {
+                const map = { '立案': 'file', '不予立案': 'drop', '派遣': 'assign', '签收': 'sign', '改派': 'reassign', '反馈': 'feed', '核查结案': 'pass', '退回重办': 'back', '重新处置': 'redo', '催办': 'nudge' };
+                return nextActions(c).map(function (a) {
+                    const kind = a === '不予立案' ? 'danger' : (a === '核查结案' ? 'primary' : 'ghost');
+                    return '<button class="sc-btn sm ' + kind + '" data-act="' + map[a] + '">' + a + '</button>';
+                }).join(' ') + ' <button class="sc-btn sm ghost" data-act="view">详情</button>';
+            }
+            function stTag(c, now) {
+                const v = viewStatus(c, now);
+                return '<span class="sc-tag ' + (TAG[v] === undefined ? TAG['处置中'] : TAG[v]) + '">' + v + '</span>' +
+                    (c.backCount ? ' <span class="sc-tag bad" title="核查不通过退回次数">退 ' + c.backCount + '</span>' : '');
+            }
+
+            function renderCases() {
+                const now = Date.now();
+                const pend = cases.filter(c => ['待立案', '已立案', '已派遣'].indexOf(c.status) > -1);
+                const proc = cases.filter(c => ['处置中', '待核查', '已退回'].indexOf(c.status) > -1);
+                const comp = cases.filter(c => c.status === '已结案' || c.status === '不予立案');
+                const groups = { pending: pend, processing: proc, completed: comp, all: cases.slice() };
+                ['pending', 'processing', 'completed', 'all'].forEach(function (k) {
+                    const el = document.getElementById('cnt-' + k);
+                    if (el) el.textContent = groups[k].length;
+                });
+
+                document.querySelector('#tbl-pending tbody').innerHTML = pend.map(function (c) {
+                    return '<tr data-id="' + SC.esc(c.id) + '"><td>' + SC.esc(c.id) + '</td>' +
+                        '<td>' + SC.esc(c.sub) + '<div class="sc-hint" style="font-size:.76em">' + SC.esc(c.cat) + ' · ' + SC.esc(c.zone) + '</div></td>' +
+                        '<td>' + SC.esc(c.addr) + '</td><td>' + SC.esc(c.source) + '</td><td>' + levelTag(c.level) + '</td>' +
+                        cdCell(c, now) + '<td>' + actBtns(c) + '</td></tr>';
+                }).join('');
+
+                document.querySelector('#tbl-processing tbody').innerHTML = proc.map(function (c) {
+                    return '<tr data-id="' + SC.esc(c.id) + '"><td>' + SC.esc(c.id) + '</td>' +
+                        '<td>' + SC.esc(c.sub) + '<div class="sc-hint" style="font-size:.76em">' + SC.esc(c.addr) + '</div></td>' +
+                        '<td>' + SC.esc(c.dept) + (c.second ? '<div class="sc-hint" style="font-size:.74em">协办 ' + SC.esc(c.second) + '</div>' : '') + '</td>' +
+                        '<td>' + SC.esc(c.officer || '待指派') + '</td><td>' + stTag(c, now) + '</td>' +
+                        cdCell(c, now) + '<td>' + actBtns(c) + '</td></tr>';
+                }).join('');
+
+                document.querySelector('#tbl-completed tbody').innerHTML = comp.map(function (c) {
+                    return '<tr data-id="' + SC.esc(c.id) + '"><td>' + SC.esc(c.id) + '</td>' +
+                        '<td>' + SC.esc(c.sub) + '<div class="sc-hint" style="font-size:.76em">' + SC.esc(c.addr) + '</div></td>' +
+                        '<td>' + SC.esc(c.dept) + ' / ' + SC.esc(c.officer || '-') + '</td>' +
+                        '<td class="sc-cell-num">' + hoursText(c.durationH) + '</td>' +
+                        '<td>' + (c.status === '不予立案' ? '<span class="sc-tag off">未立案</span>' : (c.onTime ? '<span class="sc-tag ok">按期</span>' : '<span class="sc-tag bad">逾期</span>')) + '</td>' +
+                        '<td>' + (c.score ? '<span class="sc-tag ' + (c.score >= 4 ? 'ok' : c.score >= 3 ? 'warn' : 'bad') + '">' + c.score.toFixed(1) + ' 分</span>' : '-') + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="view">详情</button></td></tr>';
+                }).join('');
+
+                document.querySelector('#tbl-all tbody').innerHTML = cases.slice().sort(function (a, b) { return b.createdAt - a.createdAt; }).map(function (c) {
+                    return '<tr data-id="' + SC.esc(c.id) + '"><td>' + SC.esc(c.id) + '</td>' +
+                        '<td>' + SC.esc(c.sub) + '</td><td>' + SC.esc(c.cat) + '</td><td>' + SC.esc(c.addr) + '</td>' +
+                        '<td>' + SC.esc(c.source) + '</td><td>' + SC.esc(c.dept) + '</td><td>' + stTag(c, now) + '</td>' +
+                        '<td>' + SC.stamp(new Date(c.createdAt)).slice(5) + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="view">详情</button></td></tr>';
+                }).join('');
+
+                Object.keys(ctrls).forEach(k => ctrls[k] && ctrls[k].reload());
+                renderChips();
+            }
+
+            function renderChips() {
+                const host = document.getElementById('case-chips');
+                if (!host) return;
+                const list = ['全部'].concat(OPEN_ST).concat(['不予立案']);
+                const now = Date.now();
+                host.innerHTML = list.map(function (s) {
+                    const n = s === '全部' ? cases.length : cases.filter(c => viewStatus(c, now) === s).length;
+                    return '<span class="sc-chip' + ((chipState === s || (!chipState && s === '全部')) ? ' active' : '') +
+                        '" data-st="' + s + '">' + s + ' <b>' + n + '</b></span>';
+                }).join('');
+            }
+            function applyChip(st) {
+                chipState = (st === '全部') ? null : st;
+                const now = Date.now();
+                if (ctrls.all) ctrls.all.setFilter(chipState ? (r => viewStatus(byId(r.id), now) === chipState) : null);
+                renderChips();
+            }
+
+            /* ---------------- 8. 临期逾期督办 ---------------- */
+            function renderAlerts() {
+                const now = Date.now();
+                const host = document.getElementById('sla-alerts');
+                if (!host) return;
+                const list = openCases(now).filter(function (c) {
+                    const m = leftMin(c, now);
+                    return m <= slaOf(c.level).warn * 60;
+                }).sort((a, b) => leftMin(a, now) - leftMin(b, now)).slice(0, 12);
+                document.getElementById('sla-alerts') && (document.getElementById('kpi-over').title = '临期 ' + list.length + ' 件待关注');
+                host.innerHTML = list.length ? list.map(function (c) {
+                    const m = leftMin(c, now), late = m <= 0;
+                    return '<div class="sla-item ' + (late ? 'late' : 'warn') + '" data-id="' + SC.esc(c.id) + '">' +
+                        '<span class="sx">' + (late ? '⛔' : '⏰') + ' ' + SC.esc(c.sub) +
+                        '<div class="sc-hint" style="font-size:.76em">' + SC.esc(c.id) + ' · ' + SC.esc(c.dept || '未派遣') + ' · ' + SC.esc(c.zone) + '</div></span>' +
+                        '<span class="cd" data-cd="' + SC.esc(c.id) + '">' + fmtLeft(m) + '</span>' +
+                        '<span class="ax"><button class="sc-btn sm ghost" data-act="nudge">催办</button></span></div>';
+                }).join('') : '<div class="sc-hint">当前无临期或逾期案卷，全部在时限内。</div>';
+            }
+
+            /* ---------------- 9. 动作调度 ---------------- */
+            const ZH2EN = {
+                '立案': 'file', '不予立案': 'drop', '派遣': 'assign', '签收': 'sign', '改派': 'reassign',
+                '反馈': 'feed', '核查结案': 'pass', '退回重办': 'back', '重新处置': 'redo', '催办': 'nudge', '详情': 'view'
+            };
+            function runAct(c, actName) {
+                if (!c) return;
+                actName = ZH2EN[actName] || actName;
+                const now = Date.now();
+                if (actName === 'file') {
+                    doAction(c, '已立案');
+                    log('立案 ' + c.id + '（' + c.sub + '，' + c.level + '）', 'info');
+                    afterChange();
+                } else if (actName === 'drop') {
+                    SC.modal.confirm({ title: '不予立案', text: '案卷 ' + c.id + ' 将标记为不予立案并归档，确定？', danger: true, okText: '不予立案' })
+                        .then(function (ok) {
+                            if (!ok) return;
+                            c.status = '不予立案'; c.closedAt = now; c.timeline.push({ t: now, act: '不予立案', by: '指挥坐席', note: '不属于城管职责范围' });
+                            save(); log('案卷 ' + c.id + ' 不予立案归档', 'warn'); afterChange();
+                        });
+                } else if (actName === 'assign' || actName === 'reassign') {
+                    openAssign(c, actName === 'reassign');
+                } else if (actName === 'sign') {
+                    doAction(c, '处置中');
+                    log(c.dept + '・' + c.officer + ' 签收工单 ' + c.id, 'info');
+                    afterChange();
+                } else if (actName === 'feed') {
+                    openFeed(c);
+                } else if (actName === 'pass') {
+                    openCheck(c, true);
+                } else if (actName === 'back') {
+                    openCheck(c, false);
+                } else if (actName === 'redo') {
+                    doAction(c, '重新处置');
+                    log('案卷 ' + c.id + ' 退回后重新进入处置，仍计承办部门时效', 'warn');
+                    afterChange();
+                } else if (actName === 'nudge') {
+                    doAction(c, '督办');
+                    log('已向 ' + (c.dept || '归属部门') + '发出催办（' + c.id + '，' + fmtLeft(leftMin(c)) + '）', c.escalated && leftMin(c) <= 0 ? 'alarm' : 'warn');
+                    afterChange();
+                }
+            }
+            function afterChange() {
+                renderCases(); renderAlerts(); renderKpi(); drawMap();
+                renderTrend(); renderSource(); renderWo(); renderPerf(); renderFlow();
+            }
+
+            function openAssign(c, isRe) {
+                const rule = deptRule(c.cat);
+                const depts = DEPTS.map(d => d.name);
+                SC.modal.form({
+                    title: (isRe ? '改派工单 ' : '立案派遣 ') + c.id,
+                    fields: [
+                        { name: 'title', type: 'static', html: '<div class="sc-note">' + SC.esc(c.sub) + '｜' + SC.esc(c.addr) + '｜' + levelTag(c.level) + ' 依据《派遣规则表》，本类事件承办单位为 ' + SC.esc(rule.dept) + '</div>' },
+                        { name: 'dept', label: '承办单位', type: 'select', options: depts, value: c.dept || rule.dept, required: true, col: 1 },
+                        { name: 'second', label: '协办单位', type: 'select', options: ['无'].concat(depts), value: c.second || rule.second || '无', col: 1 },
+                        { name: 'officer', label: '责任人', type: 'select', options: officersOf(c.dept || rule.dept), value: c.officer, col: 1 },
+                        { name: 'require', label: '处置要求', type: 'textarea', col: 1, placeholder: '如：2 小时内完成清理并上传前后对比照片' },
+                        { name: 'urgent', label: '加急挂牌', type: 'switch', onText: '纳入督办', value: !!c.escalated, col: 1 }
+                    ],
+                    onSubmit: function (v) {
+                        const link = DEPTS.filter(d => d.name === v.dept)[0];
+                        if (link && link.officers.indexOf(v.officer) < 0) { v.officer = link.officers[0]; }
+                        if (isRe) {
+                            doAction(c, '改派', { dept: v.dept, officer: v.officer, second: v.second === '无' ? '' : v.second });
+                            log('案卷 ' + c.id + ' 改派至 ' + v.dept + '・' + v.officer, 'warn');
+                        } else {
+                            doAction(c, '已派遣', { dept: v.dept, officer: v.officer, second: v.second === '无' ? '' : v.second });
+                            c.require = v.require; c.escalated = v.urgent ? true : c.escalated;
+                            log('派遣 ' + c.id + ' → ' + v.dept + '（签收时限 ' + slaOf(c.level).sign + ' 小时）', 'info');
+                        }
+                        save(); afterChange();
+                    }
+                });
+            }
+
+            function openFeed(c) {
+                SC.modal.form({
+                    title: '处置反馈 ' + c.id,
+                    fields: [
+                        { name: 'note', label: '处置说明', type: 'textarea', required: true, col: 1, placeholder: '描述处置措施、人员机械、完成状况' },
+                        { name: 'photos', label: '上传照片数', type: 'number', min: 0, max: 20, value: 3, col: 1, hint: '需含处置前 / 处置后对比照片' },
+                        { name: 'cost', label: '处置耗费（分钟）', type: 'number', min: 5, max: 1440, value: 90, col: 1 },
+                        { name: 'later', label: '延后提交', type: 'switch', onText: '主动报延期', col: 1, hint: '勾选后转入核查同时计入逾期' }
+                    ],
+                    onSubmit: function (v) {
+                        const at = Date.now() + (v.later ? 30 * MIN : 0);
+                        doAction(c, '待核查', { note: v.note, photos: v.photos });
+                        c.costMin = v.cost;
+                        log(c.dept + ' 反馈 ' + c.id + ' 处置完成（' + v.photos + ' 张照片）' + (v.later ? '，已申报延期' : ''), v.later ? 'warn' : 'ok');
+                        save(); afterChange();
+                    }
+                });
+            }
+
+            function openCheck(c, pass) {
+                if (pass) {
+                    SC.modal.form({
+                        title: '核查结案 ' + c.id,
+                        fields: [
+                            { name: 'static', type: 'static', html: '<div class="sc-note">处置说明：' + SC.esc(c.note || '无') + '<br>上报时间 ' + SC.stamp(new Date(c.createdAt)) + '，处置时限 ' + slaOf(c.level).deal + ' 小时' + (leftMin(c) <= 0 ? '，<b style="color:#e74c3c">已超出时限</b>' : '，剩余 ' + fmtLeft(leftMin(c))) + '</div>' },
+                            { name: 'score', label: '市民满意度评分', type: 'range', min: 1, max: 5, step: 0.5, value: c.source === '小程序随手拍' ? 5 : 4, unit: ' 分', col: 1 },
+                            { name: 'quality', label: '质量评定', type: 'select', options: ['优良', '合格', '基本合格'], value: '合格', col: 1 },
+                            { name: 'note', label: '核查备注', type: 'textarea', col: 1, placeholder: '现场核查情况' }
+                        ],
+                        onSubmit: function (v) {
+                            doAction(c, '已结案', { score: Number(v.score) });
+                            c.quality = v.quality;
+                            log('核查通过，案卷 ' + c.id + ' 结案（' + hoursText(c.durationH) + '，满意度 ' + v.score + ' 分）', 'ok');
+                            if (!c.onTime) log('案卷 ' + c.id + ' 逾期结案，计入 ' + c.dept + ' 绩效扣分', 'warn');
+                            save(); afterChange();
+                        }
+                    });
+                    return;
+                }
+                SC.modal.form({
+                    title: '核查不通过・退回重办 ' + c.id,
+                    fields: [
+                        { name: 'reason', label: '退回原因', type: 'select', required: true, col: 1, options: ['现场未清理到位', '照片与上报点位不一致', '只处置表面未消除成因', '反馈信息不完整', '举报人不同意办结'] },
+                        { name: 'note', label: '补充说明', type: 'textarea', col: 1 }
+                    ],
+                    onSubmit: function (v) {
+                        doAction(c, '已退回', { note: v.reason + (v.note ? '：' + v.note : '') });
+                        log('核查不通过，' + c.id + ' 退回 ' + c.dept + ' 重办（第 ' + c.backCount + ' 次）', 'alarm');
+                        save(); afterChange();
+                    }
+                });
+            }
+
+            /* ---------------- 10. 上报与重复合并 ---------------- */
+            function openReport() {
+                const form = SC.buildForm([
+                    { name: 'source', label: '发现来源', type: 'select', options: SOURCES, value: '网格员巡查', col: 1 },
+                    { name: 'level', label: '事件等级', type: 'select', options: LEVELS, value: '一般', col: 1, hint: '决定签收与处置时限' },
+                    { name: 'cat', label: '事件大类', type: 'select', options: CATS.map(c => c.name), value: CATS[0].name, col: 1, required: true },
+                    { name: 'sub', label: '事件小类', type: 'select', options: CATS[0].subs, value: CATS[0].subs[0], col: 1, required: true },
+                    { name: 'zone', label: '所属片区', type: 'select', options: ZONES, value: ZONES[0], col: 1 },
+                    { name: 'addr', label: '详细地址', type: 'text', required: true, col: 1, placeholder: '如：人民路 128 号门前' },
+                    { name: 'desc', label: '事件描述', type: 'textarea', required: true, col: 1, placeholder: '现场状况、影响范围、是否影响交通' },
+                    { name: 'photos', label: '佐证照片数', type: 'number', min: 0, max: 9, value: 2, col: 1 },
+                    { name: 'auto', label: '立案后直接派遣', type: 'switch', onText: '自动派遣', value: true, col: 1 }
+                ], {});
+                const sels = form.node.querySelectorAll('select');
+                if (sels.length >= 4) {
+                    sels[2].addEventListener('change', function () {
+                        const subs = (CATS.filter(c => c.name === sels[2].value)[0] || CATS[0]).subs;
+                        sels[3].innerHTML = subs.map(s => '<option>' + SC.esc(s) + '</option>').join('');
+                    });
+                }
+                SC.modal.open({
+                    title: '上报城管事件', size: 'lg', body: form.node, dismissible: false,
+                    footer: [
+                        { text: '取消', kind: 'ghost' },
+                        {
+                            text: '提交上报', kind: 'primary', onClick: function (m) {
+                                const res = form.read();
+                                if (!res.ok) { SC.toast(res.message || '请检查填写内容', { type: 'error' }); return false; }
+                                submitReport(res.values);
+                                m.close();
+                            }
+                        }
+                    ]
+                });
+            }
+
+            /** 实时上报用真随机定位，不受伪随机种子影响 */
+            function rnd2() { return Math.random(); }
+
+            /** 同址同类 30 分钟内已存在在办案卷 -> 归并，避免重复派遣 */
+            function findDuplicate(v, now) {
+                const addr = String(v.addr || '').replace(/\s/g, '');
+                if (!addr) return null;
+                return cases.filter(function (c) {
+                    return c.status !== '已结案' && c.sub === v.sub &&
+                        String(c.addr).replace(/\s/g, '').indexOf(addr) > -1 &&
+                        now - c.createdAt < 30 * MIN;
+                })[0] || null;
+            }
+
+            function submitReport(v, silent) {
+                const now = Date.now();
+                v = v || {};
+                const dup = findDuplicate(v, now);
+                if (dup) {
+                    dup.dupCount = (dup.dupCount || 1) + 1;
+                    if (LEVELS.indexOf(v.level) > -1 && LEVELS.indexOf(v.level) < LEVELS.indexOf(dup.level)) dup.level = v.level;
+                    dup.timeline.push({ t: now, act: '归并重复上报', by: v.source || '系统', note: '第 ' + dup.dupCount + ' 次上报，合并处置' });
+                    stamp2(dup); save();
+                    if (!silent) {
+                        SC.toast('同址同类事件已存在，本次上报归并至 ' + dup.id, { type: 'warn', title: '重复上报合并', duration: 3600 });
+                        log('重复上报归并：' + v.addr + ' ' + v.sub + ' → ' + dup.id + '（累计 ' + dup.dupCount + ' 件）', 'warn');
+                        afterChange();
+                    }
+                    return dup;
+                }
+                const c = makeCase(now, { cat: v.cat, sub: v.sub, level: v.level, zone: v.zone, source: v.source || '网格员巡查' });
+                c.addr = v.addr || c.addr;
+                c.desc = v.desc || '';
+                c.title = c.sub;
+                c.photos = Number(v.photos || 0);
+                c.x = Number(rnd2().toFixed(4));
+                c.y = Number(rnd2().toFixed(4));
+                c.timeline[0].note = c.addr;
+                cases.unshift(c);
+                if (v.auto !== false) {
+                    doAction(c, '已立案', { by: AUTO_SOURCE.indexOf(c.source) > -1 ? '系统自动' : '坐席人工' });
+                    const rule = deptRule(c.cat);
+                    doAction(c, '已派遣', { dept: rule.dept, second: rule.second, officer: rp(officersOf(rule.dept)) });
+                }
+                save();
+                if (!silent) {
+                    SC.toast('案卷 ' + c.id + ' 已上报' + (v.auto !== false ? '并派遣至 ' + c.dept : ''), { type: 'success', title: '上报成功' });
+                    log('新案卷 ' + c.id + '：' + c.cat + '・' + c.sub + '（' + c.addr + '）' + (v.auto !== false ? ' → ' + c.dept : ' 待立案'), 'info');
+                    afterChange();
+                }
+                return c;
+            }
+
+            /* ---------------- 11. 案卷详情与流转时间轴 ---------------- */
+            function openDetail(id) {
+                const c = byId(id);
+                if (!c) return;
+                const now = Date.now();
+                const kv = function (k, v) { return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; };
+                const steps = ['上报', '立案', '派遣', '签收', '处置反馈', '核查', '结案'];
+                const flowIdx = c.status === '已结案' ? 7 : c.status === '不予立案' ? 2 :
+                    ['待立案', '已立案', '已派遣', '处置中', '待核查', '已退回'].indexOf(c.status) + 1;
+                const tl = c.timeline.slice().sort((a, b) => a.t - b.t);
+                const host = SC.el(
+                    '<div>' +
+                    '<div class="sc-kv">' +
+                    kv('事件类别', SC.esc(c.cat) + ' / ' + SC.esc(c.sub)) +
+                    kv('当前状态', stTag(c, now)) +
+                    kv('等级', levelTag(c.level)) +
+                    kv('地址', SC.esc(c.addr)) +
+                    kv('发现来源', SC.esc(c.source)) +
+                    kv('承办 / 协办', SC.esc(c.dept || '未派遣') + (c.second ? ' / ' + SC.esc(c.second) : '')) +
+                    kv('责任人', SC.esc(c.officer || '待指派')) +
+                    kv('处置时限', slaOf(c.level).deal + ' 小时（' + fmtLeft(leftMin(c, now)) + '）') +
+                    '</div>' +
+                    (c.desc ? '<div class="sc-note" style="margin-top:14px">' + SC.esc(c.desc) + '</div>' : '') +
+                    (c.note ? '<div class="sc-note" style="margin-top:10px">处置说明：' + SC.esc(c.note) + '</div>' : '') +
+                    '<div class="sc-section-title">流转节点</div>' +
+                    '<div class="flow-diagram">' + steps.map(function (s, i) {
+                        return (i ? '<span class="flow-arrow">→</span>' : '') +
+                            '<span class="flow-node' + (i < flowIdx ? ' hot' : '') + '">' + s + '</span>';
+                    }).join('') + '</div>' +
+                    '<div class="sc-section-title">处置时间轴（' + tl.length + ' 条）</div>' +
+                    '<div class="sc-timeline">' + tl.map(function (t, i) {
+                        return '<div class="sc-tl-item ' + (i === tl.length - 1 ? 'todo' : 'done') + '">' +
+                            '<div class="h">' + SC.esc(t.act) + '<span class="sc-hint">・' + SC.esc(t.by || '') + '</span></div>' +
+                            '<div class="m">' + SC.stamp(new Date(t.t), true) + (t.note ? '<br>' + SC.esc(t.note) : '') + '</div></div>';
+                    }).join('') + '</div>' +
+                    '<div class="sc-section-title">考核关联指标</div>' +
+                    '<div class="sc-chips">' +
+                    '<span class="sc-chip">退回重办 <b>' + c.backCount + '</b></span>' +
+                    '<span class="sc-chip">重复上报 <b>' + (c.dupCount || 1) + '</b></span>' +
+                    '<span class="sc-chip">佐证照片 <b>' + c.photos + '</b></span>' +
+                    (c.status === '已结案' ? (c.onTime ? '<span class="sc-chip active">按期结案</span>' : '<span class="sc-chip">逾期结案</span>') : '') +
+                    (c.quality ? '<span class="sc-chip">质量 ' + SC.esc(c.quality) + '</span>' : '') +
+                    '</div>' +
+                    '<div id="dt-sub" style="margin-top:16px"></div>' +
+                    '</div>');
+                const btnMap = { '立案': 'file', '不予立案': 'drop', '派遣': 'assign', '签收': 'sign', '改派': 'reassign', '反馈': 'feed', '核查结案': 'pass', '退回重办': 'back', '重新处置': 'redo', '催办': 'nudge' };
+                let m;
+                const footer = nextActions(c).map(function (a) {
+                    return {
+                        text: a, kind: a === '核查结案' ? 'primary' : a === '不予立案' ? 'danger' : '',
+                        onClick: function () { m.close(); runAct(c, btnMap[a]); return false; }
+                    };
+                });
+                footer.push({
+                    text: '导出案卷 CSV', kind: 'ghost', onClick: function () {
+                        SC.csv.download('案卷_' + c.id + '.csv', [['项目', '内容']]
+                            .concat([
+                                ['案卷编号', c.id], ['大类/小类', c.cat + '/' + c.sub], ['等级', c.level], ['地址', c.addr], ['片区', c.zone],
+                                ['来源', c.source], ['状态', viewStatus(c)], ['承办单位', c.dept], ['协办单位', c.second], ['责任人', c.officer],
+                                ['上报时间', SC.stamp(new Date(c.createdAt), true)], ['处置截止', SC.stamp(new Date(c.dueAt), true)],
+                                ['结案时间', c.closedAt ? SC.stamp(new Date(c.closedAt), true) : '-'], ['处置时长', hoursText(c.durationH)],
+                                ['满意度', c.score || '-']
+                            ])
+                            .concat(tl.map(t => ['流转', SC.stamp(new Date(t.t), true) + ' ' + t.act + ' ' + (t.by || '') + ' ' + (t.note || '')])));
+                        SC.toast('已导出案卷 ' + c.id, { type: 'success' });
+                    }
+                });
+                m = SC.modal.open({ title: '案卷 ' + c.id + '・' + c.sub, size: 'lg', body: host, footer: footer });
+                renderDetailTrend(host.querySelector('#dt-sub'), c);
+            }
+
+            /** 详情内：本类事件近 7 天发生频次 */
+            function renderDetailTrend(host, c) {
+                if (!host) return;
+                host.innerHTML = '<div class="sc-panel-title"><h3>同类事件近 7 天发生次数</h3></div><div class="sc-chart sm"><canvas></canvas></div>';
+                const cv = host.querySelector('canvas');
+                const labels = [], data = [];
+                for (let i = 6; i >= 0; i--) {
+                    const day = new Date(); day.setHours(0, 0, 0, 0); day.setDate(day.getDate() - i);
+                    const s = day.getTime(), e = s + DAY;
+                    labels.push((day.getMonth() + 1) + '/' + day.getDate());
+                    data.push(cases.filter(x => x.cat === c.cat && x.createdAt >= s && x.createdAt < e).length);
+                }
+                SC.chart.bar(cv, { labels, unit: ' 件', series: [{ name: c.cat, data, color: catColor(c.cat) }] });
+            }
+
+            /* ---------------- 12. 城区事件态势地图 ---------------- */
+            let mapPts = [];
+            const ZONE_POS = [[0.16, 0.14], [0.5, 0.1], [0.85, 0.16], [0.16, 0.9], [0.5, 0.93], [0.86, 0.88]];
+            const ST_COLOR = { '待立案': '#e74c3c', '已立案': '#e74c3c', '已派遣': '#e74c3c', '处置中': '#f39c12', '已退回': '#f39c12', '待核查': '#00b4d8', '已结案': '#27ae60', '督办': '#8e44ad', '不予立案': '#95a5a6' };
+
+            function drawMap() {
+                const cv = document.getElementById('case-map');
+                if (!cv || !cv.parentNode) return;
+                const host = cv.parentNode;
+                const dpr = window.devicePixelRatio || 1;
+                const w = host.clientWidth || 560, h = host.clientHeight || 300;
+                cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+                const ctx = cv.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const g = ctx.createLinearGradient(0, 0, w, h);
+                g.addColorStop(0, '#f5faff'); g.addColorStop(1, '#e6eff8');
+                ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+
+                // 街区色块（固定布局，避免每次重绘拖动）
+                ctx.fillStyle = 'rgba(190,209,228,0.28)';
+                const blocks = [[0.04, 0.05, 0.2, 0.14], [0.27, 0.04, 0.17, 0.16], [0.53, 0.06, 0.22, 0.13], [0.79, 0.05, 0.17, 0.15],
+                [0.05, 0.27, 0.18, 0.16], [0.3, 0.28, 0.15, 0.15], [0.55, 0.27, 0.2, 0.17], [0.8, 0.28, 0.15, 0.14],
+                [0.06, 0.5, 0.16, 0.13], [0.29, 0.5, 0.19, 0.14], [0.56, 0.51, 0.16, 0.12], [0.79, 0.5, 0.16, 0.15]];
+                blocks.forEach(b => ctx.fillRect(b[0] * w, b[1] * h, b[2] * w, b[3] * h));
+
+                // 河道
+                ctx.strokeStyle = '#bfdcf5'; ctx.lineWidth = Math.max(13, h * 0.075); ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(-10, h * 0.44); ctx.bezierCurveTo(w * 0.32, h * 0.58, w * 0.6, h * 0.28, w + 10, h * 0.42); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(-10, h * 0.44); ctx.bezierCurveTo(w * 0.32, h * 0.58, w * 0.6, h * 0.28, w + 10, h * 0.42); ctx.stroke();
+
+                // 主干道
+                ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 7;
+                [0.24, 0.47, 0.75].forEach(function (fx) { ctx.beginPath(); ctx.moveTo(w * fx, 0); ctx.lineTo(w * fx, h); ctx.stroke(); });
+                [0.23, 0.47, 0.68].forEach(function (fy) { ctx.beginPath(); ctx.moveTo(0, h * fy); ctx.lineTo(w, h * fy); ctx.stroke(); });
+
+                // 片区标注
+                ctx.fillStyle = '#9fb0c1'; ctx.font = '11px "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ZONES.forEach(function (z, i) { const p = ZONE_POS[i % ZONE_POS.length]; ctx.fillText(z, p[0] * w, p[1] * h); });
+
+                // 点位
+                const now = Date.now();
+                mapPts = [];
+                cases.filter(c => c.status === '已结案' || c.status === '不予立案' ? now - c.createdAt < 2 * DAY : true)
+                    .slice(0, 140).forEach(function (c) {
+                        const px = 14 + c.x * (w - 28), py = 14 + c.y * (h - 28);
+                        mapPts.push({ x: px, y: py, c: c });
+                    });
+                mapPts.forEach(function (p) {
+                    const c = p.c, st = viewStatus(c, now), closed = st === '已结案' || st === '不予立案';
+                    ctx.globalAlpha = closed ? 0.34 : 0.92;
+                    ctx.fillStyle = ST_COLOR[st] || '#7f8c8d';
+                    const r = closed ? 2.6 : (c.level === '紧急' ? 6.4 : c.level === '重要' ? 4.8 : 3.6);
+                    if (closed) { ctx.fillRect(p.x - 2.4, p.y - 2.4, 4.8, 4.8); }
+                    else {
+                        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+                        ctx.globalAlpha = 0.9; ctx.strokeStyle = 'white'; ctx.lineWidth = 1.4; ctx.stroke();
+                        if (c.escalated || leftMin(c, now) <= 0) {
+                            ctx.globalAlpha = 0.5; ctx.strokeStyle = '#8e44ad'; ctx.lineWidth = 2;
+                            ctx.beginPath(); ctx.arc(p.x, p.y, r + 4.5, 0, Math.PI * 2); ctx.stroke();
+                        }
+                    }
+                    ctx.globalAlpha = 1;
+                });
+                // 左上角信息牌
+                ctx.fillStyle = 'rgba(255,255,255,0.82)';
+                ctx.fillRect(8, 8, 150, 42);
+                ctx.fillStyle = '#5b6b7b'; ctx.textAlign = 'left'; ctx.font = '11px "Microsoft YaHei", sans-serif';
+                ctx.fillText('在办 ' + openCases(now).length + ' 件 · 已绘 ' + mapPts.length + ' 个点位', 16, 22);
+                ctx.fillText('逾期 ' + inhandLate(now) + ' 件 · 片区 ' + ZONES.length + ' 个', 16, 38);
+            }
+            function inhandLate(now) { return openCases(now).filter(c => leftMin(c, now) <= 0).length; }
+
+            function bindMap() {
+                const cv = document.getElementById('case-map');
+                const tip = document.getElementById('map-tip');
+                if (!cv) return;
+                cv.addEventListener('mousemove', function (ev) {
+                    const rect = cv.getBoundingClientRect();
+                    const mx = ev.clientX - rect.left, my = ev.clientY - rect.top;
+                    let best = null, bd = 18 * 18;
+                    mapPts.forEach(function (p) {
+                        const d = (p.x - mx) * (p.x - mx) + (p.y - my) * (p.y - my);
+                        if (d < bd) { bd = d; best = p; }
+                    });
+                    cv.style.cursor = best ? 'pointer' : 'default';
+                    if (!best || !tip) { tip && (tip.style.opacity = 0); return; }
+                    const c = best.c, now = Date.now();
+                    tip.innerHTML = '<b>' + SC.esc(c.id) + '</b> ' + SC.esc(c.sub) + '<br>' + SC.esc(c.addr) +
+                        '<br>' + viewStatus(c, now) + ' · ' + SC.esc(c.dept || '未派遣') + ' · ' + fmtLeft(leftMin(c, now));
+                    tip.style.opacity = 1;
+                    tip.style.left = Math.max(4, Math.min(cv.clientWidth - tip.offsetWidth - 4, best.x + 12)) + 'px';
+                    tip.style.top = Math.max(4, Math.min(cv.clientHeight - tip.offsetHeight - 4, best.y - tip.offsetHeight - 8)) + 'px';
+                    tip.dataset.id = c.id;
+                });
+                cv.addEventListener('mouseleave', function () { if (tip) tip.style.opacity = 0; });
+                cv.addEventListener('click', function () {
+                    if (tip && tip.style.opacity !== '0' && tip.dataset.id) openDetail(tip.dataset.id);
+                });
+            }
+
+            /* ---------------- 13. 受案趋势与来源构成 ---------------- */
+            let trendInst = null, srcInst = null;
+            function renderTrend() {
+                const cv = document.getElementById('c-trend');
+                if (!cv) return;
+                const now = Date.now(), labels = [], a = [], b = [];
+                for (let i = 23; i >= 0; i--) {
+                    const end = new Date(now - i * HOUR); end.setMinutes(0, 0, 0);
+                    const s = end.getTime() - HOUR;
+                    labels.push(SC.pad2(end.getHours()) + ':00');
+                    a.push(cases.filter(c => c.createdAt > s && c.createdAt <= end.getTime()).length);
+                    b.push(cases.filter(c => c.closedAt > s && c.closedAt <= end.getTime()).length);
+                }
+                const cfg = { labels, unit: ' 件', xEvery: 4, series: [{ name: '受案', data: a, color: '#3498db' }, { name: '结案', data: b, color: '#27ae60', dash: [6, 4] }] };
+                trendInst = trendInst ? (trendInst.update(cfg), trendInst) : SC.chart.line(cv, cfg);
+                SC.chart.legend(document.getElementById('l-trend'), [
+                    { name: '受案', color: '#3498db', value: a.reduce((x, y) => x + y, 0) + ' 件' },
+                    { name: '结案', color: '#27ae60', value: b.reduce((x, y) => x + y, 0) + ' 件' }
+                ], function (i, visible) {
+                    const s = trendInst.cfg.series.slice();
+                    s[i] = Object.assign({}, s[i], { visible });
+                    trendInst.update({ series: s });
+                });
+            }
+            function renderSource() {
+                const cv = document.getElementById('c-source');
+                if (!cv) return;
+                const since = Date.now() - 30 * DAY;
+                const data = SOURCES.map(s => cases.filter(c => c.source === s && c.createdAt >= since).length);
+                const cfg = {
+                    labels: SOURCES, data, unit: ' 件', centerBottom: '近 30 天',
+                    colors: ['#3498db', '#e74c3c', '#27ae60', '#00b4d8', '#9b59b6', '#f39c12']
+                };
+                srcInst = srcInst ? (srcInst.update(cfg), srcInst) : SC.chart.pie(cv, cfg);
+                SC.chart.legend(document.getElementById('l-source'), SOURCES.map((s, i) => ({
+                    name: s, color: cfg.colors[i], value: data[i] ? SC.pct(data[i] / (data.reduce((a2, b2) => a2 + b2, 0) || 1) * 100) : '0%'
+                })));
+            }
+
+            /* ---------------- 14. 指挥派遣（工单 / 人员负载 / 部门待办） ---------------- */
+            function woList() {
+                const now = Date.now();
+                return cases.filter(c => c.dispatchAt && ['已派遣', '处置中', '待核查', '已退回'].indexOf(c.status) > -1).map(function (c) {
+                    const st = viewStatus(c, now);
+                    return { c, st, id: woIdOf(c), late: leftMin(c, now) <= 0, unsigned: !c.signAt };
+                }).sort((a, b) => (b.late - a.late) || (a.c.dueAt - b.c.dueAt));
+            }
+            function renderWo() {
+                const now = Date.now();
+                const list = woList();
+                document.querySelector('#wo-table tbody').innerHTML = list.map(function (o) {
+                    const c = o.c;
+                    const signLeft = Math.round((c.signDueAt - now) / MIN);
+                    const stTagCls = o.st === '督办' ? 'bad' : (o.unsigned ? 'warn' : o.st === '待核查' ? '' : 'info');
+                    return '<tr data-id="' + SC.esc(c.id) + '"><td>' + SC.esc(o.id) + '</td>' +
+                        '<td>' + SC.esc(c.id) + '</td>' +
+                        '<td>' + SC.esc(c.sub) + '<div class="sc-hint" style="font-size:.75em">' + SC.esc(c.addr) + '</div></td>' +
+                        '<td>' + SC.esc(c.dept) + '</td><td>' + SC.esc(c.officer || '待指派') + '</td>' +
+                        '<td>' + SC.stamp(new Date(c.dueAt)).slice(5, 16) + '</td>' +
+                        '<td><span class="cd-box ' + (signLeft <= 0 ? 'late' : 'soon') + '" data-sd="' + SC.esc(c.id) + '">' +
+                        (o.unsigned ? fmtLeft(signLeft) : '<span class="sc-tag ok">已签收</span>') + '</span></td>' +
+                        '<td><span class="sc-tag ' + stTagCls + '">' + (o.unsigned ? '待签收・' + o.st : o.st) + '</span></td>' +
+                        '<td>' + (o.unsigned ? '<button class="sc-btn sm primary" data-act="sign">签收</button> ' : '') +
+                        '<button class="sc-btn sm ghost" data-act="nudge">催办</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="reassign">改派</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="view">详情</button></td></tr>';
+                }).join('');
+                if (ctrls.wo) ctrls.wo.reload(); else ctrls.wo = SC.table.enhance(document.getElementById('wo-table'),
+                    { pageSize: 8, search: '#wo-search', export: '派遣工单', keyAttr: 'id' });
+                renderLoad(); renderDeptTodo();
+            }
+            function renderLoad() {
+                const cv = document.getElementById('c-load');
+                if (!cv) return;
+                const now = Date.now();
+                const stat = {};
+                woList().forEach(function (o) {
+                    const k = o.c.officer || '待指派';
+                    stat[k] = stat[k] || { load: 0, late: 0, dept: o.c.dept };
+                    stat[k].load++;
+                    if (o.late) stat[k].late++;
+                });
+                const keys = Object.keys(stat).sort((a, b) => stat[b].load - stat[a].load).slice(0, 9);
+                SC.chart.bar(cv, {
+                    labels: keys, unit: ' 单',
+                    series: [
+                        { name: '在办', data: keys.map(k => stat[k].load), color: '#3498db' },
+                        { name: '逾期', data: keys.map(k => stat[k].late), color: '#e74c3c' }
+                    ]
+                });
+            }
+            function renderDeptTodo() {
+                const host = document.getElementById('dept-todo');
+                if (!host) return;
+                const now = Date.now();
+                const agg = {};
+                openCases(now).forEach(function (c) {
+                    const k = c.dept || '待派遣';
+                    agg[k] = agg[k] || { n: 0, late: 0, soon: 0 };
+                    agg[k].n++;
+                    const m = leftMin(c, now);
+                    if (m <= 0) agg[k].late++;
+                    else if (m <= slaOf(c.level).warn * 60) agg[k].soon++;
+                });
+                const rows = Object.keys(agg).map(k => ({ dept: k, v: agg[k] })).sort((a, b) => (b.v.late * 100 + b.v.n) - (a.v.late * 100 + a.v.n));
+                host.innerHTML = rows.map(function (r) {
+                    const bad = r.v.late > 0;
+                    return '<div class="attn-item' + (bad ? ' bad' : '') + '" data-dept="' + SC.esc(r.dept) + '" title="点击在工单表中定位该单位">' +
+                        '<span class="sx">' + (bad ? '⛔' : '📁') + ' ' + SC.esc(r.dept) +
+                        '<div class="sc-hint" style="font-size:.76em">在办 ' + r.v.n + ' · 临期 ' + r.v.soon + ' · 逾期 ' + r.v.late + '</div></span>' +
+                        '<span class="ax"><span class="sc-tag ' + (bad ? 'bad' : 'info') + '">' + r.v.n + ' 单</span></span></div>';
+                }).join('') || '<div class="sc-hint">暂无待办工单</div>';
+            }
+
+            /* ---------------- 15. 绩效考核 ---------------- */
+            let pfDays = 30;
+            function inWindow(c) { return c.createdAt >= Date.now() - pfDays * DAY; }
+            function targetHours(list) {
+                const t = list.map(c => slaOf(c.level).deal).filter(v => v > 0);
+                return t.length ? t.reduce((a, b) => a + b, 0) / t.length : 12;
+            }
+            function perfRows() {
+                const map = {};
+                DEPTS.forEach(d => { map[d.name] = { dept: d.name, total: 0, closed: 0, onTime: 0, dur: 0, back: 0, score: 0, scoreN: 0, list: [] }; });
+                cases.forEach(function (c) {
+                    if (!inWindow(c)) return;
+                    const m = map[c.dept];
+                    if (!m) return;
+                    m.total++; m.back += c.backCount; m.list.push(c);
+                    if (c.status === '已结案') {
+                        m.closed++; if (c.onTime) m.onTime++;
+                        m.dur += c.durationH;
+                        if (c.score) { m.score += c.score; m.scoreN++; }
+                    }
+                });
+                return Object.keys(map).map(function (k) {
+                    const m = map[k];
+                    const onTimeRate = m.closed ? m.onTime / m.closed * 100 : 0;
+                    const avg = m.closed ? m.dur / m.closed : 0;
+                    const target = targetHours(m.list);
+                    const timeliness = m.closed ? SC.clamp(100 * (target - avg) / (target * 0.8), 0, 100) : 60;
+                    const quality = SC.clamp(100 - (m.back / Math.max(1, m.total)) * 220, 0, 100);
+                    const satisfy = m.scoreN ? m.score / m.scoreN / 5 * 100 : 88;
+                    const total = 0.4 * onTimeRate + 0.25 * timeliness + 0.2 * quality + 0.15 * satisfy;
+                    return { dept: k, total: m.total, closed: m.closed, onTimeRate, avg, target, timeliness, quality, satisfy, back: m.back, score: total, avgScore: m.scoreN ? m.score / m.scoreN : 0 };
+                }).sort((a, b) => b.score - a.score);
+            }
+            let scoreInst = null, catInst = null, pfTrendInst = null;
+            function renderPerf() {
+                const rows = perfRows();
+                const win = cases.filter(inWindow);
+                const closed = win.filter(c => c.status === '已结案');
+                const host = document.getElementById('pf-kv');
+                if (host) {
+                    const onTime = closed.filter(c => c.onTime).length;
+                    const avg = closed.length ? closed.reduce((s, c) => s + c.durationH, 0) / closed.length : 0;
+                    const back = win.reduce((s, c) => s + c.backCount, 0);
+                    const sc = closed.filter(c => c.score);
+                    const kv = (k, v, sub) => '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v sc-num-lg">' + v + '</div>' +
+                        (sub ? '<div class="sc-hint" style="font-size:.75em">' + sub + '</div>' : '') + '</div>';
+                    host.innerHTML =
+                        kv('考核案卷', SC.num(win.length), '近 ' + pfDays + ' 天 · 已结 ' + closed.length) +
+                        kv('按期结案率', SC.pct(closed.length ? onTime / closed.length * 100 : 0), '目标 95%') +
+                        kv('平均处置耗时', SC.num(avg, 1) + ' h', '加权时限 ' + SC.num(targetHours(win), 1) + ' h') +
+                        kv('退回重办', SC.num(back) + ' 件', '退回率 ' + SC.pct(back / Math.max(1, win.length) * 100)) +
+                        kv('市民满意度', sc.length ? SC.num(sc.reduce((s, c) => s + c.score, 0) / sc.length, 2) + ' 分' : '--', '满分 5 分') +
+                        kv('最优单位', rows.length ? SC.esc(rows[0].dept) : '--', rows.length ? SC.num(rows[0].score, 1) + ' 分' : '');
+                }
+                const cvScore = document.getElementById('c-dept-score');
+                if (cvScore) {
+                    const cfg = { labels: rows.map(r => r.dept.replace(/中心|分局|支队/g, '')), unit: ' 分', yMax: 100, series: [{ name: '综合得分', data: rows.map(r => Number(r.score.toFixed(1))), color: '#3498db' }] };
+                    scoreInst = scoreInst ? (scoreInst.update(cfg), scoreInst) : SC.chart.bar(cvScore, cfg);
+                }
+                const cvG = document.getElementById('c-satisfy');
+                if (cvG) {
+                    const sc = closed.filter(c => c.score);
+                    SC.chart.gauge(cvG, {
+                        value: sc.length ? sc.reduce((s, c) => s + c.score, 0) / sc.length : 0, min: 0, max: 5,
+                        label: '平均满意度（' + closed.length + ' 件已结案）', unit: ' 分', decimals: 2,
+                        segments: [{ to: 3, color: '#e74c3c' }, { to: 4, color: '#f39c12' }, { to: 5, color: '#27ae60' }]
+                    });
+                }
+                const cvCat = document.getElementById('c-cat-pie');
+                if (cvCat) {
+                    const data = CATS.map(cat => win.filter(c => c.cat === cat.name).length);
+                    const cfg = { labels: CATS.map(c => c.name), data, colors: CATS.map(c => c.color), centerBottom: '案卷大类', unit: ' 件' };
+                    catInst = catInst ? (catInst.update(cfg), catInst) : SC.chart.pie(cvCat, cfg);
+                    const sum = data.reduce((a, b) => a + b, 0) || 1;
+                    SC.chart.legend(document.getElementById('l-cat-pie'), CATS.map((c, i) => ({ name: c.name, color: c.color, value: SC.pct(data[i] / sum * 100, 0) })));
+                }
+                const tb = document.getElementById('pf-table');
+                if (tb) {
+                    tb.querySelector('tbody').innerHTML = rows.map(function (r, i) {
+                        const tag = r.score >= 90 ? 'ok' : r.score >= 78 ? 'info' : r.score >= 65 ? 'warn' : 'bad';
+                        return '<tr data-dept="' + SC.esc(r.dept) + '"><td>' + (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1) + '</td>' +
+                            '<td>' + SC.esc(r.dept) + '</td><td class="sc-cell-num">' + r.total + '</td><td class="sc-cell-num">' + r.closed + '</td>' +
+                            '<td><span class="sc-tag ' + (r.onTimeRate >= 95 ? 'ok' : r.onTimeRate >= 85 ? 'warn' : 'bad') + '">' + SC.pct(r.onTimeRate) + '</span></td>' +
+                            '<td class="sc-cell-num">' + SC.num(r.avg, 1) + ' h</td>' +
+                            '<td class="sc-cell-num">' + r.back + '</td>' +
+                            '<td class="sc-cell-num">' + (r.avgScore ? r.avgScore.toFixed(2) : '--') + '</td>' +
+                            '<td><div class="sc-bar-mini"><i style="width:' + r.score.toFixed(0) + '%;background:' + (tag === 'ok' ? '#27ae60' : tag === 'warn' ? '#f39c12' : tag === 'bad' ? '#e74c3c' : '#3498db') + '"></i></div>' +
+                            '<span class="sc-tag ' + tag + '">' + SC.num(r.score, 1) + '</span></td>' +
+                            '<td><button class="sc-btn sm ghost" data-act="dept">明细</button></td></tr>';
+                    }).join('');
+                    if (!ctrls.pf) ctrls.pf = SC.table.enhance(tb, { pageSize: 10, search: false, export: '绩效考核', emptyText: '该周期内无案卷' });
+                    else ctrls.pf.reload();
+                }
+                renderPfTrend();
+            }
+            function renderPfTrend() {
+                const cv = document.getElementById('c-pf-trend');
+                if (!cv) return;
+                const days = Math.min(30, pfDays), labels = [], real = [], aim = [];
+                for (let i = days - 1; i >= 0; i--) {
+                    const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
+                    const s = d.getTime(), e = s + DAY;
+                    const done = cases.filter(c => c.closedAt >= s && c.closedAt < e);
+                    labels.push((d.getMonth() + 1) + '/' + d.getDate());
+                    real.push(done.length ? Number((done.reduce((x, c) => x + c.durationH, 0) / done.length).toFixed(1)) : 0);
+                    aim.push(Number(targetHours(done.length ? done : cases.filter(inWindow)).toFixed(1)));
+                }
+                const cfg = { labels, unit: ' h', series: [{ name: '实际平均耗时', data: real, color: '#e67e22' }, { name: '时限基准', data: aim, color: '#95a5a6', dash: [6, 4], fill: false }] };
+                pfTrendInst = pfTrendInst ? (pfTrendInst.update(cfg), pfTrendInst) : SC.chart.line(cv, cfg);
+            }
+            /** 单位明细弹窗：逐项拆解得分构成 */
+            function openDeptDetail(dept) {
+                const r = perfRows().filter(x => x.dept === dept)[0];
+                if (!r) { SC.toast('该单位本周期无案卷', { type: 'warn' }); return; }
+                const list = r.list.slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, 40);
+                const bar = (name, val, weight, color) =>
+                    '<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:.85em">' +
+                    '<span>' + name + '<span class="sc-hint"> 权重 ' + weight + '</span></span><b>' + SC.num(val, 1) + '</b></div>' +
+                    '<div class="sc-bar-mini"><i style="width:' + SC.clamp(val, 0, 100) + '%;background:' + color + '"></i></div></div>';
+                const body = SC.el('<div><div class="sc-kv">' +
+                    '<div class="sc-kv-item"><div class="k">受案 / 已结</div><div class="v">' + r.total + ' / ' + r.closed + '</div></div>' +
+                    '<div class="sc-kv-item"><div class="k">综合得分</div><div class="v">' + SC.num(r.score, 1) + '</div></div>' +
+                    '<div class="sc-kv-item"><div class="k">平均耗时</div><div class="v">' + SC.num(r.avg, 1) + ' h</div></div>' +
+                    '<div class="sc-kv-item"><div class="k">时限基准</div><div class="v">' + SC.num(r.target, 1) + ' h</div></div>' +
+                    '</div>' + bar('按期结案率', r.onTimeRate, '40%', '#3498db') + bar('处置时效', r.timeliness, '25%', '#00b4d8') +
+                    bar('处置质量（退回扣分）', r.quality, '20%', '#27ae60') + bar('市民满意度', r.satisfy, '15%', '#f39c12') +
+                    '<div class="sc-section-title">案卷明细（近 40 件）</div><div class="data-table-container"><table class="data-table">' +
+                    '<thead><tr><th>案卷</th><th>小类</th><th>责任人</th><th>状态</th><th>耗时</th><th>满意度</th></tr></thead><tbody>' +
+                    list.map(function (c) {
+                        return '<tr><td>' + SC.esc(c.id) + '</td><td>' + SC.esc(c.sub) + '</td><td>' + SC.esc(c.officer || '-') + '</td>' +
+                            '<td>' + viewStatus(c) + '</td><td>' + (c.durationH ? hoursText(c.durationH) : '-') + '</td>' +
+                            '<td>' + (c.score ? c.score.toFixed(1) : '-') + '</td></tr>';
+                    }).join('') + '</tbody></table></div></div>');
+                SC.modal.open({
+                    title: '考核明细・' + dept, size: 'lg', body,
+                    footer: [
+                        {
+                            text: '导出该单位案卷', kind: 'ghost', onClick: function () {
+                                const header = ['案卷', '大类', '小类', '等级', '责任人', '上报', '结案', '耗时(h)', '按期', '退回', '满意度'];
+                                const data = r.list.map(c => [c.id, c.cat, c.sub, c.level, c.officer,
+                                SC.stamp(new Date(c.createdAt), true), c.closedAt ? SC.stamp(new Date(c.closedAt), true) : '',
+                                c.durationH.toFixed(1), c.onTime ? 'Y' : 'N', c.backCount, c.score || '']);
+                                SC.csv.download('考核_' + dept + '_' + SC.today() + '.csv', [header].concat(data));
+                            }
+                        },
+                        { text: '关闭', kind: 'primary' }
+                    ]
+                });
+            }
+            /** 考核报表：汇总 + 等细表 + 导出 */
+            function openPfReport() {
+                const rows = perfRows();
+                const win = cases.filter(inWindow);
+                const closed = win.filter(c => c.status === '已结案');
+                const late = closed.filter(c => !c.onTime);
+                const catTop = CATS.map(c => ({ n: c.name, v: win.filter(x => x.cat === c.name).length })).sort((a, b) => b.v - a.v);
+                const srcAuto = win.filter(c => AUTO_SOURCE.indexOf(c.source) > -1).length;
+                const body = SC.el('<div>' +
+                    '<div class="sc-note">考核周期：近 ' + pfDays + ' 天（至 ' + SC.today() + '）。共受案 ' + win.length + ' 件，已结 ' +
+                    closed.length + ' 件，其中逾期结案 ' + late.length + ' 件；自动发现占比 ' + SC.pct(srcAuto / Math.max(1, win.length) * 100) + '。</div>' +
+                    '<div class="sc-section-title">单位排名</div><div class="data-table-container"><table class="data-table"><thead><tr>' +
+                    '<th>名次</th><th>单位</th><th>受案</th><th>按期率</th><th>时效</th><th>质量</th><th>满意度</th><th>得分</th></tr></thead><tbody>' +
+                    rows.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + SC.esc(r.dept) + '</td><td>' + r.total + '</td><td>' + SC.pct(r.onTimeRate) +
+                        '</td><td>' + SC.num(r.timeliness, 0) + '</td><td>' + SC.num(r.quality, 0) + '</td><td>' + SC.num(r.satisfy, 0) + '</td><td><b>' + SC.num(r.score, 1) + '</b></td></tr>').join('') +
+                    '</tbody></table></div>' +
+                    '<div class="sc-section-title">高发案件类型</div><div class="sc-chips">' +
+                    catTop.map(c => '<span class="sc-chip">' + SC.esc(c.n) + ' <b>' + c.v + '</b></span>').join('') + '</div>' +
+                    '<div class="sc-section-title">整改建议</div><div class="sc-note">' +
+                    (rows.length ? '1. ' + rows[rows.length - 1].dept + ' 综合得分最低（' + SC.num(rows[rows.length - 1].score, 1) + '），建议重点检查退回重办与临期签收；<br>' : '') +
+                    '2. 退回重办共 ' + win.reduce((s, c) => s + c.backCount, 0) + ' 件，核查环节应保留处置前后对比照片；<br>' +
+                    '3. 逾期案卷 ' + inhandLate(Date.now()) + ' 件仍挂在督办，建议启动约谈与现场核查。</div></div>');
+                SC.modal.open({
+                    title: '数字城管绩效考核报表（' + SC.today() + '）', size: 'lg', body,
+                    footer: [
+                        {
+                            text: '导出报表 CSV', kind: 'primary', onClick: function () {
+                                const header = ['承办单位', '受案量', '已结案', '按期率%', '时效', '质量', '满意度', '综合得分'];
+                                const data = rows.map(r => [r.dept, r.total, r.closed, r.onTimeRate.toFixed(1),
+                                r.timeliness.toFixed(1), r.quality.toFixed(1), r.satisfy.toFixed(1), r.score.toFixed(1)]);
+                                SC.csv.download('绩效考核报表_近' + pfDays + '天_' + SC.today() + '.csv', [header].concat(data));
+                            }
+                        },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            /* ---------------- 16. 系统设置 ---------------- */
+            function renderSla() {
+                const tb = document.querySelector('#sla-table tbody');
+                if (!tb) return;
+                tb.innerHTML = LEVELS.map(function (l) {
+                    const s = slaOf(l), n = cases.filter(c => c.level === l && c.status !== '已结案').length;
+                    return '<tr data-level="' + l + '"><td>' + levelTag(l) + '</td>' +
+                        '<td>' + s.sign + ' 小时</td><td>' + s.deal + ' 小时</td><td>' + s.warn + ' 小时</td>' +
+                        '<td>' + SC.esc(s.rule) + '</td>' +
+                        '<td><span class="sc-hint" style="margin-right:8px">在办 ' + n + ' 件</span>' +
+                        '<button class="sc-btn sm ghost" data-act="sla-edit">编辑</button></td></tr>';
+                }).join('');
+            }
+            function renderRules() {
+                const tb = document.querySelector('#rule-table tbody');
+                if (!tb) return;
+                tb.innerHTML = RULES.map(function (r, i) {
+                    const match = cases.filter(c => c.cat === r.cat && c.status !== '已结案').length;
+                    return '<tr data-idx="' + i + '"><td>' + SC.esc(r.cat) + '</td>' +
+                        '<td>' + SC.esc(r.subs || '全部') + '</td>' +
+                        '<td>' + SC.esc(r.dept) + '</td><td>' + SC.esc(r.second || '无') + '</td>' +
+                        '<td class="sc-cell-num">' + match + '</td>' +
+                        '<td><span class="sc-tag ' + (r.enabled ? 'ok' : 'off') + '">' + (r.enabled ? '启用' : '停用') + '</span></td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="rule-edit">编辑</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="rule-toggle">' + (r.enabled ? '停用' : '启用') + '</button> ' +
+                        '<button class="sc-btn sm danger" data-act="rule-del">删除</button></td></tr>';
+                }).join('');
+            }
+            function renderFlow() {
+                const host = document.getElementById('flow-view');
+                if (!host) return;
+                const now = Date.now(), t0 = new Date(); t0.setHours(0, 0, 0, 0);
+                const cnt = [
+                    cases.filter(c => c.createdAt >= t0.getTime()).length,
+                    cases.filter(c => c.status === '待立案').length,
+                    cases.filter(c => c.status === '已立案').length,
+                    cases.filter(c => c.status === '已派遣').length,
+                    cases.filter(c => c.status === '处置中').length,
+                    cases.filter(c => c.status === '待核查' || c.status === '已退回').length,
+                    cases.filter(c => c.closedAt >= t0.getTime()).length
+                ];
+                host.innerHTML = FLOW.map(function (s, i) {
+                    return (i ? '<span class="flow-arrow">→</span>' : '') +
+                        '<span class="flow-node' + (cnt[i] > 3 ? ' hot' : '') + '" title="当前环节案卷数">' + s + ' <b>' + cnt[i] + '</b></span>';
+                }).join('') + '<span class="flow-arrow">↘</span><span class="flow-node">督办 ' + openCases(now).filter(c => c.escalated).length + '</span>';
+            }
+            function renderPerms() {
+                const tb = document.querySelector('#perm-table tbody');
+                if (!tb) return;
+                tb.innerHTML = PERMS.map(function (p, i) {
+                    return '<tr data-idx="' + i + '"><td>' + SC.esc(p.role) + '</td>' + p.p.map(function (v, j) {
+                        return '<td style="text-align:center"><input type="checkbox" class="sc-checkbox" data-col="' + j + '"' + (v ? ' checked' : '') + '></td>';
+                    }).join('') + '</tr>';
+                }).join('');
+            }
+            function renderDict() {
+                const host = document.getElementById('dict-view');
+                if (!host) return;
+                const now = Date.now();
+                host.innerHTML = CATS.map(function (c) {
+                    const n = cases.filter(x => x.cat === c.name && x.status !== '已结案').length;
+                    return '<div class="attn-item" title="点击筛选该类案卷" data-cat="' + SC.esc(c.name) + '">' +
+                        '<span class="sx"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + c.color + ';margin-right:6px"></i>' +
+                        SC.esc(c.name) + '<div class="sc-chips" style="margin-top:6px">' +
+                        c.subs.map(s => '<span class="sc-chip" style="padding:2px 8px;font-size:.78em">' + SC.esc(s) +
+                            ' <b>' + cases.filter(x => x.sub === s && x.createdAt >= now - 7 * DAY).length + '</b></span>').join('') + '</div></span>' +
+                        '<span class="ax"><span class="sc-tag info">' + n + ' 在办</span></span></div>';
+                }).join('');
+            }
+            function editSla(level) {
+                const s = slaOf(level);
+                SC.modal.form({
+                    title: '立案与处置标准・' + level,
+                    fields: [
+                        { name: 'sign', label: '签收时限', type: 'number', min: 0.1, max: 48, step: 0.1, value: s.sign, unit: ' 小时', col: 1, required: true },
+                        { name: 'warn', label: '临期提醒', type: 'number', min: 0.1, max: 24, step: 0.1, value: s.warn, unit: ' 小时', col: 1, required: true, hint: '剩余时限低于该值进入临期督办清单' },
+                        { name: 'deal', label: '处置时限', type: 'number', min: 1, max: 240, step: 0.5, value: s.deal, unit: ' 小时', col: 1, required: true },
+                        { name: 'rule', label: '督办规则', type: 'text', value: s.rule, col: 1, required: true }
+                    ],
+                    onSubmit: function (v) {
+                        SLA[level] = { sign: Number(v.sign), deal: Number(v.deal), warn: Number(v.warn), rule: v.rule };
+                        SC.store.set(NS, 'sla', SLA);
+                        cases.forEach(c => { if (c.status !== '已结案') stamp2(c); });
+                        save();
+                        SC.toast('已更新 ' + level + ' 事件标准，在办 ' + cases.filter(c => c.level === level && c.status !== '已结案').length + ' 件 SLA 已重算', { type: 'success' });
+                        log('修改 ' + level + ' 级标准：签收 ' + v.sign + 'h / 处置 ' + v.deal + 'h', 'warn');
+                        renderSla(); afterChange();
+                    }
+                });
+            }
+            function editRule(idx) {
+                const r = idx === -1 ? { cat: CATS[0].name, subs: '全部', dept: DEPTS[0].name, second: '', enabled: true } : RULES[idx];
+                SC.modal.form({
+                    title: idx === -1 ? '新增派遣规则' : '编辑派遣规则',
+                    fields: [
+                        { name: 'cat', label: '事件大类', type: 'select', options: CATS.map(c => c.name), value: r.cat, col: 1, required: true },
+                        { name: 'subs', label: '适用小类', type: 'text', value: r.subs || '全部', col: 1, hint: '多个用顿号分隔，留空或“全部”表示整类' },
+                        { name: 'dept', label: '承办单位', type: 'select', options: DEPTS.map(d => d.name), value: r.dept, col: 1, required: true },
+                        { name: 'second', label: '协办单位', type: 'select', options: ['无'].concat(DEPTS.map(d => d.name)), value: r.second || '无', col: 1 },
+                        { name: 'enabled', label: '启用', type: 'switch', onText: '参与自动派遣', value: r.enabled !== false, col: 1 }
+                    ],
+                    onSubmit: function (v) {
+                        const item = { cat: v.cat, subs: v.subs || '全部', dept: v.dept, second: v.second === '无' ? '' : v.second, enabled: !!v.enabled };
+                        if (idx === -1) RULES.push(item); else RULES[idx] = item;
+                        SC.store.set(NS, 'rules', RULES);
+                        SC.toast('派遣规则已保存，后续立案将按新规则自动定岗', { type: 'success' });
+                        log('更新派遣规则：' + item.cat + ' → ' + item.dept, 'info');
+                        renderRules(); renderFlow();
+                    }
+                });
+            }
+
+            /* ---------------- 17. 实时流转仿真 ---------------- */
+            let simN = 0;
+            function tickCd() {
+                const now = Date.now();
+                document.querySelectorAll('.cd-box[data-cd]').forEach(function (el) {
+                    const c = byId(el.getAttribute('data-cd'));
+                    if (!c) return;
+                    const m = leftMin(c, now);
+                    el.textContent = fmtLeft(m);
+                    el.className = 'cd-box ' + (m <= 0 ? 'late' : m <= slaOf(c.level).warn * 60 ? 'soon' : '');
+                });
+                document.querySelectorAll('.sla-item .cd[data-cd]').forEach(function (el) {
+                    const c = byId(el.getAttribute('data-cd'));
+                    if (c) el.textContent = fmtLeft(leftMin(c, now));
+                });
+                document.querySelectorAll('.cd-box[data-sd]').forEach(function (el) {
+                    const c = byId(el.getAttribute('data-sd'));
+                    if (!c || c.signAt) return;
+                    const m = Math.round((c.signDueAt - now) / MIN);
+                    el.textContent = fmtLeft(m);
+                    el.className = 'cd-box ' + (m <= 0 ? 'late' : 'soon');
+                });
+            }
+            function simTick() {
+                simN++;
+                const now = Date.now();
+                // 1）自动发现上报（视频 AI / 物联传感）
+                if (Math.random() < 0.5) {
+                    const cat = SC.sim.pick(CATS);
+                    const src = Math.random() < 0.6 ? '视频AI识别' : '物联传感器';
+                    const c = submitReport({
+                        source: src, level: cat.name === '市政设施' && Math.random() < 0.4 ? '紧急' : SC.sim.pick(LEVELS),
+                        cat: cat.name, sub: SC.sim.pick(cat.subs), zone: SC.sim.pick(ZONES),
+                        addr: SC.sim.pick(ROADS) + SC.sim.pick(SPOTS),
+                        desc: src + '自动识别：' + SC.sim.pick(cat.subs) + '，已自动抓拍并生成工单',
+                        photos: SC.sim.randInt(1, 3), auto: Math.random() < 0.85
+                    }, true);
+                    if (c) log('[' + src + '] 自动立案 ' + c.id + '：' + c.sub + '（' + c.addr + '）', c.dupCount ? 'warn' : 'info');
+                }
+                // 2）承办环节自动推进：签收 → 反馈 → 核查结案
+                const pool = openCases(now).filter(c => c.dispatchAt).sort(() => Math.random() - 0.5).slice(0, 3);
+                pool.forEach(function (c) {
+                    if (c.status === '待立案' && Math.random() < 0.3) { doAction(c, '已立案'); log('坐席审核通过，' + c.id + ' 立案', 'info'); }
+                    else if (c.status === '已立案' && Math.random() < 0.5) {
+                        const rule = deptRule(c.cat);
+                        doAction(c, '已派遣', { dept: rule.dept, second: rule.second, officer: SC.sim.pick(officersOf(rule.dept)) });
+                        log('派遣 ' + c.id + ' → ' + c.dept + '・' + c.officer, 'info');
+                    } else if (c.status === '已派遣' && Math.random() < 0.55) {
+                        doAction(c, '处置中'); log(c.officer + ' 已签收工单 ' + c.id + '（' + c.dept + '）', 'info');
+                    } else if (c.status === '处置中' && Math.random() < 0.4) {
+                        doAction(c, '待核查', { note: SC.sim.pick(['已清理并恢复原状', '更换破损部件后复位', '整治后已安排专人巡查', '疏通管道并冲洗路面']) });
+                        log(c.dept + ' 反馈处置完成：' + c.id, 'ok');
+                    } else if (c.status === '待核查') {
+                        if (Math.random() < 0.82) {
+                            doAction(c, '已结案');
+                            log('核查通过结案 ' + c.id + '（' + hoursText(c.durationH) + (c.onTime ? '，按期' : '，逾期') + '）', c.onTime ? 'ok' : 'warn');
+                        } else {
+                            doAction(c, '已退回', { note: '现场核查发现只处置表面' });
+                            log('核查不通过，' + c.id + ' 退回 ' + c.dept + ' 重办', 'alarm');
+                        }
+                    } else if (c.status === '已退回' && Math.random() < 0.5) {
+                        doAction(c, '重新处置'); log(c.dept + ' 重新处置 ' + c.id + '（第 ' + c.backCount + ' 次退回后）', 'warn');
+                    }
+                });
+                // 3）逾期自动升级督办
+                openCases(now).forEach(function (c) {
+                    if (!c.escalated && leftMin(c, now) <= 0 && Math.random() < 0.6) {
+                        c.escalated = true;
+                        log('超过处置时限，系统自动督办：' + c.id + ' → ' + c.dept, 'alarm');
+                    }
+                });
+                save();
+                renderCases(); renderAlerts(); renderKpi(); drawMap(); renderWo(); renderFlow();
+                if (simN % 3 === 0) { renderTrend(); renderSource(); renderPerf(); }
+                if (simN % 8 === 0) tickCd();
+            }
+
+            /* ---------------- 18. 坐席任务面板 ---------------- */
+            function openMyTasks() {
+                const now = Date.now();
+                const mine = openCases(now).filter(function (c) { return c.status !== '待立案'; })
+                    .sort((a, b) => leftMin(a, now) - leftMin(b, now)).slice(0, 16);
+                const kv = (k, v) => '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>';
+                const body = SC.el('<div>' +
+                    '<div class="sc-kv">' +
+                    kv('待签收', cases.filter(c => c.status === '已派遣').length) +
+                    kv('处置中', cases.filter(c => c.status === '处置中').length) +
+                    kv('待核查', cases.filter(c => c.status === '待核查').length) +
+                    kv('已退回', cases.filter(c => c.status === '已退回').length) +
+                    kv('逾期督办', openCases(now).filter(c => leftMin(c, now) <= 0).length) +
+                    kv('待立案', cases.filter(c => c.status === '待立案').length) +
+                    '</div><div class="sc-section-title">按时限排序的前 16 件</div>' +
+                    '<div class="sla-list">' + mine.map(function (c) {
+                        const m = leftMin(c, now);
+                        return '<div class="sla-item ' + (m <= 0 ? 'late' : m <= slaOf(c.level).warn * 60 ? 'warn' : '') + '" data-id="' + SC.esc(c.id) + '" style="cursor:pointer">' +
+                            '<span class="sx">' + SC.esc(c.id) + '・' + SC.esc(c.sub) +
+                            '<div class="sc-hint" style="font-size:.76em">' + SC.esc(c.dept) + '・' + SC.esc(c.officer || '待指派') + ' · ' + viewStatus(c, now) + '</div></span>' +
+                            '<span class="cd">' + fmtLeft(m) + '</span>' +
+                            '<span class="ax"><button class="sc-btn sm ' + (c.status === '已派遣' ? 'primary' : 'ghost') + '" data-act="' + (c.status === '已派遣' ? 'sign' : 'view') + '">' +
+                            (c.status === '已派遣' ? '签收' : c.status === '处置中' ? '反馈' : '详情') + '</button></span></div>';
+                    }).join('') + '</div></div>');
+                SC.modal.open({ title: '坐席任务列表・' + SC.stamp(new Date()).slice(5, 16), size: 'lg', body });
+            }
+
+            /* ---------------- 19. 初始化与事件绑定 ---------------- */
+            function init() {
+                DICT_EXTRA.forEach(function (x) { if (!CATS.some(c => c.name === x.name)) CATS.push(x); });
+                RULES.forEach(function (r) { if (!CATS.some(c => c.name === r.cat)) CATS.push({ name: r.cat, color: '#7f8c8d', subs: ['其他'] }); });
+
+                // 日志初值：从已有案卷时间轴生成历史流水
+                cases.slice(0, 14).forEach(function (c) {
+                    const tl = c.timeline[c.timeline.length - 1];
+                    logs.push({ t: tl.t, text: tl.act + '：' + c.id + ' ' + c.sub + '（' + c.dept + '・' + (c.officer || '未指派') + '）', lv: tl.act === '核查结案' ? 'ok' : tl.act === '核查退回' ? 'alarm' : 'info' });
+                });
+                logs.sort((a, b) => b.t - a.t);
+                paintLogs();
+
+                const EXPORT_NAME = { pending: '待处理案卷', processing: '处置中案卷', completed: '已结案案卷', all: '全部案卷' };
+                ['pending', 'processing', 'completed', 'all'].forEach(function (k) {
+                    const el = document.getElementById('tbl-' + k);
+                    if (!el) return;
+                    ctrls[k] = SC.table.enhance(el, {
+                        pageSize: k === 'pending' ? 6 : 8, keyAttr: 'id', export: EXPORT_NAME[k],
+                        selectable: k === 'pending', search: '#case-search',
+                        emptyText: '该环节暂无案卷'
+                    });
+                });
+                renderCases(); renderAlerts(); renderKpi(); drawMap(); bindMap();
+                renderTrend(); renderSource(); renderWo(); renderPerf();
+                renderSla(); renderRules(); renderFlow(); renderPerms(); renderDict();
+
+                // 操作列与行点击委托
+                const ACT_MAP = { file: '立案', drop: '不予立案', assign: '派遣', sign: '签收', reassign: '改派', feed: '反馈', pass: '核查结案', back: '退回重办', redo: '重新处置', nudge: '催办', view: '详情' };
+                document.addEventListener('click', function (ev) {
+                    const inSettings = ev.target.closest('#system-settings-module');
+                    const btn = ev.target.closest('button[data-act]');
+                    if (inSettings && btn) {
+                        const row = btn.closest('[data-level],[data-idx]');
+                        if (!row) return;
+                        if (btn.dataset.act === 'sla-edit') editSla(row.dataset.level);
+                        if (btn.dataset.act === 'rule-edit') editRule(Number(row.dataset.idx));
+                        if (btn.dataset.act === 'rule-toggle') {
+                            RULES[Number(row.dataset.idx)].enabled = !RULES[Number(row.dataset.idx)].enabled;
+                            SC.store.set(NS, 'rules', RULES); renderRules();
+                            SC.toast('规则已' + (RULES[Number(row.dataset.idx)].enabled ? '启用' : '停用'), { type: 'success' });
+                        }
+                        if (btn.dataset.act === 'rule-del') {
+                            SC.modal.confirm({ title: '删除规则', text: '删除后该类事件将回退到第一条启用规则派遣，确定删除？', danger: true })
+                                .then(function (ok) { if (!ok) return; RULES.splice(Number(row.dataset.idx), 1); SC.store.set(NS, 'rules', RULES); renderRules(); log('删除派遣规则', 'warn'); });
+                        }
+                        return;
+                    }
+                    const host = ev.target.closest('tr[data-id],.sla-item[data-id]');
+                    const id = host ? host.dataset.id : null;
+                    if (btn) {
+                        const act = ACT_MAP[btn.dataset.act];
+                        if (!act || !id) return;
+                        if (btn.dataset.act === 'view') { openDetail(id); return; }
+                        const c = byId(id);
+                        if (c) runAct(c, act);
+                        return;
+                    }
+                    if (id && !ev.target.closest('input,select,textarea,a,.sc-chip,.attn-item')) openDetail(id);
+                });
+
+                // 字典项 → 筛选该类在办案卷
+                document.getElementById('dict-view').addEventListener('click', function (ev) {
+                    const item = ev.target.closest('[data-cat]');
+                    if (!item) return;
+                    const cat = item.dataset.cat;
+                    document.querySelector('.module-btn[data-module="case-management"]').click();
+                    document.querySelector('.tab-btn[data-tab="all"]').click();
+                    const kw = cat;
+                    if (ctrls.all) ctrls.all.setKeyword(kw);
+                    SC.toast('已在全部案卷中筛选「' + cat + '」', { type: 'info' });
+                });
+                document.getElementById('case-chips').addEventListener('click', function (ev) {
+                    const chip = ev.target.closest('[data-st]');
+                    if (chip) applyChip(chip.dataset.st);
+                });
+                document.getElementById('pf-table').addEventListener('click', function (ev) {
+                    const btn = ev.target.closest('button[data-act="dept"]');
+                    if (!btn) return;
+                    const row = btn.closest('[data-dept]');
+                    if (row) openDeptDetail(row.dataset.dept);
+                });
+                document.getElementById('dept-todo').addEventListener('click', function (ev) {
+                    const item = ev.target.closest('[data-dept]');
+                    if (!item || !ctrls.wo) return;
+                    ctrls.wo.setKeyword(item.dataset.dept);
+                    document.getElementById('wo-search').focus();
+                    SC.toast('已筛选 ' + item.dataset.dept + ' 的待办工单', { type: 'info' });
+                });
+
+                document.getElementById('qa-report').addEventListener('click', openReport);
+                document.getElementById('btn-new-case').addEventListener('click', openReport);
+                document.getElementById('qa-query').addEventListener('click', function () {
+                    document.querySelector('.module-btn[data-module="case-management"]').click();
+                    document.querySelector('.tab-btn[data-tab="all"]').click();
+                    setTimeout(() => document.getElementById('case-search').focus(), 60);
+                });
+                document.getElementById('qa-task').addEventListener('click', openMyTasks);
+                document.getElementById('qa-report-doc').addEventListener('click', openPfReport);
+                document.getElementById('btn-pf-report').addEventListener('click', openPfReport);
+                document.getElementById('btn-log-export').addEventListener('click', function () {
+                    SC.csv.download('处置流水_' + SC.today() + '.csv', [['时间', '类型', '内容']]
+                        .concat(logs.map(l => [SC.stamp(new Date(l.t), true), l.lv, l.text])));
+                    SC.toast('已导出 ' + logs.length + ' 条流水', { type: 'success' });
+                });
+                document.getElementById('btn-wo-export').addEventListener('click', function () {
+                    const header = ['工单号', '案卷号', '任务', '地址', '承办单位', '责任人', '要求完成', '签收时限', '状态', '退回次数'];
+                    const data = woList().map(function (o) {
+                        return [o.id, o.c.id, o.c.sub, o.c.addr, o.c.dept, o.c.officer,
+                        SC.stamp(new Date(o.c.dueAt), true), SC.stamp(new Date(o.c.signDueAt), true), o.st, o.c.backCount];
+                    });
+                    SC.csv.download('派遣工单_' + SC.today() + '.csv', [header].concat(data));
+                    SC.toast('已导出 ' + data.length + ' 条工单', { type: 'success' });
+                });
+                document.getElementById('btn-nudge-all').addEventListener('click', function () {
+                    const now = Date.now();
+                    const list = openCases(now).filter(c => leftMin(c, now) <= slaOf(c.level).warn * 60);
+                    if (!list.length) { SC.toast('当前无临期或逾期案卷', { type: 'success' }); return; }
+                    list.forEach(c => doAction(c, '督办'));
+                    save();
+                    SC.toast('已向 ' + list.length + ' 件案卷的承办单位发出催办', { type: 'warn', title: '批量催办' });
+                    log('批量催办 ' + list.length + ' 件（含逾期 ' + list.filter(c => leftMin(c, now) <= 0).length + ' 件）', 'alarm');
+                    afterChange();
+                });
+                document.getElementById('btn-batch-assign').addEventListener('click', function () {
+                    const ids = (ctrls.pending && ctrls.pending.getSelectedIds()) || [];
+                    const list = ids.map(byId).filter(c => c && c.status === '待立案' || c && c.status === '已立案');
+                    if (!ids.length) { SC.toast('请先在「待处理」列表勾选案卷', { type: 'warn' }); return; }
+                    SC.modal.form({
+                        title: '批量派遣 ' + list.length + ' 件案卷',
+                        fields: [
+                            { name: 'tip', type: 'static', html: '<div class="sc-note">已选 ' + ids.length + ' 件。留空承办单位时，按《派遣规则表》逐件自动定岗；已立案未派遣的案卷将直接补派遣。</div>' },
+                            { name: 'dept', label: '指定承办单位', type: 'select', options: ['按规则自动匹配'].concat(DEPTS.map(d => d.name)), col: 1 },
+                            { name: 'officer', label: '责任人分配', type: 'select', options: ['按当前负载最少优先', '随机指派'], col: 1 },
+                            { name: 'urgent', label: '全部纳入督办', type: 'switch', onText: '挂牌督办', col: 1 }
+                        ],
+                        onSubmit: function (v) {
+                            const load = {};
+                            openCases(Date.now()).forEach(c => { load[c.officer] = (load[c.officer] || 0) + 1; });
+                            let n = 0;
+                            list.forEach(function (c) {
+                                if (c.status === '待立案') doAction(c, '已立案', { silent: true });
+                                const rule = deptRule(c.cat);
+                                const dept = v.dept === '按规则自动匹配' ? rule.dept : v.dept;
+                                let officer = '';
+                                if (v.officer === '随机指派') officer = SC.sim.pick(officersOf(dept));
+                                else {
+                                    officer = officersOf(dept).slice().sort(function (a, b) {
+                                        return ((load[a] || 0) + (a === c.officer ? 5 : 0)) - ((load[b] || 0) + (b === c.officer ? 5 : 0));
+                                    })[0];
+                                }
+                                load[officer] = (load[officer] || 0) + 1;
+                                doAction(c, '已派遣', { silent: true, dept: dept, second: rule.second, officer: officer });
+                                if (v.urgent) c.escalated = true;
+                                n++;
+                            });
+                            save();
+                            SC.toast('已批量派遣 ' + n + ' 件案卷', { type: 'success' });
+                            log('批量派遣 ' + n + ' 件（' + (v.dept === '按规则自动匹配' ? '按规则自动定岗' : v.dept) + '）', 'info');
+                            if (ctrls.pending) ctrls.pending.clearSelected();
+                            afterChange();
+                        }
+                    });
+                });
+                document.getElementById('btn-add-rule').addEventListener('click', () => editRule(-1));
+                document.getElementById('btn-add-cat').addEventListener('click', function () {
+                    SC.modal.form({
+                        title: '新增事件大类',
+                        fields: [
+                            { name: 'name', label: '大类名称', type: 'text', required: true, col: 1, placeholder: '如：地下空间' },
+                            { name: 'subs', label: '小类列表', type: 'textarea', required: true, col: 1, placeholder: '用逗号分隔，如：通道堵塞,照明故障,积水' },
+                            { name: 'dept', label: '默认承办单位', type: 'select', options: DEPTS.map(d => d.name), col: 1 }
+                        ],
+                        onSubmit: function (v) {
+                            const item = { name: v.name, color: SC.chartPalette[DICT_EXTRA.length % SC.chartPalette.length], subs: v.subs.split(/[,,、s]+/).filter(s => s.trim()).map(s => s.trim()) };
+                            if (!item.subs.length) { SC.toast('至少填写一个小类', { type: 'error' }); return false; }
+                            CATS.push(item); DICT_EXTRA.push(item);
+                            SC.store.set(NS, 'dict', DICT_EXTRA);
+                            RULES.push({ cat: item.name, subs: '全部', dept: v.dept, second: '', enabled: true });
+                            SC.store.set(NS, 'rules', RULES);
+                            renderDict(); renderRules();
+                            SC.toast('已新增大类「' + item.name + '」并生成派遣规则', { type: 'success' });
+                            log('新增事件大类：' + item.name + '（' + item.subs.length + ' 个小类）', 'info');
+                        }
+                    });
+                });
+                document.getElementById('btn-perm-save').addEventListener('click', function () {
+                    document.querySelectorAll('#perm-table tbody tr').forEach(function (tr, i) {
+                        if (!PERMS[i]) return;
+                        PERMS[i].p = Array.prototype.map.call(tr.querySelectorAll('input[data-col]'), el => el.checked ? 1 : 0);
+                    });
+                    SC.store.set(NS, 'perms', PERMS);
+                    SC.toast('角色权限已保存，共 ' + PERMS.length + ' 个角色', { type: 'success' });
+                    log('更新角色权限矩阵', 'warn');
+                });
+                document.getElementById('btn-reset').addEventListener('click', function () {
+                    SC.modal.confirm({ title: '重置演示数据', text: '将清空本地保存的案卷、规则、SLA 与权限设置，并重新生成演示台账。', danger: true, okText: '确定重置' })
+                        .then(function (ok) { if (!ok) return;['cases', 'rules', 'sla', 'perms', 'dict'].forEach(k => SC.store.remove(NS, k)); location.reload(); });
+                });
+
+                // 周期切换
+                document.getElementById('pf-period').addEventListener('click', function (ev) {
+                    const btn = ev.target.closest('button[data-days]');
+                    if (!btn) return;
+                    Array.prototype.forEach.call(this.querySelectorAll('button'), b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    pfDays = Number(btn.dataset.days);
+                    renderPerf();
+                });
+                // 模块切换后重绘（隐藏容器内 canvas 宽度为 0）
+                document.querySelectorAll('.module-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        setTimeout(function () {
+                            const m = btn.dataset.module;
+                            if (m === 'case-management') { drawMap(); renderTrend(); renderSource(); }
+                            if (m === 'work-order') renderWo();
+                            if (m === 'performance') renderPerf();
+                            if (m === 'system-settings') { renderSla(); renderRules(); renderFlow(); renderPerms(); renderDict(); }
+                        }, 50);
+                    });
+                });
+
+                // 实时时钟（SLA 倒计时）+ 仿真时钟
+                setInterval(tickCd, 1000);
+                tickCd();
+                SC.live({ interval: 4200, button: document.getElementById('live-btn'), onTick: simTick, runningText: '实时流转', pausedText: '已暂停' });
+                window.addEventListener('resize', SC.debounce(drawMap, 200));
+            }
+
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            else init();
+        })();
+    </script>
 </body>
 
 </html>
