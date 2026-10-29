@@ -211,6 +211,77 @@
             color: #95a5a6;
         }
 
+        /* 灯信息维护 / 开关信息 */
+        .am-addr {
+            font-weight: 600;
+        }
+
+        .am-sub {
+            font-size: 0.78em;
+            color: #95a5a6;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .am-coord {
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.82em;
+            color: #5d6d7e;
+        }
+
+        .am-coord.bad {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .am-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 0.82em;
+            color: #7f8c8d;
+        }
+
+        .am-legend i {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .am-badge {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: #fff3cd;
+            color: #b7791f;
+            font-size: 0.78em;
+        }
+
+        .sw-time {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sw-dev {
+            font-variant-numeric: tabular-nums;
+            font-weight: bold;
+        }
+
+        .sw-dev.pos {
+            color: #e74c3c;
+        }
+
+        .sw-dev.neg {
+            color: #2980b9;
+        }
+
+        .sw-dur {
+            font-variant-numeric: tabular-nums;
+            font-weight: bold;
+            color: #e1a100;
+        }
+
         @media (max-width: 900px) {
             .sc-split {
                 grid-template-columns: 1fr;
@@ -271,6 +342,18 @@
                 <div class="metric-label">待处理故障</div>
                 <div class="metric-trend trend-down" id="kpi-fault-trend"><span>↓</span><span>5</span></div>
             </div>
+            <div class="metric-card">
+                <div class="metric-icon">🗂️</div>
+                <div class="metric-value" id="kpi-poles" data-animated="1" style="color: #8e44ad;">--</div>
+                <div class="metric-label">灯杆档案（在役）</div>
+                <div class="metric-trend trend-up" id="kpi-poles-trend"><span>坐标完整率</span><span>--</span></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">🕒</div>
+                <div class="metric-value" id="kpi-onrate" data-animated="1" style="color: #16a085;">--</div>
+                <div class="metric-label">近 7 日开关按时率</div>
+                <div class="metric-trend trend-up" id="kpi-onrate-trend"><span>异常</span><span>--</span></div>
+            </div>
         </div>
 
         <div class="lighting-control">
@@ -291,6 +374,8 @@
 
         <div class="module-nav">
             <button class="module-btn active" data-module="lighting-control">🎛️ 照明控制</button>
+            <button class="module-btn" data-module="asset-ledger">🗂️ 灯信息维护</button>
+            <button class="module-btn" data-module="switch-log">🕒 开关信息</button>
             <button class="module-btn" data-module="fault-management">🔧 故障工单</button>
             <button class="module-btn" data-module="energy-monitor">📊 能耗监控</button>
             <button class="module-btn" data-module="schedule-management">📅 调度管理</button>
@@ -355,7 +440,8 @@
                         <thead>
                             <tr>
                                 <th>灯杆编号</th>
-                                <th>安装位置</th>
+                                <th>安装地点</th>
+                                <th>行政区</th>
                                 <th>回路</th>
                                 <th>型号 / 功率</th>
                                 <th>亮度</th>
@@ -368,6 +454,301 @@
                         <tbody></tbody>
                     </table>
                 </div>
+                <div class="sc-hint" style="margin-top:8px">
+                    此处为实时运行视图（亮度 / 电压 / 状态）；杆件档案、经纬度与资产信息在「🗂️ 灯信息维护」中维护，两边共用同一份台账。
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ 灯信息维护 ============ -->
+        <div id="asset-ledger-module" class="module-content">
+            <div class="module-tabs">
+                <button class="tab-btn active" data-tab="am-ledger">🗂️ 灯杆档案</button>
+                <button class="tab-btn" data-tab="am-map">🗺️ 经纬度分布</button>
+                <button class="tab-btn" data-tab="am-stat">📊 资产统计</button>
+            </div>
+
+            <div id="am-ledger-tab" class="tab-content active">
+                <div class="content-header">
+                    <h3>🗂️ 灯信息维护（经纬度 · 地点 · 杆型 · 灯具）</h3>
+                    <div class="content-actions">
+                        <input type="text" placeholder="搜索灯杆编号 / 道路 / 桩号 / 资产编号..." class="search-input" id="am-search">
+                        <select class="search-input" id="am-dist" style="min-width:132px">
+                            <option value="全部">全部行政区</option>
+                        </select>
+                        <button class="sc-btn sm" id="btn-am-new">➕ 新增灯杆</button>
+                        <button class="sc-btn sm ghost" id="btn-am-check">📐 坐标校验</button>
+                        <button class="sc-btn sm ghost" id="btn-am-export">⬇ 导出档案</button>
+                    </div>
+                </div>
+                <div class="sc-note" id="am-note"></div>
+                <div class="sc-chips" id="am-chips"></div>
+                <div class="data-table-container">
+                    <table class="data-table" id="am-table">
+                        <thead>
+                            <tr>
+                                <th>灯杆编号</th>
+                                <th>安装地点</th>
+                                <th>经纬度</th>
+                                <th>行政区</th>
+                                <th>回路</th>
+                                <th>杆型 / 高度</th>
+                                <th>灯具（型号 · 功率 · 色温）</th>
+                                <th>投运日期</th>
+                                <th>管养单位</th>
+                                <th>档案状态</th>
+                                <th data-no-sort>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="sc-hint" style="margin-top:8px" id="am-hint"></div>
+            </div>
+
+            <div id="am-map-tab" class="tab-content">
+                <div class="content-header">
+                    <h3>🗺️ 灯杆经纬度分布</h3>
+                    <div class="content-actions">
+                        <div class="sc-seg" id="am-layer">
+                            <button class="active" data-layer="all">全部点位</button>
+                            <button data-layer="main">主干道</button>
+                            <button data-layer="landscape">景观</button>
+                            <button data-layer="courtyard">庭院</button>
+                            <button data-layer="signal">信号</button>
+                            <button data-layer="bad">坐标异常</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="sc-split">
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>点位分布（WGS84 经纬度投影）</h3>
+                            <span class="sc-hint" id="am-map-count"></span>
+                        </div>
+                        <div class="sc-chart" style="height:430px"><canvas id="am-map"></canvas></div>
+                        <div class="am-legend" id="am-legend"></div>
+                        <div class="sc-hint" style="margin-top:8px">
+                            点击点位可查看杆件档案、最近开关记录与故障历史；灰色空心点为坐标缺失或越界，需补采后重新上图。
+                        </div>
+                    </div>
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>坐标质量</h3>
+                            <span class="sc-tag info" id="am-coord-tag"></span>
+                        </div>
+                        <div class="sc-kv" id="am-coord-kv"></div>
+                        <div class="sc-section-title">待补采点位</div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="am-bad-table">
+                                <thead>
+                                    <tr>
+                                        <th>灯杆</th>
+                                        <th>问题</th>
+                                        <th>当前值</th>
+                                        <th data-no-sort>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="am-stat-tab" class="tab-content">
+                <div class="sc-kv" id="am-stat-kv"></div>
+                <div class="sc-split">
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>按行政区资产分布</h3>
+                        </div>
+                        <div class="sc-chart"><canvas id="am-dist-chart"></canvas></div>
+                    </div>
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>按投运年份分布</h3>
+                        </div>
+                        <div class="sc-chart"><canvas id="am-year-chart"></canvas></div>
+                    </div>
+                </div>
+                <div class="sc-split">
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>行政区资产与坐标完整率</h3>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="am-dist-table">
+                                <thead>
+                                    <tr>
+                                        <th>行政区</th>
+                                        <th>灯杆数</th>
+                                        <th>回路数</th>
+                                        <th>坐标完整率</th>
+                                        <th>平均功率</th>
+                                        <th>超期服役</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>杆型与灯具配置</h3>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="am-type-table">
+                                <thead>
+                                    <tr>
+                                        <th>杆型</th>
+                                        <th>数量</th>
+                                        <th>平均高度</th>
+                                        <th>平均功率</th>
+                                        <th>主要灯具</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>超期服役与待更新清单</h3>
+                        <span class="sc-hint" id="am-age-hint">投运年限 ≥ 8 年，建议纳入下一年度改造计划</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="am-age-table">
+                            <thead>
+                                <tr>
+                                    <th>灯杆</th>
+                                    <th>安装地点</th>
+                                    <th>投运日期</th>
+                                    <th>已服役</th>
+                                    <th>杆型</th>
+                                    <th>灯具配置</th>
+                                    <th>建议</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ 开关信息 ============ -->
+        <div id="switch-log-module" class="module-content">
+            <div class="module-tabs">
+                <button class="tab-btn active" data-tab="sw-list">🕒 开关记录</button>
+                <button class="tab-btn" data-tab="sw-stat">📉 开关偏差分析</button>
+            </div>
+
+            <div id="sw-list-tab" class="tab-content active">
+                <div class="content-header">
+                    <h3>🕒 回路开关信息（采集日期 · 开启 / 关闭时间）</h3>
+                    <div class="content-actions">
+                        <div class="sc-seg" id="sw-range">
+                            <button data-range="7">近 7 日</button>
+                            <button class="active" data-range="14">近 14 日</button>
+                            <button data-range="30">近 30 日</button>
+                        </div>
+                        <input type="text" placeholder="搜索日期 / 回路 / 批次..." class="search-input" id="sw-search">
+                        <button class="sc-btn sm ghost" id="btn-sw-collect">📡 重新采集今日</button>
+                        <button class="sc-btn sm ghost" id="btn-sw-add">✏️ 补录开关记录</button>
+                        <button class="sc-btn sm" id="btn-sw-export">⬇ 导出记录</button>
+                    </div>
+                </div>
+                <div class="sc-note" id="sw-note"></div>
+                <div class="sc-kv" id="sw-kv"></div>
+                <div class="sc-chips" id="sw-chips"></div>
+                <div class="data-table-container">
+                    <table class="data-table" id="sw-table">
+                        <thead>
+                            <tr>
+                                <th>采集日期</th>
+                                <th>回路</th>
+                                <th>计划开关</th>
+                                <th>实际开关</th>
+                                <th>亮灯时长</th>
+                                <th>偏差（开 / 关）</th>
+                                <th>判定</th>
+                                <th>控制方式</th>
+                                <th>采集来源 / 批次</th>
+                                <th data-no-sort>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="sc-hint" style="margin-top:8px" id="sw-hint"></div>
+            </div>
+
+            <div id="sw-stat-tab" class="tab-content">
+                <div class="sc-split">
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>近 14 日亮灯时长（实际 vs 计划）</h3>
+                            <span class="sc-tag info">单位：小时</span>
+                        </div>
+                        <div class="sc-chart"><canvas id="sw-dur-chart"></canvas></div>
+                    </div>
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>各回路累计开灯偏差</h3>
+                            <span class="sc-hint">正值＝晚开，负值＝早开</span>
+                        </div>
+                        <div class="sc-chart"><canvas id="sw-dev-chart"></canvas></div>
+                    </div>
+                </div>
+                <div class="sc-split">
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>回路开关台账汇总</h3>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="sw-circuit-table">
+                                <thead>
+                                    <tr>
+                                        <th>回路</th>
+                                        <th>记录数</th>
+                                        <th>按时率</th>
+                                        <th>平均开灯偏差</th>
+                                        <th>平均关灯偏差</th>
+                                        <th>平均亮灯</th>
+                                        <th>缺报</th>
+                                        <th>最近异常</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="sc-panel" style="margin-bottom:0">
+                        <div class="sc-panel-title">
+                            <h3>异常清单</h3>
+                            <span class="sc-hint">偏差超 10 分钟或未回传即入清单，可一键报修</span>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="sw-abn-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>回路</th>
+                                        <th>异常类型</th>
+                                        <th>偏差</th>
+                                        <th>处置</th>
+                                        <th data-no-sort>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="sc-note" id="sw-stat-note" style="margin-top:16px"></div>
             </div>
         </div>
 
@@ -616,30 +997,228 @@
             const zoneOf = id => state.zones.filter(z => z.id === id)[0];
             const metaOf = id => ZONES.filter(z => z.id === id)[0];
 
-            /* ---------------- 单灯台账（生成一次后固定） ---------------- */
-            const lamps = SC.store.get('lighting', 'lamps', null) || (function buildLamps() {
-                const roads = ['人民路', '解放大道', '文一西路', '中山北路', '环城东路', '望江街', '科技园路', '江滨中路'];
+            /* ---------------- 回路与灯杆档案（经纬度 / 地点 / 杆型 / 灯具） ---------------- */
+            const AM_VER = 4;
+            const DISTRICTS = ['上城区', '拱墅区', '西湖区', '滨江区', '萧山区'];
+            const OWNERS = ['市路灯管理处', '区城管局', '城投建设集团', '街道管养站'];
+            const BRANDS = ['飞利浦', '欧司朗', '三雄极光', '华体科技', '洲明科技', '勤上光电', '雷士照明', '阳光照明'];
+            const POLE_TYPES = {
+                main: ['8m 单挑钢杆', '10m 双挑钢杆', '12m 三火高杆'],
+                landscape: ['6m 景观单挑杆', '8m 景观双挑杆', '5m 树阵灯杆'],
+                courtyard: ['4m 庭院球泡杆', '3.5m 园林方灯杆', '4.5m 庭院双头杆'],
+                signal: ['6m 信号灯杆', '8m 信号 + 监控合杆']
+            };
+            const HEIGHT_OF = {
+                '8m 单挑钢杆': 8, '10m 双挑钢杆': 10, '12m 三火高杆': 12,
+                '6m 景观单挑杆': 6, '8m 景观双挑杆': 8, '5m 树阵灯杆': 5,
+                '4m 庭院球泡杆': 4, '3.5m 园林方灯杆': 3.5, '4.5m 庭院双头杆': 4.5,
+                '6m 信号灯杆': 6, '8m 信号 + 监控合杆': 8
+            };
+            const LIGHT_SPECS = {
+                main: [{ model: 'LED-250W', watt: 250, cct: 4000 }, { model: 'LED-200W', watt: 200, cct: 4000 },
+                { model: 'LED-150W', watt: 150, cct: 3000 }, { model: 'HPS-400W', watt: 400, cct: 2100 }],
+                landscape: [{ model: 'LED-120W', watt: 120, cct: 3000 }, { model: 'LED-80W', watt: 80, cct: 2700 }],
+                courtyard: [{ model: 'LED-60W', watt: 60, cct: 2700 }, { model: 'LED-40W', watt: 40, cct: 2700 }],
+                signal: [{ model: 'LED-45W', watt: 45, cct: 4000 }, { model: 'LED-30W', watt: 30, cct: 4000 }]
+            };
+            /* 回路是开关信息与档案的共同坐标：灯杆挂回路，回路控制箱上报每日开关时刻 */
+            const CIRCUITS = [
+                { id: 'HL-A-01', name: '人民路 1# 箱变', road: '人民路', dist: '上城区', zone: 'main', box: '人民路 10kV 箱变', kva: 315, ctrl: '经纬度时控', lead: 15, lag: 5, lng: 120.1612, lat: 30.2789, count: 14 },
+                { id: 'HL-A-02', name: '解放大道 2# 箱变', road: '解放大道', dist: '上城区', zone: 'main', box: '解放路 10kV 箱变', kva: 400, ctrl: '光控 + 时控', lead: 18, lag: 6, lng: 120.1701, lat: 30.2562, count: 16 },
+                { id: 'HL-A-03', name: '文一西路 3# 箱变', road: '文一西路', dist: '西湖区', zone: 'main', box: '文一西路 10kV 箱变', kva: 400, ctrl: '经纬度时控', lead: 15, lag: 5, lng: 120.1152, lat: 30.2881, count: 15 },
+                { id: 'HL-A-04', name: '中山北路 4# 箱变', road: '中山北路', dist: '拱墅区', zone: 'main', box: '中山北路 10kV 箱变', kva: 315, ctrl: '时控', lead: 12, lag: 4, lng: 120.1665, lat: 30.2744, count: 12 },
+                { id: 'HL-A-05', name: '环城东路 5# 箱变', road: '环城东路', dist: '上城区', zone: 'main', box: '环城东路 10kV 箱变', kva: 315, ctrl: '光控 + 时控', lead: 20, lag: 8, lng: 120.1783, lat: 30.2705, count: 12 },
+                { id: 'HL-B-01', name: '望江街景观箱', road: '望江街', dist: '上城区', zone: 'landscape', box: '望江街景观配电箱', kva: 200, ctrl: '远程手动 + 时控', lead: 20, lag: 10, lng: 120.1836, lat: 30.2431, count: 10 },
+                { id: 'HL-B-02', name: '科技园路景观箱', road: '科技园路', dist: '滨江区', zone: 'landscape', box: '科技园路景观配电箱', kva: 200, ctrl: '经纬度时控', lead: 18, lag: 8, lng: 120.2032, lat: 30.2088, count: 9 },
+                { id: 'HL-B-03', name: '江滨中路景观箱', road: '江滨中路', dist: '滨江区', zone: 'landscape', box: '江滨中路景观配电箱', kva: 160, ctrl: '远程手动 + 时控', lead: 22, lag: 10, lng: 120.1958, lat: 30.2205, count: 10 },
+                { id: 'HL-C-01', name: '湖畔公园庭院箱', road: '湖畔公园', dist: '西湖区', zone: 'courtyard', box: '湖畔公园配电箱', kva: 100, ctrl: '时控', lead: 10, lag: 5, lng: 120.1362, lat: 30.2465, count: 9 },
+                { id: 'HL-C-02', name: '老城厢巷庭院箱', road: '老城厢巷', dist: '拱墅区', zone: 'courtyard', box: '老城厢巷配电箱', kva: 80, ctrl: '时控', lead: 10, lag: 5, lng: 120.1621, lat: 30.3128, count: 8 },
+                { id: 'HL-D-01', name: '延安路口信号箱', road: '延安路 / 庆春路', dist: '上城区', zone: 'signal', box: '延安路口信号控制箱', kva: 30, ctrl: '信号机联动', lead: 0, lag: 0, lng: 120.1631, lat: 30.2607, count: 6 },
+                { id: 'HL-D-02', name: '钱江路口信号箱', road: '钱江路 / 富春路', dist: '萧山区', zone: 'signal', box: '钱江路口信号控制箱', kva: 30, ctrl: '信号机联动', lead: 0, lag: 0, lng: 120.2116, lat: 30.2402, count: 7 }
+            ];
+            const ZONE_COLOR = { main: '#e1a100', landscape: '#9b59b6', courtyard: '#16a085', signal: '#e74c3c' };
+            /* 坐标合法域（本市主城区范围），越界或缺失均视为待补采 */
+            const LNG_MIN = 120.0800, LNG_MAX = 120.2500, LAT_MIN = 30.1800, LAT_MAX = 30.3500;
+
+            /* 稳定伪随机：同一 seed 永远得到同一组档案，刷新页面不会“换一批灯” */
+            function seedNum(str) {
+                let h = 2166136261;
+                for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+                h ^= h >>> 15; h = Math.imul(h, 2246822507); h ^= h >>> 13;
+                return (h >>> 0) / 4294967296;
+            }
+            function pickBy(str, arr) { return arr[Math.floor(seedNum(str) * arr.length) % arr.length]; }
+            function circuitOf(cid) { return CIRCUITS.filter(function (c) { return c.id === cid; })[0] || CIRCUITS[0]; }
+
+            function buildLamps() {
                 const list = [];
-                for (let i = 1; i <= 64; i++) {
-                    const zone = ZONES[i % ZONES.length];
-                    const roll = Math.random();
-                    const status = roll > 0.94 ? '故障' : (roll > 0.88 ? '离线' : (roll > 0.3 ? '亮灯' : '待机'));
-                    list.push({
-                        id: 'LP-' + SC.pad2(Math.ceil(i / 4)) + '-' + SC.pad2(i),
-                        road: roads[i % roads.length] + (i * 7 % 200 + 1) + '号',
-                        zone: zone.id,
-                        model: MODELS[i % MODELS.length],
-                        watt: zone.watt,
-                        brightness: status === '亮灯' ? 60 + (i % 4) * 10 : (status === '待机' ? 0 : 0),
-                        volt: 198 + (i % 26),
-                        hours: 3200 + i * 137,
-                        status,
-                        last: SC.stamp(new Date(Date.now() - i * 420000))
-                    });
-                }
+                CIRCUITS.forEach(function (c, ci) {
+                    for (let i = 0; i < c.count; i++) {
+                        const key = c.id + '#' + i;
+                        const poleType = POLE_TYPES[c.zone][i % POLE_TYPES[c.zone].length];
+                        const spec = LIGHT_SPECS[c.zone][i % LIGHT_SPECS[c.zone].length];
+                        const roll = seedNum('status:' + key);
+                        const status = roll > 0.955 ? '故障' : (roll > 0.910 ? '离线' : (roll > 0.340 ? '亮灯' : '待机'));
+                        const archRoll = seedNum('arch:' + key);
+                        const archState = archRoll > 0.988 ? '已拆除' : (archRoll > 0.966 ? '停用' : '在役');
+                        /* 两根“问题点位”：一根坐标未采集、一根经度录错，用于验证校验与补采闭环 */
+                        const bad = (c.id === 'HL-A-03' && i === 4) ? 'missing' : ((c.id === 'HL-B-01' && i === 6) ? 'out' : '');
+                        const lng = bad === 'missing' ? null : (bad === 'out' ? 120.3112 : +(c.lng + (i - c.count / 2) * 0.00042).toFixed(6));
+                        const lat = bad === 'missing' ? null : (bad === 'out' ? 30.2886 : +(c.lat + (i - c.count / 2) * 0.00031).toFixed(6));
+                        const year = 2013 + Math.floor(seedNum('year:' + key) * 13);
+                        const mon = 1 + Math.floor(seedNum('mon:' + key) * 12);
+                        const day = 1 + Math.floor(seedNum('day:' + key) * 28);
+                        const aim = c.zone === 'signal' ? 100 : targetBrightness(c.zone);
+                        const live = archState === '在役' && status === '亮灯';
+                        list.push({
+                            id: 'LP-' + SC.pad2(ci + 1) + '-' + SC.pad2(i + 1),
+                            road: c.road,
+                            stake: 'K' + (Math.floor(i / 5) + 1) + '+' + String((i * 37 + 60) % 1000).padStart(3, '0'),
+                            side: ['东侧', '西侧', '南侧', '北侧'][i % 4],
+                            dist: c.dist,
+                            cid: c.id,
+                            zone: c.zone,
+                            lng: lng, lat: lat,
+                            poleType: poleType, height: HEIGHT_OF[poleType],
+                            model: spec.model, watt: spec.watt, cct: spec.cct,
+                            brand: pickBy('brand:' + key, BRANDS),
+                            lumen: spec.watt * (108 + Math.round(seedNum('lm:' + key) * 34)),
+                            install: year + '-' + SC.pad2(mon) + '-' + SC.pad2(day),
+                            assetNo: 'ZC-' + year + '-' + (1000 + Math.floor(seedNum('as:' + key) * 8999)),
+                            owner: (c.dist === '萧山区' || c.dist === '滨江区') ? '城投建设集团' : pickBy('own:' + key, OWNERS),
+                            team: TEAMS[i % TEAMS.length],
+                            arch: archState,
+                            status: status,
+                            brightness: live ? SC.clamp(aim + (i % 3 - 1) * 5, 5, 100) : 0,
+                            volt: 214 + Math.round(seedNum('volt:' + key) * 14),
+                            hours: 2600 + Math.floor(seedNum('hrs:' + key) * 19000),
+                            last: SC.stamp(new Date(Date.now() - Math.floor(seedNum('last:' + key) * 5400000))),
+                            note: ''
+                        });
+                    }
+                });
                 return list;
-            })();
-            SC.store.set('lighting', 'lamps', lamps);
+            }
+            /* 旧版 localStorage 里的 64 条台账没有经纬度 / 回路字段，版本不匹配时整批重建 */
+            const LAMP_VER = SC.store.get('lighting', 'amver', 0);
+            let lamps = SC.store.get('lighting', 'lamps', null);
+            if (!Array.isArray(lamps) || LAMP_VER !== AM_VER || lamps.length < 100 || lamps[0].stake === undefined) {
+                lamps = buildLamps();
+                SC.store.set('lighting', 'lamps', lamps);
+                SC.store.set('lighting', 'amver', AM_VER);
+            }
+
+            /* ---------------- 开关信息：回路级每日采集（计划 vs 实际） ---------------- */
+            const SW_CIRCUITS = CIRCUITS.filter(function (c) { return c.zone !== 'signal'; });
+            /* 三个“有故事”的回路：时控晶振漂移晚开、光控参数被改提前关灯、通信中断缺报 */
+            const SW_STORY = {
+                'HL-A-03': { kind: 'lateOn', from: 5, to: 10, note: '时控模块晶振漂移，连续多日晚开 35-50 分钟' },
+                'HL-B-01': { kind: 'earlyOff', from: 2, to: 5, note: '光控参数被改成 180 lx，连续多日提前关灯' },
+                'HL-C-02': { kind: 'missing', from: 8, to: 9, note: '回路通信中断，连续 2 日未回传开关记录' },
+                'HL-A-05': { kind: 'lateOn', from: 12, to: 13, note: '单日时控回执延迟，已复核为对时任务拥堵' }
+            };
+            const swOverride = SC.store.get('lighting', 'swov', {});
+            const saveSwOverride = function () { SC.store.set('lighting', 'swov', swOverride); };
+
+            function dayStart(offset) {
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                return new Date(d.getTime() - offset * 86400000);
+            }
+            function dateKey(d) { return d.getFullYear() + '-' + SC.pad2(d.getMonth() + 1) + '-' + SC.pad2(d.getDate()); }
+            function hmOf(min) { const m = ((Math.round(min) % 1440) + 1440) % 1440; return SC.pad2(Math.floor(m / 60)) + ':' + SC.pad2(m % 60); }
+            function durText(min) {
+                if (min === null || min === undefined) return '—';
+                return Math.floor(min / 60) + 'h' + SC.pad2(Math.round(min % 60)) + 'm';
+            }
+            function nowMinute() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+
+            /** 计划开关时间：以当日日落 / 日出为基准，叠加回路的提前开灯与延后关灯量 */
+            function planOf(c, date) {
+                const sun = sunInfo(date, CITY.lat, CITY.lng);
+                return { on: SC.toMinutes(sun.sunset) - c.lead, off: SC.toMinutes(sun.sunrise) + c.lag };
+            }
+
+            /** 单条开关记录：历史日按种子稳定生成；当日按真实墙钟实时判定，不编造未来时刻 */
+            function swRecord(c, offset) {
+                const date = dayStart(offset);
+                const dstr = dateKey(date);
+                const plan = planOf(c, date);
+                const key = c.id + '@' + dstr;
+                const story = SW_STORY[c.id];
+                const inStory = story && offset >= story.from && offset <= story.to;
+                const jitter = function (tag) { return (seedNum(key + tag) - 0.5) * 9; };
+                let jOn = jitter(':on');
+                let jOff = jitter(':off');
+                let missing = false;
+                if (inStory) {
+                    if (story.kind === 'lateOn') jOn = 34 + seedNum(key + ':late') * 18;
+                    if (story.kind === 'earlyOff') jOff = -(24 + seedNum(key + ':early') * 20);
+                    if (story.kind === 'missing') missing = true;
+                }
+                let on = missing ? null : Math.round(plan.on + jOn);
+                let off = missing ? null : Math.round(plan.off + jOff);
+                let ctrl = c.ctrl;
+                let src = '回路控制箱';
+                const nm = nowMinute();
+                let batch = 'CP-' + dstr.replace(/-/g, '') + '-' + c.id.slice(3);
+                if (offset === 0) {
+                    /* 当日：开灯回执傍晚才到，关灯要到次日凌晨 */
+                    off = null;
+                    if (on !== null && nm < on) on = null;
+                    if (on === null && !missing && nm > plan.on + 25) missing = true;
+                    batch = 'CP-' + dstr.replace(/-/g, '') + '-' + c.id.slice(3) + '（进行中）';
+                }
+                const ov = swOverride[c.id + '|' + dstr];
+                if (ov) {
+                    if (ov.missing) { on = null; off = null; missing = true; }
+                    else {
+                        if (ov.on !== undefined) on = ov.on;
+                        if (ov.off !== undefined && ov.off !== null) off = ov.off;
+                        missing = false;
+                    }
+                    if (ov.ctrl) ctrl = ov.ctrl;
+                    src = ov.src || '人工补录';
+                    batch = ov.batch || batch;
+                }
+                const devOn = on === null ? null : on - plan.on;
+                const devOff = off === null ? null : off - plan.off;
+                const planDur = (plan.off - plan.on + 1440) % 1440;
+                const dur = (on !== null && off !== null) ? ((off - on + 1440) % 1440) : null;
+                const durNow = (on !== null && off === null && offset === 0) ? ((nm - on + 1440) % 1440) : null;
+                let level;
+                if (on === null) {
+                    level = missing ? '缺报' : (offset === 0 && nm <= plan.on + 25 ? '待开灯' : '缺报');
+                } else if (off === null) {
+                    const w = Math.abs(devOn);
+                    level = w > 30 ? '严重' : (w > 10 ? '轻微' : '亮灯中');
+                } else {
+                    const w = Math.max(Math.abs(devOn), Math.abs(devOff));
+                    level = w > 30 ? '严重' : (w > 10 ? '轻微' : '正常');
+                }
+                let note;
+                if (level === '缺报') note = inStory ? story.note : '回路通信异常，未按时回传开关记录';
+                else if (level === '待开灯') note = '未到计划开灯时点（' + hmOf(plan.on) + '），暂无开关回执';
+                else if (level === '亮灯中') note = '已亮灯，正在累计亮灯时长';
+                else if (Math.abs(devOn) > 10) note = '开灯时间偏离计划 ' + (devOn > 0 ? '+' : '') + devOn + ' 分钟，疑似时控漂移';
+                else if (Math.abs(devOff) > 10) note = '关灯时间偏离计划 ' + (devOff > 0 ? '+' : '') + devOff + ' 分钟，疑似光控参数被改';
+                else note = '开关灯时刻与计划一致，采集链路正常';
+                return {
+                    key: c.id + '|' + dstr, date: dstr, offset: offset, cid: c.id, cname: c.name, road: c.road, zone: c.zone,
+                    planOn: plan.on, planOff: plan.off, on: on, off: off,
+                    devOn: devOn, devOff: devOff, dur: dur, durNow: durNow, planDur: planDur,
+                    level: level, ctrl: ctrl, src: src, batch: batch, note: note,
+                    story: inStory ? story.kind : ''
+                };
+            }
+
+            function switchList(days) {
+                const out = [];
+                for (let off = 0; off < (days || 14); off++) {
+                    SW_CIRCUITS.forEach(function (c) { out.push(swRecord(c, off)); });
+                }
+                return out;
+            }
 
             /* ---------------- 故障工单 ---------------- */
             if (!state.faults) {
@@ -785,8 +1364,24 @@
             function renderKpi() {
                 const pending = state.faults.filter(f => f.status !== '已完工').length;
                 document.getElementById('kpi-fault').textContent = pending;
-                const online = Math.round(100 - pending / lamps.length * 100 * 0.6 - 3);
-                document.getElementById('kpi-online').textContent = SC.clamp(online, 80, 100) + '%';
+                /* 在线率以在役杆件为准：停用 / 已拆除不计入分母，离线单独剔除 */
+                const liveLamps = lamps.filter(l => l.arch === '在役');
+                const onlineN = liveLamps.filter(l => l.status !== '离线').length;
+                const rate = liveLamps.length ? onlineN / liveLamps.length * 100 : 0;
+                document.getElementById('kpi-online').textContent = rate.toFixed(1) + '%';
+                document.getElementById('kpi-total').textContent = SC.num(ZONES.reduce((s, z) => s + z.count, 0));
+                /* 灯杆档案：在役杆件数 + 坐标完整率 */
+                const coordOk = liveLamps.filter(l => coordValid(l)).length;
+                document.getElementById('kpi-poles').textContent = SC.num(liveLamps.length);
+                document.getElementById('kpi-poles-trend').innerHTML = '<span>坐标完整率</span><span>' +
+                    (liveLamps.length ? (coordOk / liveLamps.length * 100).toFixed(1) : '0.0') + '%</span>';
+                /* 近 7 日开关按时率：与「开关信息」同一个判定函数，避免两处口径不一 */
+                const week = switchList(7).filter(isJudged);
+                const okN = week.filter(function (r) { return r.level === '正常' || r.level === '亮灯中'; }).length;
+                const badN = week.filter(function (r) { return r.level === '严重' || r.level === '缺报' || r.level === '轻微'; }).length;
+                document.getElementById('kpi-onrate').textContent = week.length ? (okN / week.length * 100).toFixed(1) + '%' : '--';
+                document.getElementById('kpi-onrate-trend').innerHTML = '<span>异常</span><span>' + badN + ' 条</span>';
+                document.getElementById('kpi-onrate-trend').className = 'metric-trend ' + (badN ? 'trend-down' : 'trend-up');
             }
 
             /* ---------------- 场景预览（Canvas） ---------------- */
@@ -935,15 +1530,16 @@
 
             function renderLamps() {
                 lampTbody.innerHTML = lamps.map(function (l) {
-                    const cls = l.status === '故障' ? 'bad' : (l.status === '离线' ? 'off' : (l.status === '亮灯' ? 'ok' : 'info'));
+                    const cls = l.arch !== '在役' ? 'off' : (l.status === '故障' ? 'bad' : (l.status === '离线' ? 'off' : (l.status === '亮灯' ? 'ok' : 'info')));
                     return '<tr data-id="' + l.id + '">' +
-                        '<td><b>' + l.id + '</b></td><td>' + l.road + '</td>' +
-                        '<td>' + metaOf(l.zone).name + '</td>' +
+                        '<td><b>' + l.id + '</b></td><td>' + addrOf(l) + '</td>' +
+                        '<td>' + l.dist + '</td>' +
+                        '<td>' + l.cid + '<div class="am-sub">' + metaOf(l.zone).name + '</div></td>' +
                         '<td>' + l.model + ' / ' + l.watt + 'W</td>' +
                         '<td><span class="sc-cell-num">' + l.brightness + '%</span></td>' +
                         '<td><span class="sc-cell-num">' + l.volt + ' V</span></td>' +
                         '<td><span class="sc-cell-num">' + SC.num(l.hours) + ' h</span></td>' +
-                        '<td><span class="sc-tag ' + cls + '">' + l.status + '</span></td>' +
+                        '<td><span class="sc-tag ' + cls + '">' + (l.arch === '在役' ? l.status : l.arch) + '</span></td>' +
                         '<td><button class="btn-sm" data-act="detail">详情</button>' +
                         '<button class="btn-sm" data-act="test">自检</button>' +
                         '<button class="btn-sm btn-warning" data-act="order">派单</button></td></tr>';
@@ -983,21 +1579,47 @@
             });
 
             function openLampDetail(lamp) {
-                const host = SC.el('<div><div class="sc-kv">' +
-                    kv('回路', metaOf(lamp.zone).name) + kv('型号', lamp.model) + kv('额定功率', lamp.watt + ' W') +
+                const recent = switchList(4).filter(function (r) { return r.cid === lamp.cid; })
+                    .sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, 4);
+                const swBlock = recent.length
+                    ? '<div class="sc-section-title">所在回路「' + lamp.cid + '」近 4 日开关记录</div>' +
+                    '<table class="data-table" style="font-size:.84em"><thead><tr><th>采集日期</th><th>计划开关</th><th>实际开关</th><th>亮灯时长</th><th>判定</th></tr></thead><tbody>' +
+                    recent.map(function (r) {
+                        return '<tr><td>' + r.date + '</td><td class="sw-time">' + hmOf(r.planOn) + ' → ' + hmOf(r.planOff) + '</td>' +
+                            '<td class="sw-time">' + (r.on === null ? '未回传' : hmOf(r.on)) + ' → ' +
+                            (r.off === null ? (r.on === null ? '—' : '亮灯中') : hmOf(r.off)) + '</td>' +
+                            '<td>' + (r.dur !== null ? durText(r.dur) : (r.durNow !== null ? durText(r.durNow) + '（累计）' : '—')) + '</td>' +
+                            '<td><span class="sc-tag ' + SW_CLS[r.level] + '">' + r.level + '</span></td></tr>';
+                    }).join('') + '</tbody></table>' +
+                    '<div class="sc-note" style="margin-top:6px">开关为回路级采集，本杆随回路统一开闭；逐日全量记录见「开关信息」模块。</div>'
+                    : '<div class="sc-section-title">开关记录</div>' +
+                    '<div class="sc-note">所在回路「' + lamp.cid + '」为信号灯常亮回路，24 小时供电，不纳入每日开关统计。</div>';
+                const host = SC.el('<div>' +
+                    '<div class="sc-section-title">档案信息</div><div class="sc-kv">' +
+                    kv('安装地点', addrText(lamp)) + kv('经纬度', coordText(lamp)) + kv('行政区', lamp.dist) +
+                    kv('所属回路', lamp.cid + ' · ' + circuitOf(lamp.cid).name) + kv('资产编号', lamp.assetNo) +
+                    kv('投运日期', lamp.install + '（服役 ' + ageOf(lamp) + ' 年）') +
+                    kv('杆型 / 高度', lamp.poleType + ' / ' + lamp.height + ' m') +
+                    kv('灯具', lamp.model + ' · ' + lamp.watt + ' W · ' + lamp.cct + ' K · ' + SC.num(lamp.lumen) + ' lm') +
+                    kv('管养单位', lamp.owner + ' · ' + lamp.team) + kv('档案状态', lamp.arch) +
+                    '</div>' +
+                    '<div class="sc-section-title">运行数据</div><div class="sc-kv">' +
                     kv('当前亮度', lamp.brightness + '%') + kv('工作电压', lamp.volt + ' V') +
                     kv('累计点亮', SC.num(lamp.hours) + ' h') + kv('剩余寿命', Math.max(0, Math.round((50000 - lamp.hours) / 24 * 10) / 10) + ' 天') +
-                    kv('最近上报', lamp.last) + '</div>' +
+                    kv('最近上报', lamp.last) +
+                    '</div>' +
                     '<div class="sc-section-title">近 12 小时电流 / 电压</div><div class="sc-chart sm"><canvas></canvas></div>' +
+                    swBlock +
                     '<div class="sc-section-title">调光与联动</div>' +
                     '<div class="sc-range"><input type="range" min="0" max="100" step="5" value="' + lamp.brightness + '"><output>' + lamp.brightness + '%</output></div>' +
                     '</div>');
                 const m = SC.modal.open({
-                    title: '灯杆 ' + lamp.id + '（' + lamp.road + '）',
+                    title: '灯杆 ' + lamp.id + '（' + addrText(lamp) + '）',
                     size: 'lg',
                     body: host,
                     footer: [
                         { text: '关闭', kind: 'ghost' },
+                        { text: '✏️ 编辑档案', kind: 'ghost', onClick: function () { m.close(); lampForm(lamp); } },
                         {
                             text: '下发调光', kind: 'primary', onClick: function () {
                                 const v = Number(host.querySelector('input[type=range]').value);
@@ -1060,7 +1682,8 @@
             function renderFaults() {
                 faultTbody.innerHTML = state.faults.map(function (f) {
                     return '<tr data-id="' + f.id + '">' +
-                        '<td><b>' + f.id + '</b></td><td>' + f.lamp + '</td><td>' + f.road + '</td>' +
+                        '<td><b>' + f.id + '</b></td><td>' + f.lamp + '</td>' +
+                        '<td>' + f.road + (f.cid ? '<div class="rule-src">' + f.cid + '</div>' : '') + '</td>' +
                         '<td>' + f.type + '</td>' +
                         '<td><span class="sc-tag ' + (f.level === '紧急' ? 'bad' : (f.level === '重要' ? 'warn' : '')) + '">' + f.level + '</span></td>' +
                         '<td>' + f.reportAt + '</td>' +
@@ -1178,7 +1801,8 @@
                 });
             }
 
-            function createFaultFromLamp(lamp, reason) {
+            function createFaultFromLamp(lamp, reason, opt) {
+                opt = opt || {};
                 const exist = state.faults.find(f => f.lamp === lamp.id && f.status !== '已完工');
                 if (exist) {
                     SC.toast('灯杆 ' + lamp.id + ' 已有在办工单 ' + exist.id, { type: 'warn' });
@@ -1186,10 +1810,11 @@
                 }
                 const f = {
                     id: 'LD-2026' + SC.pad2(state.faults.length + 1) + SC.pad2(Math.floor(Math.random() * 90) + 10),
-                    lamp: lamp.id, road: lamp.road, type: reason ? '自检异常' : lamp.brightness > 0 ? '不亮' : '亮灯异常',
-                    level: '重要', status: '待处理', team: '', owner: '',
-                    reportAt: SC.stamp(new Date()), deadline: Date.now() + 12 * 3600000,
-                    logs: [{ t: SC.stamp(new Date()), text: (reason || '人工登记') + '：' + lamp.road }]
+                    lamp: lamp.id, road: lamp.road, cid: lamp.cid,
+                    type: opt.type || (reason ? '自检异常' : lamp.brightness > 0 ? '不亮' : '亮灯异常'),
+                    level: opt.level || '重要', status: '待处理', team: '', owner: '',
+                    reportAt: SC.stamp(new Date()), deadline: Date.now() + (opt.hours || 12) * 3600000,
+                    logs: [{ t: SC.stamp(new Date()), text: (reason || '人工登记') + '：' + addrText(lamp) + '（' + lamp.cid + '）' }]
                 };
                 state.faults.unshift(f);
                 lamp.status = '故障';
@@ -1204,7 +1829,7 @@
                     title: '登记照明故障',
                     submitText: '提交',
                     fields: [
-                        { name: 'lamp', label: '灯杆编号', type: 'select', col: 1, required: true, options: lamps.slice(0, 40).map(l => ({ value: l.id, label: l.id + ' · ' + l.road })) },
+                        { name: 'lamp', label: '灯杆（按回路排序）', type: 'select', col: 1, required: true, options: lamps.slice().sort(function (a, b) { return a.cid === b.cid ? (a.id < b.id ? -1 : 1) : (a.cid < b.cid ? -1 : 1); }).map(l => ({ value: l.id, label: l.id + ' · ' + addrText(l) + ' · ' + l.cid })) },
                         { name: 'type', label: '故障类型', type: 'select', col: 1, required: true, options: FAULT_TYPES },
                         { name: 'level', label: '紧急程度', type: 'select', col: 1, required: true, options: ['一般', '重要', '紧急'], value: '重要' },
                         { name: 'hours', label: '响应时限（小时）', type: 'number', col: 1, required: true, min: 1, max: 72, value: 12 },
@@ -1215,9 +1840,9 @@
                     const lamp = lamps.find(l => l.id === v.lamp);
                     const f = {
                         id: 'LD-2026' + SC.pad2(state.faults.length + 1) + SC.pad2(Math.floor(Math.random() * 90) + 10),
-                        lamp: lamp.id, road: lamp.road, type: v.type, level: v.level, status: '待处理', team: '', owner: '',
+                        lamp: lamp.id, road: lamp.road, cid: lamp.cid, type: v.type, level: v.level, status: '待处理', team: '', owner: '',
                         reportAt: SC.stamp(new Date()), deadline: Date.now() + v.hours * 3600000,
-                        logs: [{ t: SC.stamp(new Date()), text: '人工登记：' + v.desc }]
+                        logs: [{ t: SC.stamp(new Date()), text: '人工登记（' + addrText(lamp) + '）：' + v.desc }]
                     };
                     state.faults.unshift(f);
                     lamp.status = '故障';
@@ -1538,17 +2163,789 @@
                     });
             }
 
+            /* ==================================================================
+               灯信息维护（档案 / 经纬度 / 资产统计）
+               口径：档案与实时运行共用 lamps 一份数据，坐标只有落在合法域内才算有效点位
+               ================================================================== */
+            const AM = { chip: '全部', dist: '全部', layer: 'all', swRange: 14, swChip: '全部', pts: [] };
+            const AM_CHIPS = ['全部', '在役', '停用', '已拆除', '坐标异常'];
+            let amCtrl = null, amBadCtrl = null;
+
+            function addrText(l) { return l.road + ' ' + l.stake + ' ' + l.side; }
+            function addrOf(l) {
+                return '<b class="am-addr">' + SC.esc(l.road) + '</b><div class="am-sub">' + l.stake + ' · ' + l.side + '</div>';
+            }
+            function coordValid(l) {
+                return typeof l.lng === 'number' && typeof l.lat === 'number' && isFinite(l.lng) && isFinite(l.lat) &&
+                    l.lng >= LNG_MIN && l.lng <= LNG_MAX && l.lat >= LAT_MIN && l.lat <= LAT_MAX;
+            }
+            function coordText(l) { return coordValid(l) ? l.lng.toFixed(6) + ', ' + l.lat.toFixed(6) : '待补采'; }
+            function ageOf(l) { return new Date().getFullYear() - Number(String(l.install).slice(0, 4)); }
+            function isJudged(r) { return r.level === '正常' || r.level === '轻微' || r.level === '严重' || r.level === '缺报'; }
+
+            function amRows() {
+                return lamps.filter(function (l) {
+                    if (AM.dist !== '全部' && l.dist !== AM.dist) return false;
+                    if (AM.chip === '坐标异常') return !coordValid(l);
+                    return AM.chip === '全部' || l.arch === AM.chip;
+                }).sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+            }
+
+            function renderAmChips() {
+                document.getElementById('am-chips').innerHTML = AM_CHIPS.map(function (k) {
+                    const n = k === '全部' ? lamps.length
+                        : (k === '坐标异常' ? lamps.filter(function (l) { return !coordValid(l); }).length
+                            : lamps.filter(function (l) { return l.arch === k; }).length);
+                    return '<button class="sc-chip' + (k === AM.chip ? ' active' : '') + '" data-k="' + k + '">' + k + ' ' + n + '</button>';
+                }).join('');
+            }
+
+            function renderAmNote() {
+                document.getElementById('am-note').innerHTML =
+                    '档案库维护 <b>' + lamps.length + '</b> 根重点路段灯杆（' + CIRCUITS.length + ' 个回路），字段含经纬度、桩号、杆型高度、' +
+                    '灯具型号 / 功率 / 色温、投运日期与产权单位；与「照明控制」运行视图、「故障工单」共用同一份台账，编辑后即同步。' +
+                    '全网 ' + SC.num(ZONES.reduce(function (s, z) { return s + z.count; }, 0)) + ' 套灯具按回路汇总控制，坐标采用 WGS84。';
+            }
+
+            function renderAmTable() {
+                const list = amRows();
+                document.querySelector('#am-table tbody').innerHTML = list.map(function (l) {
+                    const ok = coordValid(l);
+                    const archCls = l.arch === '在役' ? (l.status === '故障' ? 'bad' : 'ok') : (l.arch === '停用' ? 'warn' : 'off');
+                    return '<tr data-id="' + l.id + '">' +
+                        '<td><b>' + l.id + '</b><div class="am-sub">' + l.assetNo + '</div></td>' +
+                        '<td>' + addrOf(l) + '</td>' +
+                        '<td><span class="am-coord' + (ok ? '' : ' bad') + '">' + coordText(l) + '</span></td>' +
+                        '<td>' + l.dist + '</td>' +
+                        '<td>' + l.cid + '<div class="am-sub">' + circuitOf(l.cid).name + '</div></td>' +
+                        '<td>' + l.poleType + '<div class="am-sub">' + l.height + ' m · ' + l.brand + '</div></td>' +
+                        '<td>' + l.model + ' · ' + l.watt + 'W<div class="am-sub">' + l.cct + 'K · ' + SC.num(l.lumen) + ' lm</div></td>' +
+                        '<td>' + l.install + '<div class="am-sub">已服役 ' + ageOf(l) + ' 年</div></td>' +
+                        '<td>' + l.owner + '<div class="am-sub">' + l.team + '</div></td>' +
+                        '<td><span class="sc-tag ' + archCls + '">' + l.arch + '</span></td>' +
+                        '<td><button class="btn-sm" data-act="detail">详情</button><button class="btn-sm" data-act="edit">编辑</button>' +
+                        '<button class="btn-sm btn-warning" data-act="report">报修</button></td></tr>';
+                }).join('');
+                if (amCtrl) amCtrl.reload();
+                const live = lamps.filter(function (l) { return l.arch === '在役'; }).length;
+                const bad = lamps.filter(function (l) { return !coordValid(l); }).length;
+                document.getElementById('am-hint').textContent = '当前筛选 ' + list.length + ' 根（共 ' + lamps.length +
+                    ' 根，在役 ' + live + ' 根）· 坐标待补采 ' + bad + ' 根';
+            }
+
+            /* ---------- 经纬度分布图：等比投影，不把经纬度拉变形 ---------- */
+            function amMapPoints() {
+                return lamps.filter(function (l) {
+                    if (!coordValid(l)) return false;
+                    return AM.layer === 'all' || AM.layer === l.zone;
+                });
+            }
+
+            function drawAmMap() {
+                const cv = document.getElementById('am-map');
+                if (!cv || !cv.clientWidth) return;
+                const w = cv.clientWidth, h = cv.clientHeight;
+                const dpr = window.devicePixelRatio || 1;
+                cv.width = w * dpr; cv.height = h * dpr;
+                const ctx = cv.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.fillStyle = '#fffdf6';
+                ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = 'rgba(225, 161, 0, 0.16)';
+                ctx.lineWidth = 1;
+                for (let i = 1; i < 12; i++) {
+                    ctx.beginPath(); ctx.moveTo(w * i / 12, 0); ctx.lineTo(w * i / 12, h); ctx.stroke();
+                }
+                for (let j = 1; j < 8; j++) {
+                    ctx.beginPath(); ctx.moveTo(0, h * j / 8); ctx.lineTo(w, h * j / 8); ctx.stroke();
+                }
+                /* 等比缩放：经纬度 1° 不同长度，取小尺度保证点位不拉变形 */
+                const pad = 34;
+                const s = Math.min((w - pad * 2) / (LNG_MAX - LNG_MIN), (h - pad * 2) / (LAT_MAX - LAT_MIN));
+                const offX = (w - (LNG_MAX - LNG_MIN) * s) / 2;
+                const offY = (h - (LAT_MAX - LAT_MIN) * s) / 2;
+                const X = function (lng) { return offX + (lng - LNG_MIN) * s; };
+                const Y = function (lat) { return h - offY - (lat - LAT_MIN) * s; };
+
+                /* 行政区中心标注：取该区有效点均值 */
+                ctx.font = '11px "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center';
+                DISTRICTS.forEach(function (ds) {
+                    const pool = lamps.filter(function (l) { return l.dist === ds && coordValid(l); });
+                    if (!pool.length) return;
+                    const cx = pool.reduce(function (s2, l) { return s2 + l.lng; }, 0) / pool.length;
+                    const cy = pool.reduce(function (s2, l) { return s2 + l.lat; }, 0) / pool.length;
+                    ctx.fillStyle = 'rgba(127, 140, 141, 0.72)';
+                    ctx.fillText(ds, X(cx), Y(cy) - 10);
+                });
+
+                const pts = [];
+                amMapPoints().forEach(function (l) {
+                    const x = X(l.lng), y = Y(l.lat);
+                    pts.push({ l: l, x: x, y: y });
+                    const r = 2.8 + Math.min(3.2, l.watt / 120);
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                    ctx.fillStyle = ZONE_COLOR[l.zone] || '#e1a100';
+                    ctx.globalAlpha = l.arch === '在役' ? 0.92 : 0.35;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                    if (l.status === '故障' && l.arch === '在役') {
+                        ctx.strokeStyle = '#e74c3c';
+                        ctx.lineWidth = 1.6;
+                        ctx.beginPath();
+                        ctx.arc(x, y, r + 3.2, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                });
+                AM.pts = pts;
+
+                ctx.textAlign = 'left';
+                ctx.fillStyle = 'rgba(127, 140, 141, 0.9)';
+                ctx.fillText('经度 ' + LNG_MIN.toFixed(3) + ' ~ ' + LNG_MAX.toFixed(3) + '　纬度 ' + LAT_MIN.toFixed(3) + ' ~ ' + LAT_MAX.toFixed(3), 10, h - 10);
+                ctx.textAlign = 'right';
+                ctx.fillText('当前图层 ' + pts.length + ' / 全部 ' + lamps.length + ' 个点位　红圈＝在役故障杆', w - 10, h - 10);
+            }
+
+            function renderAmMap() {
+                drawAmMap();
+                const live = lamps.filter(function (l) { return l.arch === '在役'; });
+                const okN = live.filter(coordValid).length;
+                const miss = lamps.filter(function (l) { return l.lng === null || l.lat === null; });
+                const out = lamps.filter(function (l) { return l.lng !== null && l.lat !== null && !coordValid(l); });
+                document.getElementById('am-map-count').textContent = '当前图层 ' + (AM.pts || []).length + ' 个点位';
+                document.getElementById('am-coord-tag').textContent =
+                    (live.length ? (okN / live.length * 100).toFixed(1) : '0.0') + '% 完整';
+                document.getElementById('am-coord-kv').innerHTML =
+                    kv('在役杆件', live.length + ' 根') + kv('坐标有效', okN + ' 根') +
+                    kv('坐标缺失', miss.length + ' 根') + kv('坐标越界', out.length + ' 根') +
+                    kv('经度区间', LNG_MIN + ' ~ ' + LNG_MAX) + kv('纬度区间', LAT_MIN + ' ~ ' + LAT_MAX);
+                const bad = miss.concat(out);
+                document.querySelector('#am-bad-table tbody').innerHTML = bad.map(function (l) {
+                    const isMiss = l.lng === null || l.lat === null;
+                    return '<tr data-id="' + l.id + '"><td><b>' + l.id + '</b><div class="am-sub">' + addrText(l) + '</div></td>' +
+                        '<td><span class="sc-tag bad">' + (isMiss ? '坐标缺失' : '坐标越界') + '</span></td>' +
+                        '<td class="am-coord bad">' + (isMiss ? '—' : l.lng + ', ' + l.lat) + '</td>' +
+                        '<td><button class="btn-sm" data-act="fix">补采坐标</button></td></tr>';
+                }).join('');
+                if (amBadCtrl) amBadCtrl.reload();
+                document.getElementById('am-legend').innerHTML = ZONES.map(function (z) {
+                    const n = lamps.filter(function (l) { return l.zone === z.id && coordValid(l); }).length;
+                    return '<span><i style="background:' + ZONE_COLOR[z.id] + '"></i>' + z.name + ' ' + n + '</span>';
+                }).join('') + '<span><i style="background:#bdc3c7"></i>坐标待补采 ' + bad.length + '</span>';
+            }
+
+            /* ---------- 资产统计 ---------- */
+            function renderAmStat() {
+                const live = lamps.filter(function (l) { return l.arch === '在役'; });
+                const avgAge = live.length ? live.reduce(function (s, l) { return s + ageOf(l); }, 0) / live.length : 0;
+                const old = live.filter(function (l) { return ageOf(l) >= 8; });
+                document.getElementById('am-stat-kv').innerHTML =
+                    kv('灯杆档案', lamps.length + ' 根') + kv('在役', live.length + ' 根') +
+                    kv('停用 / 已拆除', (lamps.length - live.length) + ' 根') +
+                    kv('平均服役', avgAge.toFixed(1) + ' 年') + kv('超期服役', old.length + ' 根') +
+                    kv('回路总数', CIRCUITS.length + ' 个');
+
+                const distRows = DISTRICTS.map(function (ds) {
+                    const pool = lamps.filter(function (l) { return l.dist === ds; });
+                    const lv = pool.filter(function (l) { return l.arch === '在役'; });
+                    const okN = lv.filter(coordValid).length;
+                    const cids = {};
+                    pool.forEach(function (l) { cids[l.cid] = 1; });
+                    const watts = lv.map(function (l) { return l.watt; });
+                    return {
+                        ds: ds, n: pool.length, cids: Object.keys(cids).length,
+                        rate: lv.length ? (okN / lv.length * 100) : 0,
+                        avgW: watts.length ? watts.reduce(function (s, v) { return s + v; }, 0) / watts.length : 0,
+                        old: lv.filter(function (l) { return ageOf(l) >= 8; }).length
+                    };
+                });
+                document.querySelector('#am-dist-table tbody').innerHTML = distRows.map(function (r) {
+                    return '<tr><td><b>' + r.ds + '</b></td><td>' + r.n + '</td><td>' + r.cids + '</td>' +
+                        '<td>' + r.rate.toFixed(1) + '%</td><td>' + SC.num(r.avgW, 0) + ' W</td>' +
+                        '<td>' + (r.old ? '<span class="dn-over">' + r.old + '</span>' : 0) + '</td></tr>';
+                }).join('');
+
+                const types = {};
+                lamps.forEach(function (l) {
+                    const t = types[l.poleType] || (types[l.poleType] = { n: 0, h: 0, w: 0, models: {} });
+                    t.n++; t.h += l.height; t.w += l.watt;
+                    (t.models[l.model] = (t.models[l.model] || 0) + 1);
+                });
+                document.querySelector('#am-type-table tbody').innerHTML = Object.keys(types).map(function (k) {
+                    const t = types[k];
+                    const top = Object.keys(t.models).sort(function (a, b) { return t.models[b] - t.models[a]; })[0];
+                    return '<tr><td><b>' + k + '</b></td><td>' + t.n + '</td><td>' + (t.h / t.n).toFixed(1) + ' m</td>' +
+                        '<td>' + SC.num(t.w / t.n, 0) + ' W</td><td>' + top + '（' + t.models[top] + '）</td></tr>';
+                }).join('');
+
+                const ages = live.slice().sort(function (a, b) { return ageOf(b) - ageOf(a); }).slice(0, 12);
+                document.getElementById('am-age-hint').textContent = '投运年限 ≥ 8 年共 ' + old.length + ' 根（占在役 ' +
+                    (live.length ? (old.length / live.length * 100).toFixed(0) : 0) + '%），按服役年限降序展示前 ' + ages.length + ' 根';
+                document.querySelector('#am-age-table tbody').innerHTML = ages.map(function (l) {
+                    const y = ageOf(l);
+                    return '<tr data-id="' + l.id + '"><td><b>' + l.id + '</b></td><td>' + addrOf(l) + '</td>' +
+                        '<td>' + l.install + '</td><td><span class="sc-tag ' + (y >= 12 ? 'bad' : 'warn') + '">' + y + ' 年</span></td>' +
+                        '<td>' + l.poleType + '</td><td>' + l.model + ' · ' + l.watt + 'W</td>' +
+                        '<td>' + (y >= 12 ? '整杆更换 + 灯具升级' : '灯具换新 + 回路检修') + '</td>' +
+                        '<td><button class="btn-sm" data-act="edit">编辑</button></td></tr>';
+                }).join('');
+
+                SC.chart.bar(document.getElementById('am-dist-chart'), {
+                    labels: distRows.map(function (r) { return r.ds; }),
+                    series: [{ name: '灯杆数', color: '#e1a100', data: distRows.map(function (r) { return r.n; }) }]
+                });
+                const years = {};
+                lamps.forEach(function (l) {
+                    const y = String(l.install).slice(0, 4);
+                    years[y] = (years[y] || 0) + 1;
+                });
+                const yl = Object.keys(years).sort();
+                SC.chart.bar(document.getElementById('am-year-chart'), {
+                    labels: yl,
+                    series: [{ name: '投运杆件', color: '#9b59b6', data: yl.map(function (y) { return years[y]; }) }]
+                });
+                if (amDistCtrl) amDistCtrl.reload();
+                if (amTypeCtrl) amTypeCtrl.reload();
+                if (amAgeCtrl) amAgeCtrl.reload();
+            }
+
+            /* ---------- 新增 / 编辑档案 ---------- */
+            function lampForm(origin) {
+                const isNew = !origin;
+                const base = origin || {
+                    road: '', stake: 'K0+000', side: '东侧', dist: DISTRICTS[0], cid: CIRCUITS[0].id,
+                    poleType: POLE_TYPES.main[0], model: 'LED-250W', watt: 250, cct: 4000, brand: BRANDS[0],
+                    install: SC.today(), owner: OWNERS[0], arch: '在役', lng: '', lat: '', note: ''
+                };
+                SC.modal.form({
+                    title: isNew ? '新增灯杆档案' : '编辑 ' + origin.id + ' 档案',
+                    submitText: isNew ? '建档' : '保存',
+                    values: base,
+                    fields: [
+                        { name: 'road', label: '所在道路 / 地点', type: 'text', required: true, col: 1, placeholder: '例如：人民路、湖畔公园' },
+                        { name: 'stake', label: '桩号', type: 'text', required: true, col: 1, placeholder: 'K1+240' },
+                        { name: 'side', label: '所在侧', type: 'select', col: 1, options: ['东侧', '西侧', '南侧', '北侧', '路中'] },
+                        { name: 'dist', label: '行政区', type: 'select', col: 1, options: DISTRICTS },
+                        { name: 'cid', label: '所属回路', type: 'select', col: 1, options: CIRCUITS.map(function (c) { return { value: c.id, label: c.id + ' · ' + c.name }; }) },
+                        { name: 'arch', label: '档案状态', type: 'select', col: 1, options: ['在役', '停用', '已拆除'] },
+                        { name: 'poleType', label: '杆型', type: 'select', col: 1, options: Object.keys(HEIGHT_OF) },
+                        { name: 'install', label: '投运日期', type: 'date', required: true, col: 1 },
+                        { name: 'model', label: '灯具型号', type: 'text', required: true, col: 1 },
+                        { name: 'watt', label: '单灯功率（W）', type: 'number', required: true, min: 10, max: 1000, col: 1 },
+                        { name: 'cct', label: '色温（K）', type: 'select', col: 1, options: [2100, 2700, 3000, 4000, 5000, 5700] },
+                        { name: 'brand', label: '灯具品牌', type: 'select', col: 1, options: BRANDS },
+                        { name: 'owner', label: '管养单位', type: 'select', col: 1, options: OWNERS },
+                        { name: 'lng', label: '经度（WGS84）', type: 'number', step: '0.000001', min: LNG_MIN, max: LNG_MAX, col: 1, hint: '留空表示待补采' },
+                        { name: 'lat', label: '纬度（WGS84）', type: 'number', step: '0.000001', min: LAT_MIN, max: LAT_MAX, col: 1, hint: '合法区间 ' + LAT_MIN + ' ~ ' + LAT_MAX },
+                        { name: 'note', label: '备注', type: 'textarea', col: 'full', placeholder: '例如：杆件迁移、灯具改造记录' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const c = circuitOf(v.cid);
+                    const lng = v.lng === '' || v.lng === null ? null : Number(v.lng);
+                    const lat = v.lat === '' || v.lat === null ? null : Number(v.lat);
+                    if ((lng === null) !== (lat === null)) {
+                        SC.toast('经纬度需成对填写，否则无法上图', { type: 'warn' });
+                        return;
+                    }
+                    if (lng !== null && (lng < LNG_MIN || lng > LNG_MAX || lat < LAT_MIN || lat > LAT_MAX)) {
+                        SC.toast('坐标超出本市合法范围，请核对后再存', { type: 'error' });
+                        return;
+                    }
+                    if (!isNew && v.arch === '已拆除' && state.faults.some(function (f) { return f.lamp === origin.id && f.status !== '已完工'; })) {
+                        SC.toast('该灯杆仍有在办工单，请先闭环后再归档拆除', { type: 'warn' });
+                        return;
+                    }
+                    if (isNew) {
+                        const seq = lamps.filter(function (l) { return l.cid === c.id; }).length + 1;
+                        const id = 'LP-' + SC.pad2(CIRCUITS.indexOf(c) + 1) + '-' + SC.pad2(seq);
+                        lamps.push({
+                            id: id, road: v.road, stake: v.stake, side: v.side, dist: v.dist, cid: c.id, zone: c.zone,
+                            lng: lng, lat: lat, poleType: v.poleType, height: HEIGHT_OF[v.poleType] || 8,
+                            model: v.model, watt: v.watt, cct: Number(v.cct), brand: v.brand, lumen: v.watt * 120,
+                            install: v.install, assetNo: 'ZC-' + String(v.install).slice(0, 4) + '-' + (1000 + lamps.length * 7 % 8999),
+                            owner: v.owner, team: TEAMS[0], arch: v.arch, status: '待机', brightness: 0,
+                            volt: 220, hours: 0, last: SC.stamp(new Date()), note: v.note || ''
+                        });
+                        SC.toast('已建档 ' + id + '（' + v.road + ' ' + v.stake + '）', { type: 'success' });
+                    } else {
+                        Object.assign(origin, {
+                            road: v.road, stake: v.stake, side: v.side, dist: v.dist, cid: c.id, zone: c.zone,
+                            poleType: v.poleType, height: HEIGHT_OF[v.poleType] || origin.height,
+                            model: v.model, watt: v.watt, cct: Number(v.cct), brand: v.brand, owner: v.owner,
+                            arch: v.arch, install: v.install, lng: lng, lat: lat, note: v.note || ''
+                        });
+                        if (origin.arch !== '在役') origin.brightness = 0;
+                        SC.toast('灯杆 ' + origin.id + ' 档案已更新', { type: 'success' });
+                    }
+                    SC.store.set('lighting', 'lamps', lamps);
+                    renderLamps();
+                    renderAmChips();
+                    renderAmNote();
+                    renderAmTable();
+                    if (document.getElementById('am-map-tab').classList.contains('active')) renderAmMap();
+                    if (document.getElementById('am-stat-tab').classList.contains('active')) renderAmStat();
+                    renderKpi();
+                });
+            }
+
+            document.getElementById('am-chips').addEventListener('click', function (ev) {
+                const b = ev.target.closest('.sc-chip');
+                if (!b) return;
+                AM.chip = b.dataset.k;
+                renderAmChips();
+                renderAmTable();
+            });
+            document.getElementById('am-dist').addEventListener('change', function () {
+                AM.dist = this.value;
+                renderAmTable();
+            });
+            document.getElementById('btn-am-new').addEventListener('click', function () { lampForm(null); });
+            document.getElementById('btn-am-check').addEventListener('click', function () {
+                const miss = lamps.filter(function (l) { return l.lng === null || l.lat === null; });
+                const out = lamps.filter(function (l) { return l.lng !== null && l.lat !== null && !coordValid(l); });
+                if (!miss.length && !out.length) {
+                    SC.toast('坐标校验通过：' + lamps.length + ' 根杆件均在合法域内', { type: 'success' });
+                    return;
+                }
+                AM.chip = '坐标异常';
+                renderAmChips();
+                renderAmTable();
+                SC.toast('发现 ' + miss.length + ' 根坐标缺失、' + out.length + ' 根越界，已筛出待补采清单', { type: 'warn' });
+            });
+            document.getElementById('btn-am-export').addEventListener('click', function () {
+                const list = amRows();
+                SC.csv.download('灯杆档案_' + SC.today() + '.csv',
+                    [['灯杆编号', '资产编号', '道路', '桩号', '所在侧', '经度', '纬度', '行政区', '回路', '杆型', '高度m', '灯具型号', '功率W', '色温K', '品牌', '光通量lm', '投运日期', '管养单位', '维护班组', '档案状态', '运行状态', '备注']]
+                        .concat(list.map(function (l) {
+                            return [l.id, l.assetNo, l.road, l.stake, l.side, l.lng === null ? '' : l.lng, l.lat === null ? '' : l.lat,
+                            l.dist, l.cid, l.poleType, l.height, l.model, l.watt, l.cct, l.brand, l.lumen,
+                            l.install, l.owner, l.team, l.arch, l.status, l.note];
+                        })));
+                SC.toast('档案已导出 ' + list.length + ' 条（与当前筛选一致）', { type: 'success' });
+            });
+            document.querySelector('#am-table tbody').parentNode.parentNode.addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-act]');
+                if (!b) return;
+                const l = lamps.filter(function (x) { return x.id === b.closest('tr').dataset.id; })[0];
+                if (!l) return;
+                if (b.dataset.act === 'detail') openLampDetail(l);
+                else if (b.dataset.act === 'edit') lampForm(l);
+                else createFaultFromLamp(l, '人工报修');
+            });
+            document.querySelector('#am-bad-table tbody').parentNode.parentNode.addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-act]');
+                if (!b) return;
+                const l = lamps.filter(function (x) { return x.id === b.closest('tr').dataset.id; })[0];
+                if (l) lampForm(l);
+            });
+            document.querySelector('#am-age-table tbody').parentNode.parentNode.addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-act]');
+                if (!b) return;
+                const l = lamps.filter(function (x) { return x.id === b.closest('tr').dataset.id; })[0];
+                if (l) lampForm(l);
+            });
+            document.getElementById('am-layer').addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-layer]');
+                if (!b) return;
+                this.querySelectorAll('button').forEach(function (n) { n.classList.remove('active'); });
+                b.classList.add('active');
+                AM.layer = b.dataset.layer;
+                if (AM.layer === 'bad') {
+                    /* 坐标异常没有可上图坐标，切到清单视图避免空图 */
+                    SC.toast('坐标异常点位未上图，请在右侧「待补采点位」中补采', { type: 'info' });
+                    AM.layer = 'all';
+                    b.classList.remove('active');
+                    this.querySelector('[data-layer="all"]').classList.add('active');
+                }
+                renderAmMap();
+            });
+            document.getElementById('am-map').addEventListener('click', function (ev) {
+                const rect = this.getBoundingClientRect();
+                if (!rect.width || !rect.height) return;
+                const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
+                let best = null, bd = 12;
+                (AM.pts || []).forEach(function (p) {
+                    const d = Math.sqrt(Math.pow(p.x - x, 2) + Math.pow(p.y - y, 2));
+                    if (d < bd) { bd = d; best = p; }
+                });
+                if (best) openLampDetail(best.l);
+                else SC.toast('点击处没有杆件点位，可切换图层后重试', { type: 'info' });
+            });
+
+            /* ==================================================================
+               开关信息（回路级每日采集）
+               判定口径与 KPI、导出完全一致：偏差取开灯 / 关灯中绝对值较大者
+               ================================================================== */
+            const SW_CLS = { '正常': 'ok', '轻微': 'warn', '严重': 'bad', '缺报': 'off', '待开灯': 'info', '亮灯中': 'info' };
+            const SW_CHIPS = ['全部', '正常', '轻微', '严重', '缺报', '待开灯', '亮灯中'];
+            let swCtrl = null, swAbnCtrl = null, swCktCtrl = null;
+            let amDistCtrl = null, amTypeCtrl = null, amAgeCtrl = null;
+
+            function swRows(days) {
+                return switchList(days || AM.swRange).filter(function (r) {
+                    return AM.swChip === '全部' || r.level === AM.swChip;
+                }).sort(function (a, b) {
+                    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+                    return a.cid < b.cid ? -1 : 1;
+                });
+            }
+            function swDevHtml(v) {
+                if (v === null || v === undefined) return '<span class="sw-dev">—</span>';
+                return '<span class="sw-dev ' + (v > 0 ? 'pos' : (v < 0 ? 'neg' : '')) + '">' + (v > 0 ? '+' : '') + v + '</span>';
+            }
+
+            function renderSwNote() {
+                document.getElementById('sw-note').innerHTML =
+                    '采集口径：回路控制箱上传每日开启 / 关闭时刻，计划值取当日日落（提前 10-22 分钟开灯）与日出（延后 4-10 分钟关灯）；' +
+                    '亮灯时长 = 关闭 − 开启（跨零点按 24 小时取模），判定取开灯与关灯偏差中绝对值较大者：≤10 分钟为正常、' +
+                    '10-30 分钟为轻微、>30 分钟或未回传为严重 / 缺报。当日记录跟随真实时钟，未到计划时点显示「待开灯」。';
+            }
+
+            function renderSwChips() {
+                const list = switchList(AM.swRange);
+                document.getElementById('sw-chips').innerHTML = SW_CHIPS.map(function (k) {
+                    const n = k === '全部' ? list.length : list.filter(function (r) { return r.level === k; }).length;
+                    return '<button class="sc-chip' + (AM.swChip === k ? ' active' : '') + '" data-k="' + k + '">' + k + ' ' + n + '</button>';
+                }).join('');
+            }
+
+            function renderSwKv() {
+                const list = switchList(AM.swRange);
+                const judged = list.filter(isJudged);
+                const ok = judged.filter(function (r) { return r.level === '正常'; }).length;
+                const durs = list.filter(function (r) { return r.dur !== null; }).map(function (r) { return r.dur; });
+                const avg = durs.length ? durs.reduce(function (s, v) { return s + v; }, 0) / durs.length : 0;
+                document.getElementById('sw-kv').innerHTML =
+                    kv('采集记录', list.length + ' 条') +
+                    kv('按时率', judged.length ? (ok / judged.length * 100).toFixed(1) + '%' : '--') +
+                    kv('平均亮灯时长', durText(avg)) +
+                    kv('偏差超限', list.filter(function (r) { return r.level === '轻微' || r.level === '严重'; }).length + ' 条') +
+                    kv('缺报', list.filter(function (r) { return r.level === '缺报'; }).length + ' 条') +
+                    kv('覆盖回路', SW_CIRCUITS.length + ' 个');
+            }
+
+            function renderSwTable() {
+                const list = swRows();
+                document.querySelector('#sw-table tbody').innerHTML = list.map(function (r) {
+                    const act = r.on === null ? '<span class="sc-tag off">未回传</span>'
+                        : '<span class="sw-time">' + hmOf(r.on) + '</span> → ' +
+                        (r.off === null ? '<span class="am-badge">亮灯中</span>' : '<span class="sw-time">' + hmOf(r.off) + '</span>');
+                    const dur = r.dur !== null ? '<span class="sw-dur">' + durText(r.dur) + '</span>'
+                        : (r.durNow !== null ? '<span class="sw-dur">' + durText(r.durNow) + '</span><div class="am-sub">累计</div>' : '<span class="sw-dev">—</span>');
+                    const canReport = r.level === '轻微' || r.level === '严重' || r.level === '缺报';
+                    return '<tr data-id="' + r.cid + '|' + r.date + '">' +
+                        '<td><b>' + r.date + '</b><div class="am-sub">' + (r.offset === 0 ? '今日采集' : (r.offset === 1 ? '昨日' : '历史')) + '</div></td>' +
+                        '<td>' + r.cname + '<div class="am-sub">' + r.cid + '</div></td>' +
+                        '<td class="sw-time">' + hmOf(r.planOn) + ' → ' + hmOf(r.planOff) + '</td>' +
+                        '<td>' + act + '</td>' +
+                        '<td>' + dur + '</td>' +
+                        '<td>' + swDevHtml(r.devOn) + ' / ' + swDevHtml(r.devOff) + '</td>' +
+                        '<td><span class="sc-tag ' + (SW_CLS[r.level] || 'info') + '">' + r.level + '</span></td>' +
+                        '<td>' + r.ctrl + '</td>' +
+                        '<td>' + r.src + '<div class="am-sub">' + r.batch + '</div></td>' +
+                        '<td><button class="btn-sm" data-act="trace">追溯</button>' +
+                        (canReport ? '<button class="btn-sm btn-warning" data-act="report">报修</button>' : '') + '</td></tr>';
+                }).join('');
+                if (swCtrl) swCtrl.reload();
+                document.getElementById('sw-hint').textContent = '当前筛选 ' + list.length +
+                    ' 条 · 信号灯回路 24 小时常亮，不纳入开关统计；计划时刻随季节日照变化，非固定值';
+            }
+
+            function reportSw(r) {
+                const c = circuitOf(r.cid);
+                const exist = state.faults.filter(function (f) { return f.cid === r.cid && f.status !== '已完工'; })[0];
+                if (exist) {
+                    SC.toast('回路 ' + r.cid + ' 已有在办工单 ' + exist.id + '，请先在「故障工单」中流转', { type: 'warn' });
+                    return;
+                }
+                const lamp = lamps.filter(function (l) { return l.cid === r.cid && l.arch === '在役'; })[0] || lamps[0];
+                const f = {
+                    id: 'LD-2026' + SC.pad2(state.faults.length + 1) + SC.pad2(Math.floor(Math.random() * 90) + 10),
+                    lamp: lamp.id, cid: r.cid, road: r.road, type: '时控失灵',
+                    level: r.level === '严重' ? '重要' : '一般', status: '待处理', team: '', owner: '',
+                    reportAt: SC.stamp(new Date()), deadline: Date.now() + 12 * 3600000,
+                    logs: [{ t: SC.stamp(new Date()), text: '开关信息异常自动建单：' + r.date + ' ' + r.note }]
+                };
+                state.faults.unshift(f);
+                saveFaults();
+                renderFaults();
+                renderFaultChips();
+                renderKpi();
+                if (document.getElementById('sw-stat-tab').classList.contains('active')) renderSwStat();
+                SC.toast('已登记时控工单 ' + f.id + '（' + c.name + '）', { type: 'success' });
+            }
+
+            function showSwTrace(r) {
+                const c = circuitOf(r.cid);
+                const sun = sunInfo(dayStart(r.offset), CITY.lat, CITY.lng);
+                const rows = [
+                    kv('回路', r.cid + ' · ' + r.cname),
+                    kv('控制箱 / 容量', c.box + ' / ' + c.kva + ' kVA'),
+                    kv('日落 / 日出', sun.sunset + ' / ' + sun.sunrise),
+                    kv('计划开灯', hmOf(r.planOn) + '（日落 − ' + c.lead + ' 分）'),
+                    kv('计划关灯', hmOf(r.planOff) + '（日出 + ' + c.lag + ' 分）'),
+                    kv('实际开灯', r.on === null ? '未回传' : hmOf(r.on) + '（' + (r.devOn > 0 ? '+' : '') + r.devOn + ' 分）'),
+                    kv('实际关灯', r.off === null ? (r.offset === 0 ? '次日凌晨采集' : '未回传') : hmOf(r.off) + '（' + (r.devOff > 0 ? '+' : '') + r.devOff + ' 分）'),
+                    kv('亮灯时长', r.dur !== null ? durText(r.dur) : (r.durNow !== null ? durText(r.durNow) + '（累计）' : '—')),
+                    kv('计划时长', durText(r.planDur)),
+                    kv('判定', r.level)
+                ].join('');
+                SC.modal.open({
+                    title: '开关记录追溯 · ' + r.date + ' ' + c.name,
+                    size: 'md',
+                    body: '<div class="sc-kv">' + rows + '</div>' +
+                        '<div class="sc-note" style="margin-top:12px">' + SC.esc(r.note) +
+                        '<br>控制方式：' + r.ctrl + '　采集来源：' + r.src + '　批次：' + r.batch + '</div>',
+                    footer: [{ text: '关闭', kind: 'ghost' }]
+                });
+            }
+
+            function renderSwStat() {
+                const days = 14;
+                const labels = [], act = [], plan = [];
+                for (let off = days - 1; off >= 0; off--) {
+                    const d = dayStart(off);
+                    labels.push((d.getMonth() + 1) + '/' + d.getDate());
+                    const recs = SW_CIRCUITS.map(function (c) { return swRecord(c, off); });
+                    const done = recs.filter(function (r) { return r.dur !== null || r.durNow !== null; });
+                    const avg = done.length ? done.reduce(function (s, r) { return s + (r.dur !== null ? r.dur : r.durNow); }, 0) / done.length / 60 : 0;
+                    const pin = recs.reduce(function (s, r) { return s + r.planDur; }, 0) / recs.length / 60;
+                    act.push(+avg.toFixed(2));
+                    plan.push(+pin.toFixed(2));
+                }
+                SC.chart.line(document.getElementById('sw-dur-chart'), {
+                    labels: labels, unit: ' h', xEvery: 2,
+                    series: [
+                        { name: '实际平均亮灯', data: act, color: '#f1c40f', fill: true },
+                        { name: '计划平均亮灯', data: plan, color: '#95a5a6', dash: [6, 4], fill: false }
+                    ]
+                });
+                const list = switchList(AM.swRange);
+                const devs = SW_CIRCUITS.map(function (c) {
+                    const rs = list.filter(function (r) { return r.cid === c.id && r.devOn !== null; });
+                    return rs.length ? +(rs.reduce(function (s, r) { return s + Math.abs(r.devOn); }, 0) / rs.length).toFixed(1) : 0;
+                });
+                SC.chart.bar(document.getElementById('sw-dev-chart'), {
+                    labels: SW_CIRCUITS.map(function (c) { return c.id; }),
+                    unit: ' 分',
+                    series: [{ name: '平均开灯偏差（绝对值）', color: '#e67e22', data: devs }]
+                });
+
+                document.querySelector('#sw-circuit-table tbody').innerHTML = SW_CIRCUITS.map(function (c) {
+                    const rs = list.filter(function (r) { return r.cid === c.id; });
+                    const judged = rs.filter(isJudged);
+                    const ok = judged.filter(function (r) { return r.level === '正常'; }).length;
+                    const ons = rs.filter(function (r) { return r.devOn !== null; }).map(function (r) { return r.devOn; });
+                    const offs = rs.filter(function (r) { return r.devOff !== null; }).map(function (r) { return r.devOff; });
+                    const durs = rs.filter(function (r) { return r.dur !== null; }).map(function (r) { return r.dur; });
+                    const avg = function (arr) { return arr.length ? arr.reduce(function (s, v) { return s + v; }, 0) / arr.length : null; };
+                    const abn = rs.filter(function (r) { return r.level === '严重' || r.level === '缺报'; })[0];
+                    const avOn = avg(ons), avOff = avg(offs), avDur = avg(durs);
+                    return '<tr><td><b>' + c.id + '</b><div class="am-sub">' + c.name + '</div></td>' +
+                        '<td>' + rs.length + '</td>' +
+                        '<td>' + (judged.length ? (ok / judged.length * 100).toFixed(1) + '%' : '--') + '</td>' +
+                        '<td>' + (avOn === null ? '—' : swDevHtml(Math.round(avOn)) + ' 分') + '</td>' +
+                        '<td>' + (avOff === null ? '—' : swDevHtml(Math.round(avOff)) + ' 分') + '</td>' +
+                        '<td>' + (avDur === null ? '—' : durText(avDur)) + '</td>' +
+                        '<td>' + (rs.filter(function (r) { return r.level === '缺报'; }).length || 0) + '</td>' +
+                        '<td>' + (abn ? '<span class="sc-tag bad">' + abn.date + ' ' + abn.level + '</span>' : '<span class="sc-tag ok">无</span>') + '</td></tr>';
+                }).join('');
+
+                const abns = list.filter(function (r) {
+                    return r.level === '轻微' || r.level === '严重' || r.level === '缺报';
+                }).slice(0, 8);
+                const typeMap = { lateOn: '时控漂移（晚开）', earlyOff: '光控提前关灯', missing: '通信中断缺报' };
+                document.querySelector('#sw-abn-table tbody').innerHTML = abns.map(function (r) {
+                    const type = typeMap[r.story] || (r.level === '缺报' ? '通信中断缺报'
+                        : (Math.abs(r.devOn || 0) >= Math.abs(r.devOff || 0) ? '开灯偏差' : '关灯偏差'));
+                    const dev = r.devOn === null ? '—' : swDevHtml(r.devOn) + ' / ' + swDevHtml(r.devOff) + ' 分';
+                    const f = state.faults.filter(function (x) { return x.cid === r.cid && x.type === '时控失灵'; })[0];
+                    return '<tr data-id="' + r.cid + '|' + r.date + '"><td>' + r.date + '</td><td>' + r.cid + '</td>' +
+                        '<td>' + type + '</td><td>' + dev + '</td>' +
+                        '<td>' + (f ? '<span class="sc-tag ' + (f.status === '已完工' ? 'ok' : 'warn') + '">' + f.id + ' ' + f.status + '</span>' : '<span class="am-badge">待报修</span>') + '</td>' +
+                        '<td><button class="btn-sm btn-warning" data-act="report">报修</button></td></tr>';
+                }).join('');
+                if (swCktCtrl) swCktCtrl.reload();
+                if (swAbnCtrl) swAbnCtrl.reload();
+                document.getElementById('sw-stat-note').innerHTML =
+                    '图表取近 ' + days + ' 日：亮灯时长按回路取均，计划时长取当日日照推算值，两者差距来自开关灯偏差与日照季节变化；' +
+                    '偏差统计取近 ' + AM.swRange + ' 日均值的绝对值，正值（晚开）与负值（早开）明细见「开关记录」页签。';
+            }
+
+            document.getElementById('sw-range').addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-range]');
+                if (!b) return;
+                this.querySelectorAll('button').forEach(function (n) { n.classList.remove('active'); });
+                b.classList.add('active');
+                AM.swRange = Number(b.dataset.range);
+                AM.swChip = '全部';
+                renderSwChips();
+                renderSwKv();
+                renderSwTable();
+                if (document.getElementById('sw-stat-tab').classList.contains('active')) renderSwStat();
+            });
+            document.getElementById('sw-chips').addEventListener('click', function (ev) {
+                const b = ev.target.closest('.sc-chip');
+                if (!b) return;
+                AM.swChip = b.dataset.k;
+                renderSwChips();
+                renderSwTable();
+            });
+            document.querySelector('#sw-table tbody').parentNode.parentNode.addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-act]');
+                if (!b) return;
+                const id = b.closest('tr').dataset.id;
+                const r = switchList(AM.swRange).filter(function (x) { return x.cid + '|' + x.date === id; })[0];
+                if (!r) return;
+                if (b.dataset.act === 'trace') showSwTrace(r);
+                else reportSw(r);
+            });
+            document.querySelector('#sw-abn-table tbody').parentNode.parentNode.addEventListener('click', function (ev) {
+                const b = ev.target.closest('button[data-act]');
+                if (!b) return;
+                const id = b.closest('tr').dataset.id;
+                const r = switchList(AM.swRange).filter(function (x) { return x.cid + '|' + x.date === id; })[0];
+                if (r) reportSw(r);
+            });
+
+            document.getElementById('btn-sw-export').addEventListener('click', function () {
+                const list = swRows();
+                SC.csv.download('回路开关信息_' + SC.today() + '.csv',
+                    [['采集日期', '回路', '回路名称', '计划开启', '计划关闭', '实际开启', '实际关闭',
+                        '计划时长(分)', '亮灯时长(分)', '开灯偏差(分)', '关灯偏差(分)', '判定', '控制方式', '采集来源', '批次', '判定说明']]
+                        .concat(list.map(function (r) {
+                            return [r.date, r.cid, r.cname, hmOf(r.planOn), hmOf(r.planOff),
+                            r.on === null ? '' : hmOf(r.on), r.off === null ? '' : hmOf(r.off),
+                            r.planDur, r.dur === null ? '' : r.dur,
+                            r.devOn === null ? '' : r.devOn, r.devOff === null ? '' : r.devOff,
+                            r.level, r.ctrl, r.src, r.batch, r.note];
+                        })));
+                SC.toast('已导出 ' + list.length + ' 条（与当前筛选一致）', { type: 'success' });
+            });
+
+            document.getElementById('btn-sw-add').addEventListener('click', function () {
+                const today = SC.today();
+                SC.modal.form({
+                    title: '补录开关记录',
+                    submitText: '保存补录',
+                    fields: [
+                        { name: 'date', label: '采集日期', type: 'date', required: true, value: today, col: 1, validate: function (v) { return v > today ? '不能补录未来日期' : ''; } },
+                        { name: 'cid', label: '回路', type: 'select', required: true, col: 1, options: SW_CIRCUITS.map(function (c) { return { value: c.id, label: c.id + ' · ' + c.name }; }) },
+                        { name: 'on', label: '实际开启时间', type: 'time', required: true, col: 1 },
+                        { name: 'off', label: '实际关闭时间', type: 'time', col: 1, hint: '当日记录可留空，表示仍在亮灯' },
+                        { name: 'src', label: '采集来源', type: 'select', col: 1, options: ['人工补录', '巡检抄录', '单灯控制器', '回路控制箱'] },
+                        { name: 'note', label: '补录说明', type: 'textarea', col: 'full', placeholder: '例如：控制箱通信恢复后补传前一日记录' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const c = circuitOf(v.cid);
+                    const on = SC.toMinutes(v.on);
+                    const off = v.off ? SC.toMinutes(v.off) : null;
+                    if (off !== null && on === off) {
+                        SC.toast('开启与关闭时间不能相同', { type: 'error' });
+                        return;
+                    }
+                    swOverride[c.id + '|' + v.date] = {
+                        on: on, off: off, ctrl: '人工补录', src: v.src,
+                        batch: 'MAN-' + v.date.replace(/-/g, ''), note: v.note || ''
+                    };
+                    saveSwOverride();
+                    renderSwChips();
+                    renderSwKv();
+                    renderSwTable();
+                    renderKpi();
+                    SC.toast('已补录 ' + c.name + ' ' + v.date + ' 开关记录', { type: 'success' });
+                });
+            });
+
+            document.getElementById('btn-sw-collect').addEventListener('click', function () {
+                const today = SC.today();
+                let fixed = 0;
+                SW_CIRCUITS.forEach(function (c) {
+                    const r = swRecord(c, 0);
+                    const key = c.id + '|' + today;
+                    if (r.level === '缺报') {
+                        swOverride[key] = {
+                            on: Math.min(r.planOn + 2, nowMinute()), off: null, ctrl: c.ctrl,
+                            src: '召测回传', batch: 'RC-' + today.replace(/-/g, '') + '-' + c.id.slice(3)
+                        };
+                        fixed++;
+                    } else if (swOverride[key] && swOverride[key].src === '召测回传') {
+                        delete swOverride[key];
+                    }
+                });
+                saveSwOverride();
+                renderSwChips();
+                renderSwKv();
+                renderSwTable();
+                renderKpi();
+                SC.toast('已向 ' + SW_CIRCUITS.length + ' 个回路下发召测：' +
+                    (fixed ? fixed + ' 个回路回传补全开关回执' : '全部回路回执均在有效窗口内'), { type: fixed ? 'success' : 'info' });
+            });
+
+            /* ---------- 模块 / 页签切换后重绘（公共导航先切类，再延迟绘制，避开隐藏画布） ---------- */
+            const MOD_RENDER = {
+                'am-ledger': [renderAmChips, renderAmNote, renderAmTable],
+                'am-map': [renderAmMap],
+                'am-stat': [renderAmStat],
+                'sw-list': [renderSwNote, renderSwChips, renderSwKv, renderSwTable],
+                'sw-stat': [renderSwStat]
+            };
+            function renderModule(mod) {
+                const mc = document.getElementById(mod + '-module');
+                if (!mc) return;
+                const tb = mc.querySelector('.tab-btn.active');
+                const list = tb ? MOD_RENDER[tb.dataset.tab] : null;
+                if (list) list.forEach(function (f) { f(); });
+            }
+            document.addEventListener('click', function (ev) {
+                const mb = ev.target.closest('.module-btn');
+                const tb = ev.target.closest('.tab-btn');
+                if (mb) setTimeout(function () { renderModule(mb.dataset.module); }, 40);
+                else if (tb) {
+                    const mc = tb.closest('.module-content');
+                    if (!mc) return;
+                    setTimeout(function () { renderModule(mc.id.replace(/-module$/, '')); }, 40);
+                }
+            });
+
             /* ---------------- 初始化 ---------------- */
             renderLampChips();
             renderLamps();
             lampCtrl = SC.table.enhance(document.getElementById('lamp-table'), {
-                pageSize: 8, export: '单灯台账', keyAttr: 'id'
+                pageSize: 10, export: '单灯台账', keyAttr: 'id'
             });
             document.getElementById('btn-lamp-report').addEventListener('click', function () {
-                SC.csv.download('单灯台账_' + SC.today() + '.csv', [['灯杆编号', '位置', '回路', '型号', '功率W', '亮度', '电压V', '累计点亮h', '状态', '最近上报']]
-                    .concat(lamps.map(l => [l.id, l.road, metaOf(l.zone).name, l.model, l.watt, l.brightness + '%', l.volt, l.hours, l.status, l.last])));
+                SC.csv.download('单灯台账_' + SC.today() + '.csv',
+                    [['灯杆编号', '安装地点', '行政区', '回路', '经度', '纬度', '型号', '功率W', '亮度', '电压V', '累计点亮h', '状态', '最近上报']]
+                        .concat(lamps.map(l => [l.id, addrText(l), l.dist, l.cid,
+                        l.lng === null ? '' : l.lng, l.lat === null ? '' : l.lat,
+                        l.model, l.watt, l.brightness + '%', l.volt, l.hours, l.status, l.last])));
                 SC.toast('台账已导出（' + lamps.length + ' 条）', { type: 'success' });
             });
+
+            /* 灯信息维护 */
+            document.getElementById('am-dist').innerHTML = '<option value="全部">全部行政区</option>' +
+                DISTRICTS.map(function (d) { return '<option value="' + d + '">' + d + '</option>'; }).join('');
+            renderAmChips();
+            renderAmNote();
+            renderAmTable();
+            amCtrl = SC.table.enhance(document.getElementById('am-table'), { pageSize: 10, search: '#am-search', export: '灯杆档案', keyAttr: 'id' });
+            amBadCtrl = SC.table.enhance(document.getElementById('am-bad-table'), { pageSize: 6, search: false, keyAttr: 'id' });
+            amDistCtrl = SC.table.enhance(document.getElementById('am-dist-table'), { pageSize: 8, search: false });
+            amTypeCtrl = SC.table.enhance(document.getElementById('am-type-table'), { pageSize: 12, search: false });
+            amAgeCtrl = SC.table.enhance(document.getElementById('am-age-table'), { pageSize: 8, search: false });
+
+            /* 开关信息 */
+            renderSwNote();
+            renderSwChips();
+            renderSwKv();
+            renderSwTable();
+            swCtrl = SC.table.enhance(document.getElementById('sw-table'), { pageSize: 12, search: '#sw-search', export: '回路开关信息', keyAttr: 'id' });
+            swAbnCtrl = SC.table.enhance(document.getElementById('sw-abn-table'), { pageSize: 8, search: false });
+            swCktCtrl = SC.table.enhance(document.getElementById('sw-circuit-table'), { pageSize: 10, search: false });
 
             renderFaultChips();
             renderFaults();
@@ -1580,12 +2977,24 @@
                 paintSolarInfo();
                 if (state.mode === 'auto') applyAuto();
                 renderFaults();
+                /* 开关记录的「待开灯 / 亮灯中」随真实时钟变化，定时重判一次，避免台账时间落后于顶栏时钟 */
+                if (document.getElementById('switch-log-module').classList.contains('active')) {
+                    renderSwChips();
+                    renderSwKv();
+                    renderSwTable();
+                    renderKpi();
+                }
             }, 30000);
 
             document.addEventListener('visibilitychange', function () {
                 if (!document.hidden) {
                     applyAuto();
                     renderFaults();
+                    if (document.getElementById('switch-log-module').classList.contains('active')) {
+                        renderSwChips();
+                        renderSwKv();
+                        renderSwTable();
+                    }
                 }
             });
         })();
