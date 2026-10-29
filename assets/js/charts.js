@@ -143,6 +143,8 @@
             const padR = minimal ? 2 : 14;
             const padT = minimal ? 4 : 14;
             const padB = minimal ? 4 : 26;
+            const axisColor = c.axisColor || AXIS;
+            const textColor = c.textColor || TEXT;
             const series = (c.series || []).filter(s => s && s.visible !== false);
             const labels = c.labels || [];
             const plotW = Math.max(10, w - padL - padR);
@@ -171,7 +173,7 @@
                 for (let t = 0; t <= ticks; t++) {
                     const value = min + (max - min) * t / ticks;
                     const y = yAt(value);
-                    ctx.strokeStyle = AXIS;
+                    ctx.strokeStyle = axisColor;
                     ctx.lineWidth = 1;
                     ctx.setLineDash(t === 0 ? [] : [4, 4]);
                     ctx.beginPath();
@@ -179,8 +181,9 @@
                     ctx.lineTo(padL + plotW, y);
                     ctx.stroke();
                     ctx.setLineDash([]);
-                    ctx.fillStyle = TEXT;
+                    ctx.fillStyle = textColor;
                     ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
                     ctx.fillText(short(value, c.unit), padL - 8, y);
                 }
                 ctx.textAlign = 'center';
@@ -188,7 +191,7 @@
                 const every = c.xEvery || Math.ceil(labels.length / 8);
                 labels.forEach((lab, i) => {
                     if (i % every === 0 || i === labels.length - 1) {
-                        ctx.fillStyle = TEXT;
+                        ctx.fillStyle = textColor;
                         ctx.fillText(String(lab), xAt(i), padT + plotH + 8);
                     }
                 });
@@ -253,7 +256,7 @@
 
             // 悬浮竖线
             if (inst.hover >= 0 && !minimal) {
-                ctx.strokeStyle = 'rgba(44,62,80,0.35)';
+                ctx.strokeStyle = c.hoverColor || 'rgba(44,62,80,0.35)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([3, 3]);
                 ctx.beginPath();
@@ -307,6 +310,8 @@
     /** cfg = {labels, series:[{name,data,color}], stacked, unit, yMax, horizontal} */
     chart.bar = function (canvas, cfg) {
         return attach(canvas, cfg, function (ctx, w, h, c, inst) {
+            const axisColor = c.axisColor || AXIS;
+            const textColor = c.textColor || TEXT;
             const labels = c.labels || [];
             const series = (c.series || []).filter(s => s && s.visible !== false);
             const padL = c.padL || 52, padR = 14, padT = 14, padB = 28;
@@ -329,14 +334,14 @@
             for (let t = 0; t <= 4; t++) {
                 const value = min + (max - min) * t / 4;
                 const y = yAt(value);
-                ctx.strokeStyle = AXIS;
+                ctx.strokeStyle = axisColor;
                 ctx.setLineDash(t === 0 ? [] : [4, 4]);
                 ctx.beginPath();
                 ctx.moveTo(padL, y);
                 ctx.lineTo(padL + plotW, y);
                 ctx.stroke();
                 ctx.setLineDash([]);
-                ctx.fillStyle = TEXT;
+                ctx.fillStyle = textColor;
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(short(value, c.unit), padL - 8, y);
@@ -344,7 +349,7 @@
 
             labels.forEach(function (lab, i) {
                 const center = padL + bandW * (i + 0.5);
-                ctx.fillStyle = TEXT;
+                ctx.fillStyle = textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 if (bandW > 26 || i % 2 === 0) ctx.fillText(String(lab), center, padT + plotH + 8);

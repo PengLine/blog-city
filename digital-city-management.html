@@ -1583,6 +1583,42 @@
                 </table>
             </div>
 
+            <div class="sc-section-title">执法中队考核（以督查单口径）</div>
+            <div class="sc-split" style="margin-bottom:0">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>中队综合得分</h3>
+                        <span class="sc-hint">按时到场 40% + 结案率 30% + 督查评分 30%</span>
+                    </div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-squad-score"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>中队考核台账</h3>
+                        <span class="sc-hint">点击行跳转督查台账</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="squad-pf-table">
+                            <thead>
+                                <tr>
+                                    <th>中队</th>
+                                    <th>负责人</th>
+                                    <th>督查单</th>
+                                    <th>按时到场</th>
+                                    <th>结案率</th>
+                                    <th>平均评分</th>
+                                    <th>罚没</th>
+                                    <th>综合得分</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div class="sc-section-title">30 天处置时效趋势</div>
             <div class="sc-chart">
                 <canvas id="c-pf-trend"></canvas>
@@ -1847,7 +1883,7 @@
                     c.dept = o.dept || c.dept || rule.dept;
                     c.second = o.second !== undefined ? o.second : c.second;
                     c.officer = o.officer || rp(officersOf(c.dept));
-                    c.dispatchAt = now; act = '派遣';
+                    c.dispatchAt = now; c.status = '已派遣'; act = '派遣';
                 } else if (kind === '处置中') {
                     c.signAt = now; c.status = '处置中'; act = '签收';
                 } else if (kind === '待核查') {
@@ -1952,7 +1988,11 @@
                 caseSeq = 0;
                 cases = buildCases().sort((a, b) => b.createdAt - a.createdAt);
             } else {
-                cases.forEach(function (c) { if (!c.timeline) c.timeline = [{ t: c.createdAt, act: '上报', by: c.source, note: '' }]; });
+                cases.forEach(function (c) {
+                    if (!c.timeline) c.timeline = [{ t: c.createdAt, act: '上报', by: c.source, note: '' }];
+                    // 旧存档自愈：已记录派遣时间但状态停在已立案的，补齐为已派遣
+                    if (c.dispatchAt && c.status === '已立案') c.status = '已派遣';
+                });
             }
             const maxSeq = cases.reduce((m, c) => Math.max(m, Number(String(c.id).split('-')[1] || 0)), 0);
             caseSeq = Math.max(caseSeq, maxSeq);
@@ -2747,6 +2787,7 @@
                     else ctrls.pf.reload();
                 }
                 renderPfTrend();
+                renderPfSquad();
             }
             function renderPfTrend() {
                 const cv = document.getElementById('c-pf-trend');
@@ -2762,6 +2803,51 @@
                 }
                 const cfg = { labels, unit: ' h', series: [{ name: '实际平均耗时', data: real, color: '#e67e22' }, { name: '时限基准', data: aim, color: '#95a5a6', dash: [6, 4], fill: false }] };
                 pfTrendInst = pfTrendInst ? (pfTrendInst.update(cfg), pfTrendInst) : SC.chart.line(cv, cfg);
+            }
+            /* 中队考核：以 EXT.enf 督查单为口径，与执法督查模块同源 */
+            let squadScoreInst = null, squadPfCtrl = null;
+            function squadPerfRows() {
+                const from = Date.now() - pfDays * DAY;
+                return SQUADS.map(function (sq) {
+                    const list = EXT.enf.filter(e => e.squad === sq.key && e.createdAt >= from);
+                    const closed = list.filter(e => e.status === '已结案');
+                    const arrived = list.filter(e => e.arriveAt);
+                    const inTime = arrived.filter(e => e.arriveAt - e.assignAt <= (e.limitMin || 120) * MIN);
+                    const scored = list.filter(e => e.score);
+                    const avgScore = scored.length ? scored.reduce((s, e) => s + e.score, 0) / scored.length : 0;
+                    const onTimeRate = arrived.length ? inTime.length / arrived.length * 100 : 0;
+                    const closeRate = list.length ? closed.length / list.length * 100 : 0;
+                    return {
+                        key: sq.key, leader: sq.leader, total: list.length, closed: closed.length,
+                        onTimeRate: onTimeRate, closeRate: closeRate, avgScore: avgScore,
+                        fine: list.reduce((s, e) => s + (e.fine || 0), 0),
+                        score: onTimeRate * 0.4 + closeRate * 0.3 + avgScore / 5 * 100 * 0.3,
+                        list: list
+                    };
+                }).sort((a, b) => b.score - a.score);
+            }
+            function renderPfSquad() {
+                const tb = document.getElementById('squad-pf-table');
+                if (!tb) return;
+                const rows = squadPerfRows();
+                const cv = document.getElementById('c-squad-score');
+                if (cv) {
+                    const cfg = { labels: rows.map(r => r.key), unit: ' 分', yMax: 100, series: [{ name: '督查单 ' + rows.reduce((s, r) => s + r.total, 0) + ' 件', data: rows.map(r => Number(r.score.toFixed(1))), color: '#00b4d8' }] };
+                    squadScoreInst = squadScoreInst ? (squadScoreInst.update(cfg), squadScoreInst) : SC.chart.bar(cv, cfg);
+                }
+                tb.querySelector('tbody').innerHTML = rows.map(function (r) {
+                    const tag = r.score >= 85 ? 'ok' : r.score >= 70 ? 'info' : r.score >= 55 ? 'warn' : 'bad';
+                    return '<tr data-squad="' + SC.esc(r.key) + '" style="cursor:pointer"><td>' + SC.esc(r.key) + '</td>' +
+                        '<td>' + SC.esc(r.leader) + '</td><td class="sc-cell-num">' + r.total + '</td>' +
+                        '<td><span class="sc-tag ' + (r.onTimeRate >= 90 ? 'ok' : r.onTimeRate >= 70 ? 'warn' : 'bad') + '">' + (r.total ? SC.pct(r.onTimeRate) : '--') + '</span></td>' +
+                        '<td class="sc-cell-num">' + (r.total ? SC.pct(r.closeRate) : '--') + '</td>' +
+                        '<td class="sc-cell-num">' + (r.avgScore ? SC.num(r.avgScore, 2) : '--') + '</td>' +
+                        '<td class="sc-cell-num">' + (r.fine ? '¥' + SC.num(r.fine) : '-') + '</td>' +
+                        '<td><div class="sc-bar-mini"><i style="width:' + SC.clamp(r.score, 0, 100) + '%;background:#00b4d8"></i></div>' +
+                        '<span class="sc-tag ' + tag + '">' + SC.num(r.score, 1) + '</span></td></tr>';
+                }).join('');
+                if (!squadPfCtrl) squadPfCtrl = SC.table.enhance(tb, { pageSize: 6, search: false, export: '中队考核', emptyText: '该周期无督查单' });
+                else squadPfCtrl.reload();
             }
             /** 单位明细弹窗：逐项拆解得分构成 */
             function openDeptDetail(dept) {
@@ -4041,24 +4127,39 @@
                 });
             }
 
+            const ENF_SELF = '＋ 自主登记（现场发现，同步立案）';
             function openEnfCreate() {
                 const list = openCases(Date.now()).filter(c => c.dept === '城管执法局' && !enfOfCase(c.id));
-                if (!list.length) { SC.toast('当前没有待督查的执法类在办案卷', { type: 'warn' }); return; }
-                const opts = list.slice(0, 40).map(c => c.id + '｜' + c.sub + '（' + c.zone + '）');
+                const opts = [ENF_SELF].concat(list.slice(0, 40).map(c => c.id + '｜' + c.sub + '（' + c.zone + '）'));
+                const enfCats = CATS.filter(x => deptRule(x.name).dept === '城管执法局');
                 SC.modal.form({
                     title: '登记督查事件',
                     fields: [
-                        { name: 'tip', type: 'static', html: '<div class="sc-note">从在办执法类案卷中选择一件生成督查事件，登记后需分派到中队与现场负责人。</div>' },
+                        { name: 'tip', type: 'static', html: '<div class="sc-note">可关联在办执法类案卷（当前 ' + list.length + ' 件可关联），也可自主登记：系统按督查发现新立案并自动匹配承办中队。</div>' },
                         { name: 'caseId', label: '关联案卷', type: 'select', options: opts, col: 1, required: true },
+                        { name: 'cat', label: '问题大类（自主登记时生效）', type: 'select', options: (enfCats.length ? enfCats : CATS).map(x => x.name), col: 1 },
                         { name: 'squad', label: '拟定中队', type: 'select', options: ['按片区自动匹配'].concat(SQUADS.map(s => s.key)), col: 1 },
                         { name: 'limit', label: '到场时限', type: 'select', options: ['60 分钟', '120 分钟', '180 分钟'], value: '120 分钟', col: 1 },
                         { name: 'note', label: '督查要求', type: 'textarea', col: 1, placeholder: '如：重点核查占道经营是否彻底清理' }
                     ],
                     onSubmit: function (v) {
-                        const cid = String(v.caseId).split('｜')[0];
-                        const c = byId(cid);
+                        let c = null;
+                        if (String(v.caseId) === ENF_SELF) {
+                            const cat = CATS.filter(x => x.name === v.cat)[0] || (enfCats[0] || CATS[0]);
+                            const sub = SC.sim.pick(cat.subs);
+                            c = submitReport({
+                                source: '督查发现', level: '重要', cat: cat.name, sub: sub,
+                                zone: SC.sim.pick(ZONES), addr: SC.sim.pick(ROADS) + SC.sim.pick(SPOTS),
+                                desc: '督查人员现场登记：' + sub + '，已取证并要求现场整改',
+                                photos: SC.sim.randInt(1, 3)
+                            }, true);
+                            if (!c) { SC.toast('立案失败，请重试', { type: 'error' }); return false; }
+                            afterChange();
+                        } else {
+                            c = byId(String(v.caseId).split('｜')[0]);
+                        }
                         if (!c) { SC.toast('案卷不存在', { type: 'error' }); return false; }
-                        if (enfOfCase(cid)) { SC.toast('该案卷已有督查事件', { type: 'warn' }); return false; }
+                        if (enfOfCase(c.id)) { SC.toast('该案卷已有督查事件', { type: 'warn' }); return false; }
                         const squad = v.squad === '按片区自动匹配' ? squadOfZone(c.zone) : squadByKey(v.squad);
                         const now = Date.now();
                         const limitMin = Number(String(v.limit).replace(/[^0-9]/g, '')) || 120;
@@ -5588,6 +5689,20 @@
                     enfCtrl.setKeyword(item.dataset.squad);
                     document.getElementById('enf-search').focus();
                     SC.toast('已筛选 ' + item.dataset.squad + ' 的督查单', { type: 'info' });
+                });
+                // 考核：中队行点击→跳转执法督查台账
+                const squadPfEl = document.getElementById('squad-pf-table');
+                if (squadPfEl) squadPfEl.addEventListener('click', function (ev) {
+                    const tr = ev.target.closest('tr[data-squad]');
+                    if (!tr || ev.target.closest('input,select,textarea,a,.sc-chip')) return;
+                    const key = tr.dataset.squad;
+                    document.querySelector('.module-btn[data-module="enforcement"]').click();
+                    // 模块切换有 50ms 延迟渲染，待重建后再下发筛选条件
+                    setTimeout(function () {
+                        applyEnfChip('全部');
+                        if (enfCtrl) { enfCtrl.setFilter(null); enfCtrl.setKeyword(key); }
+                    }, 90);
+                    SC.toast('已跳转督查台账，筛选 ' + key, { type: 'info' });
                 });
                 document.getElementById('btn-enf-create').addEventListener('click', openEnfCreate);
                 document.getElementById('btn-enf-export').addEventListener('click', function () {
