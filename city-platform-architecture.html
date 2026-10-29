@@ -7,40 +7,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>平台架构 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
     <style>
+        :root {
+            --arch-bg: #070d18;
+            --arch-panel: rgba(13, 24, 43, .86);
+            --arch-panel-2: rgba(9, 17, 32, .92);
+            --arch-line: rgba(0, 212, 255, .16);
+            --arch-line-2: rgba(255, 255, 255, .07);
+            --arch-text: #c7d6e6;
+            --arch-dim: #7f93a8;
+            --arch-cyan: #00d4ff;
+            --arch-blue: #0080ff;
+            --arch-green: #2ee6a8;
+            --arch-amber: #f7b955;
+            --arch-red: #ff6b6b;
+        }
+
+        body.arch-page {
+            background:
+                radial-gradient(1200px 620px at 18% -12%, #0b2033 0%, rgba(7, 13, 24, 0) 62%),
+                radial-gradient(900px 520px at 92% 0%, #0a1a2c 0%, rgba(7, 13, 24, 0) 58%),
+                var(--arch-bg);
+            color: var(--arch-text);
+            min-height: 100vh;
+        }
+
         .container {
-            background: #1a1a2e;
-            color: #e0e0e0;
+            background: transparent;
+            max-width: 1480px;
+        }
+
+        header {
+            background: linear-gradient(120deg, #0c1c30 0%, #091425 100%);
+            border: 1px solid var(--arch-line);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .35);
+        }
+
+        header h1 {
+            background: linear-gradient(96deg, #eaf9ff 10%, #63dcff 60%, #2aa8ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: #8aa1b8;
         }
 
         .nav-btn {
             background: linear-gradient(135deg, #00d4ff 0%, #0080ff 100%);
-            box-shadow: 0 3px 10px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 6px 18px rgba(0, 212, 255, .28);
         }
 
-        .nav-btn:hover {
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        .arch-ver {
+            font-size: .4em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, .4);
+            color: #8fe8ff;
+            -webkit-text-fill-color: #8fe8ff;
+            vertical-align: middle;
+            letter-spacing: .04em;
         }
 
-        .module-btn.active,
-        .tab-btn.active {
-            background: linear-gradient(135deg, #00d4ff 0%, #0080ff 100%);
+        .arch-live {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: .8em;
+            color: #8aa1b8;
         }
 
-        .btn-sm {
-            background: #00d4ff;
+        .arch-live b {
+            color: #d8f6ff;
+            font-variant-numeric: tabular-nums;
         }
 
-        .btn-sm:hover {
-            background: #0080ff;
+        .arch-live .sep {
+            width: 1px;
+            height: 14px;
+            background: rgba(255, 255, 255, .14);
         }
 
-        .btn-primary {
-            background: #00d4ff;
+        /* ---------- 模块导航 ---------- */
+        .module-nav {
+            background: rgba(10, 20, 36, .72);
+            border: 1px solid var(--arch-line-2);
+            border-radius: 12px;
+            padding: 6px;
+            gap: 6px;
         }
 
-        .btn-primary:hover {
-            background: #0080ff;
+        .module-btn {
+            background: transparent;
+            color: #9db4c9;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all .2s ease;
+        }
+
+        .module-btn:hover {
+            background: rgba(0, 212, 255, .1);
+            color: #cdf3ff;
+            transform: none;
+        }
+
+        .module-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, .9), rgba(0, 128, 255, .9));
+            color: #03202e;
+            box-shadow: 0 6px 16px rgba(0, 212, 255, .25);
+        }
+
+        .content-header h3 {
+            color: #8fe8ff;
         }
 
         h1,
@@ -49,357 +130,3279 @@
         h4,
         h5,
         h6 {
-            color: #00d4ff;
+            color: #8fe8ff;
         }
 
-        .architecture-section {
-            background: rgba(15, 52, 96, 0.8);
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
+        footer {
+            color: #6f8499;
         }
 
-        .architecture-section h3 {
-            margin-bottom: 25px;
-            font-size: 1.3em;
+        /* ---------- ui-kit 深色适配 ---------- */
+        .arch-page .module-content {
+            background: rgba(9, 18, 32, .5);
+            border: 1px solid var(--arch-line-2);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
         }
 
-        .layer-diagram {
+        .arch-page .content-header h3 {
+            color: #8fe8ff;
+        }
+
+        .arch-page .sc-panel {
+            background: var(--arch-panel);
+            border: 1px solid var(--arch-line);
+            box-shadow: none;
+            color: var(--arch-text);
+        }
+
+        .arch-page .sc-panel-title h3 {
+            color: #7fe4ff;
+            font-size: 1.1em;
+        }
+
+        .arch-page .sc-hint {
+            color: var(--arch-dim);
+        }
+
+        .arch-page .sc-section-title {
+            color: #8fe8ff;
+            border-bottom-color: var(--arch-line-2);
+        }
+
+        .arch-page .sc-note {
+            background: rgba(0, 212, 255, .06);
+            border-left-color: var(--arch-cyan);
+            color: #a9c3d8;
+        }
+
+        .arch-page .sc-note.warn {
+            background: rgba(247, 185, 85, .08);
+            border-left-color: var(--arch-amber);
+            color: #e6c48c;
+        }
+
+        .arch-page .sc-kv-item {
+            background: rgba(255, 255, 255, .035);
+            border: 1px solid var(--arch-line-2);
+        }
+
+        .arch-page .sc-kv-item .k {
+            color: var(--arch-dim);
+        }
+
+        .arch-page .sc-kv-item .v {
+            color: #eaf7ff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .arch-page .sc-num-lg {
+            color: #eaf7ff;
+        }
+
+        .arch-page .data-table {
+            background: transparent;
+            color: var(--arch-text);
+        }
+
+        .arch-page .data-table th {
+            background: rgba(0, 212, 255, .07);
+            color: #9fe6ff;
+            font-weight: 600;
+        }
+
+        .arch-page .data-table th,
+        .arch-page .data-table td {
+            border-bottom-color: var(--arch-line-2);
+        }
+
+        .arch-page .data-table tr:hover {
+            background: rgba(0, 212, 255, .06);
+        }
+
+        /* 表格内容禁止折行，窄屏时由容器横向滚动承接 */
+        .arch-page .data-table td .mono,
+        .arch-page .data-table td b,
+        .arch-page .data-table td .sc-tag,
+        .arch-page .data-table td .sc-btn {
+            white-space: nowrap;
+        }
+
+        .arch-page .data-table th[data-no-sort] {
+            min-width: 60px;
+        }
+
+        /* 服务目录：行点击进入场景页，操作列内联「详情」与「场景」 */
+        .arch-page #svc-table tbody tr {
+            cursor: pointer;
+        }
+
+        .arch-page .svc-name {
+            color: #8fe8ff;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(143, 232, 255, .45);
+        }
+
+        .arch-page .svc-name:hover {
+            color: #d6f7ff;
+            border-bottom-color: #d6f7ff;
+        }
+
+        .arch-page .svc-ops .sc-btn+.sc-btn {
+            margin-left: 6px;
+        }
+
+        @media (min-width: 1100px) {
+            #services-module .sc-split {
+                grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            }
+        }
+
+        .arch-page .data-table th.sc-sortable:hover {
+            background: rgba(0, 212, 255, .12);
+        }
+
+        .arch-page .data-table th .sc-sort-ic {
+            color: #5d7a92;
+        }
+
+        .arch-page .data-table th.sc-sorted .sc-sort-ic {
+            color: var(--arch-cyan);
+        }
+
+        .arch-page .sc-table-foot {
+            color: var(--arch-dim);
+        }
+
+        .arch-page .sc-pager button {
+            background: rgba(255, 255, 255, .04);
+            border-color: var(--arch-line-2);
+            color: #a8c0d6;
+        }
+
+        .arch-page .sc-pager button:hover:not([disabled]) {
+            background: rgba(0, 212, 255, .16);
+            border-color: rgba(0, 212, 255, .4);
+        }
+
+        .arch-page .sc-pager button.active {
+            background: var(--arch-cyan);
+            border-color: var(--arch-cyan);
+            color: #03202e;
+        }
+
+        .arch-page .sc-pager button[disabled] {
+            opacity: .35;
+        }
+
+        .arch-page .search-input {
+            background: rgba(255, 255, 255, .05);
+            border-color: var(--arch-line);
+            color: #e6f4ff;
+            width: 250px;
+        }
+
+        .arch-page .search-input::placeholder {
+            color: #6f8499;
+        }
+
+        .arch-page .search-input:focus {
+            outline: none;
+            border-color: var(--arch-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, .12);
+        }
+
+        .arch-page .sc-btn {
+            background: rgba(0, 212, 255, .1);
+            color: #a5e9ff;
+            border: 1px solid rgba(0, 212, 255, .28);
+        }
+
+        .arch-page .sc-btn:hover {
+            background: rgba(0, 212, 255, .2);
+        }
+
+        .arch-page .sc-btn.primary {
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            color: #04202e;
+            border-color: transparent;
+            font-weight: bold;
+        }
+
+        .arch-page .sc-btn.primary:hover {
+            filter: brightness(1.08);
+        }
+
+        .arch-page .sc-btn.ghost {
+            background: transparent;
+            border-color: var(--arch-line);
+            color: #a8c0d6;
+        }
+
+        .arch-page .sc-btn.ghost:hover {
+            background: rgba(0, 212, 255, .1);
+        }
+
+        .arch-page .sc-btn.danger {
+            background: rgba(255, 107, 107, .16);
+            border-color: rgba(255, 107, 107, .4);
+            color: #ffb3b3;
+        }
+
+        .arch-page .sc-btn.danger:hover {
+            background: rgba(255, 107, 107, .26);
+        }
+
+        .arch-page .sc-tag {
+            background: rgba(255, 255, 255, .08);
+            color: #a8c0d6;
+        }
+
+        .arch-page .sc-tag.ok {
+            background: rgba(46, 230, 168, .14);
+            color: #6ff0c2;
+        }
+
+        .arch-page .sc-tag.warn {
+            background: rgba(247, 185, 85, .16);
+            color: #ffd08a;
+        }
+
+        .arch-page .sc-tag.bad {
+            background: rgba(255, 107, 107, .16);
+            color: #ff9d9d;
+        }
+
+        .arch-page .sc-tag.info {
+            background: rgba(0, 212, 255, .14);
+            color: #8fe8ff;
+        }
+
+        .arch-page .sc-tag.off {
+            background: rgba(255, 255, 255, .06);
+            color: #8a9db1;
+        }
+
+        .arch-page .sc-chip {
+            background: rgba(255, 255, 255, .04);
+            border-color: var(--arch-line-2);
+            color: #9db4c9;
+        }
+
+        .arch-page .sc-chip:hover {
+            border-color: rgba(0, 212, 255, .5);
+            color: #cdf3ff;
+        }
+
+        .arch-page .sc-chip.active {
+            background: rgba(0, 212, 255, .18);
+            border-color: rgba(0, 212, 255, .6);
+            color: #9fefff;
+        }
+
+        .arch-page .sc-seg {
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .arch-page .sc-seg button {
+            color: #9db4c9;
+        }
+
+        .arch-page .sc-seg button.active {
+            background: rgba(0, 212, 255, .92);
+            color: #04202e;
+        }
+
+        .arch-page .sc-bar-mini {
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .arch-page .sc-progress {
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .arch-page .attn-item {
+            background: rgba(255, 255, 255, .03);
+            color: var(--arch-text);
+            border-left-color: var(--arch-amber);
+        }
+
+        .arch-page .attn-item.bad {
+            border-left-color: var(--arch-red);
+        }
+
+        .arch-page .sc-log {
+            background: rgba(3, 9, 18, .78);
+            color: #c9dbea;
+            border: 1px solid var(--arch-line-2);
+        }
+
+        .arch-page .sc-log .li {
+            border-bottom-color: rgba(255, 255, 255, .05);
+        }
+
+        .arch-page .sc-log .t {
+            color: #6f8499;
+        }
+
+        .arch-page .sc-log .tx {
+            color: #c9dbea;
+        }
+
+        .arch-page .sc-timeline::before {
+            background: var(--arch-line-2);
+        }
+
+        .arch-page .sc-tl-item .h {
+            color: #dbeafe;
+        }
+
+        .arch-page .sc-tl-item .m {
+            color: var(--arch-dim);
+        }
+
+        .arch-page .sc-empty-row td {
+            color: var(--arch-dim);
+        }
+
+        .arch-page .sc-hl,
+        .arch-page .data-table .sc-hl,
+        .arch-page .data-table .sc-hl:hover {
+            background: rgba(0, 212, 255, .12);
+            box-shadow: inset 3px 0 0 var(--arch-cyan);
+        }
+
+        .arch-page .sc-hl>td {
+            color: #eaf7ff;
+        }
+
+        .arch-page .sc-mask {
+            background: rgba(3, 8, 16, .72);
+        }
+
+        .arch-page .sc-modal {
+            background: #0c1829;
+            border: 1px solid var(--arch-line);
+            color: var(--arch-text);
+        }
+
+        .arch-page .sc-modal-head,
+        .arch-page .sc-modal-foot {
+            border-color: var(--arch-line-2);
+        }
+
+        .arch-page .sc-modal-head h4 {
+            color: #8fe8ff;
+        }
+
+        .arch-page .sc-modal-body {
+            color: var(--arch-text);
+        }
+
+        .arch-page .sc-modal-x {
+            background: rgba(255, 255, 255, .06);
+            color: #9db4c9;
+        }
+
+        .arch-page .sc-modal-x:hover {
+            background: rgba(255, 107, 107, .8);
+            color: #fff;
+        }
+
+        .arch-page .sc-input {
+            background: rgba(255, 255, 255, .05);
+            border-color: var(--arch-line);
+            color: #e6f4ff;
+        }
+
+        .arch-page .sc-input:focus {
+            border-color: var(--arch-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, .12);
+        }
+
+        .arch-page .sc-field label {
+            color: #9db4c9;
+        }
+
+        .arch-page .sc-field .sc-input.bad {
+            border-color: var(--arch-red);
+        }
+
+        .arch-page .sc-field-error {
+            color: #ff9d9d;
+        }
+
+        .arch-page .sc-check {
+            background: rgba(255, 255, 255, .05);
+            border-color: var(--arch-line-2);
+            color: #9db4c9;
+        }
+
+        .arch-page .sc-check.on {
+            background: rgba(0, 212, 255, .18);
+            border-color: var(--arch-cyan);
+            color: #9fefff;
+        }
+
+        .arch-page .sc-range output {
+            color: #9fefff;
+        }
+
+        .arch-page .sc-chart {
+            background: transparent;
+        }
+
+        .arch-page .sc-chart-tip {
+            background: rgba(4, 12, 22, .94);
+            border: 1px solid var(--arch-line);
+            color: #d8f6ff;
+        }
+
+        .arch-page .sc-legend span {
+            color: #9db4c9;
+        }
+
+        /* ---------- 自定义组件 ---------- */
+        .arch-canvas {
+            position: relative;
+            height: 340px;
+            border-radius: 10px;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(0, 212, 255, .09), rgba(0, 212, 255, 0) 62%),
+                rgba(4, 10, 20, .55);
+            border: 1px solid var(--arch-line);
+            padding: 6px;
+        }
+
+        .arch-canvas canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .arch-canvas.h-sm {
+            height: 280px;
+        }
+
+        .layer-legend {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .layer-legend button {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--arch-line-2);
+            color: #9db4c9;
+            border-radius: 16px;
+            padding: 5px 12px;
+            font-size: .82em;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .layer-legend button i {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 3px;
+            margin-right: 7px;
+        }
+
+        .layer-legend button:hover {
+            border-color: rgba(0, 212, 255, .5);
+            color: #cdf3ff;
+        }
+
+        .layer-legend button.active {
+            background: rgba(0, 212, 255, .16);
+            border-color: rgba(0, 212, 255, .55);
+            color: #9fefff;
+        }
+
+        .comp-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
 
-        .layer {
-            background: rgba(0, 212, 255, 0.1);
-            padding: 25px;
+        .comp-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
             border-radius: 8px;
-            border-left: 4px solid #00d4ff;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, .03);
+            border-left: 3px solid rgba(0, 212, 255, .5);
         }
 
-        .layer:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: translateX(10px);
-        }
-
-        .layer-title {
+        .comp-row .cn {
             font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            color: #00d4ff;
+            color: #d8f6ff;
+            font-size: .92em;
         }
 
-        .layer-content {
+        .comp-row .ct {
+            color: var(--arch-dim);
+            font-size: .8em;
+            margin-top: 2px;
+        }
+
+        .comp-row .cv {
+            text-align: right;
+            font-size: .78em;
+            color: #8fb6cf;
+            white-space: nowrap;
+        }
+
+        .domain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+            gap: 14px;
+        }
+
+        .domain-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            background: var(--arch-panel);
+            border: 1px solid var(--arch-line);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all .25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .domain-card::after {
+            content: '';
+            position: absolute;
+            inset: auto -30% -60% auto;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, .18), transparent 70%);
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+
+        .domain-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 212, 255, .55);
+            box-shadow: 0 14px 30px rgba(0, 212, 255, .14);
+        }
+
+        .domain-card:hover::after {
+            opacity: 1;
+        }
+
+        .domain-card .dc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .domain-card h4 {
+            font-size: .98em;
+            color: #d8f6ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .domain-card .dc-icon {
+            font-size: 1.2em;
+        }
+
+        .domain-card .dc-desc {
+            font-size: .78em;
+            color: var(--arch-dim);
+            margin-top: 8px;
+            line-height: 1.55;
+            min-height: 34px;
+        }
+
+        .domain-card .dc-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: .74em;
+            color: #7f9cb4;
+            border-top: 1px dashed var(--arch-line-2);
+            padding-top: 9px;
+        }
+
+        .domain-card .dc-meta b {
+            color: #cdf3ff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .principle {
+            display: flex;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px dashed var(--arch-line-2);
+        }
+
+        .principle:last-child {
+            border-bottom: none;
+        }
+
+        .principle .pi {
+            width: 28px;
+            height: 28px;
+            flex: none;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            background: rgba(0, 212, 255, .12);
+            color: var(--arch-cyan);
+            font-size: .85em;
+            font-weight: bold;
+        }
+
+        .principle .pn {
+            color: #d8f6ff;
+            font-size: .9em;
+            font-weight: bold;
+        }
+
+        .principle .pd {
+            color: var(--arch-dim);
+            font-size: .8em;
+            margin-top: 2px;
+        }
+
+        .pipe {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 8px;
+            margin-bottom: 14px;
         }
 
-        .layer-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.9em;
+        .pipe-stage {
+            flex: 1 1 96px;
+            padding: 10px 10px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .035);
+            border: 1px solid var(--arch-line-2);
+            position: relative;
+            transition: all .25s ease;
         }
 
-        .component-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+        .pipe-stage .nm {
+            font-size: .8em;
+            color: #9db4c9;
         }
 
-        .component-card {
-            background: rgba(15, 52, 96, 0.8);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
+        .pipe-stage .ms {
+            font-size: .7em;
+            color: #67809a;
+            margin-top: 3px;
         }
 
-        .component-card:hover {
-            transform: translateY(-5px);
-            border-color: #00d4ff;
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        .pipe-stage .dot {
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4a6076;
+            margin-bottom: 7px;
         }
 
-        .component-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
+        .pipe-stage.running {
+            border-color: rgba(0, 212, 255, .55);
+            background: rgba(0, 212, 255, .1);
         }
 
-        .component-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #00d4ff;
+        .pipe-stage.running .dot {
+            background: var(--arch-cyan);
+            animation: pulse 1.1s infinite;
         }
 
-        .component-desc {
-            font-size: 0.9em;
-            color: #7f8c8d;
+        .pipe-stage.done {
+            border-color: rgba(46, 230, 168, .45);
+            background: rgba(46, 230, 168, .08);
         }
 
-        .tech-stack {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        .pipe-stage.done .dot {
+            background: var(--arch-green);
         }
 
-        .tech-item {
-            background: rgba(15, 52, 96, 0.8);
-            padding: 20px;
+        .pipe-stage.fail {
+            border-color: rgba(255, 107, 107, .5);
+            background: rgba(255, 107, 107, .1);
+        }
+
+        .pipe-stage.fail .dot {
+            background: var(--arch-red);
+        }
+
+        .cert-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 12px;
             border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, .03);
+            margin-bottom: 8px;
+            font-size: .82em;
         }
 
-        .tech-item:hover {
-            background: rgba(0, 212, 255, 0.2);
+        .cert-row .cr-name {
+            color: #d8f6ff;
         }
 
-        .tech-name {
+        .cert-row .cr-sub {
+            color: var(--arch-dim);
+            font-size: .86em;
+        }
+
+        .water-row {
+            display: grid;
+            grid-template-columns: 108px 1fr 56px;
+            gap: 12px;
+            align-items: center;
+            font-size: .82em;
+            margin-bottom: 11px;
+        }
+
+        .water-row .wn {
+            color: #a8c0d6;
+        }
+
+        .water-row .bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, .08);
+            overflow: hidden;
+        }
+
+        .water-row .bar i {
+            display: block;
+            height: 100%;
+            border-radius: 4px;
+            transition: width .4s ease;
+        }
+
+        .water-row .wv {
+            text-align: right;
+            color: #cdf3ff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sec-layer {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .03);
+            border-left: 3px solid rgba(0, 212, 255, .45);
+            margin-bottom: 9px;
+        }
+
+        .sec-layer .sl-ic {
+            font-size: 1.1em;
+        }
+
+        .sec-layer .sl-n {
+            color: #d8f6ff;
+            font-size: .88em;
             font-weight: bold;
-            margin-bottom: 5px;
-            color: #00d4ff;
         }
 
-        .tech-desc {
-            font-size: 0.8em;
-            color: #7f8c8d;
+        .sec-layer .sl-d {
+            color: var(--arch-dim);
+            font-size: .78em;
+            margin-top: 2px;
+        }
+
+        .env-note {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            font-size: .8em;
+            color: var(--arch-dim);
+            margin-top: 10px;
+        }
+
+        .env-note b {
+            color: #cdf3ff;
+        }
+
+        .adr-split {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .adr-card {
+            padding: 12px 14px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .03);
+            border-left: 3px solid rgba(0, 212, 255, .5);
+            margin-bottom: 10px;
+        }
+
+        .adr-card .at {
+            color: #d8f6ff;
+            font-size: .88em;
+            font-weight: bold;
+        }
+
+        .adr-card .am {
+            color: var(--arch-dim);
+            font-size: .78em;
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+
+        .mono {
+            font-family: Consolas, 'Courier New', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .arch-page .sc-heat .cell {
+            background: rgba(255, 255, 255, .05);
+            color: #9db4c9;
+        }
+
+        @media (max-width: 900px) {
+            .adr-split {
+                grid-template-columns: 1fr;
+            }
+
+            .arch-canvas {
+                height: 300px;
+            }
         }
 
         @media (max-width: 768px) {
-            .layer-content {
-                flex-direction: column;
+            .module-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .arch-live {
+                gap: 10px;
             }
         }
     </style>
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%232c3e50%27/%3E%3Crect x=%2712%27 y=%2730%27 width=%2710%27 height=%2722%27 fill=%27%233498db%27/%3E%3Crect x=%2727%27 y=%2718%27 width=%2710%27 height=%2734%27 fill=%27%232ecc71%27/%3E%3Crect x=%2742%27 y=%2726%27 width=%2710%27 height=%2726%27 fill=%27%23f39c12%27/%3E%3C/svg%3E">
 </head>
 
-<body>
+<body class="arch-page">
     <div class="container">
         <header>
             <div>
-                <h1>🏙️ 平台架构</h1>
-                <p>智慧城市管理平台技术架构</p>
+                <h1>🏙️ 平台架构 <span class="arch-ver">v2.4.0</span></h1>
+                <p>智慧城市管理平台 · 技术架构与运行支撑视图</p>
             </div>
-            <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            <div class="sc-inline">
+                <div class="arch-live" id="arch-live"></div>
+                <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            </div>
         </header>
 
-        <div class="architecture-section">
-            <h3>🏗️ 系统架构层次</h3>
-            <div class="layer-diagram">
-                <div class="layer">
-                    <div class="layer-title">🏠 表现层 (Presentation Layer)</div>
-                    <div class="layer-content">
-                        <div class="layer-item">Web端管理平台</div>
-                        <div class="layer-item">移动端APP</div>
-                        <div class="layer-item">大屏展示</div>
-                        <div class="layer-item">API接口</div>
-                    </div>
-                </div>
-                <div class="layer">
-                    <div class="layer-title">⚡ 业务层 (Business Layer)</div>
-                    <div class="layer-content">
-                        <div class="layer-item">数字城管</div>
-                        <div class="layer-item">智慧环卫</div>
-                        <div class="layer-item">智慧市政</div>
-                        <div class="layer-item">智慧照明</div>
-                        <div class="layer-item">智慧排水</div>
-                        <div class="layer-item">智慧停车</div>
-                        <div class="layer-item">综合指挥</div>
-                        <div class="layer-item">公共服务</div>
-                    </div>
-                </div>
-                <div class="layer">
-                    <div class="layer-title">🛠️ 服务层 (Service Layer)</div>
-                    <div class="layer-content">
-                        <div class="layer-item">认证服务</div>
-                        <div class="layer-item">权限服务</div>
-                        <div class="layer-item">消息服务</div>
-                        <div class="layer-item">调度服务</div>
-                        <div class="layer-item">数据服务</div>
-                    </div>
-                </div>
-                <div class="layer">
-                    <div class="layer-title">💾 数据层 (Data Layer)</div>
-                    <div class="layer-content">
-                        <div class="layer-item">关系型数据库</div>
-                        <div class="layer-item">时序数据库</div>
-                        <div class="layer-item">缓存服务</div>
-                        <div class="layer-item">文件存储</div>
-                    </div>
-                </div>
-                <div class="layer">
-                    <div class="layer-title">🔌 接入层 (Integration Layer)</div>
-                    <div class="layer-content">
-                        <div class="layer-item">IoT设备接入</div>
-                        <div class="layer-item">第三方系统集成</div>
-                        <div class="layer-item">数据同步</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="component-grid">
-            <div class="component-card">
-                <div class="component-icon">☁️</div>
-                <div class="component-title">云原生架构</div>
-                <div class="component-desc">基于云平台的弹性伸缩架构</div>
-            </div>
-            <div class="component-card">
-                <div class="component-icon">🔗</div>
-                <div class="component-title">微服务架构</div>
-                <div class="component-desc">模块化、松耦合的服务设计</div>
-            </div>
-            <div class="component-card">
-                <div class="component-icon">🛡️</div>
-                <div class="component-title">安全架构</div>
-                <div class="component-desc">多层次安全防护体系</div>
-            </div>
-            <div class="component-card">
-                <div class="component-icon">🔄</div>
-                <div class="component-title">数据同步</div>
-                <div class="component-desc">实时数据同步与备份</div>
-            </div>
-        </div>
-
         <div class="module-nav">
-            <button class="module-btn active" data-module="system-architecture">🏗️ 系统架构</button>
-            <button class="module-btn" data-module="tech-stack">💻 技术栈</button>
+            <button class="module-btn active" data-module="overview">🏗️ 架构全景</button>
+            <button class="module-btn" data-module="services">🧩 服务目录</button>
+            <button class="module-btn" data-module="stack">💻 技术栈</button>
             <button class="module-btn" data-module="security">🛡️ 安全架构</button>
-            <button class="module-btn" data-module="deployment">🚀 部署方案</button>
+            <button class="module-btn" data-module="deploy">🚀 部署发布</button>
+            <button class="module-btn" data-module="capacity">📈 容量监控</button>
+            <button class="module-btn" data-module="adr">📋 架构决策</button>
         </div>
 
-        <div id="system-architecture-module" class="module-content active">
-            <div class="architecture-section">
-                <h3>🗂️ 功能模块</h3>
-                <div class="tech-stack">
-                    <div class="tech-item">
-                        <div class="tech-name">数字城管</div>
-                        <div class="tech-desc">城市事件管理</div>
+        <!-- ==================== 架构全景 ==================== -->
+        <div id="overview-module" class="module-content active">
+            <div class="sc-kv" id="ov-kv"></div>
+
+            <div class="sc-split" style="margin-top:20px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>分层架构 · 五层视图</h3>
+                        <span class="sc-hint">点击图层查看落点组件</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">智慧环卫</div>
-                        <div class="tech-desc">环境卫生管理</div>
+                    <div class="arch-canvas">
+                        <canvas id="c-layers"></canvas>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">智慧市政</div>
-                        <div class="tech-desc">市政设施管理</div>
+                    <div class="layer-legend" id="ov-legend"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3 id="ov-layer-name">表现层</h3>
+                        <span class="sc-tag info" id="ov-layer-tag">--</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">智慧照明</div>
-                        <div class="tech-desc">城市照明控制</div>
+                    <div class="sc-note" id="ov-layer-desc">--</div>
+                    <div class="comp-list" id="ov-layer-detail"></div>
+                    <div class="env-note" id="ov-layer-meta"></div>
+                </div>
+            </div>
+
+            <div class="sc-section-title">业务域 · 场景应用矩阵</div>
+            <div class="domain-grid" id="ov-domains"></div>
+
+            <div class="sc-split-2" style="margin-top:22px">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>架构原则</h3>
+                        <span class="sc-hint">评审基线</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">智慧排水</div>
-                        <div class="tech-desc">排水系统监控</div>
+                    <div id="ov-principles"></div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>架构成熟度</h3>
+                        <span class="sc-hint">满分 100，按季度评估</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">智慧停车</div>
-                        <div class="tech-desc">停车场管理</div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-ov-maturity"></canvas>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">综合指挥</div>
-                        <div class="tech-desc">多部门协同</div>
-                    </div>
-                    <div class="tech-item">
-                        <div class="tech-name">公共服务</div>
-                        <div class="tech-desc">公共资源管理</div>
-                    </div>
+                    <div class="sc-section-title">架构演进</div>
+                    <div class="sc-timeline" id="ov-timeline"></div>
                 </div>
             </div>
         </div>
 
-        <div id="tech-stack-module" class="module-content">
-            <div class="architecture-section">
+        <!-- ==================== 服务目录 ==================== -->
+        <div id="services-module" class="module-content">
+            <div class="content-header">
+                <h3>🧩 服务目录</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="svc-search" placeholder="搜索服务 / 业务域 / 负责人…">
+                    <button class="sc-btn" id="btn-svc-health">🩺 全量健康检查</button>
+                    <button class="sc-btn" id="btn-svc-export">⬇ 导出服务目录</button>
+                </div>
+            </div>
+            <div class="sc-kv" id="svc-kv"></div>
+            <div class="sc-hint" id="svc-deeplink" style="display:none;margin-top:12px"></div>
+            <div class="sc-chip-holder" style="margin-top:18px">
+                <div class="sc-chips" id="svc-chips"></div>
+            </div>
+            <div class="sc-split">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>微服务清单</h3>
+                        <span class="sc-hint">点击行进入场景页 · 详情按钮查看服务档案</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="svc-table">
+                            <thead>
+                                <tr>
+                                    <th>服务</th>
+                                    <th>业务域</th>
+                                    <th>版本</th>
+                                    <th>实例</th>
+                                    <th>QPS</th>
+                                    <th>P95</th>
+                                    <th>健康</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>调用拓扑</h3>
+                        <span class="sc-hint">随筛选联动</span>
+                    </div>
+                    <div class="arch-canvas h-sm">
+                        <canvas id="c-topo"></canvas>
+                    </div>
+                    <div class="sc-hint" id="topo-tip" style="margin-top:8px">悬停查看节点，点击进入服务详情</div>
+                    <div class="sc-section-title">被依赖最多</div>
+                    <div id="svc-dep-rank" class="attn-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 技术栈 ==================== -->
+        <div id="stack-module" class="module-content">
+            <div class="content-header">
                 <h3>💻 技术栈</h3>
-                <div class="tech-stack">
-                    <div class="tech-item">
-                        <div class="tech-name">前端框架</div>
-                        <div class="tech-desc">Vue 3 + TypeScript</div>
+                <div class="sc-inline">
+                    <input class="search-input" id="stack-search" placeholder="搜索组件 / 负责人…">
+                    <button class="sc-btn" id="btn-stack-export">⬇ 导出技术栈</button>
+                </div>
+            </div>
+            <div class="sc-kv" id="stack-kv"></div>
+            <div class="sc-chips" id="stack-chips" style="margin-top:16px"></div>
+            <div class="sc-split">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>组件清单</h3>
+                        <span class="sc-hint">点击行查看选型说明</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">UI组件</div>
-                        <div class="tech-desc">Element Plus</div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="stack-table">
+                            <thead>
+                                <tr>
+                                    <th>组件</th>
+                                    <th>分组</th>
+                                    <th>当前版本</th>
+                                    <th>最新版本</th>
+                                    <th>状态</th>
+                                    <th>负责人</th>
+                                    <th>使用范围</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">后端框架</div>
-                        <div class="tech-desc">Spring Boot</div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>分组构成</h3>
+                        <span class="sc-hint">组件数量</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">数据库</div>
-                        <div class="tech-desc">MySQL + Redis</div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-stack-group"></canvas>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">消息队列</div>
-                        <div class="tech-desc">RabbitMQ</div>
-                    </div>
-                    <div class="tech-item">
-                        <div class="tech-name">容器化</div>
-                        <div class="tech-desc">Docker + Kubernetes</div>
-                    </div>
+                    <div class="sc-section-title">版本风险</div>
+                    <div id="stack-risk" class="attn-list"></div>
                 </div>
             </div>
         </div>
 
+        <!-- ==================== 安全架构 ==================== -->
         <div id="security-module" class="module-content">
-            <div class="architecture-section">
+            <div class="content-header">
                 <h3>🛡️ 安全架构</h3>
-                <div class="tech-stack">
-                    <div class="tech-item">
-                        <div class="tech-name">身份认证</div>
-                        <div class="tech-desc">JWT + OAuth2</div>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-sec-audit">🧾 生成审计抽检</button>
+                    <button class="sc-btn" id="btn-sec-export">⬇ 导出控制项</button>
+                </div>
+            </div>
+            <div class="sc-kv" id="sec-kv"></div>
+            <div class="sc-split" style="margin-top:20px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>纵深防护分层</h3>
+                        <span class="sc-hint">由外到内逐层收敛</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">权限管理</div>
-                        <div class="tech-desc">RBAC</div>
+                    <div id="sec-layers"></div>
+                    <div class="sc-section-title">控制类达标率</div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-sec-cat"></canvas>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">数据加密</div>
-                        <div class="tech-desc">AES + SSL</div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>证书与密钥</h3>
+                        <span class="sc-hint">到期前 30 天预警</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">安全审计</div>
-                        <div class="tech-desc">日志记录</div>
+                    <div id="sec-certs"></div>
+                    <div class="sc-section-title">审计流水</div>
+                    <div class="sc-log" id="sec-audit"></div>
+                </div>
+            </div>
+            <div class="sc-section-title">等保 2.0 三级控制项</div>
+            <div class="data-table-container">
+                <table class="data-table" id="sec-table">
+                    <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>控制类</th>
+                            <th>控制要求</th>
+                            <th>状态</th>
+                            <th>责任人</th>
+                            <th>复查周期</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== 部署发布 ==================== -->
+        <div id="deploy-module" class="module-content">
+            <div class="content-header">
+                <h3>🚀 部署与发布</h3>
+                <div class="sc-inline">
+                    <div class="sc-seg" id="env-seg">
+                        <button data-env="prod" class="active">生产</button>
+                        <button data-env="pre">预发</button>
+                        <button data-env="test">测试</button>
                     </div>
+                    <button class="sc-btn primary" id="btn-pipe-run">▶ 执行一次发布</button>
+                </div>
+            </div>
+            <div class="sc-kv" id="dep-kv"></div>
+            <div class="sc-split" style="margin-top:20px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>集群节点</h3>
+                        <span class="sc-hint" id="dep-env-hint">生产环境 · 华东双可用区</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="node-table">
+                            <thead>
+                                <tr>
+                                    <th>节点</th>
+                                    <th>可用区</th>
+                                    <th>角色</th>
+                                    <th>实例</th>
+                                    <th>CPU</th>
+                                    <th>内存</th>
+                                    <th>状态</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>发布流水线</h3>
+                        <span class="sc-hint" id="pipe-status">空闲</span>
+                    </div>
+                    <div class="pipe" id="pipe"></div>
+                    <div class="sc-progress" style="margin-bottom:12px">
+                        <i id="pipe-bar" style="width:0"></i>
+                    </div>
+                    <div class="sc-log" id="pipe-log"></div>
+                    <div class="env-note">
+                        <span>目标版本 <b id="pipe-ver">v2.4.1</b></span>
+                        <span>灰度比例 <b>10% → 100%</b></span>
+                        <span>失败自动回滚 <b>已开启</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="sc-section-title">发布记录</div>
+            <div class="data-table-container">
+                <table class="data-table" id="rel-table">
+                    <thead>
+                        <tr>
+                            <th>版本</th>
+                            <th>环境</th>
+                            <th>变更内容</th>
+                            <th>发布人</th>
+                            <th>开始时间</th>
+                            <th>耗时</th>
+                            <th>结果</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== 容量监控 ==================== -->
+        <div id="capacity-module" class="module-content">
+            <div class="content-header">
+                <h3>📈 容量与监控</h3>
+                <div class="sc-inline">
+                    <div class="sc-seg" id="cap-range">
+                        <button data-hours="24" class="active">近 24 小时</button>
+                        <button data-hours="72">近 3 天</button>
+                        <button data-hours="168">近 7 天</button>
+                    </div>
+                    <button class="sc-btn" id="btn-cap-report">📄 压测报告</button>
+                </div>
+            </div>
+            <div class="sc-kv" id="cap-kv"></div>
+            <div class="sc-split" style="margin-top:20px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>入口流量</h3>
+                        <span class="sc-hint">网关 QPS · 虚线为容量水位 70%</span>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-cap-qps"></canvas>
+                    </div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>响应时延</h3>
+                        <span class="sc-hint">平均 RT 与 P95（ms）</span>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-cap-rt"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="sc-split-2" style="margin-top:22px">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>资源水位</h3>
+                        <span class="sc-hint">阈值 80% 触发扩容</span>
+                    </div>
+                    <div id="cap-water"></div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>告警</h3>
+                        <span class="sc-hint" id="cap-alert-hint">待处置 0 条</span>
+                    </div>
+                    <div id="cap-alerts" class="attn-list"></div>
                 </div>
             </div>
         </div>
 
-        <div id="deployment-module" class="module-content">
-            <div class="architecture-section">
-                <h3>🚀 部署方案</h3>
-                <div class="tech-stack">
-                    <div class="tech-item">
-                        <div class="tech-name">云平台</div>
-                        <div class="tech-desc">公有云/私有云</div>
+        <!-- ==================== 架构决策 ==================== -->
+        <div id="adr-module" class="module-content">
+            <div class="content-header">
+                <h3>📋 架构决策记录</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="adr-search" placeholder="搜索决策标题 / 分类…">
+                    <button class="sc-btn primary" id="btn-adr-add">＋ 新增决策</button>
+                    <button class="sc-btn" id="btn-adr-export">⬇ 导出 ADR</button>
+                </div>
+            </div>
+            <div class="sc-kv" id="adr-kv"></div>
+            <div class="adr-split" style="margin-top:20px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>决策清单</h3>
+                        <span class="sc-hint">点击行查看决策详情</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">CI/CD</div>
-                        <div class="tech-desc">自动化部署</div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="adr-table">
+                            <thead>
+                                <tr>
+                                    <th>编号</th>
+                                    <th>标题</th>
+                                    <th>分类</th>
+                                    <th>状态</th>
+                                    <th>影响面</th>
+                                    <th>决策人</th>
+                                    <th>日期</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">监控告警</div>
-                        <div class="tech-desc">Prometheus + Grafana</div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>决策流程</h3>
+                        <span class="sc-hint">技术评审委员会</span>
                     </div>
-                    <div class="tech-item">
-                        <div class="tech-name">容灾备份</div>
-                        <div class="tech-desc">多地域备份</div>
-                    </div>
+                    <div class="sc-timeline" id="adr-flow"></div>
+                    <div class="sc-section-title">待办事项</div>
+                    <div id="adr-todo"></div>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
+            <p>&copy; 2026 智慧城市管理平台. 【余一叶知秋尽】版权所有.</p>
         </footer>
     </div>
 
+    <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
     <script src="assets/js/common.js"></script>
+    <script>
+        /* ==========================================================================
+           平台架构页运行时：分层视图 / 服务目录 / 技术栈 / 安全 / 部署 / 容量 / ADR
+           全部数据由确定性伪随机生成，可变部分（ADR、发布记录、告警处置、扩容）
+           落盘到 localStorage 的 sc:arch:state，版本不一致时重建。
+           ========================================================================== */
+        (function () {
+            'use strict';
+
+            const NS = 'arch';
+            const ARCH_VER = 1;
+            const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+
+            /* ---------------- 确定性伪随机 ---------------- */
+            let seed = 20260318;
+            function resetSeed(v) { seed = v; }
+            function srnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+            function sri(a, b) { return Math.floor(a + srnd() * (b - a + 1)); }
+            function srp(arr) { return arr[Math.floor(srnd() * arr.length)]; }
+            function hashSeed(str) {
+                let h = 2166136261;
+                for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+                return h >>> 0;
+            }
+            function pickSeeded(str) {
+                const r = hashSeed(str) % 1000 / 1000;
+                return r;
+            }
+
+            const TAG = { '健康': 'ok', '告警': 'warn', '降级': 'bad', '维护': 'off', '离线': 'off' };
+            const STATUS_TAG = { '在用': 'ok', '试点': 'info', '待退役': 'warn', '已退役': 'off' };
+
+            /* ==========================================================================
+               1. 分层架构
+               ========================================================================== */
+            const LAYERS = [
+                {
+                    key: 'present', name: '表现层', icon: '🖥️', color: '#00d4ff',
+                    slo: '可用性 99.95% · P95 210ms', owner: '前端架构组',
+                    desc: '面向 10 个业务场景的 Web / 移动 / 大屏三端统一入口，登录、埋点、异常上报统一收口。',
+                    comps: [
+                        { name: '管理后台（Web）', tech: 'Vue 3 + Vite', note: '18 个业务模块按需加载' },
+                        { name: '移动执法端', tech: 'uni-app', note: '离线缓存 + 断点续传' },
+                        { name: '指挥大屏', tech: 'Canvas / DataV', note: '6 块大屏 15s 轮播' },
+                        { name: '开放 API 门户', tech: 'Gateway + OpenAPI', note: '对外 42 个接口' },
+                        { name: '统一埋点 SDK', tech: '自研 12KB', note: '覆盖率 96%' }
+                    ]
+                },
+                {
+                    key: 'business', name: '业务层', icon: '⚡', color: '#2ee6a8',
+                    slo: '核心链路可用性 99.98%', owner: '业务中台组',
+                    desc: '按业务域垂直拆分的场景应用，共享案件、网格、资源与考核模型，避免重复造轮子。',
+                    comps: [
+                        { name: '数字城管', tech: '案件流转域', note: '立案 → 派遣 → 核查' },
+                        { name: '智慧环卫', tech: '清运调度域', note: '人车桶站一体调度' },
+                        { name: '智慧市政', tech: '设施养护域', note: '桥隧结构监测接入' },
+                        { name: '智慧照明', tech: '照明控制域', note: '单灯控制 + 节能策略' },
+                        { name: '智慧排水', tech: '排水调度域', note: '积水点与防汛预警' },
+                        { name: '智慧停车', tech: '停车计费域', note: '路内路外一体化' },
+                        { name: '综合指挥', tech: '协同指挥域', note: '多部门联动调度' },
+                        { name: '公共服务', tech: '事项服务域', note: '办事事项与资源预约' }
+                    ]
+                },
+                {
+                    key: 'service', name: '服务层', icon: '🛠️', color: '#63c8ff',
+                    slo: '接口成功率 99.97%', owner: '平台架构组',
+                    desc: '认证、权限、消息、调度、文件等公共能力以服务形式下沉，业务域只依赖契约不依赖实现。',
+                    comps: [
+                        { name: '统一认证中心', tech: 'OAuth2 + JWT', note: 'SSO 单点登录' },
+                        { name: '权限中心', tech: 'RBAC + 数据权限', note: '菜单 / 按钮 / 行级' },
+                        { name: '消息中心', tech: 'Kafka + 模板引擎', note: '短信 / APP / 站内信' },
+                        { name: '调度作业中心', tech: 'XXL-Job', note: '2.4 万次/日调度' },
+                        { name: '文件与影像服务', tech: 'MinIO 对象存储', note: '图片自动压缩' },
+                        { name: '数据同步服务', tech: 'CDC + MQ', note: '跨库准实时同步' }
+                    ]
+                },
+                {
+                    key: 'data', name: '数据层', icon: '💾', color: '#f7b955',
+                    slo: 'RPO ≤ 5min · RTO ≤ 30min', owner: '数据平台组',
+                    desc: '关系库承载事务、时序库存指标、列库存分析，冷数据下沉对象存储并按生命周期归档。',
+                    comps: [
+                        { name: '关系型数据库', tech: 'MySQL 8.0 主从', note: '一主两从 + 延迟监控' },
+                        { name: '空间数据库', tech: 'PostgreSQL + PostGIS', note: '网格与部件空间检索' },
+                        { name: '时序数据库', tech: 'InfluxDB 2.x', note: '设备指标 90 天保留' },
+                        { name: '缓存服务', tech: 'Redis 7 集群', note: '热点字典与会话' },
+                        { name: '检索服务', tech: 'Elasticsearch', note: '案件全文检索' },
+                        { name: '对象存储', tech: 'MinIO 多副本', note: '影像与附件归档' }
+                    ]
+                },
+                {
+                    key: 'access', name: '接入层', icon: '🔌', color: '#b48cff',
+                    slo: '接入成功率 99.9% · 10 万长连接', owner: '物联网组',
+                    desc: '统一承接 IoT 设备、第三方系统与视频平台的协议差异，向北提供标准物模型与事件总线。',
+                    comps: [
+                        { name: 'API 网关', tech: 'Spring Cloud Gateway', note: '限流 / 熔断 / 鉴权' },
+                        { name: '物联接入网关', tech: 'EMQX + 自研适配', note: 'MQTT / CoAP / HTTP' },
+                        { name: '视频接入代理', tech: 'GB/T 28181', note: '1.2 万路转发' },
+                        { name: '数据交换平台', tech: 'ETL + 文件摆渡', note: '对接 9 个委办局' },
+                        { name: '第三方开放平台', tech: 'OpenAPI 3.0', note: '密钥 + 配额管理' }
+                    ]
+                }
+            ];
+            function layerByKey(k) { return LAYERS.filter(l => l.key === k)[0] || LAYERS[0]; }
+
+            /* ==========================================================================
+               2. 微服务目录
+               ========================================================================== */
+            const SVC_SEED = [
+                ['auth-center', '统一认证中心', '平台', '2.8.1', 6, '平台架构组'],
+                ['perm-center', '权限中心', '平台', '2.6.4', 4, '平台架构组'],
+                ['gateway', 'API 网关', '平台', '3.4.0', 8, '平台架构组'],
+                ['msg-center', '消息中心', '平台', '1.9.2', 4, '平台架构组'],
+                ['file-service', '文件与影像服务', '平台', '1.6.7', 4, '平台架构组'],
+                ['job-center', '调度作业中心', '平台', '1.4.3', 3, '平台架构组'],
+                ['case-service', '案件流转服务', '城管', '4.1.2', 8, '数字城管组'],
+                ['dispatch-service', '派遣调度服务', '城管', '3.7.5', 6, '数字城管组'],
+                ['supervise-service', '督查考核服务', '城管', '2.5.0', 4, '数字城管组'],
+                ['vehicle-service', '车辆人员服务', '城管', '2.2.3', 4, '数字城管组'],
+                ['video-proxy', '视频接入代理', '城管', '1.8.0', 4, '视频平台组'],
+                ['grid-service', '网格社区服务', '城管', '2.0.6', 3, '数字城管组'],
+                ['waste-service', '环卫清运服务', '环卫', '3.1.4', 5, '环卫业务组'],
+                ['sanitation-kpi', '环卫考核服务', '环卫', '1.7.2', 3, '环卫业务组'],
+                ['facility-service', '市政设施服务', '市政', '3.6.0', 5, '市政业务组'],
+                ['bridge-monitor', '桥隧结构监测', '市政', '1.3.5', 2, '市政业务组'],
+                ['light-service', '照明控制服务', '照明', '2.4.1', 4, '照明业务组'],
+                ['drain-service', '排水调度服务', '排水', '2.9.0', 5, '水务业务组'],
+                ['flood-warn', '防汛预警服务', '排水', '1.5.6', 3, '水务业务组'],
+                ['parking-service', '停车计费服务', '停车', '3.0.8', 6, '停车业务组'],
+                ['guide-service', '车位引导服务', '停车', '1.4.9', 3, '停车业务组'],
+                ['command-center', '指挥调度服务', '指挥', '2.3.2', 4, '指挥中心'],
+                ['public-service', '公共服务事项', '公共服务', '1.9.8', 3, '公共服务组'],
+                ['iot-gateway', '物联接入网关', '接入', '4.2.0', 10, '物联网组'],
+                ['data-sync', '数据同步服务', '数据', '2.1.1', 4, '数据平台组'],
+                ['report-engine', '报表引擎', '数据', '3.3.0', 4, '数据平台组'],
+                ['ai-vision', '视频 AI 识别', '数据', '2.2.4', 6, '算法组'],
+                ['ops-agent', '运维采集中台', '基础设施', '1.2.0', 12, '运维组']
+            ];
+
+            const SVC_DEPS = {
+                'auth-center': [], 'perm-center': ['auth-center'], 'msg-center': ['auth-center'],
+                'job-center': ['msg-center'], 'file-service': ['auth-center'],
+                'gateway': ['auth-center', 'perm-center'],
+                'grid-service': ['auth-center'],
+                'case-service': ['auth-center', 'msg-center', 'file-service', 'grid-service'],
+                'dispatch-service': ['case-service', 'msg-center', 'perm-center'],
+                'supervise-service': ['case-service', 'report-engine'],
+                'vehicle-service': ['auth-center', 'iot-gateway', 'msg-center'],
+                'video-proxy': ['auth-center', 'iot-gateway'],
+                'ai-vision': ['video-proxy', 'msg-center'],
+                'waste-service': ['vehicle-service', 'iot-gateway', 'msg-center'],
+                'sanitation-kpi': ['waste-service', 'report-engine'],
+                'facility-service': ['auth-center', 'file-service', 'msg-center'],
+                'bridge-monitor': ['iot-gateway', 'msg-center'],
+                'light-service': ['iot-gateway', 'msg-center', 'perm-center'],
+                'flood-warn': ['iot-gateway', 'msg-center'],
+                'drain-service': ['iot-gateway', 'msg-center', 'flood-warn'],
+                'parking-service': ['iot-gateway', 'msg-center', 'perm-center'],
+                'guide-service': ['parking-service', 'iot-gateway'],
+                'command-center': ['case-service', 'dispatch-service', 'video-proxy', 'vehicle-service'],
+                'public-service': ['auth-center', 'file-service', 'msg-center'],
+                'iot-gateway': ['auth-center', 'msg-center'],
+                'data-sync': ['msg-center'],
+                'report-engine': ['data-sync'],
+                'ops-agent': ['msg-center']
+            };
+
+            const SVC_FIX = { 'ai-vision': '告警', 'guide-service': '降级', 'bridge-monitor': '维护' };
+            const DOMAIN_COLOR = {
+                '平台': '#00d4ff', '城管': '#2ee6a8', '环卫': '#63c88f', '市政': '#f7b955',
+                '照明': '#ffd479', '排水': '#48c7ff', '停车': '#8f7dff', '指挥': '#ff8fa3',
+                '公共服务': '#7fd1ff', '接入': '#b48cff', '数据': '#ffa94d', '基础设施': '#8a9db1'
+            };
+
+            resetSeed(20260401);
+            const SERVICES = SVC_SEED.map(function (r, i) {
+                const id = r[0], domain = r[2];
+                const qps = sri(12, 460) * (domain === '平台' ? 3 : 1);
+                const p95 = sri(60, 340);
+                const err = Number((srnd() * 0.42 + 0.01).toFixed(2));
+                const health = SVC_FIX[id] || (p95 > 300 ? '告警' : '健康');
+                const apiCount = sri(6, 34);
+                return {
+                    id: id, name: r[1], domain: domain, ver: r[3], inst: r[4], owner: r[5],
+                    qps: qps, p95: p95, err: err, health: health, apis: apiCount,
+                    deps: (SVC_DEPS[id] || []).slice(),
+                    sla: domain === '平台' ? '99.99%' : '99.95%',
+                    updated: Date.now() - sri(1, 26) * DAY - sri(0, 20) * HOUR
+                };
+            });
+            function svcById(id) { return SERVICES.filter(s => s.id === id)[0] || null; }
+            function svcByDomain(d) { return d === '全部' ? SERVICES.slice() : SERVICES.filter(s => s.domain === d); }
+            const SVC_DOMAINS = ['全部'].concat(SERVICES.map(s => s.domain).filter(function (d, i, a) { return a.indexOf(d) === i; }));
+
+            /* 服务接口清单：按服务 id 稳定生成，避免每次打开都变 */
+            const API_POOL = [
+                ['GET', '/list', '分页查询'],
+                ['GET', '/{id}', '详情查询'],
+                ['POST', '', '新建记录'],
+                ['PUT', '/{id}', '更新记录'],
+                ['DELETE', '/{id}', '逻辑删除'],
+                ['POST', '/export', '导出数据'],
+                ['GET', '/stat', '统计汇总']
+            ];
+            function apiList(svc) {
+                const rnd = hashSeed(svc.id);
+                const n = 3 + (rnd % 3);
+                const out = [];
+                for (let i = 0; i < n; i++) {
+                    const a = API_POOL[(rnd >> (i * 3)) % API_POOL.length];
+                    out.push({ method: a[0], path: '/api/v1/' + svc.id.replace(/-/g, '') + a[1], desc: a[2] });
+                }
+                return out;
+            }
+
+            /* ==========================================================================
+               3. 技术栈
+               ========================================================================== */
+            const STACK_SEED = [
+                ['Vue 3', '前端', '3.4.21', '3.4.27', '在用', '前端架构组', '18 个业务模块', '渐进式框架，配合 Vite 构建，路由与状态分层管理。'],
+                ['Vite', '前端', '5.2.8', '5.4.2', '在用', '前端架构组', '全部新项目', '冷启动快，按环境注入变量，产物统一走 CDN。'],
+                ['TypeScript', '前端', '5.4.3', '5.6.2', '在用', '前端架构组', '全部新项目', '核心模型与接口契约类型化，减少联调返工。'],
+                ['Element Plus', '前端', '2.6.1', '2.8.4', '在用', '前端架构组', '管理后台', '基础组件库，主题变量统一在 ui-kit 内覆盖。'],
+                ['Pinia', '前端', '2.1.7', '2.2.1', '在用', '前端架构组', '管理后台', '替代 Vuex，按业务域拆分 store。'],
+                ['uni-app', '终端', '3.0.0', '3.0.0-4020920240930001', '在用', '移动端组', '执法端 / 巡查端', '一套代码编译到小程序与 App，原生能力按需插件化。'],
+                ['执法记录仪 SDK', '终端', '2.3.0', '2.4.1', '试点', '移动端组', '执法终端 320 台', '实时回传与本地缓存双通道，弱网优先本地录制。'],
+                ['Spring Boot', '后端', '3.2.5', '3.3.4', '在用', '平台架构组', '全部微服务', '统一依赖版本由 BOM 管理，禁止单服务私改。'],
+                ['Spring Cloud Gateway', '后端', '4.1.0', '4.1.5', '在用', '平台架构组', '全部入口流量', '统一鉴权、限流与灰度路由。'],
+                ['MyBatis-Plus', '后端', '3.5.5', '3.5.7', '在用', '平台架构组', '关系库访问', '代码生成与分页插件，禁止在 XML 拼接字符串。'],
+                ['Nacos', '中间件', '2.3.2', '2.4.3', '在用', '平台架构组', '注册配置中心', '双集群部署，配置变更灰度发布。'],
+                ['Sentinel', '中间件', '1.8.7', '1.8.8', '在用', '平台架构组', '热点接口限流', '熔断规则随服务上线一起纳管。'],
+                ['XXL-Job', '中间件', '2.4.1', '2.4.1', '在用', '平台架构组', '2.4 万次/日', '调度中心与执行器分属不同可用区。'],
+                ['Kafka', '中间件', '3.6.1', '3.8.0', '在用', '数据平台组', '事件总线', '案件、设备事件统一走 Topic，消费位点可回溯。'],
+                ['EMQX', '中间件', '5.3.2', '5.8.0', '在用', '物联网组', '10 万物联连接', 'MQTT 集群，按产品维度做 ACL 隔离。'],
+                ['Nginx', '中间件', '1.24.0', '1.27.1', '在用', '运维组', '静态资源与反向代理', 'TLS 终止在最外层，内网全链路明文可控域内。'],
+                ['MySQL', '数据', '8.0.34', '8.4.2', '在用', '数据平台组', '核心事务库', '一主两从，慢查询超过 200ms 自动告警。'],
+                ['PostgreSQL + PostGIS', '数据', '15.4', '16.3', '在用', '数据平台组', '空间检索', '承载网格、部件、路段的几何计算。'],
+                ['Redis', '数据', '7.0.11', '7.4.0', '在用', '数据平台组', '会话与热点缓存', '集群模式 6 分片，键统一前缀规范。'],
+                ['InfluxDB', '数据', '2.7.4', '2.7.11', '在用', '数据平台组', '设备时序指标', '保留 90 天原始点，聚合结果落 MySQL。'],
+                ['Elasticsearch', '数据', '8.11.1', '8.15.0', '在用', '数据平台组', '案件全文检索', '索引按月滚动，冷数据转 Frozen 层。'],
+                ['ClickHouse', '数据', '23.8 LTS', '24.3 LTS', '试点', '数据平台组', '决策分析宽表', '大屏聚合查询从分钟级降到秒级。'],
+                ['MinIO', '数据', '2024.03', '2024.09', '在用', '运维组', '影像与附件', '多副本纠删码，生命周期转冷备。'],
+                ['Kubernetes', '基础设施', '1.28', '1.30', '在用', '运维组', '生产 / 预发集群', '节点按可用区打散，Pod 反亲和部署。'],
+                ['Docker', '基础设施', '24.0.7', '27.1.1', '在用', '运维组', '全部构建产物', '基础镜像统一维护，禁止业务镜像自带 OS 层。'],
+                ['Harbor', '基础设施', '2.9.2', '2.11.0', '在用', '运维组', '镜像仓库', '镜像签名校验，未签名镜像禁止部署生产。'],
+                ['Argo CD', '基础设施', '2.9.4', '2.12.0', '在用', '运维组', 'GitOps 发布', '环境差异用 Kustomize 覆盖，发布即代码。'],
+                ['Prometheus', '基础设施', '2.48.1', '2.54.0', '在用', '运维组', '指标采集', '15s 抓取，规则由服务上线时自带。'],
+                ['Grafana', '基础设施', '10.2.3', '11.2.0', '在用', '运维组', '可视化与告警', '看板按域拆分，告警统一收敛到值班群。'],
+                ['Loki', '基础设施', '2.9.3', '3.1.1', '在用', '运维组', '日志聚合', '与 Prometheus 标签对齐，便于指标日志互跳。'],
+                ['Vue 2', '前端', '2.7.16', '3.4.27', '待退役', '前端架构组', '3 个历史页面', '仅做安全修复，新需求一律用 Vue 3 重写。']
+            ];
+            function versionGap(cur, latest) {
+                if (cur === latest) return false;
+                const a = String(cur).match(/(\d+)\.(\d+)/);
+                const b = String(latest).match(/(\d+)\.(\d+)/);
+                if (!a || !b) return true;
+                return a[1] !== b[1] || a[2] !== b[2];
+            }
+            const STACK = STACK_SEED.map(function (r) {
+                return {
+                    name: r[0], group: r[1], cur: r[2], latest: r[3], status: r[4],
+                    owner: r[5], scope: r[6], note: r[7],
+                    behind: r[4] !== '待退役' && versionGap(r[2], r[3])
+                };
+            });
+            const STACK_GROUPS = ['全部'].concat(STACK.map(s => s.group).filter(function (g, i, a) { return a.indexOf(g) === i; }));
+            function stackByName(n) { return STACK.filter(s => s.name === n)[0] || null; }
+
+            /* ==========================================================================
+               4. 安全架构
+               ========================================================================== */
+            const SEC_LAYERS = [
+                { icon: '🏢', name: '物理与环境安全', desc: '机房双活、门禁与视频监控，进出留痕可追溯' },
+                { icon: '🌐', name: '网络边界防护', desc: '政务外网与互联网分域，WAF + 抗 DDoS + 微隔离' },
+                { icon: '🖥️', name: '主机与容器安全', desc: '镜像基线扫描、运行时防护、最小权限运行' },
+                { icon: '🔐', name: '应用与接口安全', desc: '统一鉴权、参数校验、防重放与越权检测' },
+                { icon: '🗄️', name: '数据安全与隐私', desc: '分级分类、脱敏展示、加密存储与流转审计' },
+                { icon: '🧾', name: '身份与审计', desc: 'SSO 单点登录、四员分权、操作留痕 180 天' }
+            ];
+
+            const SEC_SEED = [
+                ['8.1.4.1', '身份鉴别', '对登录用户进行身份标识与鉴别，采用两种及以上组合鉴别技术', '达标', '安全组-周倩', '每季度'],
+                ['8.1.4.2', '身份鉴别', '登录失败处理：连续 5 次失败锁定账户并记录审计日志', '达标', '安全组-周倩', '每季度'],
+                ['8.1.4.3', '身份鉴别', '远程管理时采取必要措施防止鉴别信息被窃听', '达标', '运维组-李航', '每半年'],
+                ['8.1.4.4', '访问控制', '按最小权限原则分配账户权限，权限变更须审批留痕', '达标', '安全组-周倩', '每季度'],
+                ['8.1.4.5', '访问控制', '重命名默认账户并修改默认口令，删除多余账户', '整改中', '运维组-李航', '每月'],
+                ['8.1.4.6', '安全审计', '审计记录覆盖每个用户，内容包含日期、用户、事件类型与结果', '达标', '安全组-罗军', '每月'],
+                ['8.1.4.7', '安全审计', '审计记录保护，避免未预期的删除、修改或覆盖', '达标', '安全组-罗军', '每月'],
+                ['8.1.4.8', '入侵防范', '遵循最小安装原则，仅安装必要组件与应用程序', '达标', '运维组-李航', '每半年'],
+                ['8.1.4.9', '入侵防范', '通过设定终端接入方式与网络地址范围限制管理终端', '整改中', '运维组-陈默', '每季度'],
+                ['8.1.4.10', '入侵防范', '发现可能存在的已知漏洞，经评估后及时修补', '达标', '安全组-罗军', '每月'],
+                ['8.1.4.11', '恶意代码防范', '部署恶意代码检测与清除机制，特征库及时更新', '达标', '运维组-陈默', '每月'],
+                ['8.1.4.12', '数据完整性', '采用校验技术保证重要数据在传输过程中的完整性', '达标', '数据平台组-吕薇', '每季度'],
+                ['8.1.4.13', '数据保密性', '重要数据存储采用密码技术保证保密性', '整改中', '数据平台组-吕薇', '每季度'],
+                ['8.1.4.14', '数据备份恢复', '提供本地数据备份与恢复功能，每日备份并定期演练', '达标', '运维组-李航', '每季度'],
+                ['8.1.4.15', '数据备份恢复', '提供异地数据备份，关键数据每日增量同步异地', '待评估', '运维组-陈默', '每半年'],
+                ['8.1.4.16', '个人信息保护', '仅采集业务必需的个人信息，展示与导出按需脱敏', '达标', '安全组-周倩', '每季度']
+            ];
+            const SEC_CTRL = SEC_SEED.map(function (r) {
+                return { id: r[0], cat: r[1], req: r[2], status: r[3], owner: r[4], cycle: r[5] };
+            });
+
+            const CERTS = [
+                { name: '平台域名通配符证书', sub: '*.city-platform.gov.cn', days: 42, owner: '运维组' },
+                { name: '政务外网接入证书', sub: 'zw-web-gw', days: 118, owner: '运维组' },
+                { name: '短信网关 API 密钥', sub: 'sms-openapi', days: 15, owner: '平台架构组' },
+                { name: '视频信令密钥', sub: 'gb28181-sip', days: 86, owner: '视频平台组' },
+                { name: '数据交换专线证书', sub: 'etl-vpn', days: 205, owner: '数据平台组' },
+                { name: '回调签名密钥', sub: 'pay-callback', days: 6, owner: '公共服务组' }
+            ];
+
+            /* ==========================================================================
+               5. 部署与发布
+               ========================================================================== */
+            const ENV_META = {
+                prod: { name: '生产环境', zone: '华东 · 双可用区', nodes: 12, pods: 248, replicas: 3 },
+                pre: { name: '预发环境', zone: '华东 · 单可用区', nodes: 6, pods: 96, replicas: 2 },
+                test: { name: '测试环境', zone: '华东 · 单可用区', nodes: 4, pods: 52, replicas: 1 }
+            };
+            const NODE_ROLES = ['应用节点', '数据节点', '网关节点', '任务节点'];
+
+            function buildNodes(env) {
+                resetSeed(env === 'prod' ? 7701 : env === 'pre' ? 8802 : 9903);
+                const meta = ENV_META[env];
+                const list = [];
+                for (let i = 1; i <= meta.nodes; i++) {
+                    const role = i <= 2 ? '网关节点' : (i % 5 === 0 ? '数据节点' : (i % 7 === 0 ? '任务节点' : '应用节点'));
+                    list.push({
+                        name: 'arch-' + env + '-' + String(i).padStart(2, '0'),
+                        zone: env === 'prod' ? (i % 2 ? '可用区 A' : '可用区 B') : meta.zone,
+                        role: role,
+                        pods: sri(12, 32),
+                        cpu: sri(28, 84),
+                        mem: sri(34, 88),
+                        status: '就绪'
+                    });
+                }
+                return list;
+            }
+
+            const PIPE_STAGES = ['代码检出', '依赖构建', '单元测试', '镜像推送', '安全扫描', '预发验证', '灰度 10%', '全量发布', '健康校验'];
+
+            const REL_SEED = [
+                ['v2.4.0', 'prod', '案件流转服务：新增重复上报归并', '顾城', 1, '成功'],
+                ['v2.4.0-rc2', 'pre', '督查考核：中队考核口径修正', '周敏', 2, '成功'],
+                ['v2.3.9', 'prod', '物联接入网关：MQTT 5 协议适配', '李航', 4, '成功'],
+                ['v2.3.8', 'prod', '排水调度：积水点阈值调整', '陈默', 6, '回滚'],
+                ['v2.3.8', 'prod', '排水调度：积水点阈值调整（二次）', '陈默', 6, '成功'],
+                ['v2.3.7', 'test', '停车计费：月卡续费规则', '吕薇', 9, '成功'],
+                ['v2.3.6', 'prod', '视频 AI：占道经营识别模型升级', '算法组', 13, '成功'],
+                ['v2.3.5', 'prod', '公共服务：事项材料清单优化', '许倩', 18, '成功']
+            ];
+
+            /* ==========================================================================
+               6. 容量与监控
+               ========================================================================== */
+            const CAP_WATER = [
+                { name: '集群 CPU', value: 62, warn: 80 },
+                { name: '集群内存', value: 71, warn: 80 },
+                { name: '存储容量', value: 48, warn: 85 },
+                { name: '出口带宽', value: 55, warn: 80 },
+                { name: '数据库连接', value: 68, warn: 80 },
+                { name: '消息积压', value: 12, warn: 70 }
+            ];
+
+            const ALERT_SEED = [
+                ['bad', '支付回调签名密钥 6 天后到期', '公共服务 / pay-callback', 26],
+                ['warn', '视频 AI 识别服务 P95 超过 300ms', '数据域 / ai-vision', 48],
+                ['warn', '车位引导服务出现降级，已切备用链路', '停车域 / guide-service', 96],
+                ['warn', '集群内存水位 71%，接近扩容阈值', '生产 / arch-prod 集群', 140],
+                ['info', '桥隧结构监测进入计划维护窗口', '市政域 / bridge-monitor', 210],
+                ['info', 'InfluxDB 冷数据归档任务完成', '数据域 / influxdb', 320]
+            ];
+
+            function buildCapSeries(hours) {
+                resetSeed(3100 + hours);
+                const points = hours <= 24 ? 24 : hours <= 72 ? 72 : 84;
+                const stepMs = hours * HOUR / points;
+                const labels = [], qps = [], rt = [], p95 = [], err = [];
+                const start = Date.now() - hours * HOUR;
+                for (let i = 0; i < points; i++) {
+                    const t = start + stepMs * i;
+                    const d = new Date(t);
+                    const h = d.getHours() + d.getMinutes() / 60;
+                    // 早晚高峰形态 + 抖动
+                    const peak = Math.exp(-Math.pow((h - 9.5) / 2.4, 2)) * 0.55 + Math.exp(-Math.pow((h - 18) / 2.2, 2)) * 0.5;
+                    const base = 620 + peak * 1450 + srnd() * 160;
+                    const v = Math.round(base);
+                    qps.push(v);
+                    const avg = Math.round(120 + peak * 90 + srnd() * 30);
+                    rt.push(avg);
+                    p95.push(Math.round(avg * (1.9 + srnd() * 0.5)));
+                    err.push(Number((0.02 + srnd() * 0.2).toFixed(2)));
+                    labels.push(points <= 24 ? (SC.pad2(d.getHours()) + ':00') : ((d.getMonth() + 1) + '/' + d.getDate() + ' ' + SC.pad2(d.getHours())));
+                }
+                return { labels, qps, rt, p95, err, peak: Math.max.apply(null, qps), avg: Math.round(rt.reduce((a, b) => a + b, 0) / rt.length), p95avg: Math.round(p95.reduce((a, b) => a + b, 0) / p95.length), errAvg: Number((err.reduce((a, b) => a + b, 0) / err.length).toFixed(2)) };
+            }
+
+            /* ==========================================================================
+               7. 架构决策 ADR
+               ========================================================================== */
+            const ADR_SEED = [
+                {
+                    id: 'ADR-0001', title: '由单体应用迁移到业务域微服务', cat: '架构风格', status: '已采纳', impact: '全域', owner: '技术委员会', ago: 320,
+                    context: '单体应用发布耦合严重，单个模块故障会导致整站不可用，迭代窗口被压缩到凌晨。',
+                    decision: '按业务域垂直拆分为 28 个微服务，公共能力下沉为平台服务，网关统一收口。',
+                    effect: '发布频率由月级提升到周级，故障影响面收敛到单域；运维复杂度上升，需要配套可观测体系。',
+                    alt: '模块化单体（Modular Monolith）：改造量小，但无法解决独立发布与隔离问题。'
+                },
+                {
+                    id: 'ADR-0002', title: '选用 Kafka 作为统一事件总线', cat: '中间件选型', status: '已采纳', impact: '数据域', owner: '数据平台组', ago: 268,
+                    context: '案件流转、设备事件、考核统计分散在不同消息组件，重复建设且难以追溯。',
+                    decision: '统一切换到 Kafka，按域划分 Topic，消费位点可回溯，事件保留 7 天。',
+                    effect: '事件链路可观测，回放能力支撑数据重算；峰值吞吐提升 3 倍。',
+                    alt: 'RabbitMQ：延迟更低，但吞吐与回溯能力不足；RocketMQ：生态偏阿里云绑定。'
+                },
+                {
+                    id: 'ADR-0003', title: '时序指标统一落 InfluxDB', cat: '数据存储', status: '已采纳', impact: '物联网 / 数据域', owner: '数据平台组', ago: 210,
+                    context: '设备指标写在 MySQL 宽表里，单表 40 亿行，查询与归档成本高。',
+                    decision: '指标类数据改写入 InfluxDB，90 天原始点 + 聚合结果回写 MySQL。',
+                    effect: '指标查询 P95 从 2.4s 降到 180ms，MySQL 存储压力下降 62%。',
+                    alt: 'ClickHouse：更适合大宽表分析，但运维成本高于当前团队承载能力。'
+                },
+                {
+                    id: 'ADR-0004', title: '前端多页应用替代单页巨型包', cat: '前端架构', status: '已采纳', impact: '表现层', owner: '前端架构组', ago: 160,
+                    context: '单页应用首屏包体 6.8MB，低配终端加载超过 12 秒，业务方投诉集中。',
+                    decision: '按场景拆成独立页面，公共运行时分包复用，图表按需加载。',
+                    effect: '首屏 JS 从 6.8MB 降到 1.1MB，低端设备首屏时间缩短到 3 秒内。',
+                    alt: '继续做大包 + 预加载：改造量小，但无法解决弱网与低配设备问题。'
+                },
+                {
+                    id: 'ADR-0005', title: '数据权限下沉到权限中心', cat: '安全与权限', status: '已采纳', impact: '全域', owner: '安全组', ago: 128,
+                    context: '各业务域自行实现数据权限，口径不一致，存在越权查看风险。',
+                    decision: '权限中心统一提供行级数据权限表达式，业务服务只做条件注入。',
+                    effect: '越权问题归零，权限变更可审计；新增业务接入成本下降。',
+                    alt: '各域自建：灵活但无法统一审计，已否决。'
+                },
+                {
+                    id: 'ADR-0006', title: '灰度发布采用 Argo Rollouts', cat: '交付流程', status: '已采纳', impact: '运维 / 全域', owner: '运维组', ago: 96,
+                    context: '手工改副本比例做灰度，过程不可复现，回滚依赖人工经验。',
+                    decision: '引入 Argo Rollouts 管理灰度与自动回滚，指标门禁接入 Prometheus。',
+                    effect: '回滚耗时从 15 分钟降到 90 秒，灰度过程全部留痕。',
+                    alt: '自研脚本：短期成本低，长期维护成本高且缺乏可视化。'
+                },
+                {
+                    id: 'ADR-0007', title: '引入 ClickHouse 支撑决策大屏', cat: '数据存储', status: '建议', impact: '数据域 / 决策分析', owner: '数据平台组', ago: 42,
+                    context: '决策分析大屏的多维聚合查询在 MySQL 上超过 8 秒，影响演示与实战。',
+                    decision: '将大屏宽表同步到 ClickHouse，查询改走列存，MySQL 只保留明细。',
+                    effect: '预计查询降到 1 秒内，需评估双写一致性与运维投入。',
+                    alt: '预计算汇总表：实现简单，但维度组合爆炸后维护困难。'
+                },
+                {
+                    id: 'ADR-0008', title: '逐步退役 Vue 2 历史页面', cat: '技术债治理', status: '已采纳', impact: '表现层', owner: '前端架构组', ago: 24,
+                    context: '3 个历史页面仍运行 Vue 2，无法复用新组件库，安全补丁停止维护。',
+                    decision: '按访问量排序分批重写，先迁移高频页面，低频页面直接下线合并。',
+                    effect: '预计 2 个季度内完成，减少一套构建链路。',
+                    alt: '一次性全量重写：风险集中，业务无法接受长时间冻结窗口。'
+                }
+            ];
+
+            /* ==========================================================================
+               8. 业务域 / 原则 / 演进 / 成熟度
+               ========================================================================== */
+            const DOMAINS = [
+                { name: '数字城管', icon: '🏠', page: 'digital-city-management.html', desc: '事件立案、派遣、核查与督查考核全流程', status: '已上线', events: 1286 },
+                { name: '综合指挥', icon: '🚀', page: 'central-command.html', desc: '多部门协同调度与应急指挥', status: '已上线', events: 342 },
+                { name: '决策分析', icon: '📊', page: 'decision-analysis.html', desc: '六大数据域可视化决策大屏', status: '已上线', events: 210 },
+                { name: '智慧街面', icon: '🚦', page: 'smart-street.html', desc: '街面秩序与交通流量治理', status: '已上线', events: 864 },
+                { name: '智慧环卫', icon: '🗑️', page: 'smart-environment.html', desc: '垃圾清运与环卫作业智能调度', status: '已上线', events: 1120 },
+                { name: '智慧市政', icon: '🏗️', page: 'smart-municipal.html', desc: '市政设施养护与桥隧结构监测', status: '已上线', events: 604 },
+                { name: '智慧排水', icon: '💧', page: 'smart-drainage.html', desc: '排水管网监控与防汛预警', status: '已上线', events: 428 },
+                { name: '智慧照明', icon: '💡', page: 'smart-lighting.html', desc: '单灯控制、能耗分析与节能策略', status: '已上线', events: 356 },
+                { name: '智慧停车', icon: '🅿️', page: 'smart-parking.html', desc: '路内路外停车与车位引导', status: '灰度中', events: 512 },
+                { name: '公共服务', icon: '🏛️', page: 'public-service.html', desc: '公共服务事项与资源预约', status: '已上线', events: 288 },
+                { name: '设备数据', icon: '🔧', page: 'equipment-data.html', desc: '设备台账、物模型与数据质量', status: '已上线', events: 96 },
+                { name: '客户端', icon: '📱', page: 'client-app.html', desc: '市民端与执法端移动应用', status: '已上线', events: 742 }
+            ];
+
+            const PRINCIPLES = [
+                { n: '01', name: '单一职责', desc: '按业务域垂直拆分，服务边界与组织边界对齐，一个服务只解决一类问题。' },
+                { n: '02', name: '契约优先', desc: '接口先定义 OpenAPI 再实现，跨域变更必须向后兼容，废弃接口保留两个版本周期。' },
+                { n: '03', name: '可观测优先', desc: '指标、日志、链路三件套随服务上线，缺任一项不予发布到生产。' },
+                { n: '04', name: '渐进演进', desc: '先立标准再改造，允许双轨并行，任何架构调整都能回滚到上一稳定态。' }
+            ];
+
+            const TIMELINE = [
+                { h: '2024 Q3', m: '单体应用上线，统一登录与工单流转，支撑首批 4 个业务域。', s: 'done' },
+                { h: '2025 Q1', m: '按域拆分为 28 个微服务，网关统一收口，引入配置中心。', s: 'done' },
+                { h: '2025 Q3', m: '数据中台成型，Kafka 事件总线 + 时序库承载设备指标。', s: 'done' },
+                { h: '2026 Q1', m: '全量容器化，K8s 双可用区部署，GitOps 与自动回滚落地。', s: 'done' },
+                { h: '2026 Q4', m: '视频 AI 与决策分析接入，走向“感知—分析—处置”闭环。', s: 'current' }
+            ];
+
+            const MATURITY = [
+                { name: '可观测性', value: 88 },
+                { name: '自动化交付', value: 82 },
+                { name: '容灾备份', value: 76 },
+                { name: '安全合规', value: 91 },
+                { name: '性能容量', value: 84 }
+            ];
+
+            const PIPE_LOG_SEED = [
+                ['ok', '流水线初始化完成，目标环境 '],
+                ['info', '拉取代码仓库 feature/release-2.4.1'],
+                ['info', '依赖构建缓存命中率 86%']
+            ];
+
+            /* ==========================================================================
+               9. 本地存档（可变状态）
+               ========================================================================== */
+            let ST = SC.store.get(NS, 'state', null);
+            if (!ST || ST.ver !== ARCH_VER) {
+                ST = { ver: ARCH_VER, adr: [], rels: [], ack: [], fixed: [], inst: {}, audits: [], pipeRuns: 0 };
+            }
+            if (!Array.isArray(ST.adr)) ST.adr = [];
+            if (!Array.isArray(ST.rels)) ST.rels = [];
+            if (!Array.isArray(ST.ack)) ST.ack = [];
+            if (!Array.isArray(ST.fixed)) ST.fixed = [];
+            if (!ST.inst) ST.inst = {};
+            if (!Array.isArray(ST.audits)) ST.audits = [];
+            function saveST() { SC.store.set(NS, 'state', ST); }
+
+            /* ==========================================================================
+               10. 渲染支撑
+               ========================================================================== */
+            function q(sel) { return document.querySelector(sel); }
+            function qa(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+            function put(sel, html) { const n = q(sel); if (n) n.innerHTML = html; }
+            function tagHTML(text, kind) { return '<span class="sc-tag ' + (kind || 'info') + '">' + SC.esc(text) + '</span>'; }
+            function kvBox(items) {
+                return items.map(function (it) {
+                    return '<div class="sc-kv-item"><div class="k">' + it[0] + '</div><div class="v">' + it[1] + '</div></div>';
+                }).join('');
+            }
+            function dayAgo(n) { return SC.stamp(new Date(Date.now() - n * DAY), false).slice(0, 10); }
+            function pctOf(a, b) { return b ? Math.round(a / b * 1000) / 10 : 0; }
+            function hexA(hex, alpha) {
+                const m = String(hex).replace('#', '');
+                if (m.length !== 6) return hex;
+                return 'rgba(' + parseInt(m.slice(0, 2), 16) + ',' + parseInt(m.slice(2, 4), 16) + ',' +
+                    parseInt(m.slice(4, 6), 16) + ',' + alpha + ')';
+            }
+            function activeModule() {
+                const node = q('.module-content.active');
+                return node ? node.id.replace('-module', '') : 'overview';
+            }
+            function healthTag(st) { return tagHTML(st, TAG[st] || 'off'); }
+
+            /* 业务域卡片与服务域名的对应关系（页面口径与微服务口径不同名） */
+            const DOMAIN_SVC = {
+                '数字城管': '城管', '智慧街面': '城管', '综合指挥': '指挥', '决策分析': '数据',
+                '智慧环卫': '环卫', '智慧市政': '市政', '智慧排水': '排水', '智慧照明': '照明',
+                '智慧停车': '停车', '公共服务': '公共服务', '设备数据': '数据', '客户端': '平台'
+            };
+
+            /* ---- 与场景页的双向联动：统一走 arch-link.js 的映射与快照 ---- */
+            function svcHref(s) {
+                if (!window.ArchLink || !ArchLink.serviceHref) return '';
+                return ArchLink.serviceHref({ id: s.id, domain: s.domain }, 'city-platform-architecture.html');
+            }
+            function domainCardHref(d, sd) {
+                if (!window.ArchLink || !ArchLink.domainHref) return d.page;
+                return ArchLink.domainHref(d.page, sd, 'city-platform-architecture.html');
+            }
+            let archPubSig = '';
+            /* 将域健康、等保达标率与服务明细发布给场景页（签名不变不重复写） */
+            function publishArchSnapshot() {
+                if (!window.ArchLink || !ArchLink.publish) return;
+                const okCtrl = SEC_CTRL.filter(c => ctrlStatus(c.id) === '达标').length;
+                const sig = okCtrl + '/' + SEC_CTRL.length + '|' + SERVICES.map(s => s.health + s.inst).join(',');
+                if (sig === archPubSig) return;
+                archPubSig = sig;
+                const domains = {};
+                const services = {};
+                SERVICES.forEach(function (s) {
+                    const d = domains[s.domain] || (domains[s.domain] = { health: '健康', ok: 0, total: 0 });
+                    d.total++;
+                    if (s.health === '健康') d.ok++;
+                    if (ArchLink.worstHealth([d.health, s.health]) !== d.health) d.health = s.health;
+                    services[s.id] = {
+                        id: s.id, name: s.name, domain: s.domain, ver: s.ver, inst: s.inst,
+                        health: s.health, owner: s.owner, qps: s.qps
+                    };
+                });
+                ArchLink.publish({
+                    security: { rate: pctOf(okCtrl, SEC_CTRL.length), ok: okCtrl, total: SEC_CTRL.length, level: '三级' },
+                    domains: domains,
+                    services: services
+                });
+            }
+
+            /* 页头实时状态 */
+            function renderLive() {
+                const healthy = SERVICES.filter(s => s.health === '健康').length;
+                const qps = SERVICES.reduce((a, s) => a + s.qps, 0);
+                const okCtrl = SEC_CTRL.filter(c => ctrlStatus(c.id) === '达标').length;
+                const d = new Date();
+                const week = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+                put('#arch-live',
+                    '<span>版本 <b>v2.4.0</b></span><span class="sep"></span>' +
+                    '<span>服务 <b>' + SERVICES.length + '</b> · 健康 <b>' + healthy + '</b></span><span class="sep"></span>' +
+                    '<span>网关 <b>' + SC.num(qps) + '</b> QPS</span><span class="sep"></span>' +
+                    '<span>等保达标 <b>' + pctOf(okCtrl, SEC_CTRL.length) + '%</b></span><span class="sep"></span>' +
+                    '<span class="mono">' + SC.stamp(d) + ' 周' + week + '</span>');
+                publishArchSnapshot();
+            }
+
+            /* ==========================================================================
+               11. 架构全景
+               ========================================================================== */
+            let ovActive = 'present', ovHover = -1, ovHits = [];
+
+            function renderOverview() {
+                const healthy = SERVICES.filter(s => s.health === '健康').length;
+                const rels = allRels();
+                const okRel = rels.filter(r => r.result === '成功').length;
+                const okCtrl = SEC_CTRL.filter(c => ctrlStatus(c.id) === '达标').length;
+                const behind = STACK.filter(s => s.behind).length;
+                const avgMat = Math.round(MATURITY.reduce((a, m) => a + m.value, 0) / MATURITY.length);
+
+                put('#ov-kv', kvBox([
+                    ['微服务', SERVICES.length + ' <span class="sc-tag ok">健康 ' + healthy + '</span>'],
+                    ['技术组件', STACK.length + ' <span class="sc-tag warn">' + behind + ' 个待升级</span>'],
+                    ['等保控制项', SEC_CTRL.length + ' <span class="sc-tag ' + (okCtrl / SEC_CTRL.length > 0.8 ? 'ok' : 'warn') + '">达标 ' + pctOf(okCtrl, SEC_CTRL.length) + '%</span>'],
+                    ['架构成熟度', avgMat + ' <span class="sc-tag info">/ 100</span>'],
+                    ['近 30 天发布', okRel + ' / ' + rels.length + ' <span class="sc-tag ok">成功</span>'],
+                    ['运行环境', '3 套 <span class="sc-tag info">生产双活</span>']
+                ]));
+
+                put('#ov-legend', LAYERS.map(function (l) {
+                    return '<button data-key="' + l.key + '"><i style="background:' + l.color + '"></i>' + SC.esc(l.name) + '</button>';
+                }).join(''));
+                qa('#ov-legend button').forEach(function (b) {
+                    b.addEventListener('click', function () { selectLayer(b.dataset.key); });
+                });
+
+                put('#ov-domains', DOMAINS.map(function (d) {
+                    const sd = DOMAIN_SVC[d.name];
+                    const svcCount = SERVICES.filter(s => s.domain === sd).length;
+                    return '<a class="domain-card" href="' + domainCardHref(d, sd) + '" ' +
+                        'title="进入' + SC.esc(d.name) + '并带域筛选">' +
+                        '<div class="dc-top"><h4><span class="dc-icon">' + d.icon + '</span>' + SC.esc(d.name) + '</h4>' +
+                        tagHTML(d.status, d.status === '已上线' ? 'ok' : 'warn') + '</div>' +
+                        '<div class="dc-desc">' + SC.esc(d.desc) + '</div>' +
+                        '<div class="dc-meta"><span>今日事件 <b>' + SC.num(d.events) + '</b></span>' +
+                        '<span>接入服务 <b>' + svcCount + '</b></span></div></a>';
+                }).join(''));
+
+                put('#ov-principles', PRINCIPLES.map(function (p) {
+                    return '<div class="principle"><div class="pi">' + p.n + '</div><div><div class="pn">' +
+                        SC.esc(p.name) + '</div><div class="pd">' + SC.esc(p.desc) + '</div></div></div>';
+                }).join(''));
+
+                put('#ov-timeline', TIMELINE.map(function (t) {
+                    return '<div class="sc-tl-item ' + t.s + '"><div class="h">' + SC.esc(t.h) +
+                        '</div><div class="m">' + SC.esc(t.m) + '</div></div>';
+                }).join(''));
+
+                selectLayer(ovActive);
+                if (activeModule() === 'overview') drawMaturity();
+            }
+
+            function selectLayer(key) {
+                const L = layerByKey(key);
+                ovActive = L.key;
+                put('#ov-layer-name', L.icon + ' ' + L.name);
+                const tag = q('#ov-layer-tag');
+                if (tag) { tag.textContent = L.slo; tag.className = 'sc-tag info'; }
+                put('#ov-layer-desc', SC.esc(L.desc));
+                put('#ov-layer-detail', L.comps.map(function (c) {
+                    return '<div class="comp-row"><div><div class="cn">' + SC.esc(c.name) +
+                        '</div><div class="ct">' + SC.esc(c.note) + '</div></div><div class="cv mono">' + SC.esc(c.tech) + '</div></div>';
+                }).join(''));
+                put('#ov-layer-meta', '<span>责任团队 <b>' + SC.esc(L.owner) + '</b></span>' +
+                    '<span>组件 <b>' + L.comps.length + '</b> 个</span><span>SLO <b>' + SC.esc(L.slo) + '</b></span>');
+                qa('#ov-legend button').forEach(function (b) {
+                    b.classList.toggle('active', b.dataset.key === L.key);
+                });
+                drawLayers();
+            }
+
+            function drawLayers() {
+                const canvas = q('#c-layers');
+                if (!canvas) return;
+                const w = canvas.clientWidth, hgt = canvas.clientHeight;
+                if (w < 80 || hgt < 80) return;
+                const dpr = window.devicePixelRatio || 1;
+                if (canvas.width !== Math.round(w * dpr)) canvas.width = Math.round(w * dpr);
+                if (canvas.height !== Math.round(hgt * dpr)) canvas.height = Math.round(hgt * dpr);
+                const ctx = canvas.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, w, hgt);
+
+                function roundRect(x, y, w2, h2, r) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.lineTo(x + w2 - r, y);
+                    ctx.quadraticCurveTo(x + w2, y, x + w2, y + r);
+                    ctx.lineTo(x + w2, y + h2 - r);
+                    ctx.quadraticCurveTo(x + w2, y + h2, x + w2 - r, y + h2);
+                    ctx.lineTo(x + r, y + h2);
+                    ctx.quadraticCurveTo(x, y + h2, x, y + h2 - r);
+                    ctx.lineTo(x, y + r);
+                    ctx.quadraticCurveTo(x, y, x + r, y);
+                    ctx.closePath();
+                }
+
+                const gap = 10;
+                const lh = (hgt - gap * (LAYERS.length - 1)) / LAYERS.length;
+                ovHits = [];
+                LAYERS.forEach(function (L, i) {
+                    const y = i * (lh + gap);
+                    const on = L.key === ovActive;
+                    const hot = i === ovHover;
+                    ovHits.push({ key: L.key, y: y, h: lh });
+                    roundRect(14, y, w - 28, lh, 9);
+                    ctx.fillStyle = on ? hexA(L.color, 0.15) : (hot ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.03)');
+                    ctx.fill();
+                    ctx.lineWidth = on ? 1.6 : 1;
+                    ctx.strokeStyle = on ? L.color : 'rgba(255,255,255,.07)';
+                    ctx.stroke();
+                    ctx.fillStyle = L.color;
+                    roundRect(14, y + 9, 3, lh - 18, 2);
+                    ctx.fill();
+
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = 'bold 14px "Microsoft YaHei", sans-serif';
+                    ctx.fillStyle = on ? '#eaf7ff' : '#c7d6e6';
+                    ctx.fillText(L.icon + '  ' + L.name, 30, y + lh / 2 - 9);
+                    ctx.font = '11px "Microsoft YaHei", sans-serif';
+                    ctx.fillStyle = '#7f93a8';
+                    ctx.fillText(L.comps.length + ' 个组件 · ' + L.owner, 30, y + lh / 2 + 10);
+                    ctx.textAlign = 'right';
+                    ctx.font = '11px Consolas, monospace';
+                    ctx.fillStyle = on ? L.color : '#6f8499';
+                    ctx.fillText(L.slo, w - 26, y + lh / 2);
+                });
+            }
+
+            function drawMaturity() {
+                const canvas = q('#c-ov-maturity');
+                if (!canvas || !canvas.clientWidth) return;
+                SC.chart.bar(canvas, {
+                    labels: MATURITY.map(m => m.name),
+                    series: [{ name: '成熟度', data: MATURITY.map(m => m.value), color: '#00d4ff' }],
+                    yMax: 100,
+                    axisColor: 'rgba(255,255,255,.08)',
+                    textColor: '#7f93a8'
+                });
+            }
+
+            /* ==========================================================================
+               12. 服务目录
+               ========================================================================== */
+            let svcFilter = '全部', svcCtrl = null;
+            let topoHover = -1, topoNodes = [], topoEdges = [];
+
+            function svcRowHTML(s) {
+                const href = svcHref(s);
+                const name = href
+                    ? '<a class="svc-name" href="' + href + '" title="进入场景页">' + SC.esc(s.name) + '</a>'
+                    : '<b>' + SC.esc(s.name) + '</b>';
+                return '<tr data-id="' + s.id + '">' +
+                    '<td>' + name + '<div class="mono" style="color:#6f8499;font-size:.76em">' + s.id + '</div></td>' +
+                    '<td>' + tagHTML(s.domain, 'info') + '</td>' +
+                    '<td class="mono">' + s.ver + '</td>' +
+                    '<td class="mono">' + s.inst + '</td>' +
+                    '<td class="mono">' + SC.num(s.qps) + '</td>' +
+                    '<td class="mono">' + s.p95 + ' ms</td>' +
+                    '<td>' + healthTag(s.health) + '</td>' +
+                    '<td class="svc-ops"><button class="sc-btn sm ghost" data-act="svc" data-id="' + s.id + '">详情</button>' +
+                    (href ? '<a class="sc-btn sm ghost" href="' + href + '" title="在场景页查看">场景 ↗</a>' : '') +
+                    '</td></tr>';
+            }
+
+            function renderSvcKv() {
+                const healthy = SERVICES.filter(s => s.health === '健康').length;
+                const qps = SERVICES.reduce((a, s) => a + s.qps, 0);
+                const inst = SERVICES.reduce((a, s) => a + s.inst, 0);
+                const p95 = Math.round(SERVICES.reduce((a, s) => a + s.p95 * s.inst, 0) / inst);
+                const apis = SERVICES.reduce((a, s) => a + s.apis, 0);
+                put('#svc-kv', kvBox([
+                    ['服务总数', SERVICES.length + ' 个'],
+                    ['健康率', '<span class="sc-tag ' + (healthy === SERVICES.length ? 'ok' : 'warn') + '">' + pctOf(healthy, SERVICES.length) + '%</span>'],
+                    ['实例总数', SC.num(inst) + ' 个'],
+                    ['网关 QPS', SC.num(qps)],
+                    ['P95 加权', p95 + ' ms'],
+                    ['接口总数', SC.num(apis) + ' 个']
+                ]));
+            }
+
+            function renderSvcChips() {
+                put('#svc-chips', SVC_DOMAINS.map(function (d) {
+                    const n = d === '全部' ? SERVICES.length : SERVICES.filter(s => s.domain === d).length;
+                    return '<button class="sc-chip' + (d === svcFilter ? ' active' : '') + '" data-domain="' + SC.esc(d) + '">' +
+                        SC.esc(d) + ' <b style="opacity:.72;font-weight:600">' + n + '</b></button>';
+                }).join(''));
+                qa('#svc-chips .sc-chip').forEach(function (b) {
+                    b.addEventListener('click', function () { applySvcDomain(b.dataset.domain); });
+                });
+            }
+
+            function applySvcDomain(d) {
+                svcFilter = d;
+                qa('#svc-chips .sc-chip').forEach(function (b) {
+                    b.classList.toggle('active', b.dataset.domain === d);
+                });
+                if (svcCtrl) {
+                    svcCtrl.setFilter(d === '全部' ? null : function (row) {
+                        return row.cells[1].indexOf(d) > -1;
+                    });
+                }
+                topoHover = -1;
+                drawTopo();
+            }
+
+            function renderSvcRows() {
+                put('#svc-table tbody', SERVICES.map(svcRowHTML).join(''));
+                if (svcCtrl) svcCtrl.reload();
+                renderSvcKv();
+                drawTopo();
+            }
+
+            function renderDepRank() {
+                const counts = {};
+                SERVICES.forEach(function (s) {
+                    s.deps.forEach(function (d) { counts[d] = (counts[d] || 0) + 1; });
+                });
+                const top = Object.keys(counts).map(function (id) {
+                    return { id: id, n: counts[id] };
+                }).sort(function (a, b) { return b.n - a.n; }).slice(0, 6);
+                const max = top.length ? top[0].n : 1;
+                put('#svc-dep-rank', top.map(function (t) {
+                    const s = svcById(t.id);
+                    return '<div class="attn-item" data-svc="' + t.id + '" style="cursor:pointer">' +
+                        '<div class="ax"><b>' + SC.esc(s ? s.name : t.id) + '</b>' +
+                        '<div class="sc-bar-mini"><i style="width:' + Math.round(t.n / max * 100) + '%;background:' +
+                        (s ? DOMAIN_COLOR[s.domain] : '#00d4ff') + '"></i></div></div>' +
+                        '<span class="mono" style="color:#9fe6ff;white-space:nowrap">' + t.n + ' 个依赖</span></div>';
+                }).join(''));
+                qa('#svc-dep-rank .attn-item').forEach(function (n) {
+                    n.addEventListener('click', function () { openService(n.dataset.svc); });
+                });
+            }
+
+            function renderServices() {
+                renderSvcKv();
+                renderSvcChips();
+                put('#svc-table tbody', SERVICES.map(svcRowHTML).join(''));
+                svcCtrl = SC.table.enhance(q('#svc-table'), {
+                    pageSize: 8,
+                    search: '#svc-search',
+                    export: '服务目录',
+                    keyAttr: 'id',
+                    onRender: renderDepRank
+                });
+                renderDepRank();
+            }
+
+            function drawTopo() {
+                const canvas = q('#c-topo');
+                if (!canvas) return;
+                const w = canvas.clientWidth, hgt = canvas.clientHeight;
+                if (w < 80 || hgt < 80) return;
+                const list = svcFilter === '全部' ? SERVICES.slice() : SERVICES.filter(s => s.domain === svcFilter);
+                if (!list.length) return;
+                const dpr = window.devicePixelRatio || 1;
+                if (canvas.width !== Math.round(w * dpr)) canvas.width = Math.round(w * dpr);
+                if (canvas.height !== Math.round(hgt * dpr)) canvas.height = Math.round(hgt * dpr);
+                const ctx = canvas.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, w, hgt);
+
+                const cols = Math.min(7, Math.max(3, Math.ceil(Math.sqrt(list.length * 1.7))));
+                const rows = Math.ceil(list.length / cols);
+                const cw = w / cols, ch = hgt / rows;
+                topoNodes = list.map(function (s, i) {
+                    return {
+                        id: s.id, svc: s,
+                        x: cw * (i % cols + 0.5),
+                        y: ch * (Math.floor(i / cols) + 0.5),
+                        r: Math.max(8, Math.min(15, cw * 0.15))
+                    };
+                });
+                const byId = {};
+                topoNodes.forEach(function (n) { byId[n.id] = n; });
+                topoEdges = [];
+                topoNodes.forEach(function (n) {
+                    n.svc.deps.forEach(function (d) {
+                        if (byId[d]) topoEdges.push({ from: byId[d], to: n });
+                    });
+                });
+
+                topoEdges.forEach(function (e) {
+                    const hot = topoHover === e.from.id || topoHover === e.to.id;
+                    ctx.strokeStyle = hot ? 'rgba(0,212,255,.55)' : 'rgba(120,170,210,.13)';
+                    ctx.lineWidth = hot ? 1.6 : 1;
+                    ctx.beginPath();
+                    ctx.moveTo(e.from.x, e.from.y);
+                    ctx.quadraticCurveTo((e.from.x + e.to.x) / 2, (e.from.y + e.to.y) / 2 - 16, e.to.x, e.to.y);
+                    ctx.stroke();
+                });
+
+                topoNodes.forEach(function (n) {
+                    const color = DOMAIN_COLOR[n.svc.domain] || '#00d4ff';
+                    const hot = topoHover === n.id;
+                    const warn = n.svc.health !== '健康';
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, n.r + (hot ? 3 : 0), 0, Math.PI * 2);
+                    ctx.fillStyle = hot ? color : 'rgba(8,18,32,.94)';
+                    ctx.fill();
+                    ctx.lineWidth = warn ? 2 : 1.4;
+                    ctx.strokeStyle = warn ? '#ff6b6b' : color;
+                    ctx.stroke();
+                    const label = n.svc.name.replace(/(服务|中心|网关)$/, '');
+                    ctx.font = '10px "Microsoft YaHei", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillStyle = hot ? '#9fefff' : '#8fa8be';
+                    ctx.fillText(label.length > 7 ? label.slice(0, 7) : label, n.x, n.y + n.r + 4);
+                });
+            }
+
+            function openService(id) {
+                const s = svcById(id);
+                if (!s) return;
+                const apis = apiList(s);
+                const deps = s.deps.map(function (d) { const x = svcById(d); return x ? x.name : d; });
+                const usedBy = SERVICES.filter(function (x) { return x.deps.indexOf(id) > -1; }).map(function (x) { return x.name; });
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['服务标识', '<span class="mono">' + s.id + '</span>'],
+                    ['业务域', tagHTML(s.domain, 'info')],
+                    ['当前版本', s.ver],
+                    ['实例数', s.inst + ' 个'],
+                    ['QPS', SC.num(s.qps)],
+                    ['P95', s.p95 + ' ms'],
+                    ['错误率', s.err + '%'],
+                    ['健康状态', healthTag(s.health)],
+                    ['SLA', s.sla],
+                    ['负责人', SC.esc(s.owner)],
+                    ['接口数', s.apis + ' 个'],
+                    ['最近变更', SC.stamp(new Date(s.updated), false)]
+                ]) + '</div>' +
+                    '<div class="sc-section-title">依赖关系</div>' +
+                    '<div style="font-size:.86em;line-height:1.9">上游依赖：' + (deps.length ? SC.esc(deps.join('、')) : '无') +
+                    '<br>被依赖：' + (usedBy.length ? SC.esc(usedBy.join('、')) : '无') + '</div>' +
+                    '<div class="sc-section-title">接口清单</div>' +
+                    '<div class="data-table-container"><table class="data-table"><thead><tr><th data-no-sort>方法</th>' +
+                    '<th data-no-sort>路径</th><th data-no-sort>说明</th></tr></thead><tbody>' +
+                    apis.map(function (a) {
+                        return '<tr><td>' + tagHTML(a.method, a.method === 'GET' ? 'info' : (a.method === 'DELETE' ? 'bad' : 'ok')) +
+                            '</td><td class="mono">' + SC.esc(a.path) + '</td><td>' + SC.esc(a.desc) + '</td></tr>';
+                    }).join('') + '</tbody></table></div>';
+
+                SC.modal.open({
+                    title: s.name + ' · 服务详情',
+                    size: 'lg',
+                    body: body,
+                    footer: [
+                        {
+                            text: '健康检查', kind: 'ghost', close: false, onClick: function () {
+                                SC.toast(s.name + '：探针返回 ' + s.p95 + 'ms，状态' + s.health, { type: s.health === '健康' ? 'success' : 'warn' });
+                            }
+                        },
+                        {
+                            text: '扩容 1 实例', kind: 'ghost', close: false, onClick: function (api) {
+                                s.inst += 1;
+                                const cell = api.body.querySelectorAll('.sc-kv-item .v')[3];
+                                if (cell) cell.textContent = s.inst + ' 个';
+                                renderSvcRows();
+                                SC.toast('已为 ' + s.name + ' 扩容至 ' + s.inst + ' 实例', { type: 'success' });
+                            }
+                        },
+                        {
+                            text: '打开场景页', kind: 'primary', onClick: function () {
+                                const href = svcHref(s);
+                                if (href) location.href = href;
+                                else SC.toast('该服务域暂无对应场景页', { type: 'warn' });
+                            }
+                        },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            function exportServices() {
+                const rows = [['服务ID', '服务名称', '业务域', '版本', '实例', 'QPS', 'P95(ms)', '错误率(%)', '健康', '负责人']];
+                SERVICES.forEach(function (s) { rows.push([s.id, s.name, s.domain, s.ver, s.inst, s.qps, s.p95, s.err, s.health, s.owner]); });
+                SC.csv.download('服务目录_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + SERVICES.length + ' 个服务', { type: 'success' });
+            }
+
+            function runHealthCheck() {
+                let changed = 0;
+                SERVICES.forEach(function (s) {
+                    const before = s.health;
+                    s.p95 = SC.clamp(s.p95 + Math.round((Math.random() - 0.5) * 46), 40, 340);
+                    if (SVC_FIX[s.id]) s.health = SVC_FIX[s.id];
+                    else s.health = s.p95 > 300 ? '告警' : '健康';
+                    if (s.health !== before) changed++;
+                });
+                renderSvcRows();
+                const healthy = SERVICES.filter(s => s.health === '健康').length;
+                SC.toast('全量探针完成：' + healthy + ' 个健康，' + (SERVICES.length - healthy) + ' 个需关注' +
+                    (changed ? '，本次状态变化 ' + changed + ' 个' : ''), { type: healthy === SERVICES.length ? 'success' : 'warn', duration: 3600 });
+            }
+
+            /* ==========================================================================
+               13. 技术栈
+               ========================================================================== */
+            let stackFilter = '全部', stackCtrl = null;
+
+            function stackRowHTML(s) {
+                const cur = s.behind ? '<span style="color:#ffd08a">' + s.cur + '</span>' : s.cur;
+                return '<tr data-id="' + SC.esc(s.name) + '">' +
+                    '<td><b>' + SC.esc(s.name) + '</b></td>' +
+                    '<td>' + tagHTML(s.group, 'info') + '</td>' +
+                    '<td class="mono">' + cur + '</td>' +
+                    '<td class="mono">' + s.latest + '</td>' +
+                    '<td>' + tagHTML(s.status, STATUS_TAG[s.status] || 'info') + '</td>' +
+                    '<td>' + SC.esc(s.owner) + '</td>' +
+                    '<td>' + SC.esc(s.scope) + '</td>' +
+                    '<td><button class="sc-btn sm ghost" data-act="stack" data-id="' + SC.esc(s.name) + '">说明</button></td>' +
+                    '</tr>';
+            }
+
+            function renderStackKv() {
+                const behind = STACK.filter(s => s.behind).length;
+                const retired = STACK.filter(s => s.status === '待退役').length;
+                const owners = STACK.map(s => s.owner).filter(function (o, i, a) { return a.indexOf(o) === i; }).length;
+                put('#stack-kv', kvBox([
+                    ['组件总数', STACK.length + ' 个'],
+                    ['在用', STACK.filter(s => s.status === '在用').length + ' 个'],
+                    ['待升级', '<span class="sc-tag warn">' + behind + ' 个</span>'],
+                    ['待退役', '<span class="sc-tag off">' + retired + ' 个</span>'],
+                    ['分组', STACK_GROUPS.length - 1 + ' 类'],
+                    ['负责团队', owners + ' 个']
+                ]));
+            }
+
+            function renderStackChips() {
+                put('#stack-chips', STACK_GROUPS.map(function (g) {
+                    const n = g === '全部' ? STACK.length : STACK.filter(s => s.group === g).length;
+                    return '<button class="sc-chip' + (g === stackFilter ? ' active' : '') + '" data-group="' + SC.esc(g) + '">' +
+                        SC.esc(g) + ' <b style="opacity:.72;font-weight:600">' + n + '</b></button>';
+                }).join(''));
+                qa('#stack-chips .sc-chip').forEach(function (b) {
+                    b.addEventListener('click', function () { applyStackGroup(b.dataset.group); });
+                });
+            }
+
+            function applyStackGroup(g) {
+                stackFilter = g;
+                qa('#stack-chips .sc-chip').forEach(function (b) {
+                    b.classList.toggle('active', b.dataset.group === g);
+                });
+                if (stackCtrl) {
+                    stackCtrl.setFilter(g === '全部' ? null : function (row) {
+                        return row.cells[1].indexOf(g) > -1;
+                    });
+                }
+            }
+
+            function renderStackRisk() {
+                const list = STACK.filter(s => s.behind).slice(0, 7);
+                put('#stack-risk', list.map(function (s) {
+                    return '<div class="attn-item' + (s.status === '待退役' ? ' bad' : '') + '" data-stack="' + SC.esc(s.name) + '" style="cursor:pointer">' +
+                        '<div class="ax"><b>' + SC.esc(s.name) + '</b><div class="sc-hint" style="margin-top:2px">' +
+                        s.cur + ' → ' + s.latest + ' · ' + s.status + '</div></div>' +
+                        '<span class="mono" style="color:#ffd08a;white-space:nowrap">升级</span></div>';
+                }).join(''));
+                qa('#stack-risk .attn-item').forEach(function (n) {
+                    n.addEventListener('click', function () { openStack(n.dataset.stack); });
+                });
+            }
+
+            function renderStack() {
+                renderStackKv();
+                renderStackChips();
+                put('#stack-table tbody', STACK.map(stackRowHTML).join(''));
+                stackCtrl = SC.table.enhance(q('#stack-table'), {
+                    pageSize: 8,
+                    search: '#stack-search',
+                    export: '技术栈清单',
+                    keyAttr: 'id'
+                });
+                renderStackRisk();
+                if (activeModule() === 'stack') drawStackChart();
+            }
+
+            function drawStackChart() {
+                const canvas = q('#c-stack-group');
+                if (!canvas || !canvas.clientWidth) return;
+                const groups = STACK_GROUPS.slice(1);
+                const data = groups.map(g => STACK.filter(s => s.group === g).length);
+                SC.chart.bar(canvas, {
+                    labels: groups,
+                    series: [{ name: '组件数', data: data, color: '#63c8ff' }],
+                    yMax: Math.max.apply(null, data) + 2,
+                    unit: ' 个',
+                    axisColor: 'rgba(255,255,255,.08)',
+                    textColor: '#7f93a8'
+                });
+            }
+
+            function openStack(name) {
+                const s = stackByName(name);
+                if (!s) return;
+                const html = '<div class="sc-kv">' + kvBox([
+                    ['分组', tagHTML(s.group, 'info')],
+                    ['状态', tagHTML(s.status, STATUS_TAG[s.status] || 'info')],
+                    ['当前版本', s.cur],
+                    ['最新版本', s.latest],
+                    ['负责人', SC.esc(s.owner)],
+                    ['使用范围', SC.esc(s.scope)]
+                ]) + '</div>' +
+                    '<div class="sc-section-title">选型与约束</div>' +
+                    '<div style="font-size:.9em;line-height:1.8">' + SC.esc(s.note) + '</div>' +
+                    '<div class="sc-section-title">升级建议</div>' +
+                    '<div style="font-size:.9em;line-height:1.8">' +
+                    (s.cur === s.latest ? '当前已是团队统一版本，无需升级，关注安全公告即可。'
+                        : '当前落后 ' + s.cur + ' → ' + s.latest + '，建议先在预发环境验证，再随常规版本窗口灰度升级；' +
+                        ('待退役' === s.status ? '该组件已进入退役期，仅做安全修复，不安排功能升级。' : '升级前需回归接口契约与监控看板。')) +
+                    '</div>';
+                SC.modal.open({
+                    title: s.name + ' · 选型说明',
+                    size: 'md',
+                    body: html,
+                    footer: [
+                        {
+                            text: '登记升级计划', kind: 'primary', close: false, onClick: function () {
+                                SC.toast('已登记 ' + s.name + ' 的升级计划，纳入下个版本窗口', { type: 'success' });
+                            }
+                        },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            function exportStack() {
+                const rows = [['组件', '分组', '当前版本', '最新版本', '状态', '负责人', '使用范围', '选型说明']];
+                STACK.forEach(function (s) { rows.push([s.name, s.group, s.cur, s.latest, s.status, s.owner, s.scope, s.note]); });
+                SC.csv.download('技术栈清单_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + STACK.length + ' 个组件', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               14. 安全架构
+               ========================================================================== */
+            const SEC_AUDIT_BASE = [
+                { t: '08:12:04', lv: 'info', tag: 'INFO', msg: '安全组 周倩 抽查 4 个控制项，全部达标' },
+                { t: '07:40:18', lv: 'info', tag: 'INFO', msg: '漏洞扫描完成，无高危项，中危 3 项已转整改任务' },
+                { t: '06:55:41', lv: 'warn', tag: 'WARN', msg: '默认账户清理未完成，8.1.4.5 保持整改中' },
+                { t: '02:20:09', lv: 'info', tag: 'INFO', msg: '密钥轮换任务执行完成，影响 6 个回调配置' }
+            ];
+            let secCtrl = null;
+
+            function ctrlStatus(id) {
+                if (ST.fixed.indexOf(id) > -1) return '达标';
+                const c = SEC_CTRL.filter(x => x.id === id)[0];
+                return c ? c.status : '待评估';
+            }
+
+            function secStatusTag(st) {
+                return tagHTML(st, st === '达标' ? 'ok' : (st === '整改中' ? 'warn' : 'info'));
+            }
+
+            function renderCerts() {
+                put('#sec-certs', CERTS.map(function (c) {
+                    const kind = c.days <= 7 ? 'bad' : (c.days <= 30 ? 'warn' : 'ok');
+                    return '<div class="cert-row"><div><div class="cr-name">' + SC.esc(c.name) + '</div>' +
+                        '<div class="cr-sub mono">' + SC.esc(c.sub) + ' · ' + SC.esc(c.owner) + '</div></div>' +
+                        tagHTML(c.days + ' 天', kind) + '</div>';
+                }).join(''));
+            }
+
+            function renderSecLog() {
+                const all = ST.audits.concat(SEC_AUDIT_BASE).slice(0, 40);
+                put('#sec-audit', all.map(function (a) {
+                    return '<div class="li"><span class="t">' + SC.esc(a.t) + '</span>' +
+                        '<span class="lv ' + a.lv + '">' + a.tag + '</span>' +
+                        '<span class="tx">' + SC.esc(a.msg) + '</span></div>';
+                }).join(''));
+            }
+
+            function renderSecurity() {
+                const ok = SEC_CTRL.filter(c => ctrlStatus(c.id) === '达标').length;
+                const fixing = SEC_CTRL.filter(c => ctrlStatus(c.id) === '整改中').length;
+                const pending = SEC_CTRL.filter(c => ctrlStatus(c.id) === '待评估').length;
+                const due = CERTS.filter(c => c.days <= 30).length;
+                put('#sec-kv', kvBox([
+                    ['等保控制项', SEC_CTRL.length + ' 项'],
+                    ['达标率', '<span class="sc-tag ' + (ok / SEC_CTRL.length > 0.8 ? 'ok' : 'warn') + '">' + pctOf(ok, SEC_CTRL.length) + '%</span>'],
+                    ['整改中', '<span class="sc-tag warn">' + fixing + ' 项</span>'],
+                    ['待评估', '<span class="sc-tag info">' + pending + ' 项</span>'],
+                    ['证书临期', '<span class="sc-tag ' + (due ? 'bad' : 'ok') + '">' + due + ' 张</span>'],
+                    ['审计流水', (ST.audits.length + SEC_AUDIT_BASE.length) + ' 条']
+                ]));
+
+                put('#sec-layers', SEC_LAYERS.map(function (l) {
+                    return '<div class="sec-layer"><div class="sl-ic">' + l.icon + '</div><div>' +
+                        '<div class="sl-n">' + SC.esc(l.name) + '</div>' +
+                        '<div class="sl-d">' + SC.esc(l.desc) + '</div></div></div>';
+                }).join(''));
+
+                renderCerts();
+                renderSecLog();
+
+                put('#sec-table tbody', SEC_CTRL.map(function (c) {
+                    const st = ctrlStatus(c.id);
+                    return '<tr data-id="' + c.id + '"><td class="mono">' + c.id + '</td>' +
+                        '<td>' + SC.esc(c.cat) + '</td>' +
+                        '<td style="font-size:.86em;line-height:1.55">' + SC.esc(c.req) + '</td>' +
+                        '<td>' + secStatusTag(st) + '</td>' +
+                        '<td style="white-space:nowrap">' + SC.esc(c.owner) + '</td>' +
+                        '<td>' + c.cycle + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="sec" data-id="' + c.id + '">详情</button></td></tr>';
+                }).join(''));
+                secCtrl = SC.table.enhance(q('#sec-table'), {
+                    pageSize: 8, search: false, export: '等保控制项', keyAttr: 'id'
+                });
+                if (secCtrl) secCtrl.reload();
+                if (activeModule() === 'security') drawSecCat();
+            }
+
+            function drawSecCat() {
+                const canvas = q('#c-sec-cat');
+                if (!canvas || !canvas.clientWidth) return;
+                const cats = SEC_CTRL.map(c => c.cat).filter(function (c, i, a) { return a.indexOf(c) === i; });
+                const vals = cats.map(function (cat) {
+                    const arr = SEC_CTRL.filter(c => c.cat === cat);
+                    const ok = arr.filter(c => ctrlStatus(c.id) === '达标').length;
+                    return Math.round(ok / arr.length * 100);
+                });
+                SC.chart.bar(canvas, {
+                    labels: cats,
+                    series: [{ name: '达标率', data: vals, color: '#2ee6a8' }],
+                    yMax: 100,
+                    unit: '%',
+                    axisColor: 'rgba(255,255,255,.08)',
+                    textColor: '#7f93a8'
+                });
+            }
+
+            function openSec(id) {
+                const c = SEC_CTRL.filter(x => x.id === id)[0];
+                if (!c) return;
+                const st = ctrlStatus(id);
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['控制项', '<span class="mono">' + c.id + '</span>'],
+                    ['控制类', SC.esc(c.cat)],
+                    ['当前状态', secStatusTag(st)],
+                    ['责任人', SC.esc(c.owner)],
+                    ['复查周期', c.cycle],
+                    ['最近复查', SC.today()]
+                ]) + '</div>' +
+                    '<div class="sc-section-title">控制要求</div>' +
+                    '<div style="font-size:.9em;line-height:1.85">' + SC.esc(c.req) + '</div>' +
+                    '<div class="sc-section-title">当前证据</div>' +
+                    '<div style="font-size:.9em;line-height:1.85">' +
+                    (st === '达标'
+                        ? '已完成配置核查与日志抽样，最近一次复查未发现例外，证据归档在安全组共享目录。'
+                        : '存在待整改项，已登记责任人与整改期限，需在下一个复查周期前闭环并补充证据。') +
+                    '</div>';
+                SC.modal.open({
+                    title: '等保控制项 ' + c.id,
+                    size: 'md',
+                    body: body,
+                    footer: [
+                        {
+                            text: '登记整改完成', kind: 'primary', close: false, onClick: function () {
+                                if (st === '达标') { SC.toast('该控制项已达标，无需重复登记', { type: 'info' }); return; }
+                                ST.fixed.push(id);
+                                saveST();
+                                renderSecurity();
+                                renderLive();
+                                SC.toast(c.id + ' 已登记整改完成，状态更新为达标', { type: 'success' });
+                            }
+                        },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            function runSecAudit() {
+                const pool = SEC_CTRL.slice();
+                const picked = [];
+                for (let i = 0; i < 3 && pool.length; i++) {
+                    picked.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+                }
+                const t = SC.stamp(new Date()).slice(11);
+                picked.forEach(function (c) {
+                    const ok = ctrlStatus(c.id) === '达标' || Math.random() > 0.35;
+                    ST.audits.unshift({
+                        t: t, lv: ok ? 'info' : 'warn', tag: ok ? 'INFO' : 'WARN',
+                        msg: '抽检 ' + c.id + ' ' + c.cat + '：' + (ok ? '符合要求' : '发现例外，已开整改单')
+                    });
+                });
+                ST.audits = ST.audits.slice(0, 60);
+                saveST();
+                renderSecLog();
+                SC.toast('已生成 ' + picked.length + ' 条审计抽检记录', { type: 'success' });
+            }
+
+            function exportSec() {
+                const rows = [['编号', '控制类', '控制要求', '状态', '责任人', '复查周期']];
+                SEC_CTRL.forEach(function (c) { rows.push([c.id, c.cat, c.req, ctrlStatus(c.id), c.owner, c.cycle]); });
+                SC.csv.download('等保控制项_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + SEC_CTRL.length + ' 条控制项', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               15. 部署与发布
+               ========================================================================== */
+            const NEXT_VER = 'v2.4.1';
+            let env = 'prod', nodes = buildNodes('prod'), nodeCtrl = null, relCtrl = null;
+            let pipeBusy = false, pipeState = [], pipeMsgs = [];
+
+            function allRels() {
+                const seeded = REL_SEED.map(function (r, i) {
+                    return {
+                        ver: r[0], env: r[1], note: r[2], by: r[3],
+                        at: Date.now() - r[4] * DAY - (i * 47 + 25) * MIN,
+                        dur: (2 + hashSeed(r[0] + i) % 4) + 'm ' + (10 + hashSeed(r[2]) % 45) + 's',
+                        result: r[5]
+                    };
+                });
+                return ST.rels.concat(seeded).sort(function (a, b) { return b.at - a.at; });
+            }
+
+            function nodeRowHTML(n) {
+                return '<tr data-id="' + n.name + '"><td class="mono">' + n.name + '</td>' +
+                    '<td>' + SC.esc(n.zone) + '</td><td>' + SC.esc(n.role) + '</td>' +
+                    '<td class="mono">' + n.pods + '</td>' +
+                    '<td class="mono">' + n.cpu + '%</td><td class="mono">' + n.mem + '%</td>' +
+                    '<td>' + tagHTML(n.status, 'ok') + '</td>' +
+                    '<td><button class="sc-btn sm ghost" data-act="node" data-id="' + n.name + '">查看</button></td></tr>';
+            }
+
+            function relRowHTML(r) {
+                const canRollback = r.result === '成功' && r.env === 'prod';
+                return '<tr data-id="' + SC.esc(r.ver + '-' + r.at) + '"><td class="mono">' + SC.esc(r.ver) + '</td>' +
+                    '<td>' + tagHTML(ENV_META[r.env] ? ENV_META[r.env].name : r.env, r.env === 'prod' ? 'ok' : 'info') + '</td>' +
+                    '<td style="font-size:.86em">' + SC.esc(r.note) + '</td>' +
+                    '<td>' + SC.esc(r.by) + '</td>' +
+                    '<td class="mono" style="font-size:.82em">' + SC.stamp(new Date(r.at), false) + '</td>' +
+                    '<td class="mono">' + r.dur + '</td>' +
+                    '<td>' + tagHTML(r.result, r.result === '成功' ? 'ok' : (r.result === '回滚' ? 'warn' : 'bad')) + '</td>' +
+                    '<td>' + (canRollback
+                        ? '<button class="sc-btn sm ghost" data-act="rollback" data-ver="' + SC.esc(r.ver) + '">回滚</button>'
+                        : '<span class="sc-hint">—</span>') + '</td></tr>';
+            }
+
+            function renderRel() {
+                put('#rel-table tbody', allRels().map(relRowHTML).join(''));
+                if (!relCtrl) {
+                    relCtrl = SC.table.enhance(q('#rel-table'), { pageSize: 6, search: false, export: '发布记录' });
+                } else {
+                    relCtrl.reload();
+                }
+            }
+
+            function pipeHTML() {
+                put('#pipe', PIPE_STAGES.map(function (n, i) {
+                    const st = pipeState[i] || '';
+                    const ms = pipeMsgs[i] || (st === 'done' ? '通过' : (st === 'running' ? '执行中…' : '待执行'));
+                    return '<div class="pipe-stage ' + st + '"><span class="dot"></span>' +
+                        '<div class="nm">' + n + '</div><div class="ms">' + ms + '</div></div>';
+                }).join(''));
+                const done = pipeState.filter(s => s === 'done').length;
+                const bar = q('#pipe-bar');
+                if (bar) bar.style.width = Math.round(done / PIPE_STAGES.length * 100) + '%';
+                put('#pipe-status', pipeBusy
+                    ? '执行中 ' + done + '/' + PIPE_STAGES.length
+                    : (done === PIPE_STAGES.length ? '成功' : '空闲'));
+            }
+
+            function renderDeploy() {
+                const meta = ENV_META[env];
+                const cpu = Math.round(nodes.reduce((a, n) => a + n.cpu, 0) / nodes.length);
+                const mem = Math.round(nodes.reduce((a, n) => a + n.mem, 0) / nodes.length);
+                const pods = nodes.reduce((a, n) => a + n.pods, 0);
+                const lastOk = allRels().filter(r => r.result === '成功')[0];
+                put('#dep-kv', kvBox([
+                    ['当前环境', meta.name],
+                    ['集群节点', meta.nodes + ' 台'],
+                    ['运行实例', SC.num(pods) + ' 个'],
+                    ['副本策略', meta.replicas + ' 副本'],
+                    ['CPU 均值', cpu + '%'],
+                    ['内存均值', mem + '%'],
+                    ['可用区', meta.zone.split(' · ')[1] || meta.zone],
+                    ['最近成功', lastOk ? lastOk.ver : '—']
+                ]));
+                put('#dep-env-hint', meta.name + ' · ' + meta.zone);
+                put('#node-table tbody', nodes.map(nodeRowHTML).join(''));
+                if (!nodeCtrl) {
+                    nodeCtrl = SC.table.enhance(q('#node-table'), { pageSize: 6, search: false, keyAttr: 'id' });
+                } else {
+                    nodeCtrl.reload();
+                }
+                renderRel();
+                pipeHTML();
+            }
+
+            function setEnv(next) {
+                env = next;
+                qa('#env-seg button').forEach(function (b) {
+                    b.classList.toggle('active', b.dataset.env === next);
+                });
+                nodes = buildNodes(next);
+                renderDeploy();
+            }
+
+            function openNode(id) {
+                const n = nodes.filter(x => x.name === id)[0];
+                if (!n) return;
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['节点', '<span class="mono">' + n.name + '</span>'],
+                    ['可用区', SC.esc(n.zone)],
+                    ['角色', SC.esc(n.role)],
+                    ['实例数', n.pods + ' 个'],
+                    ['CPU', n.cpu + '%'],
+                    ['内存', n.mem + '%'],
+                    ['状态', tagHTML(n.status, 'ok')]
+                ]) + '</div>' +
+                    '<div class="sc-section-title">调度信息</div>' +
+                    '<div style="font-size:.9em;line-height:1.85">容器运行时 Docker 24.0.7，kubelet 1.28，节点标签 topology.kubernetes.io/zone 已就绪；' +
+                    'Pod 反亲和策略保证同服务副本不会落在同一节点。</div>' +
+                    '<div class="sc-section-title">最近事件</div>' +
+                    '<div class="sc-log" style="height:auto"><div class="li"><span class="t">08:02</span><span class="lv info">INFO</span>' +
+                    '<span class="tx">节点心跳正常，容器运行时健康</span></div>' +
+                    '<div class="li"><span class="t">06:15</span><span class="lv info">INFO</span>' +
+                    '<span class="tx">镜像基础层更新完成，无重启</span></div></div>';
+                SC.modal.open({ title: n.name + ' · 节点详情', size: 'md', body: body });
+            }
+
+            function rollbackRel(ver) {
+                SC.modal.confirm({
+                    title: '确认回滚',
+                    html: '将把生产环境回滚到 ' + SC.esc(ver) + ' 之前的稳定版本，流水线会自动执行一次全量发布。',
+                    okText: '执行回滚',
+                    danger: true
+                }).then(function (ok) {
+                    if (!ok) return;
+                    ST.rels.unshift({
+                        ver: ver, env: 'prod', note: '回滚：' + ver + ' 恢复到上一稳定版本', by: '架构运维',
+                        at: Date.now(), dur: '1m 28s', result: '回滚'
+                    });
+                    saveST();
+                    renderRel();
+                    renderDeploy();
+                    SC.toast('已完成 ' + ver + ' 回滚', { type: 'warn' });
+                });
+            }
+
+            function runPipeline() {
+                if (pipeBusy) { SC.toast('流水线正在执行，请稍候', { type: 'warn' }); return; }
+                pipeBusy = true;
+                pipeState = [];
+                pipeMsgs = [];
+                put('#pipe-log', '');
+                const log = function (lv, txt) {
+                    const box = q('#pipe-log');
+                    box.insertAdjacentHTML('beforeend', '<div class="li"><span class="t">' + SC.stamp(new Date()).slice(11) +
+                        '</span><span class="lv ' + lv + '">' + lv.toUpperCase() + '</span><span class="tx">' + SC.esc(txt) + '</span></div>');
+                    box.scrollTop = box.scrollHeight;
+                };
+                log('info', '触发发布到 ' + ENV_META[env].name + '，目标版本 ' + NEXT_VER);
+
+                const finish = function () {
+                    pipeBusy = false;
+                    pipeHTML();
+                    log('info', '全部阶段通过，' + NEXT_VER + ' 已发布到 ' + ENV_META[env].name);
+                    ST.rels.unshift({
+                        ver: NEXT_VER, env: env, note: '流水线发布：' + PIPE_STAGES.length + ' 个阶段全部通过，灰度 10% → 100%',
+                        by: '架构运维', at: Date.now(),
+                        dur: (2 + Math.floor(Math.random() * 3)) + 'm ' + (10 + Math.floor(Math.random() * 50)) + 's',
+                        result: '成功'
+                    });
+                    ST.pipeRuns = (ST.pipeRuns || 0) + 1;
+                    saveST();
+                    renderRel();
+                    SC.toast('发布成功：' + NEXT_VER + ' → ' + ENV_META[env].name, { type: 'success' });
+                };
+
+                let i = 0;
+                const step = function () {
+                    if (i > 0) {
+                        pipeState[i - 1] = 'done';
+                        pipeMsgs[i - 1] = (0.6 + Math.random() * 1.8).toFixed(1) + 's';
+                    }
+                    if (i >= PIPE_STAGES.length) { finish(); return; }
+                    pipeState[i] = 'running';
+                    pipeMsgs[i] = '执行中…';
+                    pipeHTML();
+                    log('info', PIPE_STAGES[i] + ' …');
+                    i++;
+                    setTimeout(step, 380 + Math.random() * 300);
+                };
+                step();
+            }
+
+            /* ==========================================================================
+               16. 容量与监控
+               ========================================================================== */
+            let capHours = 24, capData = buildCapSeries(24);
+
+            function waterColor(v, warn) {
+                if (v >= warn) return '#ff6b6b';
+                if (v >= warn - 12) return '#f7b955';
+                return '#00d4ff';
+            }
+
+            function renderCapWater() {
+                put('#cap-water', CAP_WATER.map(function (w) {
+                    return '<div class="water-row"><div class="wn">' + SC.esc(w.name) + '</div>' +
+                        '<div class="bar"><i style="width:' + w.value + '%;background:' + waterColor(w.value, w.warn) + '"></i></div>' +
+                        '<div class="wv mono">' + w.value + '%</div></div>';
+                }).join(''));
+            }
+
+            function renderCapAlerts() {
+                const list = ALERT_SEED.filter(a => ST.ack.indexOf(a[1]) === -1);
+                put('#cap-alert-hint', '待处置 ' + list.length + ' 条');
+                put('#cap-alerts', list.length ? list.map(function (a) {
+                    return '<div class="attn-item ' + (a[0] === 'bad' ? 'bad' : '') + '">' +
+                        '<div class="ax">' + SC.esc(a[1]) +
+                        '<div class="sc-hint" style="margin-top:3px">' + SC.esc(a[2]) + ' · ' + a[3] + ' 分钟前</div></div>' +
+                        '<button class="sc-btn sm ghost" data-ack="' + SC.esc(a[1]) + '">处置</button></div>';
+                }).join('') : '<div class="sc-hint">全部告警已处置</div>');
+            }
+
+            function renderCapacity() {
+                capData = buildCapSeries(capHours);
+                const water = Math.max.apply(null, CAP_WATER.map(w => w.value));
+                const alive = ALERT_SEED.filter(a => ST.ack.indexOf(a[1]) === -1).length;
+                put('#cap-kv', kvBox([
+                    ['峰值 QPS', SC.num(capData.peak)],
+                    ['平均 RT', capData.avg + ' ms'],
+                    ['P95 时延', capData.p95avg + ' ms'],
+                    ['平均错误率', capData.errAvg + '%'],
+                    ['最高水位', '<span class="sc-tag ' + (water >= 80 ? 'bad' : 'ok') + '">' + water + '%</span>'],
+                    ['待处置告警', '<span class="sc-tag ' + (alive ? 'warn' : 'ok') + '">' + alive + ' 条</span>']
+                ]));
+                renderCapWater();
+                renderCapAlerts();
+                if (activeModule() === 'capacity') drawCapCharts();
+            }
+
+            function drawCapCharts() {
+                const qpsCanvas = q('#c-cap-qps');
+                const rtCanvas = q('#c-cap-rt');
+                if (!qpsCanvas || !rtCanvas || !qpsCanvas.clientWidth) return;
+                const axisColor = 'rgba(255,255,255,.08)';
+                const every = Math.ceil(capData.labels.length / 7);
+                SC.chart.line(qpsCanvas, {
+                    labels: capData.labels,
+                    series: [{ name: '网关 QPS', data: capData.qps, color: '#00d4ff' }],
+                    thresholds: [{ value: Math.round(capData.peak * 0.7), label: '容量水位 70%', color: '#f7b955' }],
+                    xEvery: every,
+                    axisColor: axisColor,
+                    textColor: '#7f93a8',
+                    hoverColor: 'rgba(255,255,255,.25)'
+                });
+                SC.chart.line(rtCanvas, {
+                    labels: capData.labels,
+                    series: [
+                        { name: '平均 RT', data: capData.rt, color: '#2ee6a8' },
+                        { name: 'P95', data: capData.p95, color: '#f7b955' }
+                    ],
+                    unit: 'ms',
+                    xEvery: every,
+                    axisColor: axisColor,
+                    textColor: '#7f93a8',
+                    hoverColor: 'rgba(255,255,255,.25)'
+                });
+            }
+
+            function openCapReport() {
+                const okRate = 100 - capData.errAvg;
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['统计区间', capHours === 24 ? '近 24 小时' : (capHours === 72 ? '近 3 天' : '近 7 天')],
+                    ['峰值 QPS', SC.num(capData.peak)],
+                    ['平均 RT', capData.avg + ' ms'],
+                    ['P95 时延', capData.p95avg + ' ms'],
+                    ['请求成功率', okRate.toFixed(2) + '%'],
+                    ['扩容阈值', '集群 CPU / 内存 80%']
+                ]) + '</div>' +
+                    '<div class="sc-section-title">结论</div>' +
+                    '<div style="font-size:.9em;line-height:1.85">当前容量可支撑峰值 ' + SC.num(capData.peak) +
+                    ' QPS，对应资源水位仍有约 ' + Math.max(0, 88 - capData.peak / 40).toFixed(0) + '% 余量，' +
+                    '未触发强制扩容；早高峰 09:00-10:00 与晚高峰 18:00-19:00 为压力集中段。</div>' +
+                    '<div class="sc-section-title">建议</div>' +
+                    '<div style="font-size:.9em;line-height:1.9">' +
+                    '1. 将网关与案件服务的最小副本数上调一档，应对早晚高峰冷启动；<br>' +
+                    '2. 视频 AI 与报表引擎错峰调度，避开 18 点集中计算；<br>' +
+                    '3. 存储容量按每月 6% 增长预估，当前水位可支撑 4 个月，建议提前申请扩容。</div>';
+                SC.modal.open({ title: '容量评估报告', size: 'lg', body: body });
+            }
+
+            /* ==========================================================================
+               17. 架构决策 ADR
+               ========================================================================== */
+            const ADR_FLOW = [
+                { h: '提出', m: '业务或架构组提交提案，写明背景、影响面与备选方案', s: 'done' },
+                { h: '评估', m: '架构组 3 个工作日内完成方案比选与技术风险分析', s: 'done' },
+                { h: '评审', m: '技术评审委员会双周会表决，需三分之二以上同意', s: 'current' },
+                { h: '落地', m: '纳入版本计划，配套监控、灰度与回滚预案', s: 'todo' },
+                { h: '复核', m: '上线 30 天后回看效果，必要时修订或废止该决策', s: 'todo' }
+            ];
+            const ADR_STATUS_TAG = { '已采纳': 'ok', '建议': 'info', '评审中': 'warn', '已驳回': 'bad' };
+            let adrCtrl = null;
+
+            function adrStatusOf(a) { return (ST.adrStatus && ST.adrStatus[a.id]) || a.status; }
+
+            function adrList() {
+                return ADR_SEED.map(function (a) {
+                    return Object.assign({}, a, { date: dayAgo(a.ago) });
+                }).concat(ST.adr);
+            }
+
+            function adrRowHTML(a) {
+                const st = adrStatusOf(a);
+                return '<tr data-id="' + a.id + '"><td class="mono">' + a.id + '</td>' +
+                    '<td><b>' + SC.esc(a.title) + '</b></td><td>' + SC.esc(a.cat) + '</td>' +
+                    '<td>' + tagHTML(st, ADR_STATUS_TAG[st] || 'info') + '</td>' +
+                    '<td>' + SC.esc(a.impact) + '</td><td>' + SC.esc(a.owner) + '</td>' +
+                    '<td class="mono" style="font-size:.82em">' + SC.esc(a.date) + '</td>' +
+                    '<td><button class="sc-btn sm ghost" data-act="adr" data-id="' + a.id + '">详情</button></td></tr>';
+            }
+
+            function adrSection(title, text) {
+                return '<div class="sc-section-title">' + title + '</div>' +
+                    '<div style="font-size:.9em;line-height:1.85">' + SC.esc(text || '—') + '</div>';
+            }
+
+            function renderAdrTodo() {
+                const list = adrList().filter(a => ['建议', '评审中'].indexOf(adrStatusOf(a)) > -1);
+                put('#adr-todo', list.length ? list.map(function (a) {
+                    return '<div class="attn-item" data-adr="' + a.id + '" style="cursor:pointer">' +
+                        '<div class="ax"><b>' + SC.esc(a.title) + '</b><div class="sc-hint" style="margin-top:2px">' +
+                        a.id + ' · ' + SC.esc(adrStatusOf(a)) + '</div></div>' +
+                        '<span class="mono" style="color:#8fe8ff;white-space:nowrap">待处理</span></div>';
+                }).join('') : '<div class="sc-hint">没有待处理的决策事项</div>');
+                qa('#adr-todo .attn-item').forEach(function (n) {
+                    n.addEventListener('click', function () { openAdr(n.dataset.adr); });
+                });
+            }
+
+            function renderAdr() {
+                const list = adrList();
+                const adopted = list.filter(a => adrStatusOf(a) === '已采纳').length;
+                const pending = list.filter(a => ['建议', '评审中'].indexOf(adrStatusOf(a)) > -1).length;
+                put('#adr-kv', kvBox([
+                    ['决策总数', list.length + ' 条'],
+                    ['已采纳', '<span class="sc-tag ok">' + adopted + ' 条</span>'],
+                    ['待评审', '<span class="sc-tag warn">' + pending + ' 条</span>'],
+                    ['本期新增', ST.adr.length + ' 条'],
+                    ['分类', list.map(a => a.cat).filter(function (c, i, arr) { return arr.indexOf(c) === i; }).length + ' 类'],
+                    ['评审周期', '双周会']
+                ]));
+                put('#adr-table tbody', list.map(adrRowHTML).join(''));
+                if (!adrCtrl) {
+                    adrCtrl = SC.table.enhance(q('#adr-table'), {
+                        pageSize: 8, search: '#adr-search', export: '架构决策记录', keyAttr: 'id'
+                    });
+                } else {
+                    adrCtrl.reload();
+                }
+                put('#adr-flow', ADR_FLOW.map(function (f) {
+                    return '<div class="sc-tl-item ' + f.s + '"><div class="h">' + f.h + '</div><div class="m">' + SC.esc(f.m) + '</div></div>';
+                }).join(''));
+                renderAdrTodo();
+            }
+
+            function setAdrStatus(id, st) {
+                ST.adrStatus[id] = st;
+                saveST();
+                renderAdr();
+                SC.toast(id + ' 状态更新为' + st, { type: 'success' });
+            }
+
+            function openAdr(id) {
+                const a = adrList().filter(x => x.id === id)[0];
+                if (!a) return;
+
+                // 弹窗内容与操作按钮按当前状态就地重绘，避免状态流转后仍显示旧值
+                function bodyHTML() {
+                    const st = adrStatusOf(a);
+                    return '<div class="sc-kv">' + kvBox([
+                        ['编号', '<span class="mono">' + a.id + '</span>'],
+                        ['分类', SC.esc(a.cat)],
+                        ['状态', tagHTML(st, ADR_STATUS_TAG[st] || 'info')],
+                        ['影响面', SC.esc(a.impact)],
+                        ['决策人', SC.esc(a.owner)],
+                        ['日期', SC.esc(a.date)]
+                    ]) + '</div>' +
+                        adrSection('背景与问题', a.context) +
+                        adrSection('决策内容', a.decision) +
+                        adrSection('影响与结果', a.effect) +
+                        adrSection('备选方案', a.alt);
+                }
+
+                function paint(api) {
+                    api.body.innerHTML = bodyHTML();
+                    api.footer.innerHTML = '';
+                    const st = adrStatusOf(a);
+                    const footer = [];
+                    if (st === '建议') {
+                        footer.push({ text: '提交评审', kind: 'primary', next: '评审中' });
+                    } else if (st === '评审中') {
+                        footer.push({ text: '采纳决策', kind: 'primary', next: '已采纳' });
+                        footer.push({ text: '驳回', kind: 'danger', next: '已驳回' });
+                    }
+                    footer.push({ text: '关闭', kind: 'ghost' });
+                    footer.forEach(function (cfg) {
+                        const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                        btn.addEventListener('click', function () {
+                            if (cfg.next) {
+                                setAdrStatus(id, cfg.next);
+                                paint(api);
+                            } else {
+                                api.close();
+                            }
+                        });
+                        api.footer.appendChild(btn);
+                    });
+                }
+
+                const api = SC.modal.open({
+                    title: a.id + ' · ' + a.title, size: 'lg', body: bodyHTML(),
+                    footer: [{ text: '关闭', kind: 'ghost' }]
+                });
+                paint(api);
+            }
+
+            function openAdrAdd() {
+                SC.modal.form({
+                    title: '新增架构决策',
+                    submitText: '提交评审',
+                    fields: [
+                        { name: 'title', label: '决策标题', required: true, placeholder: '如：统一日志采集方案' },
+                        { name: 'cat', label: '分类', type: 'select', options: ['架构风格', '中间件选型', '数据存储', '前端架构', '安全与权限', '交付流程', '技术债治理'] },
+                        { name: 'impact', label: '影响面', required: true, placeholder: '如：全域 / 数据域' },
+                        { name: 'owner', label: '决策人', value: '技术委员会' },
+                        { name: 'context', label: '背景与问题', type: 'textarea', required: true },
+                        { name: 'decision', label: '决策内容', type: 'textarea', required: true },
+                        { name: 'effect', label: '预期影响', type: 'textarea' },
+                        { name: 'alt', label: '备选方案', type: 'textarea' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const seq = ADR_SEED.length + ST.adr.length + 1;
+                    ST.adr.push({
+                        id: 'ADR-' + String(seq).padStart(4, '0'),
+                        title: v.title, cat: v.cat, status: '评审中', impact: v.impact,
+                        owner: v.owner || '技术委员会', date: SC.today(),
+                        context: v.context, decision: v.decision,
+                        effect: v.effect || '待上线后评估', alt: v.alt || '暂无'
+                    });
+                    saveST();
+                    renderAdr();
+                    SC.toast('已提交评审', { type: 'success' });
+                });
+            }
+
+            function exportAdr() {
+                const rows = [['编号', '标题', '分类', '状态', '影响面', '决策人', '日期', '决策内容']];
+                adrList().forEach(function (a) {
+                    rows.push([a.id, a.title, a.cat, adrStatusOf(a), a.impact, a.owner, a.date, a.decision]);
+                });
+                SC.csv.download('架构决策记录_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + (rows.length - 1) + ' 条决策', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               18. 事件绑定与初始化
+               ========================================================================== */
+            function refreshCharts(name) {
+                if (name === 'overview') { drawLayers(); drawMaturity(); }
+                else if (name === 'services') drawTopo();
+                else if (name === 'stack') drawStackChart();
+                else if (name === 'security') drawSecCat();
+                else if (name === 'capacity') drawCapCharts();
+            }
+
+            function bindAll() {
+                const layerCanvas = q('#c-layers');
+                layerCanvas.addEventListener('mousemove', function (ev) {
+                    const rect = layerCanvas.getBoundingClientRect();
+                    const y = ev.clientY - rect.top;
+                    let idx = -1;
+                    ovHits.forEach(function (b, i) { if (y >= b.y && y <= b.y + b.h) idx = i; });
+                    layerCanvas.style.cursor = idx > -1 ? 'pointer' : 'default';
+                    if (idx !== ovHover) { ovHover = idx; drawLayers(); }
+                });
+                layerCanvas.addEventListener('mouseleave', function () {
+                    ovHover = -1;
+                    drawLayers();
+                });
+                layerCanvas.addEventListener('click', function (ev) {
+                    const rect = layerCanvas.getBoundingClientRect();
+                    const y = ev.clientY - rect.top;
+                    const hit = ovHits.filter(function (b) { return y >= b.y && y <= b.y + b.h; })[0];
+                    if (hit) selectLayer(hit.key);
+                });
+
+                const topoCanvas = q('#c-topo');
+                topoCanvas.addEventListener('mousemove', function (ev) {
+                    const rect = topoCanvas.getBoundingClientRect();
+                    const mx = ev.clientX - rect.left, my = ev.clientY - rect.top;
+                    let hit = null;
+                    topoNodes.forEach(function (n) {
+                        if (Math.hypot(mx - n.x, my - n.y) <= n.r + 5) hit = n;
+                    });
+                    topoCanvas.style.cursor = hit ? 'pointer' : 'default';
+                    const id = hit ? hit.id : -1;
+                    if (id !== topoHover) { topoHover = id; drawTopo(); }
+                    put('#topo-tip', hit
+                        ? SC.esc(hit.svc.name) + ' · ' + SC.esc(hit.svc.domain) + ' · ' + hit.svc.qps + ' QPS · ' + hit.svc.health + '（点击查看）'
+                        : '悬停查看节点，点击进入服务详情');
+                });
+                topoCanvas.addEventListener('mouseleave', function () {
+                    topoHover = -1;
+                    drawTopo();
+                    put('#topo-tip', '悬停查看节点，点击进入服务详情');
+                });
+                topoCanvas.addEventListener('click', function () {
+                    if (topoHover !== -1) openService(topoHover);
+                });
+
+                q('#btn-svc-health').addEventListener('click', runHealthCheck);
+                q('#btn-svc-export').addEventListener('click', exportServices);
+                q('#btn-stack-export').addEventListener('click', exportStack);
+                q('#btn-sec-audit').addEventListener('click', runSecAudit);
+                q('#btn-sec-export').addEventListener('click', exportSec);
+                q('#btn-pipe-run').addEventListener('click', runPipeline);
+                q('#btn-cap-report').addEventListener('click', openCapReport);
+                q('#btn-adr-add').addEventListener('click', openAdrAdd);
+                q('#btn-adr-export').addEventListener('click', exportAdr);
+
+                q('#env-seg').addEventListener('click', function (ev) {
+                    const b = ev.target.closest('button[data-env]');
+                    if (b) setEnv(b.dataset.env);
+                });
+                q('#cap-range').addEventListener('click', function (ev) {
+                    const b = ev.target.closest('button[data-hours]');
+                    if (!b) return;
+                    capHours = Number(b.dataset.hours);
+                    qa('#cap-range button').forEach(function (x) {
+                        x.classList.toggle('active', x === b);
+                    });
+                    renderCapacity();
+                });
+
+                q('#cap-alerts').addEventListener('click', function (ev) {
+                    const b = ev.target.closest('button[data-ack]');
+                    if (!b) return;
+                    ST.ack.push(b.dataset.ack);
+                    saveST();
+                    renderCapacity();
+                    SC.toast('告警已登记处置：' + b.dataset.ack, { type: 'success' });
+                });
+
+                q('#svc-table').addEventListener('click', function (ev) {
+                    // 详情按钮→服务档案弹窗；行内链接→场景页；其余区域点击也进入场景页
+                    const btn = ev.target.closest('button[data-act="svc"]');
+                    if (btn) { openService(btn.dataset.id); return; }
+                    if (ev.target.closest('a')) return;
+                    const tr = ev.target.closest('tr[data-id]');
+                    if (!tr) return;
+                    const s = svcById(tr.dataset.id);
+                    if (!s) return;
+                    const href = svcHref(s);
+                    if (href) location.href = href;
+                    else openService(s.id);
+                });
+                q('#stack-table').addEventListener('click', function (ev) {
+                    const tr = ev.target.closest('tr[data-id]');
+                    if (tr) openStack(tr.dataset.id);
+                });
+                q('#sec-table').addEventListener('click', function (ev) {
+                    const tr = ev.target.closest('tr[data-id]');
+                    if (tr) openSec(tr.dataset.id);
+                });
+                q('#node-table').addEventListener('click', function (ev) {
+                    const tr = ev.target.closest('tr[data-id]');
+                    if (tr) openNode(tr.dataset.id);
+                });
+                q('#rel-table').addEventListener('click', function (ev) {
+                    const b = ev.target.closest('button[data-act="rollback"]');
+                    if (!b) return;
+                    ev.stopPropagation();
+                    rollbackRel(b.dataset.ver);
+                });
+                q('#adr-table').addEventListener('click', function (ev) {
+                    const tr = ev.target.closest('tr[data-id]');
+                    if (tr) openAdr(tr.dataset.id);
+                });
+
+                qa('.module-btn').forEach(function (b) {
+                    b.addEventListener('click', function () {
+                        const name = b.dataset.module;
+                        setTimeout(function () { refreshCharts(name); }, 70);
+                    });
+                });
+
+                window.addEventListener('resize', SC.debounce(function () {
+                    const m = activeModule();
+                    if (m === 'overview') drawLayers();
+                    else if (m === 'services') drawTopo();
+                }, 180));
+            }
+
+            function init() {
+                if (!ST.adrStatus) ST.adrStatus = {};
+                renderLive();
+                setInterval(renderLive, 1000);
+                renderOverview();
+                renderServices();
+                renderStack();
+                renderSecurity();
+                renderDeploy();
+                renderCapacity();
+                renderAdr();
+                bindAll();
+                refreshCharts('overview');
+                applyEntryContext();
+            }
+
+            /* 从场景页回跳（?svc= / ?domain=）：切模块、筛选定位并展示提示条 */
+            function applyEntryContext() {
+                let params;
+                try { params = new URLSearchParams(location.search); } catch (e) { return; }
+                const svcId = params.get('svc');
+                const dom = params.get('domain');
+                const from = params.get('from');
+                if (!svcId && !dom) return;
+
+                let svc = null, target = dom;
+                if (svcId) {
+                    svc = svcById(svcId);
+                    if (!svc) {
+                        SC.toast('未找到服务 ' + svcId + '，已为你打开服务目录', { type: 'warn', duration: 3600 });
+                    } else {
+                        target = svc.domain;
+                    }
+                }
+
+                const nav = q('.module-btn[data-module="services"]');
+                if (nav) nav.click();
+                if (target && SVC_DOMAINS.indexOf(target) > -1) applySvcDomain(target);
+
+                const input = q('#svc-search');
+                if (svc && input) {
+                    input.value = svc.id;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                const srcLabel = from && window.ArchLink ? ArchLink.labelOf(from) : '';
+                const node = q('#svc-deeplink');
+                if (node) {
+                    node.style.display = '';
+                    node.innerHTML = '🔗 已从 <b>' + SC.esc(srcLabel || '外部入口') + '</b> 定位' +
+                        (svc ? '服务 <b>' + SC.esc(svc.name) + '</b>' : '业务域 <b>' + SC.esc(target || '全部') + '</b>') +
+                        ' · ' + (svc ? '已按业务域筛选并定位到该服务' : '已按业务域筛选') +
+                        ' <button class="sc-btn sm ghost" id="svc-deeplink-clear">清除定位</button>';
+                    const clear = q('#svc-deeplink-clear');
+                    if (clear) {
+                        clear.addEventListener('click', function () {
+                            node.style.display = 'none';
+                            node.innerHTML = '';
+                            if (input) {
+                                input.value = '';
+                                input.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                            applySvcDomain('全部');
+                            try { history.replaceState(null, '', location.pathname); } catch (e) { }
+                            drawTopo();
+                        });
+                    }
+                }
+
+                setTimeout(function () {
+                    if (svc) openService(svc.id);
+                    else drawTopo();
+                }, 170);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
 </body>
 
 </html>

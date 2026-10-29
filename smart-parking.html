@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧停车 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
     <style>
         .container {
             background: #f0f8ff;
@@ -43,31 +44,13 @@
             background: #0077b6;
         }
 
-        .parking-map {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
-        }
-
-        .parking-map h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3em;
-        }
-
-        .map-placeholder {
-            width: 100%;
-            height: 400px;
-            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
-            border-radius: 8px;
+        .header-meta {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5em;
-            margin-bottom: 20px;
+            gap: 18px;
+            flex-wrap: wrap;
+            font-size: 0.9em;
+            color: #7f8c8d;
         }
 
         .parking-stats {
@@ -79,7 +62,7 @@
 
         .parking-stat-card {
             background: white;
-            padding: 25px;
+            padding: 22px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
@@ -92,109 +75,115 @@
         }
 
         .parking-stat-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
+            font-size: 2.2em;
+            margin-bottom: 12px;
         }
 
         .parking-stat-value {
-            font-size: 2.5em;
+            font-size: 2.1em;
             font-weight: bold;
             color: #00b4d8;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
         }
 
         .parking-stat-label {
-            font-size: 1em;
+            font-size: 0.95em;
             color: #7f8c8d;
         }
 
-        .lot-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+        .lot-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
         }
 
-        .lot-card {
+        .lot-tab {
+            border: 1px solid #d7e6ef;
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .lot-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .lot-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .lot-name {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .lot-status {
-            font-size: 0.8em;
-            padding: 4px 10px;
             border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            min-width: 160px;
         }
 
-        .lot-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
+        .lot-tab:hover {
+            border-color: #00b4d8;
+            transform: translateY(-2px);
         }
 
-        .lot-value {
-            font-size: 1.5em;
+        .lot-tab.active {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .lot-tab .n {
             font-weight: bold;
-            color: #00b4d8;
+            display: block;
+            font-size: 0.95em;
         }
 
-        .lot-label {
-            font-size: 0.9em;
+        .lot-tab .s {
+            font-size: 0.78em;
+            opacity: 0.85;
+        }
+
+        .aisle {
+            margin-bottom: 14px;
+        }
+
+        .aisle-title {
+            font-size: 0.8em;
             color: #7f8c8d;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .lot-progress {
-            height: 10px;
-            background: #ecf0f1;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 15px;
+        .floor-plan {
+            background: #f4f7fa;
+            border: 1px dashed #cfdbe4;
+            border-radius: 10px;
+            padding: 16px;
+            max-height: 340px;
+            overflow: auto;
         }
 
-        .lot-fill {
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.3s ease;
+        .fee-break td,
+        .fee-break th {
+            padding: 9px 12px;
+            font-size: 0.85em;
         }
 
-        .lot-fill.high {
-            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        .fee-total {
+            background: #eaf7fb;
+            font-weight: bold;
         }
 
-        .lot-fill.medium {
-            background: linear-gradient(90deg, #f39c12, #e67e22);
+        .dir-in {
+            color: #27ae60;
+            font-weight: bold;
         }
 
-        .lot-fill.low {
-            background: linear-gradient(90deg, #27ae60, #229954);
+        .dir-out {
+            color: #e67e22;
+            font-weight: bold;
         }
 
         @media (max-width: 768px) {
-            .lot-info {
-                flex-direction: column;
-                gap: 10px;
+            .parking-stats {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%232c3e50%27/%3E%3Crect x=%2712%27 y=%2730%27 width=%2710%27 height=%2722%27 fill=%27%233498db%27/%3E%3Crect x=%2727%27 y=%2718%27 width=%2710%27 height=%2734%27 fill=%27%232ecc71%27/%3E%3Crect x=%2742%27 y=%2726%27 width=%2710%27 height=%2726%27 fill=%27%23f39c12%27/%3E%3C/svg%3E">
 </head>
 
 <body>
@@ -204,202 +193,950 @@
                 <h1>🅿️ 智慧停车管理</h1>
                 <p>停车场管理与车位引导</p>
             </div>
-            <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            <div class="header-meta">
+                <span class="sc-live"><i class="sc-live-dot"></i><span data-clock="time">--</span></span>
+                <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            </div>
         </header>
 
         <div class="parking-stats">
             <div class="parking-stat-card">
-                <div class="parking-stat-icon">🅿️</div>
-                <div class="parking-stat-value">56</div>
-                <div class="parking-stat-label">停车场数量</div>
+                <div class="parking-stat-icon">🏢</div>
+                <div class="parking-stat-value" id="kpi-lots" data-animated="1">0</div>
+                <div class="parking-stat-label">联网停车场</div>
             </div>
             <div class="parking-stat-card">
                 <div class="parking-stat-icon">🚗</div>
-                <div class="parking-stat-value">12,345</div>
-                <div class="parking-stat-label">总车位数量</div>
+                <div class="parking-stat-value" id="kpi-cap" data-animated="1">0</div>
+                <div class="parking-stat-label">总车位数</div>
             </div>
             <div class="parking-stat-card">
-                <div class="parking-stat-icon">✅</div>
-                <div class="parking-stat-value">68%</div>
-                <div class="parking-stat-label">使用率</div>
+                <div class="parking-stat-icon">📈</div>
+                <div class="parking-stat-value" id="kpi-use" data-animated="1" style="color:#e67e22">0%</div>
+                <div class="parking-stat-label">实时使用率</div>
             </div>
             <div class="parking-stat-card">
                 <div class="parking-stat-icon">💰</div>
-                <div class="parking-stat-value">¥123,456</div>
-                <div class="parking-stat-label">今日收入</div>
+                <div class="parking-stat-value" id="kpi-fee" data-animated="1" style="color:#27ae60">¥0</div>
+                <div class="parking-stat-label">今日收费</div>
             </div>
-        </div>
-
-        <div class="parking-map">
-            <h3>🗺️ 停车场分布地图</h3>
-            <div class="map-placeholder">🅿️ 停车场分布图</div>
         </div>
 
         <div class="module-nav">
             <button class="module-btn active" data-module="parking-monitor">📡 停车监控</button>
             <button class="module-btn" data-module="lot-management">🏢 车场管理</button>
-            <button class="module-btn" data-module="fee-management">💰 收费管理</button>
+            <button class="module-btn" data-module="fee-management">💰 计费管理</button>
             <button class="module-btn" data-module="data-analysis">📊 数据分析</button>
         </div>
 
+        <!-- ============ 停车监控 ============ -->
         <div id="parking-monitor-module" class="module-content active">
-            <div class="content-header">
-                <h3>📡 实时停车监控</h3>
-            </div>
-            <div class="lot-grid">
-                <div class="lot-card">
-                    <div class="lot-header">
-                        <div class="lot-name">XX购物中心停车场</div><span class="lot-status status-normal">正常</span>
-                    </div>
-                    <div class="lot-info">
-                        <div>
-                            <div class="lot-value">1,234</div>
-                            <div class="lot-label">总车位</div>
-                        </div>
-                        <div>
-                            <div class="lot-value">856</div>
-                            <div class="lot-label">已占用</div>
-                        </div>
-                        <div>
-                            <div class="lot-value">378</div>
-                            <div class="lot-label">空余</div>
+            <div class="lot-bar" id="lot-tabs"></div>
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🗺️ 车位级实时平面图</h3>
+                        <div class="sc-tools">
+                            <span class="sc-live" id="lot-live"><i class="sc-live-dot"></i><span
+                                    data-live-label>实时</span>
+                                <button class="sc-btn sm ghost">⏸ 暂停</button>
+                            </span>
+                            <button class="sc-btn sm" id="btn-guide">🧭 最优车位引导</button>
                         </div>
                     </div>
-                    <div class="lot-progress">
-                        <div class="lot-fill high" style="width: 70%"></div>
+                    <div class="floor-plan" id="floor-plan"></div>
+                    <div class="sc-maplegend">
+                        <span><i style="background:#27ae60"></i>空闲</span>
+                        <span><i style="background:#95a5a6"></i>占用</span>
+                        <span><i style="background:#16a085"></i>充电车位</span>
+                        <span><i style="background:#f39c12"></i>无障碍</span>
+                        <span><i style="background:#e74c3c"></i>设备异常</span>
+                        <span><i style="background:#2c3e50"></i>选中</span>
                     </div>
-                    <button class="btn-primary">查看详情</button>
+                    <div class="sc-kv" style="margin-top:18px" id="lot-summary"></div>
                 </div>
-                <div class="lot-card">
-                    <div class="lot-header">
-                        <div class="lot-name">YY商业广场停车场</div><span class="lot-status status-normal">正常</span>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🚪 出入口实时流水</h3>
                     </div>
-                    <div class="lot-info">
-                        <div>
-                            <div class="lot-value">856</div>
-                            <div class="lot-label">总车位</div>
+                    <div class="sc-log" id="flow-log" style="height:300px"></div>
+                    <div class="sc-kv" style="margin-top:16px">
+                        <div class="sc-kv-item">
+                            <div class="k">近 1 小时进场</div>
+                            <div class="v" id="flow-in">0</div>
                         </div>
-                        <div>
-                            <div class="lot-value">428</div>
-                            <div class="lot-label">已占用</div>
+                        <div class="sc-kv-item">
+                            <div class="k">近 1 小时出场</div>
+                            <div class="v" id="flow-out">0</div>
                         </div>
-                        <div>
-                            <div class="lot-value">428</div>
-                            <div class="lot-label">空余</div>
+                        <div class="sc-kv-item">
+                            <div class="k">平均停留</div>
+                            <div class="v" id="flow-avg">--</div>
                         </div>
-                    </div>
-                    <div class="lot-progress">
-                        <div class="lot-fill medium" style="width: 50%"></div>
-                    </div>
-                    <button class="btn-primary">查看详情</button>
-                </div>
-                <div class="lot-card">
-                    <div class="lot-header">
-                        <div class="lot-name">ZZ地铁站停车场</div><span class="lot-status status-normal">正常</span>
-                    </div>
-                    <div class="lot-info">
-                        <div>
-                            <div class="lot-value">567</div>
-                            <div class="lot-label">总车位</div>
-                        </div>
-                        <div>
-                            <div class="lot-value">170</div>
-                            <div class="lot-label">已占用</div>
-                        </div>
-                        <div>
-                            <div class="lot-value">397</div>
-                            <div class="lot-label">空余</div>
+                        <div class="sc-kv-item">
+                            <div class="k">排队时长</div>
+                            <div class="v" id="flow-queue">--</div>
                         </div>
                     </div>
-                    <div class="lot-progress">
-                        <div class="lot-fill low" style="width: 30%"></div>
+                    <div class="sc-note" style="margin-top:16px">
+                        车位状态由地磁 / 视频桩上报，异常车位（设备离线、长时间未离场）会自动标红并生成巡检任务。
                     </div>
-                    <button class="btn-primary">查看详情</button>
                 </div>
             </div>
         </div>
 
+        <!-- ============ 车场管理 ============ -->
         <div id="lot-management-module" class="module-content">
             <div class="content-header">
-                <h3>🏢 车场管理</h3>
+                <h3>🏢 车场台账</h3>
+                <div class="content-actions">
+                    <input type="text" placeholder="搜索车场名称 / 地址 / 运营单位..." class="search-input">
+                    <button class="sc-btn sm primary" id="btn-add-lot">➕ 接入车场</button>
+                </div>
             </div>
+            <div class="sc-chips" id="lot-chips"></div>
             <div class="data-table-container">
-                <table class="data-table">
+                <table class="data-table" id="lot-table">
                     <thead>
                         <tr>
-                            <th>停车场名称</th>
-                            <th>位置</th>
+                            <th>车场名称</th>
+                            <th>类型</th>
+                            <th>地址</th>
                             <th>总车位</th>
+                            <th>占用</th>
+                            <th>使用率</th>
+                            <th>剩余</th>
+                            <th>单价</th>
+                            <th>运营单位</th>
                             <th>状态</th>
-                            <th>操作</th>
+                            <th data-no-sort>操作</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>XX购物中心停车场</td>
-                            <td>XX大道123号</td>
-                            <td>1,234</td>
-                            <td><span class="status-normal">正常</span></td>
-                            <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
-                        </tr>
-                        <tr>
-                            <td>YY商业广场停车场</td>
-                            <td>YY路456号</td>
-                            <td>856</td>
-                            <td><span class="status-normal">正常</span></td>
-                            <td><button class="btn-sm">详情</button><button class="btn-sm">管理</button></td>
-                        </tr>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
 
+        <!-- ============ 计费管理 ============ -->
         <div id="fee-management-module" class="module-content">
-            <div class="content-header">
-                <h3>💰 收费管理</h3>
-            </div>
-            <div class="maintenance-grid">
-                <div class="maintenance-card">
-                    <h4>计费规则</h4>
-                    <p>设置停车场计费标准</p><button class="btn-primary">配置</button>
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>📏 计费规则</h3>
+                        <button class="sc-btn sm" id="btn-rule-reset">↺ 恢复政府指导价</button>
+                    </div>
+                    <div class="sc-kv" id="rule-view"></div>
+                    <div style="margin-top:18px">
+                        <button class="sc-btn primary" id="btn-rule-edit">✏️ 编辑规则</button>
+                        <button class="sc-btn ghost" id="btn-rule-preview">🖨 查看收费公示</button>
+                    </div>
+                    <div class="sc-section-title">规则说明</div>
+                    <div class="sc-note">
+                        计费采用「免费时长 → 首小时 → 阶梯时段 → 单次封顶」四段式：先扣除免费时长，
+                        首个计费小时按首小时价，其余按所在时段单价折算 15 分钟为一档，
+                        最后套用 24 小时封顶与会员折扣。路内泊位与封闭车场共用同一算法，仅参数不同。
+                    </div>
                 </div>
-                <div class="maintenance-card">
-                    <h4>优惠政策</h4>
-                    <p>设置优惠活动和折扣</p><button class="btn-primary">配置</button>
-                </div>
-                <div class="maintenance-card">
-                    <h4>收费统计</h4>
-                    <p>查看收费数据统计</p><button class="btn-primary">查看</button>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🧮 停车费试算</h3>
+                    </div>
+                    <div class="sc-form">
+                        <div class="sc-field"><label>入场时间</label><input type="datetime-local" class="sc-input"
+                                id="calc-in"></div>
+                        <div class="sc-field"><label>出场时间</label><input type="datetime-local" class="sc-input"
+                                id="calc-out"></div>
+                        <div class="sc-field"><label>车场类型</label>
+                            <select class="sc-input" id="calc-type">
+                                <option value="mall">商业综合体</option>
+                                <option value="metro">地铁 P+R</option>
+                                <option value="street">路内泊位</option>
+                                <option value="hospital">医院周边</option>
+                            </select>
+                        </div>
+                        <div class="sc-field"><label>车牌号</label><input type="text" class="sc-input" id="calc-plate"
+                                value="浙A·88H66"></div>
+                        <label class="sc-switch full" id="calc-member" style="grid-column:1/-1"><i></i><span>月卡 /
+                                会员车辆（享折扣）</span></label>
+                    </div>
+                    <div style="margin-top:16px">
+                        <button class="sc-btn primary" id="btn-calc">计算费用</button>
+                        <span class="sc-hint" id="calc-msg"></span>
+                    </div>
+                    <div class="sc-section-title">计费明细</div>
+                    <div class="data-table-container">
+                        <table class="data-table fee-break" id="calc-table">
+                            <thead>
+                                <tr>
+                                    <th>计费项</th>
+                                    <th>时长</th>
+                                    <th>单价</th>
+                                    <th>金额</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- ============ 数据分析 ============ -->
         <div id="data-analysis-module" class="module-content">
-            <div class="content-header">
-                <h3>📊 数据分析</h3>
+            <div class="sc-panel-title">
+                <h3>📊 停车运行分析</h3>
+                <div class="sc-tools">
+                    <button class="sc-btn sm ghost" id="btn-analysis-export">⬇ 导出分析数据</button>
+                </div>
             </div>
-            <div class="maintenance-grid">
-                <div class="maintenance-card">
-                    <h4>使用率分析</h4>
-                    <p>停车场使用情况分析</p><button class="btn-primary">查看分析</button>
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🚗 进出场流量（车次）</h3>
+                    </div>
+                    <div class="sc-chart"><canvas id="chart-flow"></canvas></div>
+                    <div class="sc-legend" id="legend-flow"></div>
                 </div>
-                <div class="maintenance-card">
-                    <h4>收入统计</h4>
-                    <p>收入数据统计分析</p><button class="btn-primary">查看分析</button>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>💰 收入构成</h3>
+                    </div>
+                    <div class="sc-chart"><canvas id="chart-fee"></canvas></div>
+                    <div class="sc-legend" id="legend-fee"></div>
                 </div>
-                <div class="maintenance-card">
-                    <h4>高峰时段</h4>
-                    <p>停车高峰时段分析</p><button class="btn-primary">查看分析</button>
+            </div>
+            <div class="sc-panel">
+                <div class="sc-panel-title">
+                    <h3>🔥 车位使用率热力（近 7 日 × 24 小时）</h3>
+                    <span class="sc-hint">鼠标悬停查看具体数值，颜色越深代表越饱和</span>
+                </div>
+                <div id="heat-host"></div>
+            </div>
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🏆 车场周转率排名</h3>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="rank-table">
+                            <thead>
+                                <tr>
+                                    <th>车场</th>
+                                    <th>日均车次</th>
+                                    <th>周转率</th>
+                                    <th>平均停留</th>
+                                    <th>日收入</th>
+                                    <th>饱和时段</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>⏰ 高峰与供需预警</h3>
+                    </div>
+                    <div class="sc-kv" id="peak-kv"></div>
+                    <div class="sc-section-title">建议措施</div>
+                    <div id="advice" class="sc-note"></div>
+                    <div class="sc-chart sm"><canvas id="chart-occupy"></canvas></div>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
+            <p>&copy; 2026 智慧城市管理平台. 【余一叶知秋尽】版权所有.</p>
         </footer>
     </div>
 
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script>
+        /* ==================================================================
+           智慧停车模块：车场台账 / 车位级实时监控 / 四段式计费 / 供需分析
+           ================================================================== */
+        (function () {
+            'use strict';
+
+            /* ---------------- 车场基础数据 ---------------- */
+            const TYPES = {
+                mall: { label: '商业综合体', rate: { free: 30, first: 10, day: 8, night: 4, cap: 60, dayStart: 7, dayEnd: 22, member: 15 } },
+                metro: { label: '地铁 P+R', rate: { free: 15, first: 5, day: 3, night: 2, cap: 18, dayStart: 6, dayEnd: 23, member: 30 } },
+                street: { label: '路内泊位', rate: { free: 0, first: 12, day: 12, night: 3, cap: 80, dayStart: 8, dayEnd: 20, member: 0 } },
+                hospital: { label: '医院周边', rate: { free: 45, first: 8, day: 6, night: 2, cap: 45, dayStart: 7, dayEnd: 21, member: 10 } }
+            };
+            const lots = SC.store.get('parking', 'lots', null) || [
+                { id: 'P01', name: '湖滨银泰停车场', type: 'mall', addr: '延安路 245 号', cap: 1234, op: '银泰商业', status: '营业中' },
+                { id: 'P02', name: '市民中心停车场', type: 'mall', addr: '解放东路 18 号', cap: 856, op: '城投入股', status: '营业中' },
+                { id: 'P03', name: '地铁 2 号线 P+R', type: 'metro', addr: '古墩路站 B 口', cap: 567, op: '公交集团', status: '营业中' },
+                { id: 'P04', name: '第一医院周边泊位', type: 'hospital', addr: '环城北路 305 号', cap: 320, op: '城投停车', status: '营业中' },
+                { id: 'P05', name: '望江路内泊位段', type: 'street', addr: '望江路 12—88 号', cap: 186, op: '城投停车', status: '营业中' },
+                { id: 'P06', name: '会展中心停车场', type: 'mall', addr: '世纪新城 6 号', cap: 640, op: '会展集团', status: '维护停用' }
+            ];
+            lots.forEach(function (lot) {
+                if (lot.occupied === undefined) {
+                    const ratio = lot.status === '维护停用' ? 0 : (lot.type === 'street' ? 0.92 : 0.4 + Math.random() * 0.4);
+                    lot.occupied = Math.round(lot.cap * ratio);
+                    lot.todayFee = Math.round(lot.occupied * (6 + Math.random() * 12));
+                    lot.trips = Math.round(lot.cap * (1.2 + Math.random() * 1.6));
+                }
+            });
+            SC.store.set('parking', 'lots', lots);
+            function saveLots() {
+                // 只持久化业务字段，车位级缓存不进 localStorage
+                SC.store.set('parking', 'lots', lots.map(l => ({
+                    id: l.id, name: l.name, type: l.type, addr: l.addr, cap: l.cap,
+                    occupied: l.occupied, op: l.op, status: l.status, todayFee: l.todayFee, trips: l.trips
+                })));
+            }
+
+            /* 计费参数：TYPES 里是 {label, rate:{...}}，而下游一律按扁平对象取
+             * r.free / r.first / r.day / r.night / r.cap / r.member / r.dayStart / r.dayEnd，
+             * 因此这里统一拍平，并兼容早期把带 label 的嵌套结构写进 localStorage 的数据。 */
+            const DEFAULT_RATE = {};
+            Object.keys(TYPES).forEach(function (k) {
+                DEFAULT_RATE[k] = JSON.parse(JSON.stringify(TYPES[k].rate));
+            });
+            function normalizeRate(saved) {
+                const out = {};
+                Object.keys(DEFAULT_RATE).forEach(function (k) {
+                    const one = (saved && saved[k]) || {};
+                    out[k] = Object.assign({}, DEFAULT_RATE[k], one.rate || one);
+                });
+                return out;
+            }
+            let rate = normalizeRate(SC.store.get('parking', 'rate', null));
+
+            /* ---------------- 车位平面图 ---------------- */
+            let currentLot = lots[0].id;
+            const spaceCache = {};
+
+            function spacesOf(lot) {
+                if (!spaceCache[lot.id]) {
+                    const perRow = 16, rows = Math.max(3, Math.min(6, Math.ceil(lot.cap / 96)));
+                    const list = [];
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < perRow; c++) {
+                            const no = String.fromCharCode(65 + r) + SC.pad2(c + 1);
+                            const roll = Math.random();
+                            let kind = '普通';
+                            if (c < 2 && r === 0) kind = '无障碍';
+                            else if (c % 8 === 0) kind = '充电';
+                            const busy = roll < lot.occupied / lot.cap;
+                            list.push({
+                                no, kind, row: r,
+                                state: busy ? '占用' : '空闲',
+                                plate: busy ? randPlate() : '',
+                                since: busy ? Date.now() - SC.sim.randInt(6, 420) * 60000 : 0,
+                                fault: Math.random() > 0.97
+                            });
+                        }
+                    }
+                    spaceCache[lot.id] = list;
+                }
+                return spaceCache[lot.id];
+            }
+
+            function randPlate() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+                return '浙A·' + chars[SC.sim.randInt(0, 23)] + SC.sim.randInt(1000, 9999) + chars[SC.sim.randInt(0, 23)];
+            }
+
+            function renderFloorPlan() {
+                const lot = lots.find(l => l.id === currentLot);
+                const spaces = spacesOf(lot);
+                const rows = {};
+                spaces.forEach(s => (rows[s.row] = rows[s.row] || []).push(s));
+                document.getElementById('floor-plan').innerHTML = Object.keys(rows).map(function (r) {
+                    return '<div class="aisle"><div class="aisle-title">' + String.fromCharCode(65 + Number(r)) + ' 通道 · ' +
+                        rows[r].length + ' 个泊位</div><div class="sc-space-grid">' +
+                        rows[r].map(function (s) {
+                            const cls = s.fault ? 'fault' : (s.state === '占用' ? 'busy' : (s.kind === '充电' ? 'charge' : (s.kind === '无障碍' ? 'vip' : 'free')));
+                            return '<div class="sc-space ' + cls + '" data-no="' + s.no + '" title="' + s.no + ' ' + s.kind + ' ' + s.state + '">' + s.no + '</div>';
+                        }).join('') + '</div></div>';
+                }).join('');
+                document.getElementById('floor-plan').querySelectorAll('.sc-space').forEach(function (el) {
+                    el.addEventListener('click', function () {
+                        document.querySelectorAll('.sc-space.sel').forEach(n => n.classList.remove('sel'));
+                        el.classList.add('sel');
+                        openSpaceDetail(lot, spaces.find(s => s.no === el.dataset.no));
+                    });
+                });
+                renderLotSummary(lot, spaces);
+            }
+
+            function renderLotSummary(lot, spaces) {
+                const free = spaces.filter(s => s.state === '空闲' && !s.fault).length;
+                const charge = spaces.filter(s => s.kind === '充电');
+                document.getElementById('lot-summary').innerHTML =
+                    kvi('实时可用', free + ' 个') + kvi('当前占用', spaces.length - free) +
+                    kvi('充电空闲', charge.filter(s => s.state === '空闲').length + '/' + charge.length) +
+                    kvi('设备异常', spaces.filter(s => s.fault).length) +
+                    kvi('使用率', ((1 - free / spaces.length) * 100).toFixed(1) + '%') +
+                    kvi('运营状态', lot.status);
+            }
+
+            function kvi(k, v) {
+                return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + SC.esc(v) + '</div></div>';
+            }
+
+            function openSpaceDetail(lot, space) {
+                const body = SC.el('<div></div>');
+                const dur = space.state === '占用' ? Math.round((Date.now() - space.since) / 60000) : 0;
+                const fee = space.state === '占用' ? calcFee(space.since, Date.now(), lot.type, false) : null;
+                body.innerHTML = '<div class="sc-kv">' +
+                    kvi('泊位编号', space.no) + kvi('泊位类型', space.kind) +
+                    kvi('当前状态', space.fault ? '设备异常' : space.state) +
+                    kvi('车牌', space.plate || '—') +
+                    (space.state === '占用' ? kvi('入场时间', SC.stamp(new Date(space.since))) +
+                        kvi('已停时长', Math.floor(dur / 60) + 'h' + SC.pad2(dur % 60) + 'm') +
+                        kvi('当前应收', SC.money(fee.total, 2)) : kvi('空闲时长', '实时')) +
+                    '</div>' +
+                    (space.fault ? '<div class="sc-note warn" style="margin-top:16px">⚠️ 地磁上报超时 12 分钟，疑似探测器电量耗尽，建议生成巡检工单。</div>' : '') +
+                    (fee ? '<div class="sc-section-title">费用构成</div>' + feeTable(fee, false) : '');
+                SC.modal.open({
+                    title: lot.name + ' · 泊位 ' + space.no,
+                    body,
+                    footer: [
+                        { text: '关闭', kind: 'ghost' },
+                        space.state === '占用' && !space.fault ? {
+                            text: '人工放行', kind: '', onClick: function () {
+                                space.state = '空闲';
+                                space.plate = '';
+                                space.since = 0;
+                                lot.occupied = Math.max(0, lot.occupied - 1);
+                                renderFloorPlan();
+                                renderKpi();
+                                pushFlow('出场', lot, space, '人工放行');
+                                SC.toast('泊位 ' + space.no + ' 已人工放行并释放', { type: 'success' });
+                            }
+                        } : {
+                            text: '生成巡检任务', kind: '', onClick: function () {
+                                SC.toast('已生成设备巡检任务（' + lot.name + ' ' + space.no + '）', { type: 'success' });
+                            }
+                        }
+                    ]
+                });
+            }
+
+            /* ---------------- 出入口流水 ---------------- */
+            const flowLog = document.getElementById('flow-log');
+            const flowEvents = [];
+
+            function pushFlow(dir, lot, space, note) {
+                const item = {
+                    t: new Date(), dir, lot: lot.name,
+                    plate: space.plate || randPlate(),
+                    note: note || (dir === '进场' ? '车牌识别通过' : '缴费离场')
+                };
+                flowEvents.unshift(item);
+                if (flowEvents.length > 40) flowEvents.pop();
+                renderFlow();
+            }
+
+            function renderFlow() {
+                flowLog.innerHTML = flowEvents.map(function (e) {
+                    return '<div class="li"><span class="t">' + SC.stamp(e.t).slice(11) + '</span>' +
+                        '<span class="lv ' + (e.dir === '进场' ? 'ok' : 'info') + '">' + e.dir + '</span>' +
+                        '<span class="tx">' + SC.esc(e.plate) + ' · ' + SC.esc(e.lot) + ' · ' + SC.esc(e.note) + '</span></div>';
+                }).join('');
+                const last = Date.now() - 3600000;
+                document.getElementById('flow-in').textContent = flowEvents.filter(e => e.dir === '进场' && e.t.getTime() > last).length;
+                document.getElementById('flow-out').textContent = flowEvents.filter(e => e.dir === '出场' && e.t.getTime() > last).length;
+            }
+
+            document.getElementById('btn-guide').addEventListener('click', function () {
+                const lot = lots.find(l => l.id === currentLot);
+                const spaces = spacesOf(lot);
+                const best = spaces.filter(s => s.state === '空闲' && !s.fault && s.kind !== '无障碍')[0];
+                if (!best) {
+                    SC.toast('当前车场已无可用泊位，建议引导至邻近车场', { type: 'warn' });
+                    return;
+                }
+                document.querySelectorAll('.sc-space.sel').forEach(n => n.classList.remove('sel'));
+                const cell = document.querySelector('.sc-space[data-no="' + best.no + '"]');
+                if (cell) {
+                    cell.classList.add('sel');
+                    cell.scrollIntoView({ block: 'center' });
+                }
+                SC.toast('已为待入场车辆分配最优泊位 ' + best.no + '（' + best.kind + '，距入口最近）', { type: 'success', duration: 3600 });
+            });
+
+            /* ---------------- 车场页签与 KPI ---------------- */
+            function renderLotTabs() {
+                document.getElementById('lot-tabs').innerHTML = lots.filter(l => l.status !== '维护停用').map(function (l) {
+                    const left = l.cap - l.occupied;
+                    return '<button class="lot-tab' + (l.id === currentLot ? ' active' : '') + '" data-id="' + l.id + '">' +
+                        '<span class="n">' + SC.esc(l.name) + '</span>' +
+                        '<span class="s">剩余 ' + left + ' 位 · 使用率 ' + (l.occupied / l.cap * 100).toFixed(0) + '%</span></button>';
+                }).join('');
+            }
+
+            document.getElementById('lot-tabs').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('.lot-tab');
+                if (!btn) return;
+                currentLot = btn.dataset.id;
+                renderLotTabs();
+                renderFloorPlan();
+            });
+
+            function renderKpi() {
+                const cap = lots.reduce((s, l) => s + l.cap, 0);
+                const used = lots.reduce((s, l) => s + l.occupied, 0);
+                const fee = lots.reduce((s, l) => s + l.todayFee, 0);
+                document.getElementById('kpi-lots').textContent = lots.length;
+                document.getElementById('kpi-cap').textContent = SC.num(cap);
+                document.getElementById('kpi-use').textContent = (used / cap * 100).toFixed(1) + '%';
+                document.getElementById('kpi-fee').textContent = SC.money(fee, 0);
+            }
+
+            /* ---------------- 车场台账 ---------------- */
+            let lotCtrl, lotChip = '全部';
+            const lotTbody = document.querySelector('#lot-table tbody');
+
+            function renderLots() {
+                lotTbody.innerHTML = lots.map(function (l) {
+                    const use = l.occupied / l.cap * 100;
+                    const rateNow = rate[l.type];
+                    const cls = l.status === '维护停用' ? 'off' : (use > 85 ? 'bad' : (use > 70 ? 'warn' : 'ok'));
+                    return '<tr data-id="' + l.id + '">' +
+                        '<td><b>' + SC.esc(l.name) + '</b></td>' +
+                        '<td>' + TYPES[l.type].label + '</td>' +
+                        '<td>' + SC.esc(l.addr) + '</td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(l.cap) + '</span></td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(l.occupied) + '</span></td>' +
+                        '<td><span class="sc-tag ' + (use > 85 ? 'bad' : use > 70 ? 'warn' : 'ok') + '">' + use.toFixed(1) + '%</span></td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(l.cap - l.occupied) + '</span></td>' +
+                        '<td>' + rateNow.day + ' 元/时<div class="sc-hint">首小时 ' + rateNow.first + ' 元</div></td>' +
+                        '<td>' + SC.esc(l.op) + '</td>' +
+                        '<td><span class="sc-tag ' + cls + '">' + l.status + '</span></td>' +
+                        '<td><button class="btn-sm" data-act="detail">详情</button>' +
+                        '<button class="btn-sm" data-act="edit">编辑</button>' +
+                        '<button class="btn-sm ' + (l.status === '维护停用' ? 'btn-success' : 'btn-warning') + '" data-act="toggle">' +
+                        (l.status === '维护停用' ? '恢复运营' : '停用') + '</button></td></tr>';
+                }).join('');
+                if (lotCtrl) lotCtrl.reload();
+            }
+
+            function renderLotChips() {
+                const kinds = ['全部', '营业中', '饱和', '维护停用'];
+                document.getElementById('lot-chips').innerHTML = kinds.map(function (k) {
+                    const n = k === '全部' ? lots.length : lots.filter(l => statusOf(l) === k).length;
+                    return '<button class="sc-chip' + (k === lotChip ? ' active' : '') + '" data-k="' + k + '">' + k + ' ' + n + '</button>';
+                }).join('');
+            }
+
+            function statusOf(l) {
+                if (l.status === '维护停用') return '维护停用';
+                return l.occupied / l.cap > 0.85 ? '饱和' : '营业中';
+            }
+
+            document.getElementById('lot-chips').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('.sc-chip');
+                if (!btn) return;
+                lotChip = btn.dataset.k;
+                renderLotChips();
+                lotCtrl.setFilter(r => lotChip === '全部' || statusOf(lots.find(l => l.id === r.id)) === lotChip);
+            });
+
+            lotTbody.closest('table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('button[data-act]');
+                if (!btn) return;
+                const lot = lots.find(l => l.id === btn.closest('tr').dataset.id);
+                if (btn.dataset.act === 'detail') openLotDetail(lot);
+                else if (btn.dataset.act === 'edit') editLot(lot);
+                else {
+                    lot.status = lot.status === '维护停用' ? '营业中' : '维护停用';
+                    if (lot.status === '维护停用') lot.occupied = 0;
+                    saveLots();
+                    renderLots();
+                    renderLotChips();
+                    renderLotTabs();
+                    renderKpi();
+                    SC.toast(lot.name + ' 已' + (lot.status === '维护停用' ? '停用，剩余车辆引导离场' : '恢复运营'), { type: 'success' });
+                }
+            });
+
+            function openLotDetail(lot) {
+                const body = SC.el('<div></div>');
+                body.innerHTML = '<div class="sc-kv">' +
+                    kvi('车场编号', lot.id) + kvi('类型', TYPES[lot.type].label) + kvi('总车位', SC.num(lot.cap)) +
+                    kvi('当前占用', SC.num(lot.occupied)) + kvi('运营单位', lot.op) + kvi('状态', lot.status) +
+                    '</div><div class="sc-section-title">近 24 小时使用率</div>' +
+                    '<div class="sc-chart sm"><canvas></canvas></div>' +
+                    '<div class="sc-section-title">今日收费分布</div><div class="sc-chart sm"><canvas></canvas></div>';
+                SC.modal.open({ title: lot.name + '（' + lot.addr + '）', size: 'lg', body, footer: [{ text: '关闭', kind: 'ghost' }] });
+                const labels = [], occ = [], fee = [];
+                for (let i = 23; i >= 0; i--) {
+                    const h = (new Date().getHours() - i + 24) % 24;
+                    labels.push(SC.pad2(h) + ':00');
+                    const base = lot.type === 'street' ? 82 : 58;
+                    occ.push(Math.round(SC.clamp(base + (h >= 7 && h <= 21 ? Math.sin((h - 6) / 15 * Math.PI) * 30 : -25) + SC.sim.rand(-6, 6), 2, 100)));
+                    fee.push(Math.round(lot.cap * 0.06 * (h >= 8 && h <= 22 ? SC.sim.rand(6, 22) : 1)));
+                }
+                SC.chart.line(body.querySelector('canvas'), { labels, unit: '%', xEvery: 3, series: [{ name: '使用率', data: occ, color: '#00b4d8' }] });
+                SC.chart.bar(body.querySelectorAll('canvas')[1], { labels, unit: '元', xEvery: 3, series: [{ name: '收费', data: fee, color: '#27ae60' }] });
+            }
+
+            function editLot(lot) {
+                SC.modal.form({
+                    title: lot ? '编辑车场信息' : '接入新车场',
+                    values: lot || {},
+                    fields: [
+                        { name: 'name', label: '车场名称', required: true, col: 1, value: lot ? lot.name : '' },
+                        { name: 'type', label: '车场类型', type: 'select', required: true, col: 1, options: Object.keys(TYPES).map(k => ({ value: k, label: TYPES[k].label })), value: lot ? lot.type : 'mall' },
+                        { name: 'addr', label: '详细地址', required: true, col: 1, value: lot ? lot.addr : '' },
+                        { name: 'cap', label: '车位总数', type: 'number', required: true, min: 10, max: 5000, col: 1, value: lot ? lot.cap : 200 },
+                        { name: 'op', label: '运营单位', required: true, col: 1, value: lot ? lot.op : '' },
+                        { name: 'status', label: '运营状态', type: 'select', required: true, col: 1, options: ['营业中', '维护停用'], value: lot ? lot.status : '营业中' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    if (lot) {
+                        Object.assign(lot, v);
+                        spaceCache[lot.id] = null;
+                    } else {
+                        lots.push(Object.assign({ id: 'P' + SC.pad2(lots.length + 1), occupied: 0, todayFee: 0, trips: 0 }, v));
+                    }
+                    saveLots();
+                    renderLots();
+                    renderLotChips();
+                    renderLotTabs();
+                    renderKpi();
+                    SC.toast(lot ? '车场信息已更新' : '车场已接入并完成车位建档', { type: 'success' });
+                });
+            }
+
+            document.getElementById('btn-add-lot').addEventListener('click', () => editLot(null));
+
+            /* ---------------- 四段式计费 ---------------- */
+            /**
+             * 免费时长 → 首小时 → 阶梯（白天/夜间，15 分钟一档）→ 24 小时封顶 → 会员折扣
+             */
+            function calcFee(startMs, endMs, typeKey, member) {
+                const r = rate[typeKey];
+                const totalMin = Math.max(0, Math.round((endMs - startMs) / 60000));
+                const lines = [];
+                const freeMin = Math.min(totalMin, r.free);
+                if (freeMin > 0) lines.push({ item: '免费时长 ' + r.free + ' 分钟内', dur: freeMin + ' 分钟', price: '—', amount: 0 });
+                let billMin = totalMin - freeMin;
+                let amount = 0;
+                if (billMin > 0) {
+                    const firstMin = Math.min(billMin, 60);
+                    amount += r.first;
+                    lines.push({ item: '首小时（不足 1 小时按 1 小时）', dur: firstMin + ' 分钟', price: r.first + ' 元', amount: r.first });
+                    billMin -= firstMin;
+                    let dayMin = 0, nightMin = 0;
+                    let cursor = startMs + (freeMin + firstMin) * 60000;
+                    while (billMin > 0) {
+                        const step = Math.min(15, billMin);
+                        const h = new Date(cursor).getHours();
+                        if (h >= r.dayStart && h < r.dayEnd) dayMin += step;
+                        else nightMin += step;
+                        cursor += step * 60000;
+                        billMin -= step;
+                    }
+                    if (dayMin) {
+                        const v = Math.ceil(dayMin / 15) * r.day / 4;
+                        amount += v;
+                        lines.push({ item: '白天时段（' + SC.pad2(r.dayStart) + ':00-' + SC.pad2(r.dayEnd) + ':00）', dur: Math.round(dayMin / 60 * 10) / 10 + ' 小时', price: r.day + ' 元/时', amount: v });
+                    }
+                    if (nightMin) {
+                        const v = Math.ceil(nightMin / 15) * r.night / 4;
+                        amount += v;
+                        lines.push({ item: '夜间时段（' + SC.pad2(r.dayEnd) + ':00-' + SC.pad2(r.dayStart) + ':00）', dur: Math.round(nightMin / 60 * 10) / 10 + ' 小时', price: r.night + ' 元/时', amount: v });
+                    }
+                }
+                const days = Math.max(1, Math.ceil(totalMin / 1440));
+                const capAmount = r.cap * days;
+                let capped = false;
+                if (amount > capAmount) {
+                    lines.push({ item: '套用 ' + days + '×24 小时封顶', dur: '—', price: r.cap + ' 元/日', amount: -Math.round((amount - capAmount) * 100) / 100 });
+                    amount = capAmount;
+                    capped = true;
+                }
+                if (member && r.member > 0) {
+                    const cut = amount * r.member / 100;
+                    lines.push({ item: '月卡 / 会员折扣 ' + r.member + '%', dur: '—', price: '—', amount: -Math.round(cut * 100) / 100 });
+                    amount -= cut;
+                }
+                return { lines, total: Math.round(amount * 100) / 100, minutes: totalMin, capped };
+            }
+
+            function feeTable(fee, showTotal) {
+                return '<table class="data-table fee-break"><thead><tr><th>计费项</th><th>时长</th><th>单价</th><th>金额</th></tr></thead><tbody>' +
+                    fee.lines.map(l => '<tr><td>' + SC.esc(l.item) + '</td><td>' + l.dur + '</td><td>' + l.price + '</td><td>' + (l.amount === 0 ? '0.00' : l.amount.toFixed(2)) + '</td></tr>').join('') +
+                    (showTotal ? '<tr class="fee-total"><td>合计（停车 ' + Math.floor(fee.minutes / 60) + ' 小时 ' + fee.minutes % 60 + ' 分）</td><td></td><td></td><td>' + SC.money(fee.total, 2) + '</td></tr>' : '') +
+                    '</tbody></table>';
+            }
+
+            function renderRuleView() {
+                document.getElementById('rule-view').innerHTML = Object.keys(rate).map(function (k) {
+                    const r = rate[k];
+                    return '<div class="sc-kv-item"><div class="k">' + TYPES[k].label + '</div><div class="v">' +
+                        r.first + ' 元/首小时</div><div class="sc-hint" style="font-size:.75em">免费 ' + r.free + ' 分 · ' +
+                        '白天 ' + r.day + ' 元/时 · 夜间 ' + r.night + ' 元/时 · 封顶 ' + r.cap + ' 元/日</div></div>';
+                }).join('');
+            }
+
+            document.getElementById('btn-rule-edit').addEventListener('click', function () {
+                const fields = [];
+                Object.keys(rate).forEach(function (k) {
+                    const r = rate[k];
+                    fields.push({ name: k + '_label', label: '【' + TYPES[k].label + '】', type: 'static', html: '<div class="sc-hint">' + TYPES[k].label + '计费参数</div>', col: 'full' });
+                    [['free', '免费时长(分)', 0, 120], ['first', '首小时价(元)', 0, 50], ['day', '白天单价(元/时)', 0, 40],
+                    ['night', '夜间单价(元/时)', 0, 20], ['cap', '24 小时封顶(元)', 0, 300], ['member', '会员折扣(%)', 0, 100]]
+                        .forEach(function (f) {
+                            fields.push({ name: k + '_' + f[0], label: f[1], type: 'number', min: f[2], max: f[3], required: true, col: 1, value: r[f[0]] });
+                        });
+                });
+                SC.modal.form({ title: '编辑计费规则', size: 'lg', submitText: '保存并下发', fields }).then(function (v) {
+                    if (!v) return;
+                    Object.keys(rate).forEach(function (k) {
+                        ['free', 'first', 'day', 'night', 'cap', 'member'].forEach(p => rate[k][p] = Number(v[k + '_' + p]));
+                    });
+                    SC.store.set('parking', 'rate', rate);
+                    renderRuleView();
+                    renderLots();
+                    doCalc();
+                    SC.toast('计费规则已保存并同步至车场端', { type: 'success' });
+                });
+            });
+
+            document.getElementById('btn-rule-reset').addEventListener('click', function () {
+                SC.modal.confirm({ text: '将恢复为政府指导价模板，自定义规则会被覆盖。', danger: true }).then(function (ok) {
+                    if (!ok) return;
+                    rate = normalizeRate(null);
+                    SC.store.set('parking', 'rate', rate);
+                    renderRuleView();
+                    renderLots();
+                    doCalc();
+                    SC.toast('已恢复政府指导价', { type: 'success' });
+                });
+            });
+
+            document.getElementById('btn-rule-preview').addEventListener('click', function () {
+                const body = SC.el('<div></div>');
+                body.innerHTML = Object.keys(rate).map(function (k) {
+                    const r = rate[k];
+                    return '<div class="sc-section-title">' + TYPES[k].label + '收费标准</div><table class="data-table fee-break">' +
+                        '<tbody><tr><td>免费时长</td><td>' + r.free + ' 分钟</td></tr>' +
+                        '<tr><td>首小时</td><td>' + r.first + ' 元</td></tr>' +
+                        '<tr><td>白天 ' + SC.pad2(r.dayStart) + ':00-' + SC.pad2(r.dayEnd) + ':00</td><td>' + r.day + ' 元/小时（15 分钟为一档）</td></tr>' +
+                        '<tr><td>夜间 ' + SC.pad2(r.dayEnd) + ':00-' + SC.pad2(r.dayStart) + ':00</td><td>' + r.night + ' 元/小时</td></tr>' +
+                        '<tr><td>连续停车封顶</td><td>' + r.cap + ' 元 / 24 小时</td></tr>' +
+                        '<tr><td>月卡 / 会员</td><td>' + (r.member ? '减免 ' + r.member + '%' : '不适用') + '</td></tr></tbody></table>';
+                }).join('');
+                SC.modal.open({ title: '收费公示（可打印）', size: 'lg', body, footer: [{ text: '打印', kind: 'primary', onClick: () => window.print() }, { text: '关闭', kind: 'ghost' }] });
+            });
+
+            document.getElementById('calc-member').addEventListener('click', function () {
+                this.classList.toggle('on');
+                doCalc();
+            });
+
+            function doCalc() {
+                const inV = document.getElementById('calc-in').value;
+                const outV = document.getElementById('calc-out').value;
+                const msg = document.getElementById('calc-msg');
+                if (!inV || !outV) {
+                    msg.textContent = '请选择入场与出场时间';
+                    return;
+                }
+                const s = new Date(inV).getTime(), e = new Date(outV).getTime();
+                if (e <= s) {
+                    msg.textContent = '出场时间必须晚于入场时间';
+                    SC.toast('出场时间需晚于入场时间', { type: 'error' });
+                    return;
+                }
+                const fee = calcFee(s, e, document.getElementById('calc-type').value, document.getElementById('calc-member').classList.contains('on'));
+                msg.textContent = '停车 ' + Math.floor(fee.minutes / 60) + ' 小时 ' + fee.minutes % 60 + ' 分钟' + (fee.capped ? '（已触发封顶）' : '');
+                document.querySelector('#calc-table tbody').innerHTML =
+                    fee.lines.map(l => '<tr><td>' + SC.esc(l.item) + '</td><td>' + l.dur + '</td><td>' + l.price + '</td><td>' + l.amount.toFixed(2) + '</td></tr>').join('') +
+                    '<tr class="fee-total"><td>应收金额</td><td>' + SC.stamp(new Date(s)).slice(5, 16) + ' → ' + SC.stamp(new Date(e)).slice(5, 16) + '</td><td></td><td>' + SC.money(fee.total, 2) + '</td></tr>';
+            }
+
+            document.getElementById('btn-calc').addEventListener('click', doCalc);
+            ['calc-in', 'calc-out', 'calc-type'].forEach(id => document.getElementById(id).addEventListener('change', doCalc));
+
+            /* ---------------- 数据分析 ---------------- */
+            function renderAnalysis() {
+                const labels = SC.sim.hours(24);
+                const flowIn = SC.sim.dayCurve(28, 160, [8, 17.5]);
+                const flowOut = SC.sim.dayCurve(24, 150, [12, 19.5]);
+                const flowChart = SC.chart.line(document.getElementById('chart-flow'), {
+                    labels, unit: ' 车次',
+                    series: [{ name: '进场', data: flowIn, color: '#00b4d8' }, { name: '出场', data: flowOut, color: '#e67e22', dash: [6, 4] }]
+                });
+                SC.chart.legend(document.getElementById('legend-flow'), [
+                    { name: '进场', color: '#00b4d8' }, { name: '出场', color: '#e67e22' }
+                ], function (i, visible) {
+                    const cfg = flowChart.cfg;
+                    cfg.series[i].visible = visible;
+                    flowChart.update({ series: cfg.series });
+                });
+
+                const feeSplit = [{ name: '封闭车场', value: 128450 }, { name: '路内泊位', value: 46320 },
+                { name: 'P+R 补贴后', value: 21860 }, { name: '充电服务', value: 33210 }];
+                const feeChart = SC.chart.pie(document.getElementById('chart-fee'), {
+                    labels: feeSplit.map(f => f.name), data: feeSplit.map(f => f.value),
+                    colors: ['#00b4d8', '#0077b6', '#48cae4', '#90e0ef'], unit: ' 元'
+                });
+                SC.chart.legend(document.getElementById('legend-fee'), feeSplit.map((f, i) => ({
+                    name: f.name, color: ['#00b4d8', '#0077b6', '#48cae4', '#90e0ef'][i], value: SC.money(f.value, 0)
+                })), function (i, visible) {
+                    const cfg = feeChart.cfg;
+                    cfg.data[i] = visible ? feeSplit[i].value : 0;
+                    feeChart.update({ data: cfg.data });
+                });
+
+                const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                const grid = days.map(function (_, d) {
+                    return labels.map(function (_, h) {
+                        const base = h >= 7 && h <= 21 ? 55 + Math.sin((h - 6) / 16 * Math.PI) * 38 : 12;
+                        const weekend = d >= 5 ? (h >= 10 && h <= 22 ? 22 : -6) : 0;
+                        return Math.round(SC.clamp(base + weekend + SC.sim.rand(-8, 8), 2, 100));
+                    });
+                });
+                buildHeat(document.getElementById('heat-host'), days, labels, grid);
+
+                document.querySelector('#rank-table tbody').innerHTML = lots.map(function (l) {
+                    const turns = (l.trips / l.cap).toFixed(2);
+                    const peak = l.type === 'street' ? '08:30-10:00' : (l.type === 'metro' ? '07:00-09:00' : '18:00-21:00');
+                    return '<tr data-id="' + l.id + '"><td>' + SC.esc(l.name) + '</td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(l.trips) + '</span></td>' +
+                        '<td><span class="sc-tag ' + (turns > 2 ? 'ok' : 'warn') + '">' + turns + ' 次/位</span></td>' +
+                        '<td>' + (1.2 + l.trips / l.cap * 0.6).toFixed(1) + ' 小时</td>' +
+                        '<td><span class="sc-cell-num">' + SC.money(l.todayFee, 0) + '</span></td>' +
+                        '<td>' + peak + '</td></tr>';
+                }).join('');
+                SC.table.enhance(document.getElementById('rank-table'), { pageSize: 6, search: false, export: '车场周转率' });
+
+                const totalCap = lots.reduce((s, l) => s + l.cap, 0);
+                const peakHour = flowIn.indexOf(Math.max.apply(null, flowIn));
+                const over = lots.filter(l => l.occupied / l.cap > 0.85);
+                document.getElementById('peak-kv').innerHTML =
+                    kvi('供需指数', (totalCap / Math.max(1, lots.reduce((s, l) => s + l.occupied, 0))).toFixed(2)) +
+                    kvi('最高峰时段', SC.pad2(peakHour) + ':00') +
+                    kvi('饱和车场', over.length + ' 个') +
+                    kvi('平均停留', (2.4 + Math.random()).toFixed(1) + ' 小时');
+                document.getElementById('advice').innerHTML = over.length
+                    ? '⚠️ ' + SC.esc(over.map(l => l.name).join('、')) + ' 已饱和，建议：① 诱导屏提前分流；② 开放周边路内夜间泊位；③ ' +
+                    SC.pad2(peakHour) + ':00 前后增派现场引导人员。'
+                    : '✅ 当前供需平衡，维持常规引导策略即可。';
+                SC.chart.line(document.getElementById('chart-occupy'), {
+                    labels, unit: '%', minimal: false, xEvery: 4, padL: 40,
+                    thresholds: [{ value: 85, label: '饱和线 85%', color: '#e74c3c' }],
+                    series: [{ name: '全市使用率', data: labels.map((_, h) => Math.round(SC.clamp(48 + Math.sin(h / 24 * Math.PI * 2 - 1.2) * 34 + SC.sim.rand(-5, 5), 5, 99))), color: '#0077b6' }]
+                });
+            }
+
+            function buildHeat(host, days, labels, grid) {
+                host.innerHTML = '';
+                const wrap = SC.el('<div class="sc-heat"></div>');
+                wrap.appendChild(SC.el('<div></div>'));
+                labels.forEach(function (h, i) {
+                    wrap.appendChild(SC.el('<div class="rh" style="text-align:center">' + (i % 3 === 0 ? h.slice(0, 2) : '') + '</div>'));
+                });
+                days.forEach(function (d, di) {
+                    wrap.appendChild(SC.el('<div class="rh">' + d + '</div>'));
+                    grid[di].forEach(function (v, hi) {
+                        const cell = SC.el('<div class="cell" title="' + d + ' ' + labels[hi] + '　使用率 ' + v + '%"></div>');
+                        cell.style.background = heatColor(v);
+                        wrap.appendChild(cell);
+                    });
+                });
+                host.appendChild(wrap);
+            }
+
+            function heatColor(v) {
+                const t = SC.clamp(v / 100, 0, 1);
+                const stops = [[236, 241, 245], [160, 216, 239], [108, 175, 140], [240, 180, 90], [220, 90, 70]];
+                const idx = t * (stops.length - 1);
+                const a = stops[Math.floor(idx)], b = stops[Math.min(stops.length - 1, Math.floor(idx) + 1)];
+                const f = idx - Math.floor(idx);
+                return 'rgb(' + a.map((c, i) => Math.round(c + (b[i] - c) * f)).join(',') + ')';
+            }
+
+            document.getElementById('btn-analysis-export').addEventListener('click', function () {
+                SC.csv.download('停车分析_' + SC.today() + '.csv', [['车场', '类型', '总车位', '占用', '使用率', '日均车次', '今日收入']]
+                    .concat(lots.map(l => [l.name, TYPES[l.type].label, l.cap, l.occupied, (l.occupied / l.cap * 100).toFixed(1) + '%', l.trips, l.todayFee])));
+                SC.toast('分析数据已导出', { type: 'success' });
+            });
+
+            /* ---------------- 实时仿真 ---------------- */
+            function tickParking() {
+                lots.forEach(function (l) {
+                    if (l.status === '维护停用') return;
+                    const delta = SC.sim.randInt(-2, 3);
+                    l.occupied = SC.clamp(l.occupied + delta, 0, l.cap);
+                    l.todayFee += Math.max(0, delta) * SC.sim.randInt(4, 16) + SC.sim.randInt(0, 40);
+                    l.trips += Math.random() > 0.5 ? 1 : 0;
+                });
+                saveLots();
+                const lot = lots.find(x => x.id === currentLot);
+                const spaces = spacesOf(lot);
+                for (let i = 0; i < 4; i++) {
+                    const s = spaces[SC.sim.randInt(0, spaces.length - 1)];
+                    if (s.state === '空闲' && Math.random() < lot.occupied / lot.cap) {
+                        s.state = '占用';
+                        s.plate = randPlate();
+                        s.since = Date.now() - SC.sim.randInt(1, 200) * 60000;
+                        pushFlow('进场', lot, s);
+                    } else if (s.state === '占用') {
+                        pushFlow('出场', lot, s, '缴费 ' + SC.money(calcFee(s.since, Date.now(), lot.type, false).total, 2));
+                        s.state = '空闲';
+                        s.plate = '';
+                    }
+                }
+                renderLotTabs();
+                renderFloorPlan();
+                renderKpi();
+                renderLots();
+            }
+
+            /* ---------------- 初始化 ---------------- */
+            const now = new Date();
+            const fmtLocal = d => d.getFullYear() + '-' + SC.pad2(d.getMonth() + 1) + '-' + SC.pad2(d.getDate()) + 'T' + SC.pad2(d.getHours()) + ':' + SC.pad2(d.getMinutes());
+            document.getElementById('calc-in').value = fmtLocal(new Date(now.getTime() - 3 * 3600000 - 20 * 60000));
+            document.getElementById('calc-out').value = fmtLocal(now);
+
+            renderLotTabs();
+            renderFloorPlan();
+            renderKpi();
+            renderLotChips();
+            renderLots();
+            lotCtrl = SC.table.enhance(document.getElementById('lot-table'), { pageSize: 6, export: '停车场台账', keyAttr: 'id' });
+            renderRuleView();
+            doCalc();
+            renderAnalysis();
+
+            // 先造几条历史流水，避免面板空白
+            for (let i = 0; i < 8; i++) {
+                const l = lots[i % 4];
+                pushFlow(i % 2 ? '出场' : '进场', l, { plate: randPlate(), since: Date.now() - 3600000 });
+            }
+
+            SC.live({
+                interval: 4000,
+                button: document.querySelector('#lot-live button'),
+                onTick: tickParking
+            });
+
+            document.getElementById('flow-avg').textContent = '2.6 小时';
+            document.getElementById('flow-queue').textContent = '18 秒';
+
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) {
+                    renderLots();
+                    renderKpi();
+                }
+            });
+        })();
+    </script>
 </body>
 
 </html>
