@@ -729,7 +729,7 @@
                     <div class="sc-panel" style="margin-bottom:0">
                         <div class="sc-panel-title">
                             <h3>异常清单</h3>
-                            <span class="sc-hint">偏差超 10 分钟或未回传即入清单，可一键报修</span>
+                            <span class="sc-hint" id="sw-abn-hint">偏差超 10 分钟或未回传即入清单，可一键报修</span>
                         </div>
                         <div class="data-table-container">
                             <table class="data-table" id="sw-abn-table">
@@ -998,7 +998,7 @@
             const metaOf = id => ZONES.filter(z => z.id === id)[0];
 
             /* ---------------- 回路与灯杆档案（经纬度 / 地点 / 杆型 / 灯具） ---------------- */
-            const AM_VER = 4;
+            const AM_VER = 5;
             const DISTRICTS = ['上城区', '拱墅区', '西湖区', '滨江区', '萧山区'];
             const OWNERS = ['市路灯管理处', '区城管局', '城投建设集团', '街道管养站'];
             const BRANDS = ['飞利浦', '欧司朗', '三雄极光', '华体科技', '洲明科技', '勤上光电', '雷士照明', '阳光照明'];
@@ -1058,7 +1058,10 @@
                         const poleType = POLE_TYPES[c.zone][i % POLE_TYPES[c.zone].length];
                         const spec = LIGHT_SPECS[c.zone][i % LIGHT_SPECS[c.zone].length];
                         const roll = seedNum('status:' + key);
-                        const status = roll > 0.955 ? '故障' : (roll > 0.910 ? '离线' : (roll > 0.340 ? '亮灯' : '待机'));
+                        /* 夜间（18:00-06:00）绝大多数杆件亮灯，白天以待机为主；故障 / 离线固定少量 */
+                        const night = new Date().getHours() >= 18 || new Date().getHours() < 6;
+                        const lit = night ? roll > 0.045 : roll < 0.01;
+                        const status = roll > 0.955 ? '故障' : (roll > 0.910 ? '离线' : (lit ? '亮灯' : '待机'));
                         const archRoll = seedNum('arch:' + key);
                         const archState = archRoll > 0.988 ? '已拆除' : (archRoll > 0.966 ? '停用' : '在役');
                         /* 两根“问题点位”：一根坐标未采集、一根经度录错，用于验证校验与补采闭环 */
@@ -1129,7 +1132,8 @@
             function hmOf(min) { const m = ((Math.round(min) % 1440) + 1440) % 1440; return SC.pad2(Math.floor(m / 60)) + ':' + SC.pad2(m % 60); }
             function durText(min) {
                 if (min === null || min === undefined) return '—';
-                return Math.floor(min / 60) + 'h' + SC.pad2(Math.round(min % 60)) + 'm';
+                const t = Math.round(min);
+                return Math.floor(t / 60) + 'h' + SC.pad2(t % 60) + 'm';
             }
             function nowMinute() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
 
@@ -1575,7 +1579,7 @@
                 const act = btn.dataset.act;
                 if (act === 'detail') openLampDetail(lamp);
                 else if (act === 'test') runSelfTest(lamp);
-                else if (act === 'order') createFaultFromLamp(lamp);
+                else if (act === 'order') createFaultFromLamp(lamp, '人工报修', { type: lamp.status === '离线' ? '电缆故障' : '不亮' });
             });
 
             function openLampDetail(lamp) {
@@ -2179,7 +2183,11 @@
                 return typeof l.lng === 'number' && typeof l.lat === 'number' && isFinite(l.lng) && isFinite(l.lat) &&
                     l.lng >= LNG_MIN && l.lng <= LNG_MAX && l.lat >= LAT_MIN && l.lat <= LAT_MAX;
             }
-            function coordText(l) { return coordValid(l) ? l.lng.toFixed(6) + ', ' + l.lat.toFixed(6) : '待补采'; }
+            function coordText(l) {
+                if (l.lng === null || l.lat === null || l.lng === undefined || l.lat === undefined) return '待补采';
+                const s = Number(l.lng).toFixed(6) + ', ' + Number(l.lat).toFixed(6);
+                return coordValid(l) ? s : s + '（越界）';
+            }
             function ageOf(l) { return new Date().getFullYear() - Number(String(l.install).slice(0, 4)); }
             function isJudged(r) { return r.level === '正常' || r.level === '轻微' || r.level === '严重' || r.level === '缺报'; }
 
@@ -2532,7 +2540,7 @@
                 if (!l) return;
                 if (b.dataset.act === 'detail') openLampDetail(l);
                 else if (b.dataset.act === 'edit') lampForm(l);
-                else createFaultFromLamp(l, '人工报修');
+                else createFaultFromLamp(l, '人工报修', { type: l.status === '离线' ? '电缆故障' : '不亮' });
             });
             document.querySelector('#am-bad-table tbody').parentNode.parentNode.addEventListener('click', function (ev) {
                 const b = ev.target.closest('button[data-act]');
@@ -2755,7 +2763,14 @@
 
                 const abns = list.filter(function (r) {
                     return r.level === '轻微' || r.level === '严重' || r.level === '缺报';
-                }).slice(0, 8);
+                }).sort(function (a, b) {
+                    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+                    return a.cid < b.cid ? -1 : 1;
+                });
+                document.getElementById('sw-abn-hint').textContent = '近 ' + AM.swRange + ' 日共 ' + abns.length +
+                    ' 条异常待核（严重 ' + abns.filter(function (r) { return r.level === '严重'; }).length +
+                    ' · 缺报 ' + abns.filter(function (r) { return r.level === '缺报'; }).length +
+                    ' · 轻微 ' + abns.filter(function (r) { return r.level === '轻微'; }).length + '），可一键报修';
                 const typeMap = { lateOn: '时控漂移（晚开）', earlyOff: '光控提前关灯', missing: '通信中断缺报' };
                 document.querySelector('#sw-abn-table tbody').innerHTML = abns.map(function (r) {
                     const type = typeMap[r.story] || (r.level === '缺报' ? '通信中断缺报'
@@ -2881,8 +2896,12 @@
                 renderSwKv();
                 renderSwTable();
                 renderKpi();
+                /* 今日召测只补当日回执；区间内的历史缺报仍需现场核查或人工补录 */
+                const hist = switchList(AM.swRange).filter(function (r) { return r.level === '缺报' && r.offset > 0; });
                 SC.toast('已向 ' + SW_CIRCUITS.length + ' 个回路下发召测：' +
-                    (fixed ? fixed + ' 个回路回传补全开关回执' : '全部回路回执均在有效窗口内'), { type: fixed ? 'success' : 'info' });
+                    (fixed ? fixed + ' 个回路回传补全开关回执' : '今日回执均在有效窗口内') +
+                    (hist.length ? '；区间内仍有 ' + hist.length + ' 条历史缺报，需现场核查、补录或转工单' : ''),
+                    { type: fixed ? 'success' : 'info' });
             });
 
             /* ---------- 模块 / 页签切换后重绘（公共导航先切类，再延迟绘制，避开隐藏画布） ---------- */
