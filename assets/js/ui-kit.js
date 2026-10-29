@@ -713,7 +713,10 @@
         const btn = SC.el('<button class="sc-btn sm ghost">⬇ 导出 CSV</button>');
         btn.addEventListener('click', function () {
             const heads = Array.prototype.slice.call(ctrl.table.tHead ? ctrl.table.tHead.rows[0].cells : []);
+            // 可选列（复选框）不参与 cells，导出时必须同步去掉，否则列与数据会整体错开一格
+            const hasCheck = heads.length > 0 && !!heads[0].querySelector('input[type=checkbox]');
             const header = heads.map(th => th.textContent.replace(/[⇅↑↓]/g, '').trim());
+            if (hasCheck) header.shift();
             const body = (ctrl.visibleRows || []).map(r => r.cells);
             SC.csv.download(name + '_' + SC.today() + '.csv', [header].concat(body));
             SC.toast('已导出 ' + body.length + ' 条记录', { type: 'success' });

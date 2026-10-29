@@ -1053,7 +1053,7 @@
         </div>
 
         <footer>
-            <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
+            <p>&copy; 2026 智慧城市管理平台. 【余一叶知秋尽】版权所有.</p>
         </footer>
     </div>
 
@@ -2203,7 +2203,7 @@
                         '<td><b>' + t.no + '</b>' + (t.jump ? ' <span class="sc-tag info">插单</span>' : '') + '</td>' +
                         '<td>' + t.type + '</td>' +
                         '<td>' + r.no + '<br><span class="sc-hint">' + r.name + '</span></td>' +
-                        '<td>' + (b ? b.code : '-') + '<br><span class="sc-hint">' + (b ? SC.esc(b.addr) : '') + '</span></td>' +
+                        '<td>' + (b ? b.code : '-') + (t.bins && t.bins.length > 1 ? ' <span class="sc-tag info">+' + (t.bins.length - 1) + ' 点</span>' : '') + '<br><span class="sc-hint">' + (t.note ? SC.esc(t.note) : (b ? SC.esc(b.addr) : '')) + '</span></td>' +
                         '<td>' + (v ? v.plate + '<br><span class="sc-hint">' + v.driver + ' · ' + t.team + '</span>' : '<span class="sc-hint">未派车</span>') + '</td>' +
                         '<td class="sc-cell-num">' + hm(t.start) + '</td>' +
                         '<td>' + t.sla + ' 分<br><span class="sc-hint">' +

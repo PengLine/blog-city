@@ -31,7 +31,11 @@
     function surface(canvas) {
         const dpr = global.devicePixelRatio || 1;
         const parent = canvas.parentNode;
-        const w = canvas.clientWidth || (parent && parent.clientWidth) || 320;
+        const parentW = parent ? parent.clientWidth : 0;
+        /* 画布未被 CSS 约束宽度时，clientWidth 取自画布自身的属性宽度，
+           直接回写会形成「越画越宽」的正反馈，这里统一以父容器宽度封顶。 */
+        let w = canvas.clientWidth || parentW || 320;
+        if (parentW > 40 && w > parentW) w = parentW;
         const h = canvas.clientHeight || 220;
         if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
             canvas.width = Math.round(w * dpr);
