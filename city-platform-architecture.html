@@ -231,6 +231,26 @@
             min-width: 60px;
         }
 
+        /* 服务目录：行点击进入场景页，操作列内联「详情」与「场景」 */
+        .arch-page #svc-table tbody tr {
+            cursor: pointer;
+        }
+
+        .arch-page .svc-name {
+            color: #8fe8ff;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(143, 232, 255, .45);
+        }
+
+        .arch-page .svc-name:hover {
+            color: #d6f7ff;
+            border-bottom-color: #d6f7ff;
+        }
+
+        .arch-page .svc-ops .sc-btn+.sc-btn {
+            margin-left: 6px;
+        }
+
         @media (min-width: 1100px) {
             #services-module .sc-split {
                 grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
@@ -1061,6 +1081,7 @@
                 </div>
             </div>
             <div class="sc-kv" id="svc-kv"></div>
+            <div class="sc-hint" id="svc-deeplink" style="display:none;margin-top:12px"></div>
             <div class="sc-chip-holder" style="margin-top:18px">
                 <div class="sc-chips" id="svc-chips"></div>
             </div>
@@ -1068,7 +1089,7 @@
                 <div class="sc-panel">
                     <div class="sc-panel-title">
                         <h3>微服务清单</h3>
-                        <span class="sc-hint">点击行查看服务详情</span>
+                        <span class="sc-hint">点击行进入场景页 · 详情按钮查看服务档案</span>
                     </div>
                     <div class="data-table-container">
                         <table class="data-table" id="svc-table">
@@ -1382,6 +1403,7 @@
         </footer>
     </div>
 
+    <script src="assets/js/arch-link.js"></script>
     <script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script src="assets/js/common.js"></script>
@@ -1939,6 +1961,42 @@
                 '智慧停车': '停车', '公共服务': '公共服务', '设备数据': '数据', '客户端': '平台'
             };
 
+            /* ---- 与场景页的双向联动：统一走 arch-link.js 的映射与快照 ---- */
+            function svcHref(s) {
+                if (!window.ArchLink || !ArchLink.serviceHref) return '';
+                return ArchLink.serviceHref({ id: s.id, domain: s.domain }, 'city-platform-architecture.html');
+            }
+            function domainCardHref(d, sd) {
+                if (!window.ArchLink || !ArchLink.domainHref) return d.page;
+                return ArchLink.domainHref(d.page, sd, 'city-platform-architecture.html');
+            }
+            let archPubSig = '';
+            /* 将域健康、等保达标率与服务明细发布给场景页（签名不变不重复写） */
+            function publishArchSnapshot() {
+                if (!window.ArchLink || !ArchLink.publish) return;
+                const okCtrl = SEC_CTRL.filter(c => ctrlStatus(c.id) === '达标').length;
+                const sig = okCtrl + '/' + SEC_CTRL.length + '|' + SERVICES.map(s => s.health + s.inst).join(',');
+                if (sig === archPubSig) return;
+                archPubSig = sig;
+                const domains = {};
+                const services = {};
+                SERVICES.forEach(function (s) {
+                    const d = domains[s.domain] || (domains[s.domain] = { health: '健康', ok: 0, total: 0 });
+                    d.total++;
+                    if (s.health === '健康') d.ok++;
+                    if (ArchLink.worstHealth([d.health, s.health]) !== d.health) d.health = s.health;
+                    services[s.id] = {
+                        id: s.id, name: s.name, domain: s.domain, ver: s.ver, inst: s.inst,
+                        health: s.health, owner: s.owner, qps: s.qps
+                    };
+                });
+                ArchLink.publish({
+                    security: { rate: pctOf(okCtrl, SEC_CTRL.length), ok: okCtrl, total: SEC_CTRL.length, level: '三级' },
+                    domains: domains,
+                    services: services
+                });
+            }
+
             /* 页头实时状态 */
             function renderLive() {
                 const healthy = SERVICES.filter(s => s.health === '健康').length;
@@ -1952,6 +2010,7 @@
                     '<span>网关 <b>' + SC.num(qps) + '</b> QPS</span><span class="sep"></span>' +
                     '<span>等保达标 <b>' + pctOf(okCtrl, SEC_CTRL.length) + '%</b></span><span class="sep"></span>' +
                     '<span class="mono">' + SC.stamp(d) + ' 周' + week + '</span>');
+                publishArchSnapshot();
             }
 
             /* ==========================================================================
@@ -1986,7 +2045,8 @@
                 put('#ov-domains', DOMAINS.map(function (d) {
                     const sd = DOMAIN_SVC[d.name];
                     const svcCount = SERVICES.filter(s => s.domain === sd).length;
-                    return '<a class="domain-card" href="' + d.page + '">' +
+                    return '<a class="domain-card" href="' + domainCardHref(d, sd) + '" ' +
+                        'title="进入' + SC.esc(d.name) + '并带域筛选">' +
                         '<div class="dc-top"><h4><span class="dc-icon">' + d.icon + '</span>' + SC.esc(d.name) + '</h4>' +
                         tagHTML(d.status, d.status === '已上线' ? 'ok' : 'warn') + '</div>' +
                         '<div class="dc-desc">' + SC.esc(d.desc) + '</div>' +
@@ -2105,16 +2165,21 @@
             let topoHover = -1, topoNodes = [], topoEdges = [];
 
             function svcRowHTML(s) {
+                const href = svcHref(s);
+                const name = href
+                    ? '<a class="svc-name" href="' + href + '" title="进入场景页">' + SC.esc(s.name) + '</a>'
+                    : '<b>' + SC.esc(s.name) + '</b>';
                 return '<tr data-id="' + s.id + '">' +
-                    '<td><b>' + SC.esc(s.name) + '</b><div class="mono" style="color:#6f8499;font-size:.76em">' + s.id + '</div></td>' +
+                    '<td>' + name + '<div class="mono" style="color:#6f8499;font-size:.76em">' + s.id + '</div></td>' +
                     '<td>' + tagHTML(s.domain, 'info') + '</td>' +
                     '<td class="mono">' + s.ver + '</td>' +
                     '<td class="mono">' + s.inst + '</td>' +
                     '<td class="mono">' + SC.num(s.qps) + '</td>' +
                     '<td class="mono">' + s.p95 + ' ms</td>' +
                     '<td>' + healthTag(s.health) + '</td>' +
-                    '<td><button class="sc-btn sm ghost" data-act="svc" data-id="' + s.id + '">详情</button></td>' +
-                    '</tr>';
+                    '<td class="svc-ops"><button class="sc-btn sm ghost" data-act="svc" data-id="' + s.id + '">详情</button>' +
+                    (href ? '<a class="sc-btn sm ghost" href="' + href + '" title="在场景页查看">场景 ↗</a>' : '') +
+                    '</td></tr>';
             }
 
             function renderSvcKv() {
@@ -2307,12 +2372,19 @@
                             }
                         },
                         {
-                            text: '扩容 1 实例', kind: 'primary', close: false, onClick: function (api) {
+                            text: '扩容 1 实例', kind: 'ghost', close: false, onClick: function (api) {
                                 s.inst += 1;
                                 const cell = api.body.querySelectorAll('.sc-kv-item .v')[3];
                                 if (cell) cell.textContent = s.inst + ' 个';
                                 renderSvcRows();
                                 SC.toast('已为 ' + s.name + ' 扩容至 ' + s.inst + ' 实例', { type: 'success' });
+                            }
+                        },
+                        {
+                            text: '打开场景页', kind: 'primary', onClick: function () {
+                                const href = svcHref(s);
+                                if (href) location.href = href;
+                                else SC.toast('该服务域暂无对应场景页', { type: 'warn' });
                             }
                         },
                         { text: '关闭', kind: 'ghost' }
@@ -3200,8 +3272,17 @@
                 });
 
                 q('#svc-table').addEventListener('click', function (ev) {
+                    // 详情按钮→服务档案弹窗；行内链接→场景页；其余区域点击也进入场景页
+                    const btn = ev.target.closest('button[data-act="svc"]');
+                    if (btn) { openService(btn.dataset.id); return; }
+                    if (ev.target.closest('a')) return;
                     const tr = ev.target.closest('tr[data-id]');
-                    if (tr) openService(tr.dataset.id);
+                    if (!tr) return;
+                    const s = svcById(tr.dataset.id);
+                    if (!s) return;
+                    const href = svcHref(s);
+                    if (href) location.href = href;
+                    else openService(s.id);
                 });
                 q('#stack-table').addEventListener('click', function (ev) {
                     const tr = ev.target.closest('tr[data-id]');
@@ -3253,6 +3334,66 @@
                 renderAdr();
                 bindAll();
                 refreshCharts('overview');
+                applyEntryContext();
+            }
+
+            /* 从场景页回跳（?svc= / ?domain=）：切模块、筛选定位并展示提示条 */
+            function applyEntryContext() {
+                let params;
+                try { params = new URLSearchParams(location.search); } catch (e) { return; }
+                const svcId = params.get('svc');
+                const dom = params.get('domain');
+                const from = params.get('from');
+                if (!svcId && !dom) return;
+
+                let svc = null, target = dom;
+                if (svcId) {
+                    svc = svcById(svcId);
+                    if (!svc) {
+                        SC.toast('未找到服务 ' + svcId + '，已为你打开服务目录', { type: 'warn', duration: 3600 });
+                    } else {
+                        target = svc.domain;
+                    }
+                }
+
+                const nav = q('.module-btn[data-module="services"]');
+                if (nav) nav.click();
+                if (target && SVC_DOMAINS.indexOf(target) > -1) applySvcDomain(target);
+
+                const input = q('#svc-search');
+                if (svc && input) {
+                    input.value = svc.id;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                const srcLabel = from && window.ArchLink ? ArchLink.labelOf(from) : '';
+                const node = q('#svc-deeplink');
+                if (node) {
+                    node.style.display = '';
+                    node.innerHTML = '🔗 已从 <b>' + SC.esc(srcLabel || '外部入口') + '</b> 定位' +
+                        (svc ? '服务 <b>' + SC.esc(svc.name) + '</b>' : '业务域 <b>' + SC.esc(target || '全部') + '</b>') +
+                        ' · ' + (svc ? '已按业务域筛选并定位到该服务' : '已按业务域筛选') +
+                        ' <button class="sc-btn sm ghost" id="svc-deeplink-clear">清除定位</button>';
+                    const clear = q('#svc-deeplink-clear');
+                    if (clear) {
+                        clear.addEventListener('click', function () {
+                            node.style.display = 'none';
+                            node.innerHTML = '';
+                            if (input) {
+                                input.value = '';
+                                input.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                            applySvcDomain('全部');
+                            try { history.replaceState(null, '', location.pathname); } catch (e) { }
+                            drawTopo();
+                        });
+                    }
+                }
+
+                setTimeout(function () {
+                    if (svc) openService(svc.id);
+                    else drawTopo();
+                }, 170);
             }
 
             if (document.readyState === 'loading') {
