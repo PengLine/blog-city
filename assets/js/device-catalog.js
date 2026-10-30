@@ -151,7 +151,7 @@
         el.innerHTML =
             '<div class="dev-ctx-row">' +
             '<span class="dev-ctx-badge">🔧 本域接入设备</span>' +
-            '<span class="dev-ctx-kv">' + esc(domTxt) + '域在册 <b>' + num(sum.units) + '</b> 台 / <b>' +
+            '<span class="dev-ctx-kv">' + (full ? '全域在册' : esc(domTxt) + '域在册') + ' <b>' + num(sum.units) + '</b> 台 / <b>' +
             sum.count + '</b> 类<em>（全市 ' + num(all) + ' 台 · 23 类，与数据中台采集口径一致）</em></span>' +
             '<a class="dev-ctx-link" href="' + EQ_PAGE + '?from=' + encodeURIComponent(file) + '">设备台账与物模型 ↗</a>' +
             '</div>' +

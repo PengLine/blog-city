@@ -1406,11 +1406,25 @@
 
             function buildCams() {
                 const kinds = ['主干道卡口', '门店门前三包', '小区主入口', '工地围挡', '公园广场', '背街小巷'];
+                /* 点位设备类型与抓拍对象：与数据中台视频感知三类在册设备对齐
+                   CAM 视频监控球机 / SPR 枪机半球抓拍一体机 / DME 卡口电子警察 */
+                const SPEC = {
+                    '主干道卡口': { t: '卡口', c: 'DME', s: '过车与车牌识别' },
+                    '门店门前三包': { t: '半球', c: 'SPR', s: '商家外摆与人员聚集' },
+                    '小区主入口': { t: '枪机', c: 'SPR', s: '人员人脸与车辆进出' },
+                    '工地围挡': { t: '球机', c: 'CAM', s: '渣土遗撒与出入口车辆' },
+                    '公园广场': { t: '球机', c: 'CAM', s: '人群聚集与流动摊贩' },
+                    '背街小巷': { t: '枪机', c: 'SPR', s: '乱堆物与违停抓拍' }
+                };
                 for (let i = 0; i < 10; i++) {
+                    const kind = kinds[i % kinds.length];
+                    const sp = SPEC[kind];
                     CAMS.push({
                         id: 'CAM-' + SC.pad2(i + 1),
                         name: ROADS[i % ROADS.length].slice(0, 3) + '监控' + (i + 1) + '号',
-                        kind: kinds[i % kinds.length],
+                        kind: kind,
+                        devType: sp.t, devCode: sp.c, subj: sp.s,
+                        access: sp.c === 'DME' ? 'GB28181 + 识别服务' : (sp.c === 'CAM' ? 'GB28181 直连' : 'ONVIF + 边缘 AI'),
                         addr: addr(),
                         online: i === 6 ? false : true,
                         ai: i % 4 !== 1,
@@ -2248,7 +2262,7 @@
                         '<span class="cam-rec"><b>●</b> REC</span></div></div>' +
                         '<div class="cam-body">' +
                         '<div class="camera-name">' + c.name + ' ' + tag(c.online ? '在线' : '离线', c.online ? 'ok' : 'off') + '</div>' +
-                        '<div class="camera-location">' + c.addr + ' · ' + c.kind + '</div>' +
+                        '<div class="camera-location">' + c.addr + ' · ' + c.kind + ' · ' + c.devType + '</div>' +
                         '<div class="camera-actions">' +
                         '<button class="btn-sm" data-act="抓拍">📸 抓拍</button>' +
                         '<button class="btn-sm" data-act="录像">🎞 录像</button>' +
@@ -2258,6 +2272,7 @@
                             : '<button class="btn-sm btn-success" data-act="重启">重启</button>') +
                         '<div class="ptz">' + PTZ_KEYS.map((k, i) => '<button data-ptz="' + i + '">' + k + '</button>').join('') + '</div>' +
                         '</div><div class="cam-meta"><span>' + c.brand + ' ' + c.res + '</span>' +
+                        '<span title="' + SC.esc(c.subj) + '">抓拍：' + SC.esc(c.subj) + '</span>' +
                         '<span>' + c.bitrate + ' Mbps</span><span>截图 ' + c.snaps + '</span>' +
                         '<span>录像 ' + c.rec + '</span></div></div></div>';
                 }).join('');

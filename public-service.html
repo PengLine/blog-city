@@ -349,6 +349,7 @@
                                 <th>受理事项</th>
                                 <th>开放时间</th>
                                 <th>近30日办件</th>
+                                <th>人证核验一体机</th>
                                 <th>状态</th>
                                 <th data-no-sort>操作</th>
                             </tr>
@@ -1391,7 +1392,7 @@
             'use strict';
 
             const NS = 'service';
-            const PS_VER = 13;
+            const PS_VER = 14;   /* v14：网点台账纳入人证核验一体机（数据中台 AUT 类）接入口径 */
             const NOW = new Date();
             const TODAY = SC.today();
 
@@ -1530,6 +1531,10 @@
                         else if (t.name === '社区服务点') name = road + '社区服务点';
                         else name = region + pick(id + ':h', HALL_KINDS) + '服务大厅';
                         const status = pick(id + ':st', OUTLET_STATUS);
+                        /* 人证核验一体机（口径对应数据中台 AUT 类 486 台）：信息采集与人证比对 */
+                        const kiosk = t.name === '政务服务中心' ? rint(id + ':k1', 3, 6)
+                            : t.name === '社区服务点' ? rint(id + ':k1', 0, 2) : rint(id + ':k1', 1, 4);
+                        const kioskOn = status === '整修暂停' ? 0 : (kiosk ? rint(id + ':k2', Math.max(0, kiosk - 1), kiosk) : 0);
                         list.push({
                             id: id,
                             name: name,
@@ -1541,6 +1546,10 @@
                             address: road + rint(id + ':no', 8, 288) + '号' + pick(id + ':f', ['', '（' + rint(id + ':b', 1, 6) + '号楼）', '（临街）']),
                             phone: '0571-' + String(rint(id + ':tel', 81000000, 89999999)),
                             windows: t.name === '政务服务中心' ? rint(id + ':w', 16, 28) : rint(id + ':w', 4, 12),
+                            kiosk: kiosk,
+                            kioskOn: kioskOn,
+                            verify: kioskOn ? rint(id + ':k3', 40, 620) : 0,
+                            matchPct: Number((96.6 + seedNum(id + ':k4') * 3.2).toFixed(1)),
                             items: t.name === '社区服务点' ? rint(id + ':it', 18, 46) : rint(id + ':it', 48, 152),
                             hours: pick(id + ':h2', ['09:00-17:00', '08:30-17:30', '09:00-18:00', '08:30-16:30']),
                             days: pick(id + ':d', ['周一至周五', '周一至周六', '全年无休']),
@@ -2617,6 +2626,8 @@
                     '<td>' + o.items + ' 项</td>' +
                     '<td>' + o.hours + sub(o.days) + '</td>' +
                     '<td>' + SC.num(o.cases) + '</td>' +
+                    '<td>' + (o.kiosk ? (o.kioskOn + '/' + o.kiosk + ' 台') + sub('今日核验 ' + SC.num(o.verify || 0) + ' 人次')
+                        : '—' + sub('未配置自助终端')) + '</td>' +
                     '<td>' + outletStatusTag(o.status) + '</td>' +
                     '<td><button class="sc-btn sm ghost" data-act="detail" data-id="' + o.id + '">详情</button>' +
                     '<button class="sc-btn sm ghost" data-act="edit" data-id="' + o.id + '">编辑</button></td>' +
@@ -2638,12 +2649,24 @@
 
                 mountTable('sp-table', DB.outlets.map(outletRow).join(''), { pageSize: 8, search: '#sp-kw' });
                 applyOutletFilter();
+                /* 行内操作：表格的详情 / 编辑与地图投点共用同一弹窗与表单 */
+                onRowAction('sp-table', function (act, id) {
+                    const o = DB.outlets.filter(function (x) { return x.id === id; })[0];
+                    if (!o) return;
+                    if (act === 'detail') outletDetail(o);
+                    else if (act === 'edit') outletForm(o);
+                });
 
                 const running = DB.outlets.filter(function (o) { return o.status !== '整修暂停'; }).length;
+                const kioskAll = DB.outlets.reduce(function (s, o) { return s + (o.kiosk || 0); }, 0);
+                const kioskOnline = DB.outlets.reduce(function (s, o) { return s + (o.kioskOn || 0); }, 0);
+                const verifyAll = DB.outlets.reduce(function (s, o) { return s + (o.verify || 0); }, 0);
                 $('sp-note').innerHTML = '共 <b>' + DB.outlets.length + '</b> 个办事网点，其中 <b>' + running +
                     '</b> 个正常运行；覆盖 ' + REGIONS.length + ' 个片区、' + DB.outlets.reduce(function (s, o) { return s + o.windows; }, 0) +
-                    ' 个服务窗口，可受理 <b>' + SC.num(DB.outlets.reduce(function (s, o) { return s + o.items; }, 0)) + '</b> 类事项。';
-                $('sp-hint').textContent = '数据口径：近 30 日办件量含窗口与自助终端；网点状态每 30 分钟同步一次。';
+                    ' 个服务窗口，可受理 <b>' + SC.num(DB.outlets.reduce(function (s, o) { return s + o.items; }, 0)) + '</b> 类事项。' +
+                    '另配置人证核验一体机 <b>' + kioskAll + '</b> 台（在线 ' + kioskOnline + ' 台），今日采集并比对 <b>' + SC.num(verifyAll) + '</b> 人次。';
+                $('sp-hint').textContent = '数据口径：近 30 日办件量含窗口与自助终端；网点状态每 30 分钟同步一次；' +
+                    '核验一体机信息采集与人证比对结果经 HTTP SDK 推送至数据中台（全市 AUT 类在册 486 台）。';
             }
 
             function applyOutletFilter() {
@@ -2662,6 +2685,8 @@
                     ['联系电话', o.phone],
                     ['负责人', o.manager],
                     ['服务窗口', o.windows + ' 个'],
+                    ['人证核验一体机', (o.kiosk ? o.kioskOn + ' / ' + o.kiosk + ' 台在线' : '未配置') +
+                        (o.kiosk ? '<div class="sc-hint">今日核验 ' + SC.num(o.verify || 0) + ' 人次 · 比对通过率 ' + (o.matchPct || '-') + '%</div>' : '')],
                     ['受理事项', o.items + ' 项'],
                     ['开放时间', o.hours + '（' + o.days + '）'],
                     ['近30日办件', SC.num(o.cases) + ' 件'],
@@ -2701,7 +2726,7 @@
                 const isNew = !o;
                 const values = o ? Object.assign({}, o) : {
                     type: '街道便民服务站', region: '城东新区', status: '正常',
-                    windows: 6, items: 60, hours: '09:00-17:00', days: '周一至周五'
+                    windows: 6, items: 60, kiosk: 2, hours: '09:00-17:00', days: '周一至周五'
                 };
                 SC.modal.form({
                     title: isNew ? '新增办事网点' : '编辑网点 · ' + o.id,
@@ -2715,6 +2740,7 @@
                         { name: 'address', label: '详细地址', type: 'text', required: true },
                         { name: 'phone', label: '联系电话', type: 'text', required: true, validate: function (v) { return /^[\d-]{7,}$/.test(v) ? null : '请填写有效电话，如 0571-81234567'; } },
                         { name: 'windows', label: '服务窗口数', type: 'number', min: 1, max: 60, required: true },
+                        { name: 'kiosk', label: '人证核验一体机', type: 'number', min: 0, max: 12, unit: '台', hint: '口径与数据中台 AUT 类一致，0 表示未配置' },
                         { name: 'items', label: '受理事项数', type: 'number', min: 1, max: 400, required: true },
                         { name: 'hours', label: '开放时间', type: 'text', required: true, placeholder: '09:00-17:00' },
                         { name: 'days', label: '开放日', type: 'select', options: ['周一至周五', '周一至周六', '全年无休'] },
@@ -2729,6 +2755,8 @@
                     const payload = {
                         name: v.name, type: v.type, region: v.region, road: v.road, address: v.address,
                         phone: v.phone, windows: Number(v.windows), items: Number(v.items), hours: v.hours,
+                        kiosk: Number(v.kiosk) || 0,
+                        kioskOn: (Number(v.kiosk) || 0) && v.status !== '整修暂停' ? Number(v.kiosk) : 0,
                         days: v.days, manager: v.manager, status: v.status,
                         lng: Number(v.lng), lat: Number(v.lat)
                     };
@@ -2736,7 +2764,7 @@
                         const maxNo = Math.max.apply(null, DB.outlets.map(function (x) { return Number(x.id.split('-')[1]); }));
                         DB.outlets.push(Object.assign({
                             id: 'FW-' + SC.pad2(maxNo + 1), icon: meta.icon, color: meta.color,
-                            cases: 0, served: 0, since: TODAY
+                            cases: 0, served: 0, since: TODAY, verify: 0, matchPct: 98.5
                         }, payload));
                         MAP_BOUNDS = null;
                         SC.toast('已新增网点 ' + payload.name, { type: 'success' });

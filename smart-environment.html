@@ -403,6 +403,7 @@
                 <button class="tab-btn" data-tab="sanitation-ships">⛴️ 环卫船监管</button>
                 <button class="tab-btn" data-tab="incineration-plants">🏭 焚烧厂监管</button>
                 <button class="tab-btn" data-tab="kitchen-waste">🍽️ 餐厨企业</button>
+                <button class="tab-btn" data-tab="recycle-stations">♻️ 回收站称重</button>
             </div>
 
             <div class="stats-grid">
@@ -630,6 +631,45 @@
                         </thead>
                         <tbody></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- 回收站称重一体机 -->
+            <div id="recycle-stations-tab" class="tab-content">
+                <div class="content-header">
+                    <h3>♻️ 回收站（称重一体机）站点台账</h3>
+                    <div class="content-actions">
+                        <input type="text" placeholder="搜索站点 / 片区..." class="search-input" id="rcy-search">
+                        <button class="sc-btn sm" id="btn-rcy-cal">🧮 批量发起仪表标定</button>
+                    </div>
+                </div>
+                <div class="sc-kv" id="rcy-kv"></div>
+                <div class="data-table-container">
+                    <table class="data-table" id="rcy-table">
+                        <thead>
+                            <tr>
+                                <th>站点</th>
+                                <th>片区</th>
+                                <th>称重一体机</th>
+                                <th>今日单量</th>
+                                <th>今日称重</th>
+                                <th>单均重量</th>
+                                <th>月累计</th>
+                                <th>资源化率</th>
+                                <th>上次标定</th>
+                                <th>状态</th>
+                                <th data-no-sort>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="sc-hint" style="margin-top:10px">站点数据（station_id / cat_code / order_no / member_hash /
+                    weight_kg）经 HTTP + 地磅网关上报，
+                    入湖后与清运联单对账；测点口径见
+                    <a href="equipment-data.html?from=smart-environment.html" style="color:#00897b">设备数据页物模型</a>，
+                    采集通道见 <a href="data-platform.html?module=collect&from=smart-environment.html"
+                        style="color:#00897b">数据中台</a>。
                 </div>
             </div>
         </div>
@@ -1136,6 +1176,8 @@
                 { n: '吸污车', cap: 6, ne: false }
             ];
             const BIN_KIND = ['四分类收集点', '智能回收箱', '餐厨收集容器', '果皮箱', '地下车库投放点'];
+            /* 回收站称重一体机（口径对应数据中台 RCY 类）的五类资源化品类 */
+            const RCY_CAT = ['废纸', '废塑料', '废金属', '废玻璃', '旧织物'];
             const RKIND = ['垃圾收运', '道路保洁', '餐厨收运', '点位转运', '应急接驳'];
             const RWINDOW = { '垃圾收运': '05:30-09:30', '道路保洁': '06:00-10:00', '餐厨收运': '10:00-13:30', '点位转运': '13:00-17:00', '应急接驳': '08:00-20:00' };
             const ALARM_KIND = ['车辆偏航', '车厢超载', '超速行驶', '点位满溢', '传感器离线', '环保指标超标', '规划冲突', '疲劳驾驶', '漏收点位', '夜间噪音扰民'];
@@ -1146,7 +1188,7 @@
             function hours(n) { return Array.apply(null, Array(n || 24)).map(function (_, h) { return SC.pad2(h) + ':00'; }); }
 
             /* ======================= 台账生成 ======================= */
-            const DB = { veh: [], bins: [], ships: [], plants: [], kit: [], routes: [], tasks: [], crew: [], alarms: [], mains: [], shifts: {} };
+            const DB = { veh: [], bins: [], ships: [], plants: [], kit: [], rcy: [], routes: [], tasks: [], crew: [], alarms: [], mains: [], shifts: {} };
 
             function buildVehicles() {
                 for (let i = 0; i < 48; i++) {
@@ -1290,6 +1332,36 @@
                 }
             }
 
+            /* 回收站称重一体机台账：14 座站点，与数据中台 RCY 类 1,180 台在册量保持口径一致 */
+            function buildRecyclers() {
+                const SUF = ['再生资源回收站', '分类回收驿站', '两网融合中转站', '低值回收投放点'];
+                for (let i = 0; i < 14; i++) {
+                    const d = i % 6;
+                    const orders = ri(12, 96);
+                    const cats = RCY_CAT.map(function (c, k) {
+                        return { name: c, kg: +(orders * rf(0.4, 3.2) * (k === 0 ? 1.6 : 1)).toFixed(1) };
+                    });
+                    const today = +cats.reduce(function (n, c) { return n + c.kg; }, 0).toFixed(1);
+                    /* 固定两座站点呈异常形态，保证页面常态可见离线 / 超期未检定场景 */
+                    const cal = i === 3 ? 262 : (i === 9 ? 118 : ri(6, 318));
+                    const r = rnd();
+                    const state = i === 3 ? '离线' : i === 9 ? '待标定'
+                        : (r <= 0.06 ? '离线' : (r <= 0.12 ? '异常' : (cal > 240 ? '待标定' : '正常')));
+                    DB.rcy.push({
+                        id: 'RZ' + SC.pad2(i + 1), name: DIST[d] + pk(SUF),
+                        dist: DIST[d], di: d, keeper: person(i * 3 + 2),
+                        dev: 'RCY-' + pad3(120 + i), fw: 'v2.1.' + ri(0, 6),
+                        online: state !== '离线', orders: orders, cats: cats,
+                        today: today, avg: +(today / orders).toFixed(1),
+                        month: +(today * ri(21, 27) * rf(0.85, 1.15) / 1000).toFixed(2),
+                        recy: ri(62, 96), cal: cal,
+                        state: state,
+                        veh: DB.veh.length ? DB.veh[(i * 5) % DB.veh.length].plate : '—',
+                        x: CENTERS[d][0] + rf(-0.07, 0.07), y: CENTERS[d][1] + rf(-0.06, 0.06)
+                    });
+                }
+            }
+
             function buildCrew() {
                 const POST = ['驾驶员', '驾驶员', '操作工', '保洁员', '保洁员', '调度员', '维修工'];
                 for (let i = 0; i < 56; i++) {
@@ -1422,7 +1494,7 @@
             function vehById(id) { return DB.veh.filter(v => v.id === id)[0]; }
 
             buildVehicles(); buildBins(); buildRoutes(); buildShips(); buildPlants();
-            buildKit(); buildCrew(); buildMains(); buildAlarms(); buildTasks();
+            buildKit(); buildRecyclers(); buildCrew(); buildMains(); buildAlarms(); buildTasks();
             DB.routes.forEach(function (r) {
                 r.done = DB.tasks.filter(t => t.route === r.id && t.status === '已完成').length;
             });
@@ -1478,7 +1550,7 @@
             const TAGS = {
                 '正常': 'ok', '已完成': 'ok', '合规': 'ok', '达标': 'ok', '在岗': 'ok', '正常运行': 'ok', '作业中': 'ok', '已闭环': 'ok',
                 '执行中': 'info', '已派车': 'info', '空闲': 'info', '待执行': 'info', '处理中': 'info', '停泊待命': 'info', '休假': 'info', '培训': 'info',
-                '待确认': 'warn', '待清运': 'warn', '预警': 'warn', '检修': 'warn', '维修中': 'warn', '逾期': 'warn', '检修降负荷': 'warn', '误报': 'off',
+                '待确认': 'warn', '待清运': 'warn', '预警': 'warn', '检修': 'warn', '维修中': 'warn', '逾期': 'warn', '检修降负荷': 'warn', '待标定': 'warn', '误报': 'off',
                 '异常': 'bad', '超时': 'bad', '满溢': 'bad', '违规': 'bad', '环保指标超标': 'bad', '超标预警': 'bad', '紧急': 'bad', '规划冲突': 'bad',
                 '离线': 'off', '待派单': 'off', '暂停': 'off', '一般': 'info', '重要': 'warn'
             };
@@ -1752,6 +1824,84 @@
                         '<button class="sc-btn sm ghost" data-act="kitd" data-v="' + k.id + '">台账</button></td></tr>';
                 }).join(''));
             }
+            /* ======================= 在线监管 · 回收站称重 ======================= */
+            function rcyById(id) { return DB.rcy.filter(s => s.id === id)[0]; }
+
+            function renderRecy() {
+                const host = $('rcy-kv');
+                if (host) {
+                    const list = DB.rcy;
+                    const on = list.filter(s => s.online).length;
+                    const todayKg = list.reduce((n, s) => n + s.today, 0);
+                    const orders = list.reduce((n, s) => n + s.orders, 0);
+                    const month = list.reduce((n, s) => n + s.month, 0);
+                    const recy = list.reduce((n, s) => n + s.recy, 0) / list.length;
+                    const needCal = list.filter(s => s.cal > 240).length;
+                    host.innerHTML =
+                        kv('在册站点', list.length + ' 座') +
+                        kv('称重机在线', on + ' / ' + list.length) +
+                        kv('今日回收单', orders + ' 单') +
+                        kv('今日称重', SC.num(todayKg / 1000, 2) + ' t') +
+                        kv('月累计资源化', SC.num(month, 1) + ' t') +
+                        kv('平均资源化率', SC.pct(recy)) +
+                        kv('待标定仪表', needCal + ' 台（超 240 天未检定）');
+                }
+                fill('rcy-table', DB.rcy.map(function (s) {
+                    return '<tr data-id="' + s.id + '">' +
+                        '<td><b>' + SC.esc(s.name) + '</b><br><span class="sc-hint">' + s.id + ' · ' + SC.esc(s.keeper) + '</span></td>' +
+                        '<td>' + s.dist + '片区</td>' +
+                        '<td>' + SC.esc(s.dev) + '<br><span class="sc-hint">' + s.fw + ' · HTTP + 地磅网关</span></td>' +
+                        '<td class="sc-cell-num">' + s.orders + ' 单</td>' +
+                        '<td class="sc-cell-num">' + SC.num(s.today, 1) + ' kg</td>' +
+                        '<td class="sc-cell-num">' + SC.num(s.avg, 1) + ' kg</td>' +
+                        '<td class="sc-cell-num">' + SC.num(s.month, 2) + ' t</td>' +
+                        '<td class="sc-cell-num">' + s.recy + '%</td>' +
+                        '<td>' + (s.cal > 240 ? '<span class="sc-tag warn">' + s.cal + ' 天前</span>'
+                            : '<span class="sc-tag info">' + s.cal + ' 天前</span>') + '</td>' +
+                        '<td>' + stTag(s.state) + (s.online ? '' : '<br><span class="sc-hint">仪表离线</span>') + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="rcy" data-v="' + s.id + '">称重明细</button></td></tr>';
+                }).join(''));
+            }
+
+            function openRecy(s) {
+                if (!s) return;
+                const rows = s.cats.map(function (c) {
+                    return '<tr><td>' + c.name + '</td><td class="sc-cell-num">' + SC.num(c.kg, 1) + ' kg</td>' +
+                        '<td class="sc-cell-num">' + Math.max(1, Math.round(s.orders * c.kg / s.today)) + ' 单</td>' +
+                        '<td class="sc-cell-num">' + SC.pct(c.kg / s.today * 100) + '</td></tr>';
+                }).join('');
+                detail('♻️ ' + s.name,
+                    '<div class="sc-kv">' +
+                    kv('站点编号', s.id) + kv('所在片区', s.dist + '片区') +
+                    kv('站点负责人', s.keeper) + kv('称重一体机', SC.esc(s.dev) + '（' + s.fw + '）') +
+                    kv('今日单量', s.orders + ' 单') + kv('今日称重', SC.num(s.today, 1) + ' kg') +
+                    kv('月累计资源化', SC.num(s.month, 2) + ' t') + kv('资源化率', s.recy + ' %') +
+                    kv('上次仪表标定', s.cal + ' 天前') + kv('上报状态', stTag(s.online ? '正常' : '离线')) +
+                    kv('关联收运车', SC.esc(s.veh)) + kv('站点状态', stTag(s.state)) +
+                    '</div>' +
+                    '<div class="sc-section-title">今日分类称重明细</div>' +
+                    '<table class="data-table"><thead><tr><th>资源化品类</th><th>重量</th><th>单数</th><th>占比</th></tr></thead>' +
+                    '<tbody>' + rows + '</tbody></table>' +
+                    '<div class="sc-section-title">上报链路</div>' +
+                    tl([
+                        { done: true, h: '称重一体机上报', m: '每单实时：station_id / cat_code / order_no / member_hash / weight_kg' },
+                        { done: true, h: '数据中台入湖', m: 'HTTP + 地磅网关接入 CH-28 通道，清洗后写入资源回收明细表' },
+                        {
+                            done: s.state !== '异常', h: '与清运联单对账', m: s.state === '异常'
+                                ? '本日称重与出车联单偏差 > 15%，已列入异常待核实' : '称重与联单重量偏差在允许范围内'
+                        }
+                    ]));
+            }
+
+            /* 批量发起仪表标定：将待标定站点重置为正常并记日志 */
+            function calibrateRecy() {
+                const list = DB.rcy.filter(s => s.cal > 240 || s.state === '待标定');
+                if (!list.length) { SC.toast('当前没有超期未检定的称重仪表', { type: 'info' }); return; }
+                list.forEach(function (s) { s.cal = 0; s.state = s.online ? '正常' : '离线'; });
+                renderRecy();
+                SC.toast('已对 ' + list.length + ' 台称重仪表发起标定工单，检定周期重置', { type: 'success' });
+            }
+
             /* ======================= 派单引擎 ======================= */
             /** 点位 → 路线：优先看已归属，否则按片区 + 垃圾类型就近归类 */
             function routeForBin(b) {
@@ -3019,7 +3169,7 @@
             }
             function refreshOnline() {
                 paintMetrics();
-                renderVeh(); renderBin(); renderBinHeat(); renderShip(); renderPlant(); renderKit();
+                renderVeh(); renderBin(); renderBinHeat(); renderShip(); renderPlant(); renderKit(); renderRecy();
             }
             function refreshOps() {
                 paintMetrics();
@@ -3166,6 +3316,7 @@
                     else if (tab === 'sanitation-ships') renderShip();
                     else if (tab === 'incineration-plants') renderPlant();
                     else if (tab === 'kitchen-waste') renderKit();
+                    else if (tab === 'recycle-stations') renderRecy();
                 } else if (mod === 'operation-planning') {
                     renderPlanKv(); renderBacklog(); drawGantt();
                     if (tickN % 2 === 0) renderRoute();
@@ -3345,6 +3496,7 @@
                 },
                 kit: function (id) { kitTicket([id]); },
                 kitd: function (id) { openKit(DB.kit.filter(k => k.id === id)[0]); },
+                rcy: function (id) { openRecy(rcyById(id)); },
                 'route-go': function (id) { dispatchRoute(routeById(id)); },
                 'route-edit': function (id) { editRoute(routeById(id)); },
                 'route-view': function (id) { openRoute(routeById(id)); },
@@ -3663,6 +3815,7 @@
                 bindTable('ship-table', { pageSize: 6, search: '#ship-search', export: '环卫船台账', keyAttr: 'id' });
                 bindTable('plant-table', { pageSize: 6, search: '#plant-search', export: '焚烧厂炉线台账', keyAttr: 'id' });
                 bindTable('kit-table', { pageSize: 8, search: '#kit-search', export: '餐厨产生单位台账', keyAttr: 'id' });
+                bindTable('rcy-table', { pageSize: 8, search: '#rcy-search', export: '回收站称重台账', keyAttr: 'id', emptyText: '没有符合条件的回收站点' });
                 bindTable('route-table', { pageSize: 8, search: '#route-search', export: '作业路线台账', keyAttr: 'id' });
                 bindTable('task-table', { pageSize: 8, search: '#task-search', export: '作业任务单', keyAttr: 'id', selectable: true });
                 bindTable('crew-table', { pageSize: 8, search: '#crew-search', export: '班组花名册', keyAttr: 'id' });
@@ -3757,6 +3910,7 @@
                 $('btn-kit-order').addEventListener('click', function () {
                     kitTicket($('kit-table').scTable.visibleRows.map(r => r.id));
                 });
+                $('btn-rcy-cal').addEventListener('click', calibrateRecy);
                 $('btn-new-route').addEventListener('click', createRoute);
                 $('btn-auto-dispatch').addEventListener('click', function () {
                     const st = runDispatch({ max: 12 });
