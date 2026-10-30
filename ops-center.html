@@ -1086,14 +1086,23 @@
                 const st = ['成功', '进行中', '待审批', '待审批', '成功', '已回滚'];
                 return CHG_SEED.map(function (r, i) {
                     const h = sri(2, 26);
+                    const at = Date.now() - h * HOUR;
+                    const owner = srp(['张宇轩', '李国强', '王振宇', '周敏']);
+                    const status = i < 6 ? st[i] : srp(['成功', '成功', '待审批', '进行中']);
+                    /* 变更日志按状态回补，时间一律不晚于当前时刻 */
+                    const log = [{ t: at, tx: '提交变更单，等待审批' }];
+                    const mid = at + (Date.now() - at) * 0.4;
+                    if (status !== '待审批') log.push({ t: mid, tx: '审批通过，进入待执行队列（审批人 值班长 张宇轩）' });
+                    if (status === '成功') log.push({ t: at + (Date.now() - at) * 0.9, tx: '全部步骤执行完成，健康检查通过，变更成功' });
+                    if (status === '已回滚') log.push({ t: at + (Date.now() - at) * 0.9, tx: '步骤校验未通过，回滚至变更前版本' });
                     return {
                         no: 'CH-2610' + SC.pad2(i + 1), type: r[0], title: r[1], svc: r[2], risk: r[3],
-                        steps: r[4], status: i < 6 ? st[i] : srp(['成功', '成功', '待审批', '进行中']),
-                        owner: srp(['张宇轩', '李国强', '王振宇', '周敏']),
+                        steps: r[4], status: status,
+                        owner: owner,
                         review: srp(['平台架构组', '运维组', '业务负责人']),
                         win: '0' + (3 + (i % 4)) + ':00-0' + (5 + (i % 4)) + ':00',
-                        at: Date.now() - h * HOUR,
-                        done: 0, log: []
+                        at: at,
+                        done: status === '成功' ? r[4].length : 0, log: log
                     };
                 });
             }
@@ -2473,7 +2482,7 @@
             function renderDutyTl() {
                 const items = (ST.duty.handovers || []).map(function (h) {
                     return { d: 'done', h: '值班交接 · ' + SC.esc(h.from) + ' → ' + SC.esc(h.to), m: SC.stamp(h.at, true) + ' · ' + SC.esc(h.content) };
-                }).concat(LOG.filter(function (r) { return /变更|审批|执行|回滚|演练/.test(r.tx); }).slice(0, 10).map(function (r) {
+                }).concat(LOG.filter(function (r) { return /【|变更|审批|执行|回滚|演练/.test(r.tx); }).slice(0, 10).map(function (r) {
                     return { d: r.lv === 'ok' ? 'done' : 'todo', h: ({ info: '信息', warn: '预警', alarm: '告警', ok: '正常' }[r.lv] || r.lv) + ' · ' + SC.stamp(r.t), m: SC.esc(r.tx) };
                 }));
                 put('#duty-tl', items.length ? items.map(function (x) {
@@ -2589,6 +2598,8 @@
                     { text: '✔ 审批通过', kind: 'primary', show: c.status === '待审批', run: function () { approve(no); api.close(); } },
                     { text: '⚙ 立即执行', kind: 'danger', show: c.status === '待执行' || c.status === '进行中', run: function () { execute(no); api.close(); } },
                     { text: '↤ 回滚', kind: 'danger', show: c.status === '成功', run: function () { rollback(no); api.close(); } },
+                    { text: '↪ 重新提交审批', kind: '', show: c.status === '已回滚', run: function () { resubmit(no); api.close(); } },
+                    { text: '📖 复盘', kind: 'ghost', show: c.status === '成功', run: function () { review(no); } },
                     { text: '关闭', kind: 'ghost' }
                 ];
                 const api = SC.modal.open({
@@ -2690,10 +2701,9 @@
                         { name: 'type', label: '变更类型', type: 'select', options: ['发布', '配置', '扩容', '演练'], col: 1 },
                         { name: 'risk', label: '风险等级', type: 'select', options: ['低', '中', '高'], col: 1 },
                         {
+                            /* sc-form 的 select 只接受数组选项，这里在弹窗打开时取快照服务目录 */
                             name: 'svc', label: '影响服务', type: 'select', col: 1, hint: '取平台架构页服务目录',
-                            options: function () {
-                                return [{ value: 'multi-domain', label: '跨域公共组件' }].concat(SVC_ROWS.map(s => ({ value: s.id, label: s.name + '（' + s.domain + '）' })));
-                            }
+                            options: [{ value: 'multi-domain', label: '跨域公共组件' }].concat(SVC_ROWS.map(s => ({ value: s.id, label: s.name + '（' + s.domain + '）' })))
                         },
                         { name: 'win', label: '变更窗口', type: 'text', col: 1, value: '02:00-04:00', validate: function (v) { return /^\d{2}:\d{2}-\d{2}:\d{2}$/.test(v) ? '' : '格式应为 02:00-04:00'; } },
                         { name: 'steps', label: '执行步骤', type: 'textarea', required: true, col: 1, value: '审批通过\n灰度 1 个实例\n观察 30 分钟\n全量放开', hint: '每行一个步骤，按顺序执行' }
@@ -2720,27 +2730,31 @@
 
             function handover() {
                 const today = dutyToday(0), next = dutyToday(1);
+                const pendOpts = [
+                    { value: 'alm', label: '紧急告警 ' + totals().urgent.length + ' 条未闭环' },
+                    { value: 'chg', label: '变更窗口 ' + (ST.chg.filter(c => c.status === '待执行').length) + ' 张待执行' },
+                    { value: 'dev', label: '离线设备维修跟进' },
+                    { value: 'plan', label: '预案演练计划确认' }
+                ];
                 SC.modal.form({
                     title: '🔄 值班交接',
                     fields: [
                         { name: 'from', label: '交班人', type: 'select', options: today.map(r => r.name), col: 1 },
                         { name: 'to', label: '接班人', type: 'select', options: next.map(r => r.name), col: 1 },
-                        {
-                            name: 'pend', label: '待办事项', type: 'checkgroup', col: 1, options: [
-                                { value: 'alm', label: '紧急告警 ' + totals().urgent.length + ' 条未闭环' },
-                                { value: 'chg', label: '变更窗口 ' + (ST.chg.filter(c => c.status === '待执行').length) + ' 张待执行' },
-                                { value: 'dev', label: '离线设备维修跟进' },
-                                { value: 'plan', label: '预案演练计划确认' }
-                            ]
-                        },
+                        { name: 'pend', label: '待办事项', type: 'checkgroup', required: true, col: 1, options: pendOpts },
                         { name: 'note', label: '交接说明', type: 'textarea', required: true, col: 1, placeholder: '当前态势、风险提示、需重点观察的指标' }
                     ]
                 }).then(function (v) {
                     if (!v) return;
                     if (!v.pend || !v.pend.length) { SC.toast('请至少勾选一项待办事项', { type: 'error' }); return; }
-                    ST.duty.handovers.unshift({ at: Date.now(), from: v.from, to: v.to, content: v.note, pend: v.pend.join('、') });
+                    /* 归档时存中文标题，便于台账导出与交接阅读 */
+                    const labels = v.pend.map(function (val) {
+                        const hit = pendOpts.filter(o => o.value === val)[0];
+                        return hit ? hit.label : val;
+                    });
+                    ST.duty.handovers.unshift({ at: Date.now(), from: v.from, to: v.to, content: v.note, pend: labels.join('、') });
                     saveST();
-                    note('ok', '值班交接完成：' + v.from + ' → ' + v.to + '，待办 ' + v.pend.length + ' 项');
+                    note('ok', '值班交接完成：' + v.from + ' → ' + v.to + '，待办 ' + labels.length + ' 项');
                     SC.toast('交接记录已归档', { type: 'success' });
                     renderChange();
                     renderDutyTl();
