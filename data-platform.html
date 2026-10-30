@@ -1,0 +1,2514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据中台 - 智慧城市管理平台</title>
+    <meta name="description" content="智慧城市数据中台：多源数据采集、清洗整编、分层存储与统一数据服务的运行管理平台。">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
+    <style>
+        :root {
+            --dp: #7b61ff;
+            --dp-2: #4a3fd4;
+            --dp-soft: rgba(123, 97, 255, .1);
+            --ink: #2c3448;
+            --ink-2: #6b7689;
+        }
+
+        .container {
+            background: #f2f3f8;
+            color: var(--ink);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        header h1 {
+            color: var(--dp-2);
+        }
+
+        .dp-sub {
+            color: var(--ink-2);
+            margin-top: 6px;
+        }
+
+        .nav-btn,
+        .btn-primary,
+        .btn-sm {
+            background: linear-gradient(135deg, var(--dp) 0%, var(--dp-2) 100%);
+        }
+
+        .nav-btn {
+            box-shadow: 0 3px 10px rgba(123, 97, 255, .3);
+        }
+
+        .nav-btn:hover,
+        .btn-primary:hover,
+        .btn-sm:hover {
+            background: linear-gradient(135deg, var(--dp-2) 0%, #37289e 100%);
+        }
+
+        .module-btn.active,
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--dp) 0%, var(--dp-2) 100%);
+        }
+
+        /* 顶部运行状态条 */
+        .dp-live {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 14px;
+            background: linear-gradient(120deg, #2b2450 0%, #3a2f7a 100%);
+            color: #dcd8ff;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            font-size: .9em;
+            box-shadow: 0 6px 18px rgba(58, 47, 122, .25);
+        }
+
+        .dp-live b {
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .dp-live .sep {
+            display: inline-block;
+            width: 1px;
+            height: 14px;
+            background: rgba(255, 255, 255, .22);
+        }
+
+        .dp-live .mono {
+            margin-left: auto;
+            color: #b8b0ee;
+        }
+
+        .content-header h3 {
+            color: var(--dp-2);
+        }
+
+        .sc-panel-title h3 {
+            color: var(--dp-2);
+        }
+
+        .sc-kv-item .v {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 数据流水线 */
+        .pipe {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .pipe-node {
+            position: relative;
+            background: white;
+            border: 1px solid #e6e4f5;
+            border-top: 3px solid var(--dp);
+            border-radius: 12px;
+            padding: 16px 16px 14px;
+            cursor: pointer;
+            transition: all .22s ease;
+            box-shadow: 0 3px 12px rgba(44, 52, 72, .06);
+        }
+
+        .pipe-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(123, 97, 255, .18);
+            border-color: var(--dp);
+        }
+
+        .pipe-node .ph {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.02em;
+        }
+
+        .pipe-node .pv {
+            font-size: 1.7em;
+            font-weight: 700;
+            color: var(--dp-2);
+            margin: 8px 0 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pipe-node .pn {
+            font-size: .78em;
+            color: var(--ink-2);
+            line-height: 1.6;
+        }
+
+        .pipe-node .arrow {
+            position: absolute;
+            right: -11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #c9c4ea;
+            font-size: 1.1em;
+            z-index: 2;
+        }
+
+        .pipe-node:last-child .arrow {
+            display: none;
+        }
+
+        /* 数据域清单 */
+        .dom-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 4px 12px;
+            align-items: center;
+            padding: 9px 11px;
+            border: 1px solid #eceaf7;
+            border-radius: 9px;
+            margin-bottom: 8px;
+            background: #fbfaff;
+            cursor: pointer;
+            transition: all .18s ease;
+        }
+
+        .dom-row:hover {
+            border-color: var(--dp);
+            background: var(--dp-soft);
+        }
+
+        .dom-row .dn {
+            font-weight: 600;
+        }
+
+        .dom-row .dm {
+            grid-column: 1 / -1;
+            font-size: .78em;
+            color: var(--ink-2);
+        }
+
+        /* 存储水位 */
+        .water-row {
+            display: grid;
+            grid-template-columns: 118px 1fr 92px;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 2px;
+            border-bottom: 1px dashed #eceaf7;
+            font-size: .9em;
+        }
+
+        .water-row:last-child {
+            border-bottom: none;
+        }
+
+        .water-row .wl b {
+            display: block;
+        }
+
+        .water-row .wl span {
+            font-size: .78em;
+            color: var(--ink-2);
+        }
+
+        .water-row .wv {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            color: var(--ink-2);
+            font-size: .84em;
+        }
+
+        .rule-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 2px;
+            border-bottom: 1px dashed #eceaf7;
+            font-size: .88em;
+        }
+
+        .rule-row:last-child {
+            border-bottom: none;
+        }
+
+        .rule-row .rr-n {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rule-row .rr-n b {
+            display: block;
+        }
+
+        .rule-row .rr-n span {
+            font-size: .78em;
+            color: var(--ink-2);
+        }
+
+        .rule-row .rr-v {
+            font-variant-numeric: tabular-nums;
+            color: var(--ink-2);
+            font-size: .82em;
+            white-space: nowrap;
+        }
+
+        .lineage {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            font-size: .84em;
+        }
+
+        .lineage .ln {
+            background: var(--dp-soft);
+            border: 1px solid #ded9fa;
+            border-radius: 8px;
+            padding: 5px 10px;
+        }
+
+        .lineage .lt {
+            color: #b0a9dd;
+        }
+
+        .mono {
+            font-family: Consolas, Monaco, monospace;
+        }
+
+        @media (max-width: 720px) {
+            .water-row {
+                grid-template-columns: 96px 1fr 74px;
+            }
+        }
+    </style>
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%237b61ff%27/%3E%3Cpath d=%27M16 40h8v10H16zM28 28h8v22h-8zM40 18h8v32h-8z%27 fill=%27white%27/%3E%3C/svg%3E">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>🧮 数据中台</h1>
+                <p class="dp-sub">多端采集 · 清洗整编 · 分层存储 · 统一服务，把散落的数据变成可复用的数据资产</p>
+            </div>
+            <div class="dp-head-right" style="display:flex;align-items:center;gap:12px">
+                <span class="sc-live"><i class="sc-live-dot"></i><span id="dp-clock">--</span></span>
+                <a href="city-platform-architecture.html" class="nav-btn">🏙️ 平台架构</a>
+                <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            </div>
+        </header>
+
+        <div class="dp-live" id="dp-live">
+            <span>数据总线 <b>--</b></span>
+        </div>
+
+        <div class="module-nav">
+            <button class="module-btn active" data-module="overview">🛰 中台总览</button>
+            <button class="module-btn" data-module="collect">📥 数据采集</button>
+            <button class="module-btn" data-module="process">🧹 清洗整编</button>
+            <button class="module-btn" data-module="storage">🗄 存储治理</button>
+            <button class="module-btn" data-module="share">🔗 数据服务</button>
+        </div>
+
+        <!-- ==================== 1. 中台总览 ==================== -->
+        <div class="module-content active" id="overview-module">
+            <div class="content-header">
+                <h3>🛰 中台总览</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-dp-snapshot">📸 生成数据资产快照</button>
+                    <button class="sc-btn ghost" id="btn-dp-export-assets">⬇ 导出资产清单</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="ov-kv"></div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>数据流转链路</h3>
+                    <span class="sc-hint">点击任一环节进入对应模块</span>
+                </div>
+                <div class="pipe" id="dp-pipe"></div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>入湖与整编吞吐（近 24 小时）</h3>
+                        <span class="sc-hint">GB / 万条</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-dp-flow"></canvas></div>
+                    <div id="lg-dp-flow"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>实时活动流</h3>
+                        <span class="sc-hint">采集 / 整编 / 服务调用</span>
+                    </div>
+                    <div class="sc-log" id="dp-log"></div>
+                </div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>各业务域数据量</h3>
+                        <span class="sc-hint">点击条形查看域内明细</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-dp-domain"></canvas></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>数据域覆盖</h3>
+                        <span class="sc-hint">点击进入场景页</span>
+                    </div>
+                    <div id="dp-domains"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 2. 数据采集 ==================== -->
+        <div class="module-content" id="collect-module">
+            <div class="content-header">
+                <h3>📥 数据采集</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="col-search" placeholder="搜索通道 / 源系统 / 目标表…">
+                    <button class="sc-btn" id="btn-col-check">🩺 通道巡检</button>
+                    <button class="sc-btn primary" id="btn-col-add">➕ 新增接入</button>
+                    <button class="sc-btn ghost" id="btn-col-export">⬇ 导出</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="col-kv"></div>
+            <div class="sc-chip-holder" style="margin-top:18px">
+                <div class="sc-chips" id="col-chips"></div>
+            </div>
+
+            <div class="sc-split" style="margin-top:14px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>采集通道</h3>
+                        <span class="sc-hint">点击行查看通道配置与字段映射</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="col-table">
+                            <thead>
+                                <tr>
+                                    <th>通道 / 目标表</th>
+                                    <th>采集方式</th>
+                                    <th>源系统</th>
+                                    <th>频率</th>
+                                    <th>日增量</th>
+                                    <th>成功率</th>
+                                    <th>时延</th>
+                                    <th>状态</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>通道异常与建议</h3>
+                        <span class="sc-hint">断流 / 超时 / 权限失效</span>
+                    </div>
+                    <div class="attn-list" id="col-issues"></div>
+                    <div class="sc-panel-title" style="margin-top:18px">
+                        <h3>采集方式占比</h3>
+                        <span class="sc-hint">按通道数</span>
+                    </div>
+                    <div class="sc-chart sm"><canvas id="c-col-kind"></canvas></div>
+                </div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>选中通道入湖趋势</h3>
+                    <span class="sc-hint" id="col-trend-name">未选择通道</span>
+                </div>
+                <div class="sc-chart"><canvas id="c-col-trend"></canvas></div>
+                <div id="lg-col-trend"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 3. 清洗整编 ==================== -->
+        <div class="module-content" id="process-module">
+            <div class="content-header">
+                <h3>🧹 清洗整编</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-job-run">▶ 批量重跑失败作业</button>
+                    <button class="sc-btn ghost" id="btn-rule-reset">↺ 恢复默认规则</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="proc-kv"></div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>整编作业</h3>
+                        <span class="sc-hint">点击行查看作业详情，血缘与运行日志同步联动</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="job-table">
+                            <thead>
+                                <tr>
+                                    <th>作业</th>
+                                    <th>模式</th>
+                                    <th>输入 → 输出</th>
+                                    <th>并行度</th>
+                                    <th>吞吐</th>
+                                    <th>延迟</th>
+                                    <th>质量分</th>
+                                    <th>状态</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>清洗规则</h3>
+                        <span class="sc-hint">开关即时生效</span>
+                    </div>
+                    <div id="rule-list"></div>
+                </div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>数据质量六维评分</h3>
+                        <span class="sc-hint">满分 100</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-quality"></canvas></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>作业血缘</h3>
+                        <span class="sc-hint">上游 → 规则 → 下游</span>
+                    </div>
+                    <div id="job-lineage"></div>
+                    <div class="sc-panel-title" style="margin-top:16px">
+                        <h3>运行日志</h3>
+                        <span class="sc-hint">最近一次调度</span>
+                    </div>
+                    <div class="sc-log" id="job-log"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 4. 存储治理 ==================== -->
+        <div class="module-content" id="storage-module">
+            <div class="content-header">
+                <h3>🗄 存储治理</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="tbl-search" placeholder="搜索表名 / 分层 / 负责人…">
+                    <button class="sc-btn" id="btn-sto-archive">📦 执行归档策略</button>
+                    <button class="sc-btn ghost" id="btn-sto-export">⬇ 导出表清单</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="sto-kv"></div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>分层存储水位</h3>
+                        <span class="sc-hint">超过 80% 触发扩容评审</span>
+                    </div>
+                    <div id="sto-water"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>近 7 天各层新增量</h3>
+                        <span class="sc-hint">堆叠柱状，单位 GB</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-sto-trend"></canvas></div>
+                </div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>数据表资产</h3>
+                    <span class="sc-hint">点击行查看表结构与生命周期</span>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="tbl-table">
+                        <thead>
+                            <tr>
+                                <th>表名</th>
+                                <th>分层</th>
+                                <th>业务域</th>
+                                <th>行数</th>
+                                <th>占用</th>
+                                <th>副本</th>
+                                <th>生命周期</th>
+                                <th>质量分</th>
+                                <th>更新时间</th>
+                                <th data-no-sort>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 5. 数据服务 ==================== -->
+        <div class="module-content" id="share-module">
+            <div class="content-header">
+                <h3>🔗 数据服务</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="api-search" placeholder="搜索接口 / 订阅方…">
+                    <button class="sc-btn" id="btn-api-grant">🔑 申请授权</button>
+                    <button class="sc-btn ghost" id="btn-api-export">⬇ 导出接口目录</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="share-kv"></div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>数据服务接口</h3>
+                    <span class="sc-hint">点击行查看请求示例与调用趋势</span>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="api-table">
+                        <thead>
+                            <tr>
+                                <th>接口</th>
+                                <th>类型</th>
+                                <th>数据域</th>
+                                <th>订阅方</th>
+                                <th>QPS</th>
+                                <th>P99</th>
+                                <th>成功率</th>
+                                <th>授权</th>
+                                <th data-no-sort>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>场景订阅推送</h3>
+                        <span class="sc-hint">推送到各业务场景页</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="sub-table">
+                            <thead>
+                                <tr>
+                                    <th>目标场景</th>
+                                    <th>数据产品</th>
+                                    <th>频率</th>
+                                    <th>最近推送</th>
+                                    <th>累计条数</th>
+                                    <th>状态</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>接口调用趋势</h3>
+                        <span class="sc-hint">近 24 小时</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-api-trend"></canvas></div>
+                    <div class="sc-panel-title" style="margin-top:16px">
+                        <h3>服务健康提示</h3>
+                        <span class="sc-hint">限流与降级</span>
+                    </div>
+                    <div class="attn-list" id="share-issues"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 智慧城市管理平台. 【余一叶知秋尽】版权所有.</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script src="assets/js/common.js"></script>
+    <script>
+        /* ==========================================================================
+           数据中台运行时：总览 / 采集通道 / 清洗整编 / 存储治理 / 数据服务
+           数据由确定性伪随机生成，可变部分（通道启停、新增接入、规则开关、作业状态、
+           归档记录、授权与推送）落盘到 localStorage 的 sc:dp:state，版本不一致时重建。
+           ========================================================================== */
+        (function () {
+            'use strict';
+
+            const NS = 'dp';
+            const DP_VER = 1;
+            const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+            const ACCENT = '#7b61ff', ACCENT_2 = '#4a3fd4', GREEN = '#20bf6b', AMBER = '#f7b731', RED = '#eb3b5a';
+
+            /* ---------------- 确定性伪随机 ---------------- */
+            let seed = 20260512;
+            function resetSeed(v) { seed = v; }
+            function srnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+            function sri(a, b) { return Math.floor(a + srnd() * (b - a + 1)); }
+            function srp(arr) { return arr[Math.floor(srnd() * arr.length)]; }
+            function hashSeed(str) {
+                let h = 2166136261;
+                for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+                return h >>> 0;
+            }
+
+            const TAG = { '正常': 'ok', '运行中': 'ok', '延迟': 'warn', '积压': 'warn', '异常': 'bad', '停用': 'off', '归档中': 'info', '已归档': 'off' };
+
+            /* ==========================================================================
+               1. 本地存档
+               ========================================================================== */
+            let ST = SC.store.get(NS, 'state', null);
+            if (!ST || ST.ver !== DP_VER) {
+                ST = { ver: DP_VER, chans: [], off: {}, live: {}, rules: {}, jobs: {}, archived: [], grants: [], pushes: [], checks: 0 };
+            }
+            ['chans', 'off', 'live', 'rules', 'jobs', 'archived', 'grants', 'pushes'].forEach(function (k) {
+                if (!ST[k]) ST[k] = (k === 'off' || k === 'live' || k === 'rules' || k === 'jobs') ? {} : [];
+            });
+            function saveST() { SC.store.set(NS, 'state', ST); }
+            /* 运行态覆写（试采 / 巡检结果），与基线种子合并，不污染原始数据 */
+            function patchChan(id, patch) {
+                ST.live[id] = Object.assign({}, ST.live[id] || {}, patch);
+                saveST();
+            }
+
+            /* ==========================================================================
+               2. 采集通道（多端数据源）
+               ========================================================================== */
+            const KINDS = ['IoT 消息', '数据库 CDC', '视频 AI', '文件交换', 'API 拉取', '移动端上报', '共享交换'];
+
+            const CH_SEED = [
+                ['CH-01', '排水管网压力采集', 'IoT 消息', '排水物联平台', '15 秒', 'JSON', 'ods_drain_pressure_rt', '水务业务组'],
+                ['CH-02', '照明单灯状态上报', 'IoT 消息', '照明集中控制器', '1 分钟', 'MQTT', 'ods_light_status_rt', '照明业务组'],
+                ['CH-03', '环卫车辆 GPS 轨迹', 'IoT 消息', '车载终端 T-Box', '5 秒', 'Protobuf', 'ods_env_vehicle_gps', '环卫业务组'],
+                ['CH-04', '城管案件库增量', '数据库 CDC', '城管业务主库', '30 秒', 'Binlog', 'ods_case_incident_rt', '数字城管组'],
+                ['CH-05', '停车泊位状态', '数据库 CDC', '停车计费库', '1 分钟', 'WAL', 'ods_park_slot_rt', '停车业务组'],
+                ['CH-06', '街面事件识别结果', '视频 AI', '边缘 AI 节点', '2 分钟', 'JSON', 'dwd_video_event', '算法组'],
+                ['CH-07', '桥隧结构监测', 'IoT 消息', '应变/位移传感器', '10 分钟', 'JSON', 'ods_bridge_sensor', '市政业务组'],
+                ['CH-08', '垃圾清运联单', '文件交换', '环卫清运单位报送', '每日 06:00', 'Excel', 'ods_waste_manifest', '环卫业务组'],
+                ['CH-09', '气象预警信号', 'API 拉取', '市气象局开放接口', '5 分钟', 'JSON', 'ods_weather_alert', '数据平台组'],
+                ['CH-10', '市民上报工单', '移动端上报', '市民端 App', '实时', 'JSON', 'ods_citizen_report', '公共服务组'],
+                ['CH-11', '政务服务事项库', '共享交换', '市政务共享平台', '每日 02:00', 'XML', 'ods_gov_item', '数据平台组'],
+                ['CH-12', '公共区域能耗', 'IoT 消息', '智能电表网关', '15 分钟', 'Modbus', 'ods_energy_meter', '基础设施组'],
+                ['CH-13', '执法记录仪影像', '文件交换', '执法终端上传', '每小时', 'MP4', 'ods_law_media', '视频平台组'],
+                ['CH-14', '地下管线台账', '共享交换', '城建档案馆', '每周一', 'SHP', 'ods_pipeline_ledger', '市政业务组']
+            ];
+
+            resetSeed(20260512);
+            const CHANNELS = CH_SEED.map(function (r, i) {
+                const rows = sri(12, 940) * 10000;
+                const rate = Number((99 + srnd()).toFixed(2));
+                const lag = sri(2, 420);
+                let status = '正常';
+                if (rate < 99.3) status = '延迟';
+                if (lag > 380) status = '积压';
+                if (i === 7) status = '异常';
+                return {
+                    id: r[0], name: r[1], kind: r[2], source: r[3], freq: r[4], format: r[5],
+                    table: r[6], owner: r[7],
+                    rows: rows, rate: rate, lag: lag,
+                    size: Math.round(rows * (0.4 + srnd() * 2.6) / 100000) / 10 /* GB/日，约 0.4~3 KB/行 */,
+                    fields: sri(9, 46),
+                    retry: sri(0, 14),
+                    since: Date.now() - sri(30, 420) * DAY,
+                    status: status
+                };
+            });
+            CHANNELS.forEach(function (c) {
+                if (ST.off[c.id]) c.status = '停用';
+            });
+
+            function chanById(id) {
+                const list = chanList();
+                for (let i = 0; i < list.length; i++) { if (list[i].id === id) return list[i]; }
+                return null;
+            }
+            function chanList() {
+                const base = CHANNELS.map(function (c) {
+                    const out = ST.live[c.id] ? Object.assign({}, c, ST.live[c.id]) : Object.assign({}, c);
+                    /* 启停状态以存档为准，每次取列表时重新叠加，避免只在新建页面时生效一次 */
+                    if (ST.off[c.id]) out.status = '停用';
+                    return out;
+                });
+                return base.concat(ST.chans.map(function (r) {
+                    return Object.assign({ retry: 0, fields: r.fields || 12, rate: 99.5, lag: 30, size: 6, status: '正常' }, r);
+                }));
+            }
+
+            /* 字段映射：按通道 id 稳定生成 */
+            const FIELD_POOL = [
+                ['device_id', 'STRING', '设备编号', '主键非空'],
+                ['collect_time', 'DATETIME', '采集时间', '不允许为空'],
+                ['value', 'DOUBLE', '监测值', '范围校验 0-1000'],
+                ['status_code', 'INT', '状态码', '字典映射'],
+                ['area_code', 'STRING', '区域编码', '行政区划字典'],
+                ['raw_payload', 'STRING', '原始报文', '脱敏后入湖'],
+                ['batch_no', 'STRING', '批次号', '幂等去重键']
+            ];
+            function fieldMap(ch) {
+                const rnd = hashSeed(ch.id);
+                const n = 4 + (rnd % 3);
+                const out = [];
+                for (let i = 0; i < n; i++) {
+                    /* 必须用无右移 >>>：有符号 >> 在大数上会得出负值，取余后拿到 undefined */
+                    const f = FIELD_POOL[(rnd >>> (i * 3)) % FIELD_POOL.length];
+                    out.push({ src: f[0], type: f[1], cn: f[2], rule: f[3] });
+                }
+                return out;
+            }
+
+            /* 近 n 小时序列（入湖量 / 成功率） */
+            function seriesFor(id, hours, base, jitter) {
+                const rnd = hashSeed(id);
+                const out = [];
+                for (let i = 0; i < hours; i++) {
+                    const wave = Math.sin((i + 6) / 24 * Math.PI * 2) * 0.32 + 1;
+                    const noise = ((rnd >>> (i % 20)) % 100) / 100 - 0.5;
+                    out.push(Math.max(0, Math.round((base * wave + noise * jitter) * 100) / 100));
+                }
+                return out;
+            }
+            function hourLabels(hours) {
+                const out = [];
+                const now = new Date();
+                for (let i = hours - 1; i >= 0; i--) {
+                    out.push(SC.pad2(new Date(now.getTime() - i * HOUR).getHours()) + ':00');
+                }
+                return out;
+            }
+            function q(id) { return document.querySelector(id); }
+            function qa(id) { return Array.prototype.slice.call(document.querySelectorAll(id)); }
+            function put(id, html) { const n = q(id); if (n) n.innerHTML = html; }
+            function tag(text, kind) { return '<span class="sc-tag ' + (kind || 'info') + '">' + SC.esc(text) + '</span>'; }
+            function kvBox(items) {
+                return items.map(function (it) {
+                    return '<div class="sc-kv-item"><div class="k">' + it[0] + '</div><div class="v">' + it[1] + '</div></div>';
+                }).join('');
+            }
+            function activeModule() {
+                const node = q('.module-content.active');
+                return node ? node.id.replace('-module', '') : 'overview';
+            }
+            function ago(ts) {
+                const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+                if (s < 60) return s + ' 秒前';
+                if (s < 3600) return Math.round(s / 60) + ' 分钟前';
+                if (s < 86400) return (s / 3600).toFixed(1) + ' 小时前';
+                return Math.round(s / 86400) + ' 天前';
+            }
+            function goModule(name) {
+                const btn = q('.module-btn[data-module="' + name + '"]');
+                if (btn) btn.click();
+            }
+
+            /* ==========================================================================
+               3. 清洗整编：作业 / 规则 / 质量六维
+               ========================================================================== */
+            const JOB_SEED = [
+                ['JB-01', '案件事件标准化', '流式', 'ods_case_incident_rt', 'dwd_case_event_std', 12],
+                ['JB-02', '设备指标降采样', '流式', 'ods_drain_pressure_rt', 'dws_device_metric_1h', 16],
+                ['JB-03', '车辆作业轨迹纠偏', '流式', 'ods_env_vehicle_gps', 'dwd_vehicle_track', 8],
+                ['JB-04', '视频事件去重聚合', '微批', 'dwd_video_event', 'dws_video_event_5m', 6],
+                ['JB-05', '市民上报意图识别', '流式', 'ods_citizen_report', 'dwd_citizen_ticket', 4],
+                ['JB-06', '照明能耗日结', '批式', 'ods_light_status_rt', 'ads_light_energy_1d', 6],
+                ['JB-07', '停车周转率计算', '批式', 'ods_park_slot_rt', 'ads_park_turnover_1d', 8],
+                ['JB-08', '桥隧形变阈值判定', '流式', 'ods_bridge_sensor', 'dwd_bridge_deform', 4],
+                ['JB-09', '政务事项主数据合并', '批式', 'ods_gov_item', 'dim_gov_item_std', 3],
+                ['JB-10', '数据质量稽核', '批式', '全部 DWD 层', 'ads_dq_report_1d', 5]
+            ];
+
+            resetSeed(20260520);
+            const JOBS = JOB_SEED.map(function (r) {
+                const thr = sri(4, 96) * 1000;
+                const score = sri(78, 99);
+                let status = '运行中';
+                if (score < 82) status = '延迟';
+                if (r[5] === 3 && score < 86) status = '异常';
+                if (thr > 90000000) status = '积压';
+                return {
+                    id: r[0], name: r[1], mode: r[2], input: r[3], output: r[4], parallel: r[5],
+                    thr: thr, lag: sri(1, 240), score: score, status: status,
+                    rows: sri(20, 900) * 10000, owner: srp(['数据平台组', '算法组', '水务业务组', '数字城管组']),
+                    updated: Date.now() - sri(1, 300) * MIN
+                };
+            });
+            JOBS.forEach(function (j) { if (ST.jobs[j.id]) j.status = ST.jobs[j.id]; });
+            function jobById(id) { return JOBS.filter(j => j.id === id)[0] || null; }
+
+            const RULE_SEED = [
+                ['R-01', '主键幂等去重', '按 batch_no + 时间窗口去重，重复记录直接丢弃', 1, 3.4],
+                ['R-02', '关键字段空值补全', '设备编号缺失时按最近心跳与区域反查补全', 1, 1.8],
+                ['R-03', '单位与量纲归一', '压力 kPa→MPa、流量 m³/h→L/s、角度统一', 1, 6.2],
+                ['R-04', '异常值剔除', '3σ 以外且连续 3 点越界的传感器读数剔除', 1, 0.7],
+                ['R-05', '字典与代码映射', '区域编码、事项分类映射到全市统一代码表', 1, 11.5],
+                ['R-06', '时间戳对齐', '统一转换为东八区毫秒精度，乱序按水位线重排', 1, 2.1],
+                ['R-07', '敏感信息脱敏', '手机号、身份证、车牌按分级规则掩码', 1, 4.6],
+                ['R-08', '字符集与格式规整', '全半角、换行符、XML/Excel 表头统一', 0, 0.9]
+            ];
+            const RULES = RULE_SEED.map(function (r) {
+                const on = ST.rules[r[0]] === undefined ? !!r[3] : !!ST.rules[r[0]];
+                return {
+                    id: r[0], name: r[1], desc: r[2], on: on, hit: sri(2, 480) * 1000, pct: r[4]
+                };
+            });
+
+            const QUALITY = [
+                { name: '完整性', value: 93 }, { name: '准确性', value: 88 }, { name: '一致性', value: 85 },
+                { name: '及时性', value: 91 }, { name: '唯一性', value: 97 }, { name: '有效性', value: 89 }
+            ];
+            function qualityScore() {
+                const off = RULES.filter(r => !r.on).length;
+                const base = QUALITY.reduce((a, q2) => a + q2.value, 0) / QUALITY.length;
+                return Math.max(60, Math.round((base - off * 1.6) * 10) / 10);
+            }
+
+            /* ==========================================================================
+               4. 存储治理：分层水位 + 表资产
+               ========================================================================== */
+            const STORES = [
+                { key: 'tsdb', name: '时序库 TDengine', use: '设备遥测、轨迹', cap: 480, used: 372, unit: 'TB', owner: '数据平台组' },
+                { key: 'olap', name: 'OLAP ClickHouse', use: '分析宽表、报表', cap: 260, used: 196, unit: 'TB', owner: '数据平台组' },
+                { key: 'rdb', name: '关系库 PostgreSQL', use: '主数据、配置', cap: 40, used: 27, unit: 'TB', owner: '平台架构组' },
+                { key: 'obj', name: '对象存储 MinIO', use: '影像、附件、归档', cap: 1200, used: 908, unit: 'TB', owner: '基础设施组' },
+                { key: 'cache', name: '缓存 Redis', use: '热点查询、令牌', cap: 2, used: 1.3, unit: 'TB', owner: '平台架构组' }
+            ];
+            STORES.forEach(function (s) { s.pct = Math.round(s.used / s.cap * 1000) / 10; });
+
+            const TBL_SEED = [
+                ['ods_case_incident_rt', '贴源层', '城管', 8240, 96, '热存 30 天'],
+                ['ods_drain_pressure_rt', '贴源层', '排水', 16420, 148, '热存 15 天'],
+                ['ods_env_vehicle_gps', '贴源层', '环卫', 22800, 210, '热存 15 天'],
+                ['ods_light_status_rt', '贴源层', '照明', 9600, 62, '热存 30 天'],
+                ['ods_park_slot_rt', '贴源层', '停车', 4200, 28, '热存 30 天'],
+                ['ods_bridge_sensor', '贴源层', '市政', 1860, 24, '热存 90 天'],
+                ['dwd_case_event_std', '明细层', '城管', 6120, 74, '永久'],
+                ['dwd_video_event', '明细层', '街面', 3480, 118, '热存 90 天'],
+                ['dwd_vehicle_track', '明细层', '环卫', 12600, 164, '热存 60 天'],
+                ['dwd_citizen_ticket', '明细层', '公共服务', 2260, 26, '永久'],
+                ['dws_device_metric_1h', '汇总层', '设备', 860, 18, '永久'],
+                ['dws_video_event_5m', '汇总层', '街面', 420, 9, '永久'],
+                ['ads_light_energy_1d', '应用层', '照明', 96, 2, '永久'],
+                ['ads_park_turnover_1d', '应用层', '停车', 148, 3, '永久'],
+                ['ads_dq_report_1d', '应用层', '平台', 62, 1, '永久'],
+                ['dim_gov_item_std', '维度层', '公共服务', 12, 1, '永久']
+            ];
+            resetSeed(20260601);
+            const TABLES = TBL_SEED.map(function (r, i) {
+                return {
+                    name: r[0], layer: r[1], domain: r[2], rows: r[3] * 10000, size: r[4],
+                    life: r[5], replica: i % 3 === 0 ? 3 : 2,
+                    score: sri(76, 99), updated: Date.now() - sri(1, 60) * HOUR,
+                    owner: srp(['数据平台组', '水务业务组', '环卫业务组', '数字城管组', '停车业务组']),
+                    archived: ST.archived.indexOf(r[0]) > -1
+                };
+            });
+            function tblByName(n) { return TABLES.filter(t => t.name === n)[0] || null; }
+
+            /* ==========================================================================
+               5. 数据服务：接口目录 + 场景订阅
+               ========================================================================== */
+            const API_SEED = [
+                ['AP-01', '/api/v1/case/realtime', '实时查询', '城管', '综合指挥、决策分析', 3],
+                ['AP-02', '/api/v1/device/metric', '时序查询', '设备', '智慧排水、智慧照明、智慧市政', 3],
+                ['AP-03', '/api/v1/video/event', '事件订阅', '街面', '综合指挥、决策分析', 2],
+                ['AP-04', '/api/v1/env/track', '轨迹回放', '环卫', '智慧环卫', 2],
+                ['AP-05', '/api/v1/park/occupancy', '批量查询', '停车', '智慧停车、公共服务', 1],
+                ['AP-06', '/api/v1/energy/day', '指标推送', '照明', '决策分析', 1],
+                ['AP-07', '/api/v1/gov/item', '目录查询', '公共服务', '公共服务、客户端', 2],
+                ['AP-08', '/api/v1/bridge/deform', '阈值告警', '市政', '综合指挥', 3],
+                ['AP-09', '/api/v1/dq/report', '质量报告', '平台', '平台架构组', 1],
+                ['AP-10', '/api/v1/weather/alert', '共享交换', '平台', '智慧排水、综合指挥', 2]
+            ];
+            resetSeed(20260610);
+            const APIS = API_SEED.map(function (r) {
+                const ok = 99 + srnd();
+                return {
+                    id: r[0], path: r[1], type: r[2], domain: r[3], subs: r[4], level: r[5],
+                    qps: sri(6, 620), p99: sri(28, 460), rate: Number(ok.toFixed(2)),
+                    today: sri(20, 980) * 1000,
+                    owner: srp(['数据平台组', '算法组', '公共服务组']),
+                    status: ok < 99.2 ? '延迟' : '正常'
+                };
+            });
+            function apiById(id) { return APIS.filter(a => a.id === id)[0] || null; }
+
+            const SUB_SEED = [
+                ['SB-01', 'digital-city-management.html', '案件实时流', '实时'],
+                ['SB-02', 'central-command.html', '多源事件融合', '1 分钟'],
+                ['SB-03', 'decision-analysis.html', '六域指标日报', '每日 07:00'],
+                ['SB-04', 'smart-environment.html', '车辆作业轨迹', '5 分钟'],
+                ['SB-05', 'smart-municipal.html', '桥隧形变指标', '10 分钟'],
+                ['SB-06', 'smart-drainage.html', '管网压力与积水预警', '15 秒'],
+                ['SB-07', 'smart-lighting.html', '单灯状态与能耗', '1 分钟'],
+                ['SB-08', 'smart-parking.html', '泊位占用与周转', '1 分钟'],
+                ['SB-09', 'public-service.html', '市民上报办件数据', '实时'],
+                ['SB-10', 'equipment-data.html', '设备台账与物模型', '每小时'],
+                ['SB-11', 'ops-center.html', '设备与链路健康指标', '1 分钟']
+            ];
+            resetSeed(20260618);
+            const SUBS = SUB_SEED.map(function (r) {
+                return {
+                    id: r[0], page: r[1], product: r[2], freq: r[3],
+                    last: Date.now() - sri(1, 220) * MIN, rows: sri(120, 9800) * 100,
+                    status: srnd() > 0.88 ? '延迟' : '正常',
+                    label: (window.ArchLink && ArchLink.labelOf(r[1])) || r[1]
+                };
+            });
+            function subById(id) { return SUBS.filter(s => s.id === id)[0] || null; }
+
+            /* 业务域数据资产（点击进入场景页） */
+            const DP_DOMAINS = [
+                { name: '城管', icon: '🏠', page: 'digital-city-management.html', tables: 6, size: 170 },
+                { name: '街面', icon: '🚦', page: 'smart-street.html', tables: 4, size: 127 },
+                { name: '环卫', icon: '🗑️', page: 'smart-environment.html', tables: 5, size: 374 },
+                { name: '市政', icon: '🏗️', page: 'smart-municipal.html', tables: 4, size: 96 },
+                { name: '排水', icon: '💧', page: 'smart-drainage.html', tables: 5, size: 210 },
+                { name: '照明', icon: '💡', page: 'smart-lighting.html', tables: 4, size: 88 },
+                { name: '停车', icon: '🅿️', page: 'smart-parking.html', tables: 3, size: 42 },
+                { name: '公共服务', icon: '🏛️', page: 'public-service.html', tables: 4, size: 33 }
+            ];
+            resetSeed(20260626);
+            DP_DOMAINS.forEach(function (d) {
+                d.cover = sri(72, 99);
+                d.rows = sri(1200, 26000) * 10000;
+                d.apis = sri(2, 6);
+                d.fresh = sri(1, 40);
+            });
+
+            /* ==========================================================================
+               6. 实时活动流
+               ========================================================================== */
+            const LOG_TPL = [
+                ['ok', '通道 {ch} 完成批次写入，{n} 条落入 {t}'],
+                ['info', '作业 {j} 水位推进，延迟 {ms}ms'],
+                ['info', '规则 {r} 命中 {n} 条，已自动拦截'],
+                ['warn', '通道 {ch} 心跳超时，已切换备用链路'],
+                ['ok', '接口 {a} 调用成功，P99 {ms}ms'],
+                ['info', '订阅 {s} 推送完成，{n} 条已送达场景页'],
+                ['alarm', '作业 {j}  checkpoint 失败，触发第 {k} 次重试']
+            ];
+            let logSeq = 0;
+            function logLine() {
+                const t = LOG_TPL[logSeq % LOG_TPL.length];
+                logSeq++;
+                const ch = chanList()[logSeq % CHANNELS.length];
+                const jb = JOBS[logSeq % JOBS.length];
+                const rl = RULES[logSeq % RULES.length];
+                const ap = APIS[logSeq % APIS.length];
+                const sb = SUBS[logSeq % SUBS.length];
+                const txt = t[1]
+                    .replace('{ch}', ch.name).replace('{t}', ch.table)
+                    .replace('{j}', jb.name).replace('{r}', rl.name)
+                    .replace('{a}', ap.path).replace('{s}', sb.label)
+                    .replace('{n}', SC.num(200 + (logSeq * 137) % 8600))
+                    .replace('{ms}', String(20 + (logSeq * 53) % 380))
+                    .replace('{k}', String(1 + logSeq % 3));
+                return { lv: t[0], tx: txt, at: Date.now() };
+            }
+
+            /* ==========================================================================
+               7. 渲染调度：图表实例 / 活动流 / 顶部状态条
+               ========================================================================== */
+            const CH = {};
+            const LOG_TAG_TEXT = { info: 'INFO', ok: 'OK', warn: 'WARN', alarm: 'ALARM' };
+
+            function drawChart(key, sel, type, cfg) {
+                const canvas = q(sel);
+                if (!canvas || !SC.chart[type]) return null;
+                CH[key] = SC.chart[type](canvas, cfg);
+                return CH[key];
+            }
+
+            /** 汇总口径：所有 KPI 从这里取，保证状态条 / 总览 / 快照三处一致 */
+            function totals() {
+                const chans = chanList();
+                const on = chans.filter(c => c.status !== '停用');
+                const rows = on.reduce((a, c) => a + c.rows, 0);
+                const gb = on.reduce((a, c) => a + c.size, 0);
+                const used = STORES.reduce((a, s) => a + s.used, 0);
+                const cap = STORES.reduce((a, s) => a + s.cap, 0);
+                return {
+                    chans: chans.length, on: on.length, rows: rows, gb: Math.round(gb * 10) / 10,
+                    jobsRun: JOBS.filter(j => j.status === '运行中').length, jobs: JOBS.length,
+                    badJobs: JOBS.filter(j => j.status === '异常' || j.status === '积压').length,
+                    used: Math.round(used * 10) / 10, cap: Math.round(cap),
+                    water: Math.round(used / cap * 1000) / 10,
+                    tables: TABLES.length, archived: TABLES.filter(t => t.archived).length,
+                    apis: APIS.length, calls: APIS.reduce((a, x) => a + x.today, 0),
+                    subs: SUBS.length, quality: qualityScore()
+                };
+            }
+
+            /** 自适应容量文本：不足 1 TB 用 GB，否则用 TB */
+            function sizeText(gb) {
+                return gb >= 1024 ? SC.num(Math.round(gb / 1024 * 10) / 10) + ' TB' : SC.num(gb, 1) + ' GB';
+            }
+
+            let busRate = 0;
+            function renderLive() {
+                const t = totals();
+                const base = Math.max(50, Math.round(t.rows / 86400));
+                busRate = Math.round(SC.sim.walk(busRate || base, {
+                    min: Math.round(base * 0.72), max: Math.round(base * 1.45), volatility: base * 0.08
+                }));
+                const lagAvg = Math.round(JOBS.reduce((a, j) => a + j.lag, 0) / JOBS.length);
+                const wk = t.water >= 80 ? 'bad' : (t.water >= 70 ? 'warn' : 'ok');
+                put('#dp-live',
+                    '<span>数据总线 <b>' + SC.num(busRate) + '</b> 条/秒</span><i class="sep"></i>' +
+                    '<span>在线通道 <b>' + t.on + '/' + t.chans + '</b></span><i class="sep"></i>' +
+                    '<span>今日入湖 <b>' + SC.num(t.rows / 10000, 0) + '</b> 万行 · <b>' + sizeText(t.gb) + '</b></span><i class="sep"></i>' +
+                    '<span>整编延迟 <b>' + lagAvg + 's</b></span><i class="sep"></i>' +
+                    '<span>质量均分 <b>' + SC.pct(t.quality, 1) + '</b></span><i class="sep"></i>' +
+                    '<span>存储水位 <b style="color:' + (wk === 'bad' ? '#ff9ba1' : (wk === 'warn' ? '#ffd48a' : '#a8f0c6')) + '">' +
+                    SC.pct(t.water, 1) + '</b></span><i class="sep"></i>' +
+                    '<span>服务调用 <b>' + SC.num(t.calls / 10000, 1) + '</b> 万次/日</span>' +
+                    '<span class="mono">刷新 <b id="dp-updated">--</b></span>');
+                const clock = q('#dp-clock');
+                if (clock) clock.textContent = SC.stamp(new Date());
+                const up = q('#dp-updated');
+                if (up) up.textContent = SC.stamp(new Date()).slice(11);
+            }
+
+            function logHTML(e) {
+                return '<div class="li"><span class="t">' + SC.stamp(new Date(e.at)).slice(11) + '</span>' +
+                    '<span class="lv ' + e.lv + '">' + (LOG_TAG_TEXT[e.lv] || 'INFO') + '</span>' +
+                    '<span class="tx">' + SC.esc(e.tx) + '</span></div>';
+            }
+            function logPush(e) {
+                const box = q('#dp-log');
+                if (!box) return;
+                box.insertAdjacentHTML('afterbegin', logHTML(e));
+                while (box.children.length > 40) box.lastElementChild.remove();
+            }
+            function seedLog() {
+                const box = q('#dp-log');
+                if (!box) return;
+                box.innerHTML = '';
+                for (let k = 12; k >= 1; k--) {
+                    const e = logLine();
+                    e.at = Date.now() - k * 7000;
+                    logPush(e);
+                }
+            }
+            /* 供各处操作写入活动流 */
+            function note(lv, text) {
+                logPush({ lv: lv, tx: text, at: Date.now() });
+            }
+
+            /* ==========================================================================
+               8. 中台总览
+               ========================================================================== */
+            const PIPE = [
+                { mod: 'collect', icon: '📥', name: '采集接入', unit: '通道' },
+                { mod: 'process', icon: '🧹', name: '清洗整编', unit: '作业' },
+                { mod: 'storage', icon: '🗄', name: '存储治理', unit: '表资产' },
+                { mod: 'share', icon: '🔗', name: '数据服务', unit: '接口' }
+            ];
+
+            function domainHref(d) {
+                return (window.ArchLink && ArchLink.domainHref)
+                    ? ArchLink.domainHref(d.page, d.name, 'data-platform.html') : d.page;
+            }
+
+            function renderOverview() {
+                const t = totals();
+                put('#ov-kv', kvBox([
+                    ['采集通道', t.on + ' <small>/ ' + t.chans + '</small>'],
+                    ['今日入湖', SC.num(t.rows / 10000, 1) + ' 万行'],
+                    ['入湖容量', sizeText(t.gb)],
+                    ['整编作业', t.jobsRun + ' 运行中'],
+                    ['数据资产', t.tables + ' 张表'],
+                    ['存储水位', SC.pct(t.water, 1)],
+                    ['对外接口', t.apis + ' 个'],
+                    ['场景订阅', t.subs + ' 路']
+                ]));
+
+                const vals = {
+                    collect: [t.on + '/' + t.chans, '通道', KINDS.length + ' 种采集方式并行，日入湖 ' + SC.num(t.rows / 10000, 0) + ' 万条'],
+                    process: [JOBS.length, '作业', '清洗规则 ' + RULES.filter(r => r.on).length + '/' + RULES.length + ' 条生效，质量均分 ' + SC.pct(t.quality, 1)],
+                    storage: [t.tables, '表资产', '五层存储共用 ' + SC.num(t.used) + ' TB，已归档 ' + t.archived + ' 张'],
+                    share: [t.apis, '接口', '场景订阅 ' + t.subs + ' 路，今日调用 ' + SC.num(t.calls / 10000, 1) + ' 万次']
+                };
+                put('#dp-pipe', PIPE.map(function (p, i) {
+                    const v = vals[p.mod];
+                    return '<div class="pipe-node" data-go="' + p.mod + '" title="点击进入' + p.name + '">' +
+                        '<div class="ph">' + p.icon + ' ' + p.name + '</div>' +
+                        '<div class="pv">' + v[0] + '<small style="font-size:.4em;font-weight:600;color:#6b7689"> ' + v[1] + '</small></div>' +
+                        '<div class="pn">' + SC.esc(v[2]) + '</div>' +
+                        (i < PIPE.length - 1 ? '<span class="arrow">➔</span>' : '') + '</div>';
+                }).join(''));
+
+                /* 入湖与整编吞吐（近 24 小时） */
+                const labels = hourLabels(24);
+                const series = [
+                    { name: '入湖量 GB', color: ACCENT, data: seriesFor('dp-flow-gb', 24, t.gb / 24, t.gb / 24 * 0.3) },
+                    { name: '整编产出 万条', color: GREEN, dash: [6, 4], data: seriesFor('dp-flow-out', 24, t.rows / 24 / 10000, t.rows / 24 / 10000 * 0.25) }
+                ];
+                drawChart('flow', '#c-dp-flow', 'line', { labels: labels, series: series, unit: '', zeroBased: true });
+                SC.chart.legend(q('#lg-dp-flow'), series.map(function (s) {
+                    return { name: s.name, color: s.color, value: SC.num(s.data.reduce((a, v) => a + v, 0), 0) };
+                }), function (i, on) {
+                    series[i].visible = on;
+                    if (CH.flow) CH.flow.update({ series: series });
+                });
+
+                /* 各业务域数据量 */
+                drawChart('dom', '#c-dp-domain', 'bar', {
+                    labels: DP_DOMAINS.map(d => d.name), unit: 'TB',
+                    series: [{ name: '数据量', color: ACCENT_2, data: DP_DOMAINS.map(d => d.size) }]
+                });
+
+                put('#dp-domains', DP_DOMAINS.map(function (d) {
+                    return '<div class="dom-row" data-dom="' + SC.esc(d.name) + '" title="点击进入 ' +
+                        (ArchLinkLabel(d.page) || d.page) + '">' +
+                        '<div class="dn">' + d.icon + ' ' + SC.esc(d.name) + '</div>' +
+                        tag('覆盖 ' + d.cover + '%', d.cover >= 92 ? 'ok' : 'warn') +
+                        '<div class="dm">' + d.tables + ' 张表 · ' + d.size + ' TB · ' + d.apis + ' 个接口 · 最新数据 ' +
+                        d.fresh + ' 分钟前 · 行数 ' + SC.num(d.rows / 10000, 0) + ' 万</div></div>';
+                }).join(''));
+            }
+
+            function ArchLinkLabel(file) {
+                return (window.ArchLink && ArchLink.labelOf(file)) || '';
+            }
+
+            function openDomain(d) {
+                const tbls = TABLES.filter(function (t) {
+                    return t.domain === d.name || (d.name === '设备' && t.layer === '汇总层');
+                });
+                const apis = APIS.filter(a => a.domain === d.name || String(a.subs).indexOf(ArchLinkLabel(d.page)) > -1);
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['数据表', (tbls.length || d.tables) + ' 张'],
+                    ['数据量', d.size + ' TB'],
+                    ['行数', SC.num(d.rows / 10000, 0) + ' 万'],
+                    ['资产覆盖率', SC.pct(d.cover, 0)],
+                    ['数据新鲜度', d.fresh + ' 分钟前'],
+                    ['对外接口', apis.length + ' 个']
+                ]) + '</div>' +
+                    '<div class="sc-section-title">域内数据表</div>' +
+                    (tbls.length ? '<div class="data-table-container"><table class="data-table"><thead><tr>' +
+                        '<th>表名</th><th>分层</th><th>行数</th><th>占用</th><th>质量分</th></tr></thead><tbody>' +
+                        tbls.map(function (t) {
+                            return '<tr><td class="mono">' + SC.esc(t.name) + '</td><td>' + t.layer + '</td><td>' +
+                                SC.num(t.rows / 10000, 1) + ' 万</td><td>' + t.size + ' GB</td><td>' + t.score + '</td></tr>';
+                        }).join('') + '</tbody></table></div>'
+                        : '<div class="sc-hint">该域当前以汇总指标形式供给，明细见场景页数据看板。</div>') +
+                    '<div class="sc-section-title">联通场景</div>' +
+                    '<div class="sc-hint">点击「前往场景页」将携带 <span class="mono">?domain=' + SC.esc(d.name) +
+                    '</span>，场景页页头会回显该域的服务健康与等保达标率。</div>';
+                SC.modal.open({
+                    title: d.icon + ' ' + d.name + ' 域 · 数据资产明细', size: 'lg', body: body,
+                    footer: [
+                        { text: '前往场景页', kind: 'primary', onClick: function () { location.href = domainHref(d); } },
+                        { text: '查看存储治理', kind: 'ghost', onClick: function () { goModule('storage'); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            /* ==========================================================================
+               9. 数据采集：通道列表 / 巡检 / 接入 / 入湖趋势
+               ========================================================================== */
+            let colKind = '';
+            let colTrend = 'CH-01';
+
+            function chanIssues() {
+                return chanList().filter(function (c) {
+                    return c.status === '异常' || c.status === '延迟' || c.status === '积压' || c.retry > 10;
+                });
+            }
+
+            function chanRowHTML(c) {
+                const off = c.status === '停用';
+                return '<tr data-id="' + c.id + '" data-kind="' + SC.esc(c.kind) + '">' +
+                    '<td><b>' + SC.esc(c.name) + '</b><div class="sc-hint mono" style="font-size:.78em">→ ' + SC.esc(c.table) + '</div></td>' +
+                    '<td>' + SC.esc(c.kind) + '</td>' +
+                    '<td>' + SC.esc(c.source) + '</td>' +
+                    '<td>' + SC.esc(c.freq) + '</td>' +
+                    '<td>' + SC.num(c.rows / 10000, 1) + ' 万</td>' +
+                    '<td>' + SC.pct(c.rate, 2) + '</td>' +
+                    '<td>' + (c.lag >= 60 ? (Math.round(c.lag / 6) / 10) + ' 分' : c.lag + ' 秒') + '</td>' +
+                    '<td>' + tag(c.status, TAG[c.status] || 'info') + '</td>' +
+                    '<td><button class="sc-btn sm ' + (off ? 'primary' : 'ghost') + '" data-act="toggle" data-id="' + c.id + '">' +
+                    (off ? '启用' : '停用') + '</button></td></tr>';
+            }
+
+            function renderCollect() {
+                const list = chanList();
+                const on = list.filter(c => c.status !== '停用');
+                put('#col-kv', kvBox([
+                    ['通道总数', list.length],
+                    ['在线运行', on.length],
+                    ['今日入湖', SC.num(on.reduce((a, c) => a + c.rows, 0) / 10000, 1) + ' 万行'],
+                    ['平均成功率', SC.pct(on.reduce((a, c) => a + c.rate, 0) / (on.length || 1), 2)],
+                    ['最大时延', Math.max.apply(null, on.map(c => c.lag).concat([0])) + ' 秒'],
+                    ['累计巡检', ST.checks ? ST.checks + ' 次' : '尚未巡检']
+                ]));
+
+                const counts = {};
+                list.forEach(function (c) { counts[c.kind] = (counts[c.kind] || 0) + 1; });
+                put('#col-chips', '<span class="sc-chip' + (colKind === '' ? ' active' : '') + '" data-kind="">全部 ' + list.length + '</span>' +
+                    KINDS.map(function (k) {
+                        return '<span class="sc-chip' + (colKind === k ? ' active' : '') + '" data-kind="' + SC.esc(k) + '">' +
+                            SC.esc(k) + ' ' + (counts[k] || 0) + '</span>';
+                    }).join(''));
+
+                q('#col-table tbody').innerHTML = list.map(chanRowHTML).join('');
+                const ctrl = SC.table.enhance(q('#col-table'), { pageSize: 8, search: '#col-search', keyAttr: 'id' });
+                ctrl.setFilter(function (r) { return !colKind || r.tr.dataset.kind === colKind; });
+
+                const issues = chanIssues();
+                put('#col-issues', issues.length ? issues.map(function (c) {
+                    return '<div class="attn-item' + (c.status === '异常' ? ' bad' : '') + '" data-id="' + c.id + '" title="点击查看通道详情">' +
+                        '<div class="ax"><b>' + SC.esc(c.name) + '</b>' +
+                        '<div class="sc-hint">' + SC.esc(c.kind) + ' · 时延 ' + c.lag + 's · 重试 ' + c.retry + ' 次 · ' + SC.esc(c.owner) + '</div></div>' +
+                        '<span class="sc-tag ' + (TAG[c.status] || 'warn') + '">' + SC.esc(c.status === '正常' ? '频繁重试' : c.status) + '</span></div>';
+                }).join('') : '<div class="sc-hint">✅ 全部通道巡检通过，无断流与积压。</div>');
+                qa('#col-issues .attn-item').forEach(function (n) {
+                    n.addEventListener('click', function () { openChannel(n.dataset.id); });
+                });
+
+                const kinds = KINDS.filter(k => counts[k]);
+                drawChart('kind', '#c-col-kind', 'pie', {
+                    labels: kinds, data: kinds.map(k => counts[k]), centerTop: list.length, centerBottom: '采集通道',
+                    colors: kinds.map(function (k, i) { return SC.chartPalette[i % SC.chartPalette.length]; })
+                });
+
+                renderChanTrend();
+            }
+
+            function renderChanTrend() {
+                const ch = chanById(colTrend) || chanList()[0];
+                if (!ch) return;
+                colTrend = ch.id;
+                put('#col-trend-name', ch.name + ' · ' + ch.kind + ' · 目标表 ' + ch.table +
+                    ' · 当日成功率 ' + SC.pct(ch.rate, 2) + ' · 重试 ' + ch.retry + ' 次');
+                const labels = hourLabels(24);
+                const rows = seriesFor(ch.id + '-rows', 24, ch.rows / 24 / 10000, ch.rows / 24 / 10000 * 0.35);
+                const fails = rows.map(function (v, i) {
+                    return Math.max(0, Math.round(v * (100 - ch.rate) * 12 * (0.6 + ((i % 5) / 10))) / 100);
+                });
+                drawChart('trend', '#c-col-trend', 'line', {
+                    labels: labels, unit: '', zeroBased: true,
+                    series: [
+                        { name: '入湖量 万行', color: ACCENT, data: rows },
+                        { name: '失败行数', color: RED, fill: false, dash: [5, 4], data: fails }
+                    ]
+                });
+                SC.chart.legend(q('#lg-col-trend'), [
+                    { name: '入湖量 万行', color: ACCENT, value: SC.num(rows.reduce((a, v) => a + v, 0), 1) },
+                    { name: '失败行数', color: RED, value: SC.num(fails.reduce((a, v) => a + v, 0), 1) }
+                ]);
+            }
+
+            /* 巡检：检查连通性、超时与权限，结果落存运行态 */
+            function checkChannels() {
+                const found = [];
+                const list = chanList();
+                list.forEach(function (c) {
+                    if (c.status === '停用') return;
+                    let fix = null;
+                    if (c.lag > 380) fix = { lag: 45, status: '延迟' };
+                    if (c.retry > 10) fix = { retry: Math.max(0, c.retry - 12) };
+                    if (fix) { patchChan(c.id, fix); found.push(c); }
+                });
+                ST.checks++;
+                ST.lastCheck = Date.now();
+                saveST();
+                renderCollect();
+                renderLive();
+                note(found.length ? 'warn' : 'ok', '通道巡检完成，共 ' + list.length + ' 条，发现 ' + found.length + ' 条需优化');
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['巡检通道', list.length + ' 条'],
+                    ['在线', list.filter(c => c.status !== '停用').length + ' 条'],
+                    ['发现问题', found.length + ' 条'],
+                    ['耗时', (1.2 + found.length * 0.3).toFixed(1) + ' 秒']
+                ]) + '</div>' +
+                    '<div class="sc-section-title">巡检项</div>' +
+                    '<div class="sc-hint">连通性探活 · 心跳超时 · 认证凭证有效期 · 目标表写入权限 · 积压水位</div>' +
+                    (found.length
+                        ? '<div class="attn-list" style="margin-top:12px">' + found.map(function (c) {
+                            return '<div class="attn-item' + (c.status === '异常' ? ' bad' : '') + '"><div class="ax"><b>' +
+                                SC.esc(c.name) + '</b><div class="sc-hint">' +
+                                (c.lag > 380 ? '积压水位超限，已重置消费位点；' : '') +
+                                (c.retry > 10 ? '重试次数偏高，已切换备用链路；' : '') + '</div></div>' +
+                                '<span class="sc-tag ok">已优化</span></div>';
+                        }).join('') + '</div>'
+                        : '<div class="sc-hint" style="margin-top:12px">✅ 本次巡检未发现异常通道。</div>');
+                SC.modal.open({
+                    title: '🩺 采集通道巡检报告', size: 'md', body: body,
+                    footer: [{ text: '知道了', kind: 'primary' }]
+                });
+            }
+
+            /* 新增接入：落入 ST.chans，与种子通道同构 */
+            function addChannel() {
+                SC.modal.form({
+                    title: '➕ 新增数据采集通道',
+                    submitText: '创建并上线',
+                    fields: [
+                        { name: 'name', label: '通道名称', required: true, placeholder: '如：公交车辆 CAN 总线采集' },
+                        { name: 'kind', label: '采集方式', type: 'select', options: KINDS, col: 1 },
+                        { name: 'source', label: '源系统', required: true, placeholder: '如：公交调度平台', col: 1 },
+                        { name: 'freq', label: '采集频率', placeholder: '如：30 秒 / 每日 06:00', value: '1 分钟' },
+                        { name: 'format', label: '数据格式', type: 'select', options: ['JSON', 'MQTT', 'Protobuf', 'Avro', 'CSV', 'Excel', 'XML'], col: 1 },
+                        {
+                            name: 'table', label: '目标表', required: true, placeholder: 'ods_xxx_rt', col: 1,
+                            validate: function (v) { return /^(ods|dwd|dws|ads|dim)_[a-z0-9_]+$/.test(v) ? '' : '表名需以 ods_/dwd_/dws_/ads_/dim_ 开头，仅含小写字母数字下划线'; }
+                        },
+                        { name: 'owner', label: '负责人', placeholder: '如：数据平台组', col: 1 },
+                        { name: 'fields', label: '字段数', type: 'number', min: 2, max: 120, value: 16, col: 1 },
+                        { name: 'note', label: '接入说明', type: 'textarea', placeholder: '源端改造、权限、回滚方式等' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const id = 'CH-X' + (ST.chans.length + 1);
+                    resetSeed(hashSeed(id + v.name));
+                    const rows = sri(8, 620) * 10000;
+                    const rate = Number((99 + srnd()).toFixed(2));
+                    const lag = sri(3, 60);
+                    ST.chans.push({
+                        id: id, name: v.name, kind: v.kind, source: v.source, freq: v.freq, format: v.format,
+                        table: v.table, owner: v.owner || '数据平台组', fields: v.fields || 16,
+                        rows: rows, rate: rate, lag: lag,
+                        size: Math.round(rows * 1.4 / 100000) / 10, retry: 0, since: Date.now(),
+                        status: rate < 99.3 ? '延迟' : '正常'
+                    });
+                    saveST();
+                    colTrend = id;
+                    renderCollect();
+                    renderLive();
+                    renderOverview();
+                    note('ok', '新增采集通道「' + v.name + '」已上线，目标表 ' + v.table);
+                    SC.toast('通道已创建并上线：' + v.name, { type: 'success' });
+                });
+            }
+
+            function exportChannels() {
+                const rows = [['通道编号', '通道名称', '采集方式', '源系统', '频率', '格式', '目标表', '日增量行数', '成功率%', '时延s', '状态', '负责人']];
+                chanList().forEach(function (c) {
+                    rows.push([c.id, c.name, c.kind, c.source, c.freq, c.format, c.table, c.rows, c.rate, c.lag, c.status, c.owner]);
+                });
+                SC.csv.download('采集通道清单_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + (rows.length - 1) + ' 条通道配置', { type: 'success' });
+            }
+
+            function openChannel(id) {
+                const ch = chanById(id);
+                if (!ch) return;
+                colTrend = id;
+                const fm = fieldMap(ch);
+                function bodyHTML() {
+                    return '<div class="sc-kv">' + kvBox([
+                        ['采集方式', SC.esc(ch.kind)],
+                        ['源系统', SC.esc(ch.source)],
+                        ['频率', SC.esc(ch.freq)],
+                        ['格式', SC.esc(ch.format)],
+                        ['日增量', SC.num(ch.rows / 10000, 1) + ' 万行'],
+                        ['容量', sizeText(ch.size)],
+                        ['成功率', SC.pct(ch.rate, 2)],
+                        ['时延', ch.lag + ' 秒'],
+                        ['重试次数', ch.retry + ' 次'],
+                        ['已运行', Math.round((Date.now() - ch.since) / DAY) + ' 天'],
+                        ['负责人', SC.esc(ch.owner)],
+                        ['状态', tag(ch.status, TAG[ch.status] || 'info')]
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">字段映射（' + ch.fields + ' 个字段，展示核心 ' + fm.length + ' 个）</div>' +
+                        '<div class="data-table-container"><table class="data-table"><thead><tr>' +
+                        '<th>源端字段</th><th>类型</th><th>中台标准字段</th><th>加工规则</th></tr></thead><tbody>' +
+                        fm.map(function (f, i) {
+                            return '<tr><td class="mono">' + SC.esc(f.src) + '</td><td>' + f.type + '</td>' +
+                                '<td class="mono">' + SC.esc(f.src === 'raw_payload' ? 'payload_enc' : (i === 0 ? ch.table.split('_')[1] + '_id' : f.src)) + '</td>' +
+                                '<td>' + SC.esc(f.rule) + '</td></tr>';
+                        }).join('') + '</tbody></table></div>' +
+                        '<div class="sc-section-title">接入配置</div>' +
+                        '<pre class="sc-code">' + SC.esc(
+                            'channel: ' + ch.id + '\n' +
+                            'source:  ' + {
+                                'IoT 消息': 'mqtt://iot-gateway.city.internal/' + ch.table,
+                                '数据库 CDC': 'debezium://' + ch.source.replace(/\s/g, '-') + '/' + ch.table,
+                                '文件交换': 'sftp://exchange.city.internal/daily/' + ch.table,
+                                'API 拉取': 'https://open.city.gov/api/v1/' + ch.table.replace('ods_', '') + '?token=***',
+                                '视频 AI': 'kafka://edge-ai.city.internal/video-event',
+                                '移动端上报': 'https://gw.city.internal/collect/app',
+                                '共享交换': 'https://share.city.gov/pull/' + ch.table
+                            }[ch.kind] + '\n' +
+                            'schedule: ' + ch.freq + '   format: ' + ch.format + '   parallel: ' + (1 + ch.fields % 8) + '\n' +
+                            'sink:     ' + ch.table + '   retry: ' + ch.retry + '/24h   watermark: 5m') + '</pre>' +
+                        '<div class="sc-hint" style="margin-top:10px">入湖趋势已联动到页面底部图卡，关闭弹窗即可查看。</div>';
+                }
+                function paint(api) {
+                    api.body.innerHTML = bodyHTML();
+                    api.footer.innerHTML = '';
+                    const cfgs = [
+                        { text: '⚡ 立即试采', kind: 'primary', run: function () { trialRun(ch.id, api); } },
+                        ch.status === '停用'
+                            ? { text: '▶ 启用通道', kind: 'ghost', run: function () { setChanStatus(ch.id, '正常'); } }
+                            : { text: '⏸ 停用通道', kind: 'danger', run: function () { setChanStatus(ch.id, '停用'); } },
+                        { text: '查看入湖趋势', kind: 'ghost', closeIt: true, run: function () { renderChanTrend(); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ];
+                    cfgs.forEach(function (cfg) {
+                        const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                        btn.addEventListener('click', function () {
+                            if (cfg.run) cfg.run();
+                            if (cfg.closeIt) { api.close(); return; }
+                            if (!cfg.run) { api.close(); return; }
+                            const fresh = chanById(ch.id);
+                            if (fresh) Object.assign(ch, fresh);
+                            paint(api);
+                            renderCollect();
+                        });
+                        api.footer.appendChild(btn);
+                    });
+                }
+                const api = SC.modal.open({ title: ch.id + ' · ' + ch.name, size: 'lg', body: bodyHTML(), footer: [{ text: '关闭', kind: 'ghost' }] });
+                paint(api);
+            }
+
+            function setChanStatus(id, status) {
+                const inSeed = CHANNELS.filter(c => c.id === id).length > 0;
+                if (inSeed) {
+                    if (status === '停用') ST.off[id] = 1; else delete ST.off[id];
+                    if (ST.live[id]) delete ST.live[id].status;
+                } else {
+                    const e = ST.chans.filter(x => x.id === id)[0];
+                    if (e) e.status = status;
+                }
+                saveST();
+                renderCollect();
+                renderLive();
+                const ch = chanById(id);
+                note(status === '停用' ? 'warn' : 'ok', '通道「' + (ch ? ch.name : id) + '」已' + (status === '停用' ? '停用，下游作业进入空转等待' : '恢复采集'));
+                SC.toast(status === '停用' ? '通道已停用' : '通道已启用', { type: status === '停用' ? 'warn' : 'success' });
+            }
+
+            function trialRun(id, api) {
+                const ch = chanById(id);
+                if (!ch) return;
+                if (ch.status === '停用') {
+                    SC.toast('通道已停用，请先启用后再试采', { type: 'error' });
+                    return;
+                }
+                const n = 200 + Math.round(srnd() * 1800);
+                const lag = Math.max(2, Math.round(ch.lag * 0.4 + srnd() * 30));
+                patchChan(id, { lag: lag, rate: Math.min(100, Number((ch.rate + 0.06).toFixed(2))), lastTrial: n });
+                note('ok', '通道 ' + ch.name + ' 试采完成，抽取 ' + n + ' 条样本写入沙箱表 ' + ch.table + '_trial');
+                SC.toast('试采完成：抽取 ' + n + ' 条样本，时延降至 ' + lag + ' 秒', { type: 'success', duration: 3400 });
+                void api;
+            }
+
+            function exportAssets() {
+                const rows = [['资产类型', '编号/名称', '明细', '业务口径', '体量', '状态', '负责人']];
+                chanList().forEach(function (c) {
+                    rows.push(['采集通道', c.id + ' ' + c.name, c.kind + ' ← ' + c.source, c.table, c.rows + ' 行/日', c.status, c.owner]);
+                });
+                TABLES.forEach(function (t) {
+                    rows.push(['数据表', t.name, t.layer, t.domain, t.size + ' GB', t.archived ? '已归档' : '在线', t.owner]);
+                });
+                APIS.forEach(function (a) {
+                    rows.push(['数据接口', a.id + ' ' + a.path, a.type, a.domain, a.qps + ' QPS', a.status, a.owner]);
+                });
+                SC.csv.download('数据中台资产清单_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + (rows.length - 1) + ' 条资产记录', { type: 'success' });
+            }
+
+            function snapshotReport() {
+                const t = totals();
+                const layers = ['贴源层', '明细层', '汇总层', '应用层', '维度层'];
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['快照时间', SC.stamp(new Date())],
+                    ['采集通道', t.on + '/' + t.chans],
+                    ['整编作业', t.jobsRun + ' 运行中'],
+                    ['数据资产', t.tables + ' 张表'],
+                    ['存储占用', SC.num(t.used) + ' TB'],
+                    ['质量均分', SC.pct(t.quality, 1)],
+                    ['对外接口', t.apis + ' 个'],
+                    ['场景订阅', t.subs + ' 路']
+                ]) + '</div>' +
+                    '<div class="sc-section-title">分层资产分布</div>' +
+                    layers.map(function (l) {
+                        const n = TABLES.filter(x => x.layer === l).length;
+                        const sz = TABLES.filter(x => x.layer === l).reduce((a, x) => a + x.size, 0);
+                        return '<div class="water-row"><div class="wl"><b>' + l + '</b><span>' + n + ' 张表</span></div>' +
+                            '<div><div class="sc-bar-mini"><i style="width:' + Math.min(100, sz / 6) + '%;background:' + ACCENT + '"></i></div></div>' +
+                            '<div class="wv">' + sz + ' GB</div></div>';
+                    }).join('') +
+                    '<div class="sc-section-title">数据质量六维</div>' +
+                    QUALITY.map(function (x) {
+                        return '<div class="water-row"><div class="wl"><b>' + x.name + '</b></div>' +
+                            '<div><div class="sc-bar-mini"><i style="width:' + x.value + '%;background:' +
+                            (x.value >= 92 ? GREEN : x.value >= 85 ? AMBER : RED) + '"></i></div></div>' +
+                            '<div class="wv">' + x.value + ' / 100</div></div>';
+                    }).join('') +
+                    '<div class="sc-hint" style="margin-top:10px">快照仅写入当前页面，导出可归档到运维台账。</div>';
+                SC.modal.open({
+                    title: '📸 数据资产快照 · ' + SC.today(), size: 'lg', body: body,
+                    footer: [
+                        { text: '⬇ 导出快照 CSV', kind: 'primary', onClick: exportAssets },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            /* ==========================================================================
+               10. 清洗整编：作业 / 规则 / 质量 / 血缘
+               ========================================================================== */
+            TAG['暂停'] = 'off';
+            let procSel = 'JB-01';
+
+            function setJobStatus(id, status) {
+                const j = jobById(id);
+                if (!j) return;
+                j.status = status;
+                j.updated = Date.now();
+                ST.jobs[id] = status;
+                saveST();
+            }
+
+            function jobRowHTML(j) {
+                const paused = j.status === '暂停';
+                return '<tr data-id="' + j.id + '">' +
+                    '<td><b>' + SC.esc(j.name) + '</b><div class="sc-hint mono" style="font-size:.78em">' + j.id + ' · ' + SC.esc(j.owner) + '</div></td>' +
+                    '<td>' + SC.esc(j.mode) + '</td>' +
+                    '<td class="mono" style="font-size:.78em;line-height:1.5">' + SC.esc(j.input) + '<br>↓ ' + SC.esc(j.output) + '</td>' +
+                    '<td>' + j.parallel + '</td>' +
+                    '<td>' + SC.num(j.thr) + '</td>' +
+                    '<td>' + j.lag + ' 秒</td>' +
+                    '<td>' + j.score + '</td>' +
+                    '<td>' + tag(j.status, TAG[j.status] || 'info') + '</td>' +
+                    '<td class="sc-inline"><button class="sc-btn sm ghost" data-act="rerun" data-id="' + j.id + '">重跑</button>' +
+                    '<button class="sc-btn sm ' + (paused ? 'primary' : 'danger') + '" data-act="pause" data-id="' + j.id + '">' +
+                    (paused ? '启动' : '暂停') + '</button></td></tr>';
+            }
+
+            function renderProcess() {
+                const run = JOBS.filter(j => j.status === '运行中');
+                const bad = JOBS.filter(j => j.status === '异常' || j.status === '积压' || j.status === '延迟');
+                put('#proc-kv', kvBox([
+                    ['整编作业', JOBS.length + ' 个'],
+                    ['运行中', run.length + ' 个'],
+                    ['异常与积压', bad.length + ' 个'],
+                    ['平均延迟', Math.round(JOBS.reduce((a, j) => a + j.lag, 0) / JOBS.length) + ' 秒'],
+                    ['生效规则', RULES.filter(r => r.on).length + '/' + RULES.length],
+                    ['质量均分', SC.pct(qualityScore(), 1)]
+                ]));
+
+                q('#job-table tbody').innerHTML = JOBS.map(jobRowHTML).join('');
+                SC.table.enhance(q('#job-table'), { pageSize: 8, search: false, keyAttr: 'id' });
+                renderRules();
+
+                drawChart('qual', '#c-quality', 'bar', {
+                    labels: QUALITY.map(x => x.name), unit: '',
+                    series: [{ name: '得分', color: ACCENT_2, data: QUALITY.map(x => x.value) }], yMax: 100
+                });
+                renderLineage();
+            }
+
+            function renderRules() {
+                put('#rule-list', RULES.map(function (r) {
+                    return '<div class="rule-row"><div class="rr-n"><b>' + SC.esc(r.name) + '</b><span>' + SC.esc(r.desc) + '</span></div>' +
+                        '<div class="rr-v">命中 ' + SC.num(r.hit) + ' 条<br>' + r.pct + '% 入库量</div>' +
+                        '<div class="sc-switch' + (r.on ? ' on' : '') + '" data-rule="' + r.id + '" title="点击即时生效"><i></i>' +
+                        '<span>' + (r.on ? '生效' : '关闭') + '</span></div></div>';
+                }).join(''));
+                qa('#rule-list .sc-switch').forEach(function (n) {
+                    n.addEventListener('click', function () { toggleRule(n.dataset.rule); });
+                });
+            }
+
+            function toggleRule(id) {
+                const r = RULES.filter(x => x.id === id)[0];
+                if (!r) return;
+                r.on = !r.on;
+                ST.rules[id] = r.on ? 1 : 0;
+                saveST();
+                renderRules();
+                renderProcessKv();
+                renderLive();
+                if (CH.qual) CH.qual.update({});
+                note(r.on ? 'ok' : 'warn', '清洗规则「' + r.name + '」已' + (r.on ? '生效，质量均分回升' : '关闭，质量均分下降'));
+                SC.toast('规则已' + (r.on ? '开启' : '关闭') + '，质量均分 ' + SC.pct(qualityScore(), 1),
+                    { type: r.on ? 'success' : 'warn' });
+            }
+
+            function renderProcessKv() {
+                const run = JOBS.filter(j => j.status === '运行中');
+                const bad = JOBS.filter(j => j.status === '异常' || j.status === '积压' || j.status === '延迟');
+                put('#proc-kv', kvBox([
+                    ['整编作业', JOBS.length + ' 个'],
+                    ['运行中', run.length + ' 个'],
+                    ['异常与积压', bad.length + ' 个'],
+                    ['平均延迟', Math.round(JOBS.reduce((a, j) => a + j.lag, 0) / JOBS.length) + ' 秒'],
+                    ['生效规则', RULES.filter(r => r.on).length + '/' + RULES.length],
+                    ['质量均分', SC.pct(qualityScore(), 1)]
+                ]));
+            }
+
+            function renderLineage() {
+                const j = jobById(procSel) || JOBS[0];
+                if (!j) return;
+                procSel = j.id;
+                const upChans = chanList().filter(c => c.table === j.input);
+                const downs = SUBS.filter(function (s) {
+                    return APIS.some(function (a) {
+                        return a.domain === j.output.split('_')[1] || String(a.subs).indexOf(s.label) > -1;
+                    }) && s.product.toLowerCase().indexOf(j.name.slice(0, 2)) > -1;
+                });
+                const scenes = (downs.length ? downs : SUBS.slice(0, 2));
+                const rulesOn = RULES.filter(r => r.on);
+                put('#job-lineage',
+                    '<div class="lineage">' +
+                    (upChans.length ? upChans.map(c => '<span class="ln" data-chan="' + c.id + '" title="查看采集通道">📥 ' + SC.esc(c.name) + '</span>').join('')
+                        : '<span class="ln" data-table="' + SC.esc(j.input) + '" title="查看表资产">🗄 ' + SC.esc(j.input) + '</span>') +
+                    '<span class="lt">➔</span>' +
+                    '<span class="ln">🧹 ' + SC.esc(j.mode) + ' · ' + SC.esc(j.name) + '</span>' +
+                    '<span class="lt">➔</span>' +
+                    '<span class="ln" data-table="' + SC.esc(j.output) + '" title="查看表资产">🗄 ' + SC.esc(j.output) + '</span>' +
+                    '<span class="lt">➔</span>' +
+                    scenes.map(function (s) {
+                        return '<span class="ln" data-page="' + SC.esc(s.page) + '" title="打开场景页">' +
+                            (s.label ? '🖥 ' + SC.esc(s.label) : '🖥 ' + SC.esc(s.page)) + '</span>';
+                    }).join('') +
+                    '</div>' +
+                    '<div class="sc-hint" style="margin-top:12px">参与清洗规则 ' + rulesOn.length + ' 条：' +
+                    SC.esc(rulesOn.map(r => r.name).join('、') || '无') + '</div>' +
+                    '<div class="sc-kv" style="margin-top:12px">' + kvBox([
+                        ['并行度', j.parallel],
+                        ['吞吐', SC.num(j.thr) + ' 行/秒'],
+                        ['状态', tag(j.status, TAG[j.status] || 'info')],
+                        ['质量分', j.score]
+                    ]) + '</div>');
+                qa('#job-lineage .ln').forEach(function (n) {
+                    n.style.cursor = 'pointer';
+                    n.addEventListener('click', function () {
+                        if (n.dataset.chan) openChannel(n.dataset.chan);
+                        else if (n.dataset.table) openTable(n.dataset.table);
+                        else if (n.dataset.page) location.href = n.dataset.page + '?from=data-platform.html';
+                    });
+                });
+
+                const rnd = hashSeed(j.id + j.status);
+                const steps = [
+                    ['ok', '读取 checkpoint，恢复水位线 ' + (sri(10, 99) + rnd % 7)],
+                    ['info', '申请 ' + j.parallel + ' 个 slot，算子链实例化完成'],
+                    ['info', '上游 ' + j.input + ' 拉取 ' + SC.num(j.thr) + ' 行/秒'],
+                    [j.status === '异常' ? 'alarm' : 'ok', '清洗规则校验：' + (RULES.filter(r => r.on).length) + ' 条生效，拦截 ' + (rnd % 400) + ' 条'],
+                    [j.status === '积压' ? 'warn' : 'ok', '写入 ' + j.output + '，提交事务 ' + (rnd % 40 + 3) + ' 批次'],
+                    [j.status === '延迟' ? 'warn' : 'info', '端到端延迟 ' + j.lag + ' 秒，' + (j.lag > 120 ? '超出预期阈值' : '水位正常')],
+                    ['info', '下次调度：' + SC.stamp(new Date(Date.now() + 5 * MIN)).slice(11)]
+                ];
+                put('#job-log', steps.map(function (s, i) {
+                    const t = j.updated - (steps.length - i) * 47000;
+                    return '<div class="li"><span class="t">' + SC.stamp(new Date(t)).slice(11) + '</span>' +
+                        '<span class="lv ' + s[0] + '">' + s[0].toUpperCase() + '</span>' +
+                        '<span class="tx">' + SC.esc(s[1]) + '</span></div>';
+                }).join(''));
+            }
+
+            function runJob(id) {
+                const j = jobById(id);
+                if (!j) return;
+                setJobStatus(id, '运行中');
+                j.lag = Math.max(1, Math.round(j.lag * 0.3));
+                j.score = Math.min(99, j.score + 2);
+                note('ok', '作业「' + j.name + '」手动重跑完成，延迟降至 ' + j.lag + ' 秒，质量分 ' + j.score);
+                SC.toast('作业已重跑：' + j.name, { type: 'success' });
+            }
+
+            function rerunFailed() {
+                const bad = JOBS.filter(j => j.status === '异常' || j.status === '积压' || j.status === '延迟');
+                if (!bad.length) {
+                    SC.toast('当前没有需要重跑的作业', { type: 'info' });
+                    return;
+                }
+                SC.modal.confirm({
+                    title: '批量重跑失败作业',
+                    html: '<p>共 <b>' + bad.length + '</b> 个作业处于异常 / 积压 / 延迟状态：</p>' +
+                        '<p class="sc-hint" style="margin-top:6px">' + SC.esc(bad.map(j => j.name).join('、')) + '</p>' +
+                        '<p style="margin-top:8px">重跑会从最近 checkpoint 恢复，预计占用集群 <b>' + (bad.length * 3) + '</b> 个 slot。</p>',
+                    okText: '开始重跑'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    bad.forEach(function (j) {
+                        setJobStatus(j.id, '运行中');
+                        j.lag = Math.max(1, Math.round(j.lag * 0.35));
+                        j.score = Math.min(99, j.score + 1);
+                    });
+                    renderProcess();
+                    renderLive();
+                    note('ok', '批量重跑完成，' + bad.length + ' 个作业恢复运行');
+                    SC.toast('已重跑 ' + bad.length + ' 个作业', { type: 'success' });
+                });
+            }
+
+            function resetRules() {
+                SC.modal.confirm({
+                    title: '恢复默认清洗规则',
+                    html: '将清除本地保存的规则开关，回到出厂配置（仅「字符集与格式规整」默认关闭）。',
+                    okText: '恢复默认', danger: true
+                }).then(function (ok) {
+                    if (!ok) return;
+                    ST.rules = {};
+                    RULES.forEach(function (r, i) { r.on = RULE_SEED[i][3] === 1; });
+                    saveST();
+                    renderProcess();
+                    renderLive();
+                    note('warn', '清洗规则已恢复默认配置，质量均分 ' + SC.pct(qualityScore(), 1));
+                    SC.toast('规则已恢复默认', { type: 'success' });
+                });
+            }
+
+            function openJob(id) {
+                const j = jobById(id);
+                if (!j) return;
+                procSel = id;
+                const body = '<div class="sc-kv">' + kvBox([
+                    ['运行模式', SC.esc(j.mode)],
+                    ['并行度', j.parallel],
+                    ['吞吐', SC.num(j.thr) + ' 行/秒'],
+                    ['端到端延迟', j.lag + ' 秒'],
+                    ['质量分', j.score + ' / 100'],
+                    ['累计产出', SC.num(j.rows / 10000, 0) + ' 万行'],
+                    ['负责人', SC.esc(j.owner)],
+                    ['最近运行', ago(j.updated)],
+                    ['状态', tag(j.status, TAG[j.status] || 'info')]
+                ]) + '</div>' +
+                    '<div class="sc-section-title">算子链</div>' +
+                    '<div class="lineage">' +
+                    ['源表读取', '去重', '空值补全', '量纲归一', '字典映射', '脱敏', '维表关联', '聚合写回']
+                        .map(n => '<span class="ln">' + n + '</span>').join('<span class="lt">➔</span>') + '</div>' +
+                    '<div class="sc-section-title">上下游</div>' +
+                    '<div class="sc-hint mono">输入：' + SC.esc(j.input) + '<br>输出：' + SC.esc(j.output) + '</div>' +
+                    '<div class="sc-section-title">异常处置建议</div>' +
+                    (j.status === '运行中'
+                        ? '<div class="sc-hint">✅ 作业健康，无需处置。</div>'
+                        : '<div class="attn-list"><div class="attn-item' + (j.status === '异常' ? ' bad' : '') + '">' +
+                        '<div class="ax"><b>' + (j.status === '积压' ? '下游写入瓶颈' : j.status === '延迟' ? '水位线滞后' : 'checkpoint 失败') + '</b>' +
+                        '<div class="sc-hint">建议：' +
+                        (j.status === '积压' ? '扩容 sink 并行度并从 ' + j.parallel + ' 提升至 ' + (j.parallel * 2) :
+                            j.status === '延迟' ? '提高 checkpoint 间隔至 30s 并检查上游乱序' :
+                                '从最近 checkpoint 重跑，必要时关闭低优先级规则') + '</div></div>' +
+                        '<span class="sc-tag ' + (TAG[j.status] || 'warn') + '">' + SC.esc(j.status) + '</span></div></div>');
+                SC.modal.open({
+                    title: j.id + ' · ' + j.name, size: 'lg', body: body,
+                    footer: [
+                        {
+                            text: '▶ 重跑作业', kind: 'primary', onClick: function () {
+                                runJob(j.id); renderProcess(); renderLive();
+                                SC.toast('已触发重跑', { type: 'success' });
+                            }
+                        },
+                        {
+                            text: '查看血缘', kind: 'ghost', onClick: function () {
+                                renderLineage();
+                                SC.toast('血缘与运行日志已更新到页面', { type: 'info' });
+                            }
+                        },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            /* ==========================================================================
+               11. 存储治理：分层水位 / 表资产 / 归档
+               ========================================================================== */
+            /* 归档去向：热层（时序 / OLAP / 关系库）释放，对象存储冷存层承接 */
+            const LAYER_STORE = { '贴源层': 'tsdb', '明细层': 'tsdb', '汇总层': 'olap', '应用层': 'olap', '维度层': 'rdb' };
+            const LAYER_COLOR = { '贴源层': '#7b61ff', '明细层': '#4a3fd4', '汇总层': '#20bf6b', '应用层': '#f7b731', '维度层': '#00b4d8' };
+            const COLD_STORE = 'obj';
+
+            function arcDelta() {
+                const hot = {};
+                let cold = 0;
+                TABLES.forEach(function (t) {
+                    if (!t.archived) return;
+                    const k = LAYER_STORE[t.layer];
+                    hot[k] = (hot[k] || 0) + t.size;
+                    if (k !== COLD_STORE) cold += t.size;
+                });
+                return { hot: hot, cold: cold };
+            }
+            function storeLive() {
+                const a = arcDelta();
+                return STORES.map(function (s) {
+                    const deltaGB = s.key === COLD_STORE ? a.cold : -(a.hot[s.key] || 0);
+                    const used = Math.max(0, Math.round((s.used + deltaGB / 1024) * 100) / 100);
+                    return {
+                        key: s.key, name: s.name, use: s.use, cap: s.cap, used: used, delta: deltaGB,
+                        pct: Math.round(used / s.cap * 1000) / 10, owner: s.owner
+                    };
+                });
+            }
+
+            function tblRowHTML(t) {
+                return '<tr data-name="' + t.name + '" data-layer="' + t.layer + '">' +
+                    '<td class="mono"><b>' + SC.esc(t.name) + '</b><div class="sc-hint" style="font-size:.76em">' + SC.esc(t.owner) + '</div></td>' +
+                    '<td>' + SC.esc(t.layer) + '</td>' +
+                    '<td>' + SC.esc(t.domain) + '</td>' +
+                    '<td>' + SC.num(t.rows / 10000, 0) + ' 万</td>' +
+                    '<td>' + t.size + ' GB</td>' +
+                    '<td>' + t.replica + ' 副本</td>' +
+                    '<td>' + SC.esc(t.life) + '</td>' +
+                    '<td>' + t.score + '</td>' +
+                    '<td>' + ago(t.updated) + '</td>' +
+                    '<td>' + (t.archived
+                        ? '<span class="sc-tag off">已归档</span>'
+                        : '<button class="sc-btn sm ghost" data-act="arc" data-name="' + SC.esc(t.name) + '">归档</button>') + '</td></tr>';
+            }
+
+            function renderStorage() {
+                const live = storeLive();
+                const cap = live.reduce((a, s) => a + s.cap, 0);
+                const used = live.reduce((a, s) => a + s.used, 0);
+                const freed = TABLES.filter(t => t.archived).reduce((a, t) => a + t.size, 0);
+                const hi = live.filter(s => s.pct >= 80);
+                put('#sto-kv', kvBox([
+                    ['存储总量', SC.num(cap) + ' TB'],
+                    ['已用容量', SC.num(Math.round(used * 100) / 100) + ' TB'],
+                    ['整体水位', SC.pct(Math.round(used / cap * 1000) / 10, 1)],
+                    ['数据表', TABLES.length + ' 张'],
+                    ['已归档', TABLES.filter(t => t.archived).length + ' 张'],
+                    ['热层释放', SC.num(freed) + ' GB']
+                ]));
+
+                put('#sto-water', live.map(function (s) {
+                    const color = s.pct >= 85 ? RED : s.pct >= 70 ? AMBER : GREEN;
+                    const delta = s.delta ? '<span style="color:' + (s.delta < 0 ? GREEN : AMBER) + '">' +
+                        (s.delta < 0 ? '↓ 释放 ' : '↑ 接收 ') + SC.num(Math.abs(Math.round(s.delta))) + ' GB</span>' : '';
+                    return '<div class="water-row"><div class="wl"><b>' + SC.esc(s.name) + '</b>' +
+                        '<span>' + SC.esc(s.use) + '</span></div>' +
+                        '<div><div class="sc-bar-mini"><i style="width:' + Math.min(100, s.pct) + '%;background:' + color + '"></i></div></div>' +
+                        '<div class="wv">' + SC.num(s.used) + '/' + s.cap + ' TB<br>' + SC.pct(s.pct, 1) +
+                        (delta ? '<br>' + delta : '') + '</div></div>';
+                }).join('') +
+                    (hi.length ? '<div class="sc-hint" style="margin-top:10px">⚠️ ' + SC.esc(hi.map(s => s.name).join('、')) +
+                        ' 水位超过 80%，已触发扩容评审。</div>' : '') +
+                    (freed ? '<div class="sc-hint" style="margin-top:8px">已归档 ' + TABLES.filter(t => t.archived).length +
+                        ' 张表：热层释放 ' + SC.num(freed) + ' GB，全部下沉至对象存储冷存层。</div>' : ''));
+
+                /* 近 7 天各层新增量（堆叠柱） */
+                const days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(Date.now() - i * DAY);
+                    days.push((d.getMonth() + 1) + '-' + SC.pad2(d.getDate()));
+                }
+                const layers = Object.keys(LAYER_COLOR);
+                drawChart('sto', '#c-sto-trend', 'bar', {
+                    labels: days, unit: 'GB', stacked: true,
+                    series: layers.map(function (l) {
+                        const base = TABLES.filter(t => t.layer === l).reduce((a, t) => a + t.size, 0) / 30;
+                        return { name: l, color: LAYER_COLOR[l], data: seriesFor('sto-' + l, 7, Math.max(1, base), Math.max(1, base) * 0.4) };
+                    })
+                });
+
+                q('#tbl-table tbody').innerHTML = TABLES.map(tblRowHTML).join('');
+                const ctrl = SC.table.enhance(q('#tbl-table'), { pageSize: 8, search: '#tbl-search', keyAttr: 'name' });
+                void ctrl;
+            }
+
+            /* 归档候选：带热存周期且体积较大的表 */
+            function arcCandidates() {
+                return TABLES.filter(function (t) {
+                    return !t.archived && t.life.indexOf('热存') === 0 && t.size >= 60;
+                });
+            }
+
+            function runArchive() {
+                const cand = arcCandidates();
+                if (!cand.length) {
+                    SC.toast('没有命中归档策略的表，无需执行', { type: 'info' });
+                    return;
+                }
+                SC.modal.confirm({
+                    title: '执行生命周期归档策略',
+                    html: '<p>命中 <b>' + cand.length + '</b> 张表（热存到期且体积 ≥ 60 GB）：</p>' +
+                        '<p class="sc-hint mono" style="margin-top:8px;line-height:1.8">' +
+                        cand.map(t => t.name + ' · ' + t.size + ' GB · ' + t.life).join('<br>') + '</p>' +
+                        '<p style="margin-top:10px">归档后数据下沉对象存储冷存层，查询延迟升高但可释放热层水位；<b>可随时恢复</b>。</p>',
+                    okText: '执行归档'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    cand.forEach(function (t) {
+                        t.archived = true;
+                        ST.archived.push(t.name);
+                    });
+                    saveST();
+                    renderStorage();
+                    renderLive();
+                    const freed = cand.reduce((a, t) => a + t.size, 0);
+                    note('ok', '归档策略执行完成，' + cand.length + ' 张表下沉冷存，释放热层 ' + freed + ' GB');
+                    SC.toast('已归档 ' + cand.length + ' 张表，释放 ' + freed + ' GB', { type: 'success', duration: 3400 });
+                });
+            }
+
+            function restoreTable(name) {
+                const t = tblByName(name);
+                if (!t) return;
+                t.archived = false;
+                ST.archived = ST.archived.filter(n => n !== name);
+                saveST();
+                renderStorage();
+                renderLive();
+                note('info', '表 ' + name + ' 已从冷存拉起，重新回到 ' + t.layer);
+                SC.toast('已恢复为在线表', { type: 'success' });
+            }
+
+            function exportTables() {
+                const rows = [['表名', '分层', '业务域', '行数', '占用GB', '副本', '生命周期', '质量分', '状态', '负责人', '更新时间']];
+                TABLES.forEach(function (t) {
+                    rows.push([t.name, t.layer, t.domain, t.rows, t.size, t.replica, t.life, t.score,
+                    t.archived ? '已归档' : '在线', t.owner, SC.stamp(new Date(t.updated))]);
+                });
+                SC.csv.download('数据表资产_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + (rows.length - 1) + ' 张表', { type: 'success' });
+            }
+
+            function tableSchema(t) {
+                const pk = t.name.split('_')[1] || 'data';
+                const extra = [
+                    { src: pk + '_id', type: 'STRING', cn: '业务主键', rule: '非空唯一' },
+                    { src: 'collect_time', type: 'DATETIME', cn: '采集时间', rule: '东八区毫秒' },
+                    { src: 'area_code', type: 'STRING', cn: '区域编码', rule: '行政区划字典' },
+                    { src: 'value', type: 'DOUBLE', cn: '监测值', rule: '量纲已归一' },
+                    { src: 'batch_no', type: 'STRING', cn: '批次号', rule: '幂等去重键' },
+                    { src: 'dt', type: 'DATE', cn: '业务日期', rule: '分区键' },
+                    { src: 'dq_flag', type: 'INT', cn: '质量标记', rule: '0 正常 / 1 补全 / 2 丢弃' }
+                ];
+                return extra.concat(fieldMap({ id: t.name }).slice(0, 3));
+            }
+
+            function openTable(name) {
+                const t = tblByName(name);
+                if (!t) return;
+                const schema = tableSchema(t);
+                const consumers = APIS.filter(a => a.domain === t.domain || String(a.subs).indexOf(t.domain) > -1);
+                const jobs = JOBS.filter(j => j.input === t.name || j.output === t.name);
+                const subs = SUBS.filter(s => s.product.toLowerCase().indexOf(t.name.slice(4, 8)) > -1);
+                function bodyHTML() {
+                    return '<div class="sc-kv">' + kvBox([
+                        ['所属分层', SC.esc(t.layer)],
+                        ['业务域', SC.esc(t.domain)],
+                        ['行数', SC.num(t.rows / 10000, 1) + ' 万'],
+                        ['占用', t.size + ' GB'],
+                        ['副本数', t.replica + ' 副本'],
+                        ['生命周期', SC.esc(t.life)],
+                        ['质量分', t.score + ' / 100'],
+                        ['负责人', SC.esc(t.owner)],
+                        ['最近更新', ago(t.updated)],
+                        ['存储状态', t.archived ? tag('已归档（冷存）', 'off') : tag('在线可写', 'ok')]
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">表结构（' + schema.length + ' 列）</div>' +
+                        '<div class="data-table-container"><table class="data-table"><thead><tr>' +
+                        '<th>字段</th><th>类型</th><th>说明</th><th>约束</th></tr></thead><tbody>' +
+                        schema.map(function (f) {
+                            return '<tr><td class="mono">' + SC.esc(f.src) + '</td><td>' + f.type + '</td><td>' +
+                                SC.esc(f.cn) + '</td><td>' + SC.esc(f.rule) + '</td></tr>';
+                        }).join('') + '</tbody></table></div>' +
+                        '<div class="sc-section-title">读写关系</div>' +
+                        '<div class="sc-hint">整编作业：' + SC.esc(jobs.length ? jobs.map(j => j.name).join('、') : '无（源表直接归档）') +
+                        '<br>对外接口：' + SC.esc(consumers.length ? consumers.map(a => a.path).join('、') : '未开放') +
+                        '<br>场景订阅：' + SC.esc(subs.length ? subs.map(s => s.label).join('、') : '无场景直接订阅') + '</div>' +
+                        '<div class="sc-section-title">分区与保存</div>' +
+                        '<pre class="sc-code">partition by (dt)  buckets 16\n' +
+                        'ttl    ' + SC.esc(t.life) + '\n' +
+                        'replica ' + t.replica + '   compaction: ' + (t.layer === '贴源层' ? 'daily merge' : 'size-tiered') + '\n' +
+                        'cold   ' + (t.archived ? 'oss://city-cold/' + t.name : '未下沉') + '</pre>';
+                }
+                function paint(api) {
+                    api.body.innerHTML = bodyHTML();
+                    api.footer.innerHTML = '';
+                    const cfgs = [
+                        t.archived
+                            ? { text: '♻ 从冷存恢复', kind: 'primary', run: function () { restoreTable(t.name); } }
+                            : { text: '📦 归档到冷存', kind: 'danger', run: function () { archiveOne(t.name); } },
+                        { text: '⬇ 导出采样 200 行', kind: 'ghost', run: function () { exportSample(t); } },
+                        {
+                            text: '🧹 查看整编血缘', kind: 'ghost', run: function () {
+                                const j = JOBS.filter(x => x.input === t.name || x.output === t.name)[0];
+                                goModule('process');
+                                if (j) { procSel = j.id; renderLineage(); }
+                            }
+                        },
+                        { text: '关闭', kind: 'ghost' }
+                    ];
+                    cfgs.forEach(function (cfg) {
+                        const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                        btn.addEventListener('click', function () {
+                            if (!cfg.run) { api.close(); return; }
+                            cfg.run();
+                            const fresh = tblByName(t.name);
+                            if (fresh) Object.assign(t, fresh);
+                            paint(api);
+                        });
+                        api.footer.appendChild(btn);
+                    });
+                }
+                const api = SC.modal.open({ title: '🗄 ' + t.name, size: 'lg', body: bodyHTML(), footer: [{ text: '关闭', kind: 'ghost' }] });
+                paint(api);
+            }
+
+            function archiveOne(name) {
+                const t = tblByName(name);
+                if (!t) return;
+                t.archived = true;
+                ST.archived.push(name);
+                saveST();
+                renderStorage();
+                renderLive();
+                note('ok', '表 ' + name + ' 已归档到对象存储冷存层，释放 ' + t.size + ' GB');
+                SC.toast('已归档，释放 ' + t.size + ' GB', { type: 'success' });
+            }
+
+            function exportSample(t) {
+                const schema = tableSchema(t);
+                const rows = [schema.map(f => f.src)];
+                resetSeed(hashSeed(t.name + '-sample'));
+                for (let i = 0; i < 200; i++) {
+                    rows.push(schema.map(function (f) {
+                        if (f.type === 'DATETIME') return SC.stamp(new Date(Date.now() - i * 37000));
+                        if (f.type === 'DATE') return SC.today();
+                        if (f.type === 'DOUBLE') return Math.round(srnd() * 10000) / 100;
+                        if (f.type === 'INT') return sri(0, 2);
+                        return String(sri(100000, 999999));
+                    }));
+                }
+                SC.csv.download(t.name + '_采样200行_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + t.name + ' 采样 200 行', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               12. 数据服务：接口目录 / 授权 / 场景订阅推送
+               ========================================================================== */
+            const LEVEL_NAME = { 1: '公开', 2: '部门内', 3: '需审批' };
+
+            function granted(id) { return ST.grants.indexOf(id) > -1; }
+
+            function apiRowHTML(a) {
+                return '<tr data-id="' + a.id + '">' +
+                    '<td><b class="mono">' + SC.esc(a.path) + '</b><div class="sc-hint mono" style="font-size:.76em">' + a.id + '</div></td>' +
+                    '<td>' + SC.esc(a.type) + '</td>' +
+                    '<td>' + SC.esc(a.domain) + '</td>' +
+                    '<td>' + SC.esc(a.subs) + '</td>' +
+                    '<td>' + a.qps + '</td>' +
+                    '<td>' + a.p99 + ' ms</td>' +
+                    '<td>' + SC.pct(a.rate, 2) + '</td>' +
+                    '<td>' + tag(LEVEL_NAME[a.level] + (granted(a.id) ? '·已授权' : ''), a.level === 3 && !granted(a.id) ? 'warn' : granted(a.id) ? 'ok' : 'info') + '</td>' +
+                    '<td><button class="sc-btn sm ghost" data-act="grant" data-id="' + a.id + '">' +
+                    (granted(a.id) ? '已授权' : '申请授权') + '</button></td></tr>';
+            }
+
+            function subRowHTML(s) {
+                const pushed = ST.pushes.filter(function (p) { return p.id === s.id; })[0];
+                const last = pushed ? pushed.at : s.last;
+                return '<tr data-id="' + s.id + '">' +
+                    '<td><b>' + SC.esc(s.label) + '</b><div class="sc-hint mono" style="font-size:.76em">' + SC.esc(s.page) + '</div></td>' +
+                    '<td>' + SC.esc(s.product) + '</td>' +
+                    '<td>' + SC.esc(s.freq) + '</td>' +
+                    '<td>' + ago(last) + '</td>' +
+                    '<td>' + SC.num((s.rows + (pushed ? pushed.rows : 0)) / 10000, 1) + ' 万</td>' +
+                    '<td>' + tag(pushed && pushed.status ? pushed.status : s.status, TAG[pushed && pushed.status ? pushed.status : s.status] || 'info') + '</td>' +
+                    '<td class="sc-inline"><button class="sc-btn sm ghost" data-act="push" data-id="' + s.id + '">立即推送</button>' +
+                    '<a class="sc-btn sm" href="' + s.page + '?from=data-platform.html" title="打开场景页">场景 ↗</a></td></tr>';
+            }
+
+            function renderShare() {
+                const avgRate = APIS.reduce((a, x) => a + x.rate, 0) / APIS.length;
+                put('#share-kv', kvBox([
+                    ['对外接口', APIS.length + ' 个'],
+                    ['今日调用', SC.num(APIS.reduce((a, x) => a + x.today, 0) / 10000, 1) + ' 万次'],
+                    ['峰值 QPS', Math.max.apply(null, APIS.map(a => a.qps))],
+                    ['最大 P99', Math.max.apply(null, APIS.map(a => a.p99)) + ' ms'],
+                    ['平均成功率', SC.pct(avgRate, 2)],
+                    ['场景订阅', SUBS.length + ' 路'],
+                    ['新增授权', ST.grants.length + ' 条'],
+                    ['手动推送', ST.pushes.length + ' 次']
+                ]));
+
+                q('#api-table tbody').innerHTML = APIS.map(apiRowHTML).join('');
+                SC.table.enhance(q('#api-table'), { pageSize: 8, search: '#api-search', keyAttr: 'id' });
+                q('#sub-table tbody').innerHTML = SUBS.map(subRowHTML).join('');
+                SC.table.enhance(q('#sub-table'), { pageSize: 8, search: false, keyAttr: 'id' });
+
+                const labels = hourLabels(24);
+                const calls = seriesFor('api-calls', 24, APIS.reduce((a, x) => a + x.qps, 0) / 100, 60);
+                const limit = calls.map(function (v, i) { return Math.round(v * (i % 7 === 3 ? 1.6 : 0.2) * 10) / 100; });
+                drawChart('api', '#c-api-trend', 'line', {
+                    labels: labels, unit: '', zeroBased: true,
+                    series: [
+                        { name: '调用量 万次/小时', color: ACCENT, data: calls },
+                        { name: '限流次数', color: AMBER, fill: false, dash: [5, 4], data: limit }
+                    ]
+                });
+
+                const bad = APIS.filter(a => a.status !== '正常' || a.p99 > 400).concat(
+                    SUBS.filter(s => s.status !== '正常'));
+                put('#share-issues', bad.length ? bad.map(function (x) {
+                    const isApi = !!x.path;
+                    return '<div class="attn-item' + (x.status === '异常' ? ' bad' : '') + '" data-id="' + x.id + '" data-kind="' +
+                        (isApi ? 'api' : 'sub') + '" title="点击查看明细">' +
+                        '<div class="ax"><b>' + SC.esc(isApi ? x.path : x.label + ' · ' + x.product) + '</b>' +
+                        '<div class="sc-hint">' + (isApi
+                            ? 'P99 ' + x.p99 + 'ms · 成功率 ' + SC.pct(x.rate, 2) + ' · ' + SC.esc(x.subs)
+                            : '订阅频率 ' + SC.esc(x.freq) + ' · 最近推送 ' + ago(x.last)) + '</div></div>' +
+                        '<span class="sc-tag ' + (TAG[x.status] || 'warn') + '">' + SC.esc(x.status) + '</span></div>';
+                }).join('') : '<div class="sc-hint">✅ 接口与推送均健康，无限流与滗后。</div>');
+                qa('#share-issues .attn-item').forEach(function (n) {
+                    n.addEventListener('click', function () {
+                        if (n.dataset.kind === 'api') openApi(n.dataset.id);
+                        else openSub(n.dataset.id);
+                    });
+                });
+            }
+
+            function apiExample(a) {
+                const obj = {};
+                resetSeed(hashSeed(a.id));
+                a.subs.split('、').slice(0, 2).forEach(function (s, i) {
+                    obj['item_' + (i + 1)] = sri(100, 9999);
+                });
+                return '$ curl -X GET "https://data.city.internal' + a.path + '?dt=' + SC.today() + '&limit=100" \\\n' +
+                    '  -H "Authorization: Bearer <token>" \\\n' +
+                    '  -H "X-App-Id: ops-demo"\n\n' +
+                    '{\n  "code": 0,\n  "message": "success",\n  "data": {\n    "total": ' + SC.num(a.today) + ',\n' +
+                    '    "freshness": "' + sri(1, 9) + ' 分钟前",\n    "items": [' + JSON.stringify(obj) + ']\n  }\n}';
+            }
+
+            function openApi(id) {
+                const a = apiById(id);
+                if (!a) return;
+                const tbl = tblByName('ads_' + a.domain) || TABLES[APIS.indexOf(a) % TABLES.length];
+                function bodyHTML() {
+                    return '<div class="sc-kv">' + kvBox([
+                        ['接口类型', SC.esc(a.type)],
+                        ['数据域', SC.esc(a.domain)],
+                        ['实时 QPS', a.qps],
+                        ['P99 耗时', a.p99 + ' ms'],
+                        ['成功率', SC.pct(a.rate, 2)],
+                        ['今日调用', SC.num(a.today / 10000, 1) + ' 万次'],
+                        ['开放级别', LEVEL_NAME[a.level]],
+                        ['授权状态', granted(a.id) ? tag('已授权', 'ok') : tag('未授权', 'warn')],
+                        ['数据表', SC.esc(tbl ? tbl.name : '多表聚合')],
+                        ['负责方', SC.esc(a.owner)]
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">调用方</div>' +
+                        '<div class="lineage">' + a.subs.split('、').map(function (s) {
+                            return '<span class="ln">🖥 ' + SC.esc(s) + '</span>';
+                        }).join('') + '</div>' +
+                        '<div class="sc-section-title">请求与响应示例</div>' +
+                        '<pre class="sc-code">' + SC.esc(apiExample(a)) + '</pre>' +
+                        '<div class="sc-panel-title" style="margin-top:16px"><h3>近 24 小时调用量</h3>' +
+                        '<span class="sc-hint">万次/小时</span></div>' +
+                        '<div class="sc-chart sm"><canvas id="c-api-modal"></canvas></div>';
+                }
+                function paint(api) {
+                    api.body.innerHTML = bodyHTML();
+                    api.footer.innerHTML = '';
+                    const cfgs = [
+                        granted(a.id)
+                            ? { text: '✓ 已授权（撤销）', kind: 'ghost', run: function () { revokeGrant(a.id); } }
+                            : { text: '🔑 申请授权', kind: 'primary', run: function () { grantApi(a.id); } },
+                        { text: '🔍 查看数据表', kind: 'ghost', run: function () { goModule('storage'); if (tbl) openTable(tbl.name); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ];
+                    cfgs.forEach(function (cfg) {
+                        const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                        btn.addEventListener('click', function () {
+                            if (!cfg.run) { api.close(); return; }
+                            cfg.run();
+                            paint(api);
+                        });
+                        api.footer.appendChild(btn);
+                    });
+                    const labels = hourLabels(24);
+                    SC.chart.line(q('#c-api-modal'), {
+                        labels: labels, unit: '', zeroBased: true,
+                        series: [{ name: '调用量', color: ACCENT_2, data: seriesFor(a.id, 24, a.qps / 100, a.qps / 160) }]
+                    });
+                }
+                const api = SC.modal.open({ title: a.id + ' · ' + a.path, size: 'lg', body: bodyHTML(), footer: [{ text: '关闭', kind: 'ghost' }] });
+                paint(api);
+            }
+
+            function grantApi(id) {
+                const a = apiById(id);
+                if (!a) return;
+                if (granted(id)) { SC.toast('该接口已授权，无需重复申请', { type: 'info' }); return; }
+                if (a.level === 1) {
+                    ST.grants.push(id);
+                    saveST();
+                    renderShare();
+                    note('ok', '公开接口 ' + a.path + ' 已自动开通调用权限');
+                    SC.toast('公开接口，已直接授权', { type: 'success' });
+                    return;
+                }
+                SC.modal.form({
+                    title: '🔑 申请接口授权 · ' + a.path,
+                    fields: [
+                        { name: 'app', label: '申请应用', required: true, placeholder: '如：决份分析平台', col: 1 },
+                        { name: 'qps', label: '预估峰值 QPS', type: 'number', min: 1, max: 5000, value: Math.max(10, Math.round(a.qps / 3)), col: 1 },
+                        { name: 'reason', label: '使用场景', type: 'textarea', required: true, placeholder: '说明数据用途、展示对象与保存周期' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    ST.grants.push(id);
+                    saveST();
+                    renderShare();
+                    note(a.level === 3 ? 'warn' : 'ok', '接口 ' + a.path + ' 授权申请已提交（申请方 ' + v.app + '，' + v.qps + ' QPS），' +
+                        (a.level === 3 ? '属「需审批」级，需数据平台组二次确认' : '已自动通过'));
+                    SC.toast('授权已受理，共 ' + ST.grants.length + ' 条授权记录', { type: 'success' });
+                });
+            }
+
+            function revokeGrant(id) {
+                const a = apiById(id);
+                ST.grants = ST.grants.filter(g => g !== id);
+                saveST();
+                renderShare();
+                note('warn', '已撤销接口 ' + (a ? a.path : id) + ' 的调用授权');
+                SC.toast('授权已撤销', { type: 'warn' });
+            }
+
+            function pushNow(id) {
+                const s = subById(id);
+                if (!s) return;
+                resetSeed(hashSeed(id + Date.now()));
+                const n = sri(300, 9000);
+                ST.pushes.push({ id: id, at: Date.now(), rows: n, status: '正常' });
+                s.last = Date.now();
+                saveST();
+                renderShare();
+                renderLive();
+                note('ok', '向「' + s.label + '」主动推送 ' + s.product + '，共 ' + SC.num(n) + ' 条');
+                SC.toast('已推送 ' + n + ' 条到' + s.label, { type: 'success' });
+            }
+
+            function openSub(id) {
+                const s = subById(id);
+                if (!s) return;
+                const hist = ST.pushes.filter(p => p.id === id);
+                const rows = [['推送时间', '条数', '触发方式']];
+                hist.forEach(function (p) { rows.push([SC.stamp(new Date(p.at)), p.rows, '手动']); });
+                for (let i = 0; i < 6; i++) {
+                    rows.push([SC.stamp(new Date(s.last - (i + 1) * (s.freq === '实时' ? MIN : 15 * MIN))), SC.num(sri(200, 4000)), '调度']);
+                }
+                SC.modal.open({
+                    title: s.id + ' · ' + s.label + ' 订阅详情', size: 'md',
+                    body: '<div class="sc-kv">' + kvBox([
+                        ['数据产品', SC.esc(s.product)],
+                        ['推送频率', SC.esc(s.freq)],
+                        ['目标页面', SC.esc(s.page)],
+                        ['累计条数', SC.num(s.rows / 10000, 1) + ' 万'],
+                        ['最近推送', ago(s.last)],
+                        ['状态', tag(s.status, TAG[s.status] || 'info')]
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">最近推送记录</div>' +
+                        '<div class="data-table-container"><table class="data-table"><thead><tr>' +
+                        '<th>时间</th><th>条数</th><th>方式</th></tr></thead><tbody>' +
+                        rows.slice(1).map(function (r) {
+                            return '<tr><td class="mono">' + SC.esc(r[0]) + '</td><td>' + SC.esc(r[1]) + '</td><td>' + SC.esc(r[2]) + '</td></tr>';
+                        }).join('') + '</tbody></table></div>' +
+                        '<div class="sc-hint" style="margin-top:10px">关闭后可在场景页查看订阅数据的落地效果。</div>',
+                    footer: [
+                        { text: '⚡ 立即推送', kind: 'primary', onClick: function () { pushNow(s.id); } },
+                        { text: '打开场景页', kind: 'ghost', onClick: function () { location.href = s.page + '?from=data-platform.html'; } },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            function exportAPIs() {
+                const rows = [['接口编号', '路径', '类型', '数据域', '订阅方', 'QPS', 'P99ms', '成功率%', '今日调用', '开放级别', '授权', '负责方']];
+                APIS.forEach(function (a) {
+                    rows.push([a.id, a.path, a.type, a.domain, a.subs, a.qps, a.p99, a.rate, a.today,
+                    LEVEL_NAME[a.level], granted(a.id) ? '已授权' : '未授权', a.owner]);
+                });
+                SC.csv.download('数据服务接口目录_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + (rows.length - 1) + ' 个接口', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               13. 事件绑定与启动
+               ========================================================================== */
+            const RENDER = {
+                overview: renderOverview, collect: renderCollect, process: renderProcess,
+                storage: renderStorage, share: renderShare
+            };
+
+            /** 表内点击：优先操作按钮，链接与表单元素不抓行，其余落到行级详情 */
+            function bindTable(sel, onRow, onAct) {
+                const el = q(sel);
+                if (!el) return;
+                el.addEventListener('click', function (ev) {
+                    if (ev.target.closest('a')) return;
+                    const btn = ev.target.closest('button[data-act]');
+                    if (btn) { onAct(btn.dataset.act, btn.dataset); return; }
+                    if (ev.target.closest('input,select,textarea,.sc-chip,.sc-tag,.sc-switch')) return;
+                    const tr = ev.target.closest('tbody tr');
+                    if (!tr || tr.classList.contains('sc-empty-row')) return;
+                    onRow(tr.dataset.id || tr.dataset.name, tr);
+                });
+            }
+
+            function bindAll() {
+                /* 总览 */
+                const pipe = q('#dp-pipe');
+                if (pipe) {
+                    pipe.addEventListener('click', function (ev) {
+                        const node = ev.target.closest('.pipe-node');
+                        if (node && node.dataset.go) goModule(node.dataset.go);
+                    });
+                }
+                const domCanvas = q('#c-dp-domain');
+                if (domCanvas) {
+                    domCanvas.style.cursor = 'pointer';
+                    domCanvas.addEventListener('click', function (ev) {
+                        const inst = CH.dom;
+                        if (!inst || !inst.geo || !inst.geo.hit) return;
+                        const r = domCanvas.getBoundingClientRect();
+                        const hit = inst.geo.hit(ev.clientX - r.left, ev.clientY - r.top);
+                        if (hit && DP_DOMAINS[hit.index]) openDomain(DP_DOMAINS[hit.index]);
+                    });
+                }
+                const domains = q('#dp-domains');
+                if (domains) {
+                    domains.addEventListener('click', function (ev) {
+                        const row = ev.target.closest('.dom-row');
+                        if (!row) return;
+                        const d = DP_DOMAINS.filter(function (x) { return x.name === row.dataset.dom; })[0];
+                        if (d) location.href = domainHref(d);
+                    });
+                }
+                if (q('#btn-dp-snapshot')) q('#btn-dp-snapshot').addEventListener('click', snapshotReport);
+                if (q('#btn-dp-export-assets')) q('#btn-dp-export-assets').addEventListener('click', exportAssets);
+
+                /* 采集 */
+                const chips = q('#col-chips');
+                if (chips) {
+                    chips.addEventListener('click', function (ev) {
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        colKind = chip.dataset.kind || '';
+                        renderCollect();
+                    });
+                }
+                bindTable('#col-table', function (id) { openChannel(id); }, function (act, data) {
+                    if (act !== 'toggle') return;
+                    const c = chanById(data.id);
+                    if (c) setChanStatus(c.id, c.status === '停用' ? '正常' : '停用');
+                });
+                if (q('#btn-col-check')) q('#btn-col-check').addEventListener('click', checkChannels);
+                if (q('#btn-col-add')) q('#btn-col-add').addEventListener('click', addChannel);
+                if (q('#btn-col-export')) q('#btn-col-export').addEventListener('click', exportChannels);
+
+                /* 整编 */
+                bindTable('#job-table', function (id) { procSel = id; openJob(id); }, function (act, data) {
+                    if (act === 'rerun') { runJob(data.id); renderProcess(); renderLive(); }
+                    else if (act === 'pause') {
+                        const j = jobById(data.id);
+                        if (!j) return;
+                        setJobStatus(j.id, j.status === '暂停' ? '运行中' : '暂停');
+                        renderProcess();
+                        renderLive();
+                        note(j.status === '暂停' ? 'warn' : 'ok', '作业「' + j.name + '」已' + (j.status === '暂停' ? '暂停，上游入湖不受影响' : '恢复调度'));
+                        SC.toast('作业已' + (j.status === '暂停' ? '暂停' : '启动'), { type: j.status === '暂停' ? 'warn' : 'success' });
+                    }
+                });
+                if (q('#btn-job-run')) q('#btn-job-run').addEventListener('click', rerunFailed);
+                if (q('#btn-rule-reset')) q('#btn-rule-reset').addEventListener('click', resetRules);
+
+                /* 存储 */
+                bindTable('#tbl-table', function (name) { openTable(name); }, function (act, data) {
+                    if (act === 'arc') archiveOne(data.name);
+                });
+                if (q('#btn-sto-archive')) q('#btn-sto-archive').addEventListener('click', runArchive);
+                if (q('#btn-sto-export')) q('#btn-sto-export').addEventListener('click', exportTables);
+
+                /* 服务 */
+                bindTable('#api-table', function (id) { openApi(id); }, function (act, data) {
+                    if (act === 'grant') grantApi(data.id);
+                });
+                bindTable('#sub-table', function (id) { openSub(id); }, function (act, data) {
+                    if (act === 'push') pushNow(data.id);
+                });
+                if (q('#btn-api-grant')) q('#btn-api-grant').addEventListener('click', function () {
+                    SC.modal.form({
+                        title: '🔑 批量申请接口授权',
+                        fields: [
+                            {
+                                name: 'apis', label: '待授权接口', type: 'checkgroup', full: true,
+                                options: APIS.filter(a => !granted(a.id)).map(function (a) { return { value: a.id, label: a.path + '（' + LEVEL_NAME[a.level] + '）' }; })
+                            },
+                            { name: 'app', label: '申请应用', required: true, placeholder: '如：综合指挥屏', col: 1 },
+                            { name: 'days', label: '有效期（天）', type: 'number', min: 7, max: 365, value: 90, col: 1 }
+                        ]
+                    }).then(function (v) {
+                        if (!v) return;
+                        const list = v.apis || [];
+                        if (!list.length) { SC.toast('请至少勾选一个接口', { type: 'error' }); return; }
+                        list.forEach(function (id) { if (!granted(id)) ST.grants.push(id); });
+                        saveST();
+                        renderShare();
+                        note('ok', '批量授权 ' + list.length + ' 个接口（申请方 ' + v.app + '，有效期 ' + v.days + ' 天）');
+                        SC.toast('已受理 ' + list.length + ' 条授权申请', { type: 'success' });
+                    });
+                });
+                if (q('#btn-api-export')) q('#btn-api-export').addEventListener('click', exportAPIs);
+
+                /* 模块切换后重绘（charts.js 只听 resize，隐藏容器里的 canvas 尺寸不准） */
+                qa('.module-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        setTimeout(function () { renderModule(activeModule()); }, 30);
+                    });
+                });
+            }
+
+            function renderModule(name) {
+                if (RENDER[name]) RENDER[name]();
+            }
+
+            function init() {
+                renderLive();
+                renderOverview();
+                seedLog();
+                bindAll();
+                setInterval(renderLive, 1000);
+                setInterval(function () { logPush(logLine()); }, 2600);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+
+</html>

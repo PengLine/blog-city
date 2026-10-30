@@ -26,7 +26,10 @@
         'smart-parking.html': { label: '智慧停车', icon: '🅿️', domains: ['停车'], primary: '停车' },
         'public-service.html': { label: '公共服务', icon: '🏛️', domains: ['公共服务'], primary: '公共服务' },
         'equipment-data.html': { label: '设备数据', icon: '🔧', domains: ['接入', '数据', '基础设施'], primary: '接入' },
-        'client-app.html': { label: '客户端', icon: '📱', domains: ['平台'], svcLink: false }
+        'client-app.html': { label: '客户端', icon: '📱', domains: ['平台'], svcLink: false },
+        /* 新增两个支撑型模块：放在末尾，保证既有 pageOf 结果不变 */
+        'data-platform.html': { label: '数据中台', icon: '🧮', domains: ['数据', '接入', '基础设施'] },
+        'ops-center.html': { label: '运维中心', icon: '🛠️', domains: ['平台', '基础设施', '接入'] }
     };
 
     /* 首次访问场景页（架构页还未发布快照）时的兜底数据，与架构页种子口径一致 */

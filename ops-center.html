@@ -1,0 +1,3057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运维中心 - 智慧城市管理平台</title>
+    <meta name="description" content="智慧城市运维中心：平台服务健康观测、设备运行维护、告警处置与变更值班的一体化运行保障平台。">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
+    <style>
+        :root {
+            --oc: #12a594;
+            --oc-2: #0d7c70;
+            --oc-soft: rgba(18, 165, 148, .1);
+            --ink: #2c3448;
+            --ink-2: #6b7689;
+        }
+
+        .container {
+            background: #f1f5f5;
+            color: var(--ink);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        header h1 {
+            color: var(--oc-2);
+        }
+
+        .oc-sub {
+            color: var(--ink-2);
+            margin-top: 6px;
+        }
+
+        .nav-btn,
+        .btn-primary,
+        .btn-sm {
+            background: linear-gradient(135deg, var(--oc) 0%, var(--oc-2) 100%);
+        }
+
+        .nav-btn {
+            box-shadow: 0 3px 10px rgba(18, 165, 148, .3);
+        }
+
+        .nav-btn:hover,
+        .btn-primary:hover,
+        .btn-sm:hover {
+            background: linear-gradient(135deg, var(--oc-2) 0%, #07554d 100%);
+        }
+
+        .module-btn.active,
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--oc) 0%, var(--oc-2) 100%);
+        }
+
+        .content-header h3,
+        .sc-panel-title h3 {
+            color: var(--oc-2);
+        }
+
+        .sc-kv-item .v {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 顶部实时运行状态条 */
+        .oc-live {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 14px;
+            background: linear-gradient(120deg, #103b39 0%, #14655c 100%);
+            color: #cfeee9;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            font-size: .9em;
+            box-shadow: 0 6px 18px rgba(16, 59, 57, .24);
+        }
+
+        .oc-live b {
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .oc-live .sep {
+            display: inline-block;
+            width: 1px;
+            height: 14px;
+            background: rgba(255, 255, 255, .22);
+        }
+
+        .oc-live .mono {
+            margin-left: auto;
+            color: #9fd6ce;
+        }
+
+        /* 域健康卡片 */
+        .h-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+            gap: 12px;
+        }
+
+        .h-card {
+            background: white;
+            border: 1px solid #dce9e7;
+            border-left: 3px solid var(--oc);
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all .2s ease;
+            box-shadow: 0 3px 10px rgba(44, 52, 72, .05);
+        }
+
+        .h-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px rgba(18, 165, 148, .16);
+        }
+
+        .h-card .hc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .h-card .hc-num {
+            font-size: 1.34em;
+            font-variant-numeric: tabular-nums;
+            margin: 6px 0 2px;
+        }
+
+        .h-card .hc-num small {
+            font-size: .55em;
+            color: var(--ink-2);
+            font-weight: 400;
+        }
+
+        .h-card .hc-meta {
+            font-size: .78em;
+            color: var(--ink-2);
+            line-height: 1.7;
+        }
+
+        /* 水位 / SLA 条 */
+        .bar-row {
+            display: grid;
+            grid-template-columns: 168px 1fr 116px;
+            gap: 10px;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px dashed #e3ecea;
+            font-size: .88em;
+        }
+
+        .bar-row:last-child {
+            border-bottom: none;
+        }
+
+        .bar-row .bl b {
+            display: block;
+        }
+
+        .bar-row .bl span {
+            font-size: .78em;
+            color: var(--ink-2);
+        }
+
+        .bar-row .bv {
+            font-variant-numeric: tabular-nums;
+            color: var(--ink-2);
+            font-size: .82em;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        /* 值班 / 预案卡片 */
+        .duty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+        }
+
+        .duty-card {
+            border: 1px solid #dce9e7;
+            border-radius: 10px;
+            padding: 13px 15px;
+            background: linear-gradient(180deg, #f7fcfb 0%, #fff 100%);
+        }
+
+        .duty-card.cur {
+            border-color: var(--oc);
+            box-shadow: 0 4px 14px rgba(18, 165, 148, .14);
+        }
+
+        .duty-card .dc-role {
+            font-size: .76em;
+            color: var(--ink-2);
+            letter-spacing: .5px;
+        }
+
+        .duty-card .dc-name {
+            font-weight: 700;
+            margin: 3px 0 6px;
+        }
+
+        .duty-card .dc-line {
+            font-size: .8em;
+            color: var(--ink-2);
+            line-height: 1.8;
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(226px, 1fr));
+            gap: 12px;
+        }
+
+        .plan-card {
+            border: 1px solid #dce9e7;
+            border-radius: 10px;
+            padding: 13px 15px;
+            background: #fff;
+        }
+
+        .plan-card .pc-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .plan-card .pc-body {
+            font-size: .8em;
+            color: var(--ink-2);
+            line-height: 1.75;
+        }
+
+        .inst-bar {
+            display: inline-flex;
+            gap: 3px;
+            vertical-align: middle;
+        }
+
+        .inst-bar i {
+            width: 7px;
+            height: 14px;
+            border-radius: 2px;
+            background: #cfd8d7;
+        }
+
+        .inst-bar i.up {
+            background: var(--oc);
+        }
+
+        .inst-bar i.bad {
+            background: #eb3b5a;
+        }
+
+        .sla-ok {
+            color: var(--oc-2);
+            font-weight: 700;
+        }
+
+        .rule-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 2px;
+            border-bottom: none;
+        }
+
+        .rule-row .rr-n {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rule-row .rr-n b {
+            display: block;
+        }
+
+        .rule-row .rr-n span {
+            font-size: .78em;
+            color: var(--ink-2);
+        }
+
+        .rule-row .rr-v {
+            font-variant-numeric: tabular-nums;
+            color: var(--ink-2);
+            font-size: .82em;
+            white-space: nowrap;
+        }
+
+        .mono {
+            font-family: Consolas, Monaco, monospace;
+        }
+
+        @media (max-width: 720px) {
+            .bar-row {
+                grid-template-columns: 120px 1fr 92px;
+            }
+        }
+    </style>
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%2312a594%27/%3E%3Cpath d=%27M32 14a10 10 0 0 0 4 19.2V44a6 6 0 0 1-12 0V28.4A10 10 0 0 0 28 14z%27 fill=%27white%27 opacity=%27.9%27/%3E%3C/svg%3E">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>🛠️ 运维中心</h1>
+                <p class="oc-sub">服务健康 · 设备运维 · 告警处置 · 变更值班，用同一套口径观测并保障平台与末端设备的持续运行</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+                <span class="sc-live"><i class="sc-live-dot"></i><span id="oc-clock">--</span></span>
+                <a href="city-platform-architecture.html" class="nav-btn">🏙️ 平台架构</a>
+                <a href="data-platform.html" class="nav-btn">🧮 数据中台</a>
+                <a href="index.html" class="nav-btn">🔙 返回主页面</a>
+            </div>
+        </header>
+
+        <div class="oc-live" id="oc-live">
+            <span>运行态势 <b>--</b></span>
+        </div>
+
+        <div class="module-nav">
+            <button class="module-btn active" data-module="overview">📈 运维总览</button>
+            <button class="module-btn" data-module="service">🧩 服务健康</button>
+            <button class="module-btn" data-module="device">📡 设备运维</button>
+            <button class="module-btn" data-module="alarm">🚨 告警中心</button>
+            <button class="module-btn" data-module="change">🧾 变更值班</button>
+        </div>
+
+        <!-- ==================== 1. 运维总览 ==================== -->
+        <div class="module-content active" id="overview-module">
+            <div class="content-header">
+                <h3>📈 运维总览</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-oc-sweep">🔍 全平台健康巡检</button>
+                    <button class="sc-btn ghost" id="btn-oc-daily">📋 生成运维日报</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="oc-kv"></div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>平台综合健康指数</h3>
+                        <span class="sc-hint">服务 / 设备 / 告警 / 变更加权</span>
+                    </div>
+                    <div class="sc-chart sm"><canvas id="c-oc-gauge"></canvas></div>
+                    <div class="sc-hint" id="oc-gauge-sub"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>各域服务正常率</h3>
+                        <span class="sc-hint">点击柱体查看该域服务</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-oc-dom"></canvas></div>
+                    <div class="sc-legend" id="lg-oc-dom"></div>
+                </div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel" style="flex:2 1 460px">
+                    <div class="sc-panel-title">
+                        <h3>近 24 小时健康指数与告警量</h3>
+                        <span class="sc-hint">数据来源：运维采集中台 ops-agent</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-oc-trend"></canvas></div>
+                    <div class="sc-legend" id="lg-oc-trend"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>实时事件流</h3>
+                        <span class="sc-hint">告警 / 巡检 / 变更 / 值班</span>
+                    </div>
+                    <div class="sc-log" id="oc-log"></div>
+                </div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>需要立即处理</h3>
+                    <span class="sc-hint">按影响面排序，点击直达对应模块</span>
+                </div>
+                <div class="attn-list" id="oc-attn"></div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>业务域健康</h3>
+                    <span class="sc-hint">口径与平台架构页快照一致</span>
+                </div>
+                <div class="h-grid" id="oc-domains"></div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>核心链路 SLA 达标情况</h3>
+                    <span class="sc-hint">月度承诺：可用性 99.9%、P95 延迟阈值</span>
+                </div>
+                <div id="oc-sla"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 2. 服务健康 ==================== -->
+        <div class="module-content" id="service-module">
+            <div class="content-header">
+                <h3>🧩 服务健康</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-svc-sweep">🩺 一键全量巡检</button>
+                    <button class="sc-btn ghost" id="btn-svc-export">⬇ 导出健康报表</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="svc-kv"></div>
+
+            <div class="sc-chips" id="svc-chips" style="margin-top:14px"></div>
+
+            <div class="sc-panel" style="margin-top:14px">
+                <div class="sc-panel-title">
+                    <h3>服务实例健康清单</h3>
+                    <input type="text" class="search-input" id="tbl-search-svc" placeholder="搜索服务名称 / 标识 / 负责人">
+                </div>
+                <table class="data-table" id="tbl-svc">
+                    <thead>
+                        <tr>
+                            <th>服务</th>
+                            <th>所属域</th>
+                            <th>版本</th>
+                            <th>实例</th>
+                            <th>健康</th>
+                            <th>QPS</th>
+                            <th>P95 延迟</th>
+                            <th>错误率</th>
+                            <th>CPU 水位</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="sc-hint" style="margin-top:10px">点击行查看服务详情、实例列表与近期指标，可在详情内重启实例、摘流或发起巡检。</div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>资源占用 Top 8</h3>
+                        <span class="sc-hint">CPU 折算核数</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-svc-res"></canvas></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>巡检与自愈记录</h3>
+                        <span class="sc-hint">最近 12 条</span>
+                    </div>
+                    <div class="sc-log" id="svc-insp-log"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 3. 设备运维 ==================== -->
+        <div class="module-content" id="device-module">
+            <div class="content-header">
+                <h3>📡 设备运维</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-dev-inspect">📡 下发巡检任务</button>
+                    <button class="sc-btn ghost" id="btn-dev-ticket">🧾 离线设备批量派单</button>
+                    <button class="sc-btn ghost" id="btn-dev-export">⬇ 导出设备台账</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="dev-kv"></div>
+
+            <div class="sc-split" style="margin-top:16px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>设备在线率与心跳缺失</h3>
+                        <span class="sc-hint">近 12 小时</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-dev-trend"></canvas></div>
+                    <div class="sc-legend" id="lg-dev-trend"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>设备类型分布</h3>
+                        <span class="sc-hint">点击行下方筹码可按类型筛选</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-dev-pie"></canvas></div>
+                </div>
+            </div>
+
+            <div class="sc-chips" id="dev-chips" style="margin-top:16px"></div>
+
+            <div class="sc-panel" style="margin-top:14px">
+                <div class="sc-panel-title">
+                    <h3>末端设备运行清单</h3>
+                    <input type="text" class="search-input" id="tbl-search-dev" placeholder="搜索设备编号 / 点位 / 类型">
+                </div>
+                <table class="data-table" id="tbl-dev">
+                    <thead>
+                        <tr>
+                            <th>设备编号</th>
+                            <th>类型</th>
+                            <th>安装点位</th>
+                            <th>接入方式</th>
+                            <th>信号</th>
+                            <th>电量</th>
+                            <th>最后上报</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="sc-hint" style="margin-top:10px">点击行查看设备档案与诊断历史；「诊断」执行远程自检，可下发自愈指令或生成维修工单。</div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>维修工单</h3>
+                    <div class="sc-chips" id="tk-chips"></div>
+                </div>
+                <table class="data-table" id="tbl-ticket">
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>设备</th>
+                            <th>故障描述</th>
+                            <th>优先级</th>
+                            <th>责任人</th>
+                            <th>生成时间</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== 4. 告警中心 ==================== -->
+        <div class="module-content" id="alarm-module">
+            <div class="content-header">
+                <h3>🚨 告警中心</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-alm-ack">✅ 批量确认待处理</button>
+                    <button class="sc-btn ghost" id="btn-alm-rules">🧩 告警规则与静默</button>
+                    <button class="sc-btn ghost" id="btn-alm-export">⬇ 导出告警台账</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="alm-kv"></div>
+
+            <div class="sc-split" style="margin-top:16px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>24 小时告警分布</h3>
+                        <span class="sc-hint">按级别堆叠</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-alm-trend"></canvas></div>
+                    <div class="sc-legend" id="lg-alm-trend"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>告警来源构成</h3>
+                        <span class="sc-hint">服务 / 设备 / 链路 / 安全</span>
+                    </div>
+                    <div class="sc-chart"><canvas id="c-alm-src"></canvas></div>
+                </div>
+            </div>
+
+            <div class="sc-chips" id="alm-chips" style="margin-top:16px"></div>
+
+            <div class="sc-panel" style="margin-top:14px">
+                <div class="sc-panel-title">
+                    <h3>实时告警队列</h3>
+                    <input type="text" class="search-input" id="tbl-search-alm" placeholder="搜索告警标题 / 对象 / 域">
+                </div>
+                <table class="data-table" id="tbl-alm">
+                    <thead>
+                        <tr>
+                            <th>级别</th>
+                            <th>告警内容</th>
+                            <th>对象</th>
+                            <th>来源域</th>
+                            <th>触发时间</th>
+                            <th>持续</th>
+                            <th>处置时限</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="sc-hint" style="margin-top:10px" id="alm-note"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 5. 变更与值班 ==================== -->
+        <div class="module-content" id="change-module">
+            <div class="content-header">
+                <h3>🧾 变更值班</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-chg-new">➕ 新建变更单</button>
+                    <button class="sc-btn ghost" id="btn-duty-handover">🔄 值班交接</button>
+                    <button class="sc-btn ghost" id="btn-chg-export">⬇ 导出变更记录</button>
+                </div>
+            </div>
+
+            <div class="sc-kv" id="chg-kv"></div>
+
+            <div class="sc-chips" id="chg-chips" style="margin-top:14px"></div>
+
+            <div class="sc-panel" style="margin-top:14px">
+                <div class="sc-panel-title">
+                    <h3>变更单流水线</h3>
+                    <span class="sc-hint">发布 / 配置 / 扩容 / 演练，须在维护窗口内执行</span>
+                </div>
+                <table class="data-table" id="tbl-chg">
+                    <thead>
+                        <tr>
+                            <th>单号</th>
+                            <th>类型</th>
+                            <th>变更内容</th>
+                            <th>影响服务</th>
+                            <th>变更窗口</th>
+                            <th>风险</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="sc-hint" style="margin-top:10px">点击行查看变更方案、影响面与执行日志；高风险变更需二级审批后方可执行。</div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>值班安排</h3>
+                    <div class="sc-inline">
+                        <button class="sc-btn sm ghost" id="btn-duty-swap">🔁 申请换班</button>
+                        <button class="sc-btn sm ghost" id="btn-duty-log">📝 追加值班日志</button>
+                    </div>
+                </div>
+                <div class="duty-grid" id="oc-duty"></div>
+            </div>
+
+            <div class="sc-split" style="margin-top:18px">
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>值班与交接记录</h3>
+                        <span class="sc-hint">时间倒序</span>
+                    </div>
+                    <div class="sc-timeline" id="duty-tl"></div>
+                </div>
+                <div class="sc-panel">
+                    <div class="sc-panel-title">
+                        <h3>应急预案</h3>
+                        <span class="sc-hint">可发起演练并记录结果</span>
+                    </div>
+                    <div class="plan-grid" id="plan-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 智慧城市管理平台. 【余一叶知秋尽】版权所有.</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script src="assets/js/common.js"></script>
+    <script>
+        /* ==========================================================================
+           运维中心运行时：总览 / 服务健康 / 设备运维 / 告警中心 / 变更值班
+           基线数据由确定性伪随机生成；服务清单与健康口径直接取平台架构页发布的快照
+           （ArchLink.snapshot），保证与架构页、场景页三方一致。可变部分（巡检结果、
+           实例重启与摘流、设备状态与工单、告警处置与规则、变更单与值班）落盘到
+           localStorage 的 sc:oc:state，版本不一致时整表重建。
+           ========================================================================== */
+        (function () {
+            'use strict';
+            const NS = 'oc';
+            const OC_VER = 1;
+            const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+            const ACCENT = '#12a594', ACCENT_2 = '#0d7c70', GREEN = '#20bf6b', AMBER = '#f7b731', RED = '#eb3b5a';
+            const BLUE = '#0f8bd9', GRAY = '#8fa3a0', PURPLE = '#7b61ff';
+
+            /* ---------------- 确定性伪随机 ---------------- */
+            let seed = 20260606;
+            function resetSeed(v) { seed = v; }
+            function srnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+            function sri(a, b) { return Math.floor(a + srnd() * (b - a + 1)); }
+            function srp(arr) { return arr[Math.floor(srnd() * arr.length)]; }
+            function hashSeed(str) {
+                let h = 2166136261;
+                for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+                return h >>> 0;
+            }
+
+            const H_TAG = { '健康': 'ok', '降级': 'warn', '告警': 'bad', '维护': 'info', '未知': 'off' };
+            const H_ICON = { '健康': '●', '降级': '▲', '告警': '◆', '维护': '◼', '未知': '○' };
+            const H_RANK = { '告警': 3, '降级': 2, '维护': 1, '健康': 0, '未知': 0 };
+            const LVL_TAG = { '紧急': 'bad', '重要': 'warn', '次要': 'info', '提示': 'off' };
+            const ASM_TAG = { '待确认': 'bad', '处理中': 'warn', '已恢复': 'ok', '已关闭': 'off' };
+            const DEV_TAG = { '在线': 'ok', '离线': 'bad', '低电': 'warn', '异常': 'bad', '维护': 'info' };
+
+            /* ==========================================================================
+               1. 本地存档
+               ========================================================================== */
+            let ST = SC.store.get(NS, 'state', null);
+            if (!ST || ST.ver !== OC_VER) {
+                ST = {
+                    ver: OC_VER, svc: {}, dev: {}, alm: {}, rules: {}, silence: 0,
+                    tickets: [], chg: [], logs: [], duty: { swaps: [], handovers: [] },
+                    plans: {}, sweeps: 0, lastSweep: 0, daily: 0
+                };
+            }
+            ['svc', 'dev', 'alm', 'rules', 'plans', 'duty', 'task'].forEach(function (k) { if (!ST[k]) ST[k] = {}; });
+            ['tickets', 'chg', 'logs'].forEach(function (k) { if (!ST[k]) ST[k] = []; });
+            if (!ST.duty.swaps) ST.duty.swaps = [];
+            if (!ST.duty.handovers) ST.duty.handovers = [];
+            function saveST() { SC.store.set(NS, 'state', ST); }
+
+            /* ==========================================================================
+               2. 通用小工具
+               ========================================================================== */
+            function q(id) { return document.querySelector(id); }
+            function qa(id) { return Array.prototype.slice.call(document.querySelectorAll(id)); }
+            function put(id, html) { const n = q(id); if (n) n.innerHTML = html; }
+            function tag(text, kind) {
+                return '<span class="sc-tag ' + (kind || 'info') + '">' + SC.esc(text) + '</span>';
+            }
+            function hTag(h) { return tag(H_ICON[h] + ' ' + h, H_TAG[h] || 'off'); }
+            function kvBox(items) {
+                return items.map(function (it) {
+                    return '<div class="sc-kv-item"><div class="k">' + it[0] + '</div><div class="v">' + it[1] + '</div></div>';
+                }).join('');
+            }
+            function barMini(pct, color) {
+                return '<div class="sc-bar-mini"><i style="width:' + SC.clamp(pct, 0, 100) + '%;background:' +
+                    (color || (pct >= 85 ? RED : pct >= 70 ? AMBER : GREEN)) + '"></i></div>';
+            }
+            function ago(ts) {
+                if (!ts) return '从未';
+                const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+                if (s < 45) return '刚刚';
+                if (s < 3600) return Math.round(s / 60) + ' 分钟前';
+                if (s < 86400) return (s / 3600).toFixed(1) + ' 小时前';
+                return Math.round(s / 86400) + ' 天前';
+            }
+            function dur(ts) {
+                const m = Math.max(0, Math.round((Date.now() - ts) / MIN));
+                if (m < 60) return m + ' 分钟';
+                if (m < 1440) return (m / 60).toFixed(1) + ' 小时';
+                return Math.round(m / 1440) + ' 天';
+            }
+            function activeModule() {
+                const node = q('.module-content.active');
+                return node ? node.id.replace('-module', '') : 'overview';
+            }
+            function goModule(name) {
+                const btn = q('.module-btn[data-module="' + name + '"]');
+                if (btn) btn.click();
+            }
+            function link(file, domain) {
+                if (!window.ArchLink) return file;
+                return domain ? ArchLink.domainHref(file, domain, 'ops-center.html')
+                    : file + '?from=' + encodeURIComponent('ops-center.html');
+            }
+            function pageOfDomain(name) {
+                const f = (window.ArchLink && ArchLink.pageForDomain(name)) || '';
+                return f ? link(f, name) : link(window.ArchLink ? ArchLink.HUB : 'city-platform-architecture.html', name);
+            }
+
+            /* 图表注册表：模块切换 / 数据变更时整体重绘（charts.js 只听 resize） */
+            const CH = {};
+            function drawChart(key, sel, type, cfg) {
+                const cv = q(sel);
+                if (!cv || !window.SC || !SC.chart) return null;
+                if (CH[key]) { CH[key].detach && CH[key].detach(); }
+                CH[key] = SC.chart[type](cv, cfg);
+                return CH[key];
+            }
+
+            /* ==========================================================================
+               3. 服务健康：直接复用平台架构页发布的服务快照
+               ========================================================================== */
+            const SNAP = (window.ArchLink && ArchLink.snapshot()) || { services: {}, domains: {}, security: {} };
+            const SVC_ROWS = Object.keys(SNAP.services || {})
+                .map(function (k) { return SNAP.services[k]; })
+                .filter(function (s) { return s && s.id && s.inst; });
+
+            function svcState(id) {
+                if (!ST.svc[id]) {
+                    ST.svc[id] = { fixed: [], iso: [], extra: [], restarted: [], inspAt: 0 };
+                }
+                const st = ST.svc[id];
+                ['fixed', 'iso', 'extra', 'restarted'].forEach(function (k) { if (!st[k]) st[k] = []; });
+                return st;
+            }
+            function byId(id) {
+                for (let i = 0; i < SVC_ROWS.length; i++) { if (SVC_ROWS[i].id === id) return SVC_ROWS[i]; }
+                return null;
+            }
+            /** 基线异常实例数：与快照健康等级一致（维护位单独按摘流处理） */
+            function baseBadCount(s) {
+                if (s.health === '告警') return SC.clamp(Math.floor(s.inst / 4), 2, 3);
+                if (s.health === '降级') return 1;
+                return 0;
+            }
+            /** 异常实例下标（已被重启自愈的会移出，人工发现的会并入） */
+            function badIdx(s) {
+                const st = svcState(s.id);
+                resetSeed(hashSeed(s.id + '#bad'));
+                const out = [];
+                for (let i = 0; i < baseBadCount(s); i++) {
+                    const idx = sri(0, Math.max(0, s.inst - 1));
+                    if (out.indexOf(idx) < 0) out.push(idx);
+                }
+                return out.filter(function (i) { return st.fixed.indexOf(i) < 0; }).concat(st.extra);
+            }
+            /** 摘流实例：基线维护位 + 人工摘流 */
+            function isoIdx(s) {
+                const st = svcState(s.id);
+                const out = st.iso.slice();
+                if (s.health === '维护') { const m = s.inst - 1; if (out.indexOf(m) < 0) out.push(m); }
+                return out;
+            }
+            function svcHealth(s) {
+                const bad = badIdx(s).length;
+                const usable = s.inst - isoIdx(s).length;
+                if (usable <= 0) return '未知';
+                if (bad >= 2) return '告警';
+                if (bad === 1) return '降级';
+                if (s.health === '维护' && isoIdx(s).length) return '维护';
+                return '健康';
+            }
+            /** 指标随异常/摘流数量放大，保证「处置后指标回落」可被观察到 */
+            function svcMetric(s) {
+                resetSeed(hashSeed(s.id + '#m'));
+                const bad = badIdx(s).length, iso = isoIdx(s).length;
+                const base = { qps: sri(120, 4600), p95: sri(28, 210), err: sri(3, 55) / 100, cpu: sri(21, 63), mem: sri(34, 70) };
+                const stress = 1 + bad * 0.85 + iso * 0.18;
+                return {
+                    qps: Math.round(base.qps * (1 + bad * 0.05)),
+                    p95: Math.round(base.p95 * stress),
+                    err: Math.round(base.err * stress * 100) / 100,
+                    cpu: Math.min(98, Math.round(base.cpu + bad * 12 - iso * 4)),
+                    mem: Math.min(97, Math.round(base.mem + bad * 7)),
+                    up: Math.min(99.999, Number((99.99 - bad * 0.06 - iso * 0.01).toFixed(3)))
+                };
+            }
+            function nodes(s) {
+                const st = svcState(s.id);
+                const bad = badIdx(s), iso = isoIdx(s);
+                const pfx = String(s.id).replace(/[^a-z]/gi, '').slice(0, 4).toLowerCase();
+                const out = [];
+                resetSeed(hashSeed(s.id + '#n'));
+                for (let i = 0; i < s.inst; i++) {
+                    const state = iso.indexOf(i) > -1 ? '已摘流' : bad.indexOf(i) > -1 ? '异常' : '运行中';
+                    const w = state === '异常' ? 1.8 : state === '已摘流' ? 0.2 : 1;
+                    out.push({
+                        i: i, name: pfx + '-' + SC.pad2(i + 1), az: ['可用区A', '可用区B', '可用区C'][i % 3],
+                        state: state, ver: s.ver, cpu: Math.round((20 + sri(0, 42)) * w),
+                        mem: Math.round((30 + sri(0, 40)) * Math.min(1.6, w)), rt: Math.round((20 + sri(5, 90)) * w),
+                        qps: Math.round(sri(30, 900) * (state === '已摘流' ? 0 : 1)),
+                        since: Date.now() - sri(2, 640) * HOUR
+                    });
+                }
+                return out;
+            }
+            function instBar(s) {
+                const bad = badIdx(s), iso = isoIdx(s);
+                let html = '<span class="inst-bar" title="异常 ' + bad.length + ' / 摘流 ' + iso.length + '">';
+                for (let i = 0; i < s.inst; i++) {
+                    const cls = iso.indexOf(i) > -1 ? '' : bad.indexOf(i) > -1 ? 'bad' : 'up';
+                    html += '<i class="' + cls + '"></i>';
+                }
+                return html + '</span>';
+            }
+
+            /* 域健康：以本页实时处置结果重算，快照口径兜底 */
+            const DOMAINS = Object.keys(SNAP.domains || {}).map(function (name) {
+                const d = SNAP.domains[name] || {};
+                const list = SVC_ROWS.filter(function (s) { return s.domain === name; });
+                const ok = list.filter(function (s) { const h = svcHealth(s); return h === '健康' || h === '维护'; }).length;
+                let health = list.length ? '健康' : (d.health || '未知');
+                list.forEach(function (s) {
+                    const h = svcHealth(s);
+                    if ((H_RANK[h] || 0) > (H_RANK[health] || 0)) health = h;
+                });
+                return {
+                    name: name, health: health, ok: list.length ? ok : (d.ok || 0),
+                    total: list.length || d.total || 0, page: (window.ArchLink && ArchLink.pageForDomain(name)) || ''
+                };
+            });
+
+            /* ==========================================================================
+               4. 设备运维：类型台账 + 末端设备清单
+               ========================================================================== */
+            const KIND_DEF = [
+                ['CAM', '视频监控球机', 'GB28181 直连', 3126, BLUE],
+                ['MNH', '智能井盖探测器', 'NB-IoT', 1482, ACCENT],
+                ['WLV', '管网水位计', 'NB-IoT', 864, GREEN],
+                ['LTC', '路灯单灯控制器', 'LoRa', 12480, AMBER],
+                ['GPS', '车载定位终端', '4G Cat.1', 1268, PURPLE],
+                ['MKR', '地磁车检器', 'Sub-1G', 2140, RED],
+                ['STR', '桥隧应变计', '光纤光栅', 318, '#00b4d8'],
+                ['MET', '区域气象站', '4G', 96, GRAY]
+            ];
+            const DEV_TOTAL = KIND_DEF.reduce(function (a, k) { return a + k[3]; }, 0);
+            const POINTS = [
+                '人民路口', '解放大道·建设大道', '中山门桥', '湖滨南路污水泵站', '高铁站南广场', '工业园东路',
+                '老城文化街', '长江隧道东口', '市民中心地库', '环城快速 K12', '纺织厂生活区', '新港物流园',
+                '凤凰山路灯 03 回路', '滨河公园北 gate', '实验小学门口', '开发区污水检查井 27', '第三加油站',
+                '云溪桥主缆', '高铁停车场 B 区', '环城北路气象观测点'
+            ];
+            const DEV_OWNER = ['物联网组', '市政业务组', '照明业务组', '环卫业务组', '停车业务组', '排水业务组', '视频平台组'];
+
+            resetSeed(20260714);
+            const DEVICES = [];
+            KIND_DEF.forEach(function (k, ki) {
+                const n = k[0] === 'MET' ? 4 : 6;
+                for (let i = 0; i < n; i++) {
+                    const total = k[3];
+                    const id = k[0] + '-' + SC.pad2(ki + 1) + SC.pad2(Math.floor(total / 40 + i * 7)) + sri(10, 99);
+                    const r = srnd();
+                    let status = '在线';
+                    if (r > 0.9) status = '离线';
+                    else if (r > 0.82) status = '异常';
+                    else if (r > 0.74) status = '低电';
+                    else if (r > 0.71) status = '维护';
+                    DEVICES.push({
+                        id: id, kind: k[1], pfx: k[0], access: k[2], total: total, color: k[4],
+                        point: POINTS[(ki * 3 + i) % POINTS.length], owner: DEV_OWNER[(ki + i) % DEV_OWNER.length],
+                        status: status, sig: status === '离线' ? 0 : sri(28, 99),
+                        batt: /NB|LoRa|Sub/.test(k[2]) ? (status === '低电' ? sri(4, 17) : sri(38, 99)) : 100,
+                        last: Date.now() - (status === '离线' ? sri(42, 1500) : sri(1, 24)) * MIN,
+                        rt: sri(6, 240), err: sri(0, 42) / 10
+                    });
+                }
+            });
+            function devList() {
+                return DEVICES.map(function (d) {
+                    const o = ST.dev[d.id];
+                    return o ? Object.assign({}, d, o) : d;
+                });
+            }
+            function devById(id) {
+                const list = devList();
+                for (let i = 0; i < list.length; i++) { if (list[i].id === id) return list[i]; }
+                return null;
+            }
+            function patchDev(id, patch) {
+                ST.dev[id] = Object.assign({}, ST.dev[id] || {}, patch);
+                saveST();
+            }
+
+            /* 历史维修工单（首次进入时落盘，之后可流转状态） */
+            function seedTickets() {
+                resetSeed(20260718);
+                const kinds = ['井盖探测器通信中断', '球机镜头污损、识别置信度下降', '水位计读数长期恒定', '单灯控制器无法下发调光指令', '车载终端重复上报同一轨迹点'];
+                const out = [];
+                for (let i = 0; i < 5; i++) {
+                    const d = DEVICES[sri(0, DEVICES.length - 1)];
+                    out.push({
+                        no: 'WO-2610' + SC.pad2(11 + i), dev: d.id, kind: d.kind, point: d.point,
+                        desc: srp(kinds), pri: srp(['高', '中', '中', '低']), owner: srp(['李国强', '王振宇', '周敏', '陈立']),
+                        at: Date.now() - sri(6, 96) * HOUR, status: srp(['待接单', '处理中', '已完成', '已关闭']),
+                        src: '历史巡检'
+                    });
+                }
+                return out;
+            }
+            if (!ST.tickets.length) { ST.tickets = seedTickets(); saveST(); }
+            const TK_TAG = { '待接单': 'bad', '处理中': 'warn', '已完成': 'ok', '已关闭': 'off' };
+            const TK_PRI_TAG = { '高': 'bad', '中': 'warn', '低': 'info' };
+
+            /* ==========================================================================
+               5. 告警中心
+               ========================================================================== */
+            const ALM_TPL = [
+                ['紧急', '服务实例连续 3 次健康检查失败', 'service', 'case-service', '城管', '按重启 + 扩容预案处置，15 分钟内响应'],
+                ['紧急', '泵站液位遥测中断超过 10 分钟', 'device', 'WLV-0307', '排水', '现场核查供电与 NB-IoT 卡，同步防汛值班'],
+                ['紧急', '数据库主从复制延迟异常升高', 'link', 'pg-cluster-01', '基础设施', '触发只读降级，暂停批量写入任务'],
+                ['重要', '接口 P95 延迟持续高于阈值', 'service', 'gateway', '平台', '排查慢查询与连接池，评估扩容'],
+                ['重要', '视频 AI 识别成功率跌破 90%', 'service', 'ai-vision', '数据', '确认边缘节点算力与模型版本'],
+                ['重要', '路灯控制器回路通信失败', 'device', 'LTC-0421', '照明', '远程复位一次，仍失败则派单'],
+                ['重要', '消息队列积压超过 20 万条', 'link', 'msg-center', '平台', '扩容消费者并核对下游幂等'],
+                ['次要', '设备电量低于 20% 预警', 'device', 'MNH-0219', '环卫', '纳入下次例行巡检更换电池'],
+                ['次要', '慢 SQL 数量环比上升', 'service', 'parking-service', '停车', '推送给业务组优化索引'],
+                ['次要', '对象存储桶容量水位达 78%', 'infra', 'minio-cluster', '基础设施', '提交扩容评审'],
+                ['提示', '证书有效期不足 30 天', 'sec', 'gateway-tls', '平台', '安排轮换窗口'],
+                ['提示', '备份任务耗时上升但未超时', 'infra', 'job-center', '基础设施', '继续观察'],
+                ['重要', '异常登录尝试触发安全基线', 'sec', 'auth-center', '平台', '核实来源 IP 并按需封禁'],
+                ['次要', '地磁车检器心跳缺失', 'device', 'MKR-0508', '停车', '远程唤醒自检']
+            ];
+            resetSeed(20260721);
+            /* 前 14 条用架构页真实服务标识，后续扩展条按类型轮转真实对象，避免凭空捏造名称 */
+            const ALARMS = ALM_TPL.concat(ALM_TPL.map(function (r, i) {
+                const c = r.slice();
+                c[0] = ['紧急', '重要', '重要', '次要', '次要', '提示'][i % 6];
+                if (r[2] === 'service' && SVC_ROWS.length) c[3] = SVC_ROWS[(i * 3 + 2) % SVC_ROWS.length].id;
+                else if (r[2] === 'device' && DEVICES.length) c[3] = DEVICES[(i * 5 + 3) % DEVICES.length].id;
+                return c;
+            })).map(function (r, i) {
+                const obj = r[3];
+                const age = r[0] === '紧急' ? sri(4, 160) : r[0] === '重要' ? sri(20, 420) : sri(40, 1400);
+                let state = '待确认';
+                if (r[0] === '提示') state = i % 3 ? '已关闭' : '待确认';
+                else if (age > 300) state = srp(['已恢复', '处理中', '已关闭']);
+                else if (age > 120) state = srp(['处理中', '待确认', '已恢复']);
+                return {
+                    id: 'AL-' + SC.pad2(i + 1), level: r[0], title: r[1], src: r[2], obj: obj,
+                    domain: r[4], advice: r[5], at: Date.now() - age * MIN,
+                    state: state, owner: srp(['张宇轩', '李国强', '王振宇', '周敏', '陈立', '赵婉']),
+                    sla: r[0] === '紧急' ? 15 : r[0] === '重要' ? 60 : r[0] === '次要' ? 240 : 0,
+                    cnt: r[0] === '紧急' ? sri(3, 26) : sri(1, 9)
+                };
+            });
+            const ALM_SRC_NAME = { service: '服务', device: '设备', link: '链路', infra: '基础设施', sec: '安全' };
+            function almState(a) {
+                const o = ST.alm[a.id] || {};
+                return {
+                    state: o.state || a.state, owner: o.owner || a.owner,
+                    silence: o.silence || 0, note: o.note || ''
+                };
+            }
+            function setAlm(id, patch) {
+                ST.alm[id] = Object.assign({}, ST.alm[id] || {}, patch);
+                saveST();
+            }
+            function almList() {
+                return ALARMS.map(function (a) { return Object.assign({}, a, almState(a)); });
+            }
+
+            const RULE_SEED = [
+                ['AR-01', '实例健康检查连续失败', '连续 3 次探测失败即告警（紧急）', 1, 3],
+                ['AR-02', '接口 P95 延迟越限', 'P95 > 500 ms 持续 5 分钟', 1, 5],
+                ['AR-03', '错误率突增', '5 分钟错误率环比放大 3 倍', 1, 3],
+                ['AR-04', '设备心跳缺失', '超 3 个上报周期未收到数据', 1, 3],
+                ['AR-05', '设备电量低', '电量 < 20% 每日最多提醒 1 次', 1, 1],
+                ['AR-06', '存储水位', '已用容量 ≥ 80% 触发扩容评审', 1, 7],
+                ['AR-07', '安全基线', '异常登录 / 高危端口暴露即时告警', 1, 1],
+                ['AR-08', '抖动抑制', '同一对象 10 分钟内重复告警自动合并', 0, 10]
+            ];
+            const RULES = RULE_SEED.map(function (r) {
+                return { id: r[0], name: r[1], desc: r[2], on: ST.rules[r[0]] === undefined ? !!r[3] : !!ST.rules[r[0]], win: r[4] };
+            });
+            function ruleById(id) { return RULES.filter(r => r.id === id)[0] || null; }
+
+            /* ==========================================================================
+               6. 变更与值班
+               ========================================================================== */
+            const CHG_SEED = [
+                ['发布', '案件流转服务灰度发布 4.2.0', 'case-service', '中', ['审批通过', '灰度 10%', '观察 30 分钟', '全量放开']],
+                ['发布', '视频 AI 模型升级 v2.3（街面占道）', 'ai-vision', '高', ['审批通过', '离线评测', '灰度 2 路', '扩至全部边缘节点']],
+                ['配置', 'API 网关限流阈值调整', 'gateway', '低', ['审批通过', '下发配置', '验证限流']],
+                ['扩容', '时序库增加 2 个数据节点', 'tsdb-cluster', '中', ['审批通过', '节点上线', '分区再平衡']],
+                ['配置', '排水遥测采集频率 15s→10s', 'iot-gateway', '低', ['审批通过', '下发模板', '观察写入量']],
+                ['发布', '停车计费服务修复发票重复开具', 'parking-service', '中', ['审批通过', '停写 5 分钟', '执行发布', '补数校验']],
+                ['演练', '可用区 A 故障切换演练', 'gateway', '高', ['审批通过', '流量切至可用区 B', '验证业务连续', '回切']],
+                ['扩容', '消息中心消费者 4→8', 'msg-center', '低', ['审批通过', '调整副本数']],
+                ['配置', '日志采集保留策略 7→14 天', 'ops-agent', '低', ['审批通过', '更新采集模板']],
+                ['发布', '统一认证中心支持国密 SM2', 'auth-center', '高', ['审批通过', '密钥轮换', '灰度 1 节点', '全量放开']],
+                ['回滚预案', '桥隧监测阈值判定规则回退', 'bridge-monitor', '中', ['审批通过', '回退规则版本', '复核告警']],
+                ['配置', '数据同步任务并行度提升', 'data-sync', '低', ['审批通过', '调整并行度']]
+            ];
+            function seedChanges() {
+                resetSeed(20260725);
+                const st = ['成功', '进行中', '待审批', '待审批', '成功', '已回滚'];
+                return CHG_SEED.map(function (r, i) {
+                    const h = sri(2, 26);
+                    return {
+                        no: 'CH-2610' + SC.pad2(i + 1), type: r[0], title: r[1], svc: r[2], risk: r[3],
+                        steps: r[4], status: i < 6 ? st[i] : srp(['成功', '成功', '待审批', '进行中']),
+                        owner: srp(['张宇轩', '李国强', '王振宇', '周敏']),
+                        review: srp(['平台架构组', '运维组', '业务负责人']),
+                        win: '0' + (3 + (i % 4)) + ':00-0' + (5 + (i % 4)) + ':00',
+                        at: Date.now() - h * HOUR,
+                        done: 0, log: []
+                    };
+                });
+            }
+            if (!ST.chg.length) { ST.chg = seedChanges(); saveST(); }
+            ST.chg.forEach(function (c) { if (!c.log) c.log = []; });
+            const CHG_TAG = { '待审批': 'warn', '待执行': 'info', '进行中': 'info', '成功': 'ok', '已回滚': 'bad', '已取消': 'off' };
+            const RISK_TAG = { '高': 'bad', '中': 'warn', '低': 'info' };
+            function chgById(no) { return ST.chg.filter(c => c.no === no)[0] || null; }
+
+            const DUTY_ROSTER = [
+                { role: '一线值班', team: '运行监控班', names: ['张宇轩', '刘思远', '孙雅琪'], tag: '7×24 告警响应' },
+                { role: '二线值班', team: '平台架构班', names: ['李国强', '何康', '彭晓'], tag: '服务与中间件' },
+                { role: '网络与安全', team: '网络安全班', names: ['王振宇', '袁浩'], tag: '等保与应急处置' },
+                { role: '设备与现场', team: '现场运维班', names: ['周敏', '陈立', '赵婉'], tag: '末端设备与工单' }
+            ];
+            const DUTY_DAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            /** 联系方式按人稳定生成，避免每次重绘跳动 */
+            function phoneOf(name) {
+                const h = hashSeed(name);
+                return '1' + (30 + h % 60) + String(10000000 + (h % 89999999));
+            }
+            /** 今日各岗位值班人：按年内天数轮转，并叠加已审批的换班 */
+            function dutyToday(offset) {
+                const d = new Date(Date.now() + (offset || 0) * DAY);
+                const dayIdx = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / DAY);
+                return DUTY_ROSTER.map(function (r, ri) {
+                    let name = r.names[(dayIdx + ri) % r.names.length];
+                    (ST.duty.swaps || []).forEach(function (s) {
+                        if (s.date === SC.stamp(d, false).slice(0, 10) && s.role === r.role) name = s.to;
+                    });
+                    return { role: r.role, team: r.team, tag: r.tag, name: name, phone: phoneOf(name) };
+                });
+            }
+
+            const PLANS = [
+                ['PL-01', '城市大脑门户不可用', '切换备用集群 + 静态兜底页', 8, '每月'],
+                ['PL-02', '物联接入网关拥塞', '限流非关键上报，优先防汛与照明', 12, '每季度'],
+                ['PL-03', '数据中心市电中断', 'UPS 供冷 30 分钟，柴发带核心业务', 15, '每半年'],
+                ['PL-04', '勒索病毒与数据损坏', '隔离网段 + 冷备快照恢复', 20, '每半年'],
+                ['PL-05', '重大活动保障', '提前扩容、封版变更、驻场值守', 6, '按任务']
+            ].map(function (r) {
+                return { id: r[0], name: r[1], action: r[2], minutes: r[3], cycle: r[4], drill: ST.plans[r[0]] || 0 };
+            });
+
+            /* 实时事件流：真实操作写入存档，另按分钟生成观察类事件 */
+            const LOG_OBS = [
+                ['info', 'ops-agent 采集 {n} 个服务实例指标，用时 {t} 秒'],
+                ['info', '{d} 域心跳正常，实例存活率 {p}%'],
+                ['ok', '自愈动作完成：{s} 重启异常实例并回捞流量'],
+                ['warn', '{d} 域 P95 延迟上浮 {p}%，未触发阈值'],
+                ['info', '设备网关统计：在线率 {p}%，心跳缺失 {n} 台'],
+                ['alarm', '收到告警：{s} 错误率 {p}%（级别 次要）'],
+                ['info', '备份任务快照成功，用时 {t} 分钟'],
+                ['ok', '变更窗口检查通过，无高风险变更在执行']
+            ];
+            function logLine() {
+                const t = srp(LOG_OBS);
+                const svc = SVC_ROWS[sri(0, SVC_ROWS.length - 1)];
+                const dom = DOMAINS[sri(0, DOMAINS.length - 1)];
+                const tx = t[1]
+                    .replace('{n}', SC.num(sri(28, 320)))
+                    .replace('{t}', sri(2, 26))
+                    .replace('{p}', sri(6, 99))
+                    .replace('{d}', dom ? dom.name : '平台')
+                    .replace('{s}', svc ? svc.name : '网关');
+                return { t: Date.now(), lv: t[0], tx: tx };
+            }
+            function note(lv, tx) {
+                const row = { t: Date.now(), lv: lv, tx: tx };
+                LOG.unshift(row);
+                ST.logs.unshift(row);
+                if (ST.logs.length > 60) ST.logs.length = 60;
+                saveST();
+                if (activeModule() === 'overview') renderLog();
+            }
+            let LOG = [];
+            function seedLog() {
+                resetSeed(20260728);
+                const out = ST.logs.slice();
+                for (let i = 0; i < 14; i++) { out.push(logLine()); }
+                out.sort(function (a, b) { return b.t - a.t; });
+                LOG = out.slice(0, 40);
+                renderLog();
+            }
+            function renderLog() {
+                put('#oc-log', LOG.slice(0, 14).map(function (r) {
+                    return '<div class="li"><span class="t">' + SC.stamp(r.t) + '</span>' +
+                        '<span class="lv ' + r.lv + '">' + ({ info: '信息', warn: '预警', alarm: '告警', ok: '正常' }[r.lv] || r.lv) + '</span>' +
+                        '<span class="tx">' + SC.esc(r.tx) + '</span></div>';
+                }).join(''));
+            }
+            /* ==========================================================================
+               7. 汇总口径与顶部状态条
+               ========================================================================== */
+            function totals() {
+                const hc = { '健康': 0, '维护': 0, '降级': 0, '告警': 0, '未知': 0 };
+                let inst = 0, iso = 0, bad = 0, p95 = 0, err = 0;
+                SVC_ROWS.forEach(function (s) {
+                    const h = svcHealth(s);
+                    hc[h] = (hc[h] || 0) + 1;
+                    inst += s.inst;
+                    iso += isoIdx(s).length;
+                    bad += badIdx(s).length;
+                    const m = svcMetric(s);
+                    p95 += m.p95; err += m.err;
+                });
+                const dev = devList();
+                const offline = dev.filter(d => d.status === '离线');
+                const lowbat = dev.filter(d => d.status === '低电');
+                const devBad = offline.length + dev.filter(d => d.status === '异常').length;
+                const alarms = almList();
+                const open = alarms.filter(a => a.state === '待确认' || a.state === '处理中');
+                const urgent = open.filter(a => a.level === '紧急');
+                const tkOpen = ST.tickets.filter(t => t.status === '待接单' || t.status === '处理中');
+                const pend = ST.chg.filter(c => c.status === '待审批');
+                const roll = ST.chg.filter(c => c.status === '已回滚');
+                const n = SVC_ROWS.length || 1;
+                const svcScore = (hc['健康'] + hc['维护']) / n * 100;
+                const devScore = Math.max(60, 100 - devBad / dev.length * 260);
+                const almScore = Math.max(40, 100 - open.length * 3.6 - urgent.length * 6);
+                const chgScore = Math.max(60, 100 - pend.filter(c => c.risk === '高').length * 6 - roll.length * 7);
+                const score = Math.round(svcScore * .4 + devScore * .25 + almScore * .25 + chgScore * .1);
+                return {
+                    hc: hc, inst: inst, iso: iso, bad: bad, svc: SVC_ROWS.length,
+                    p95: Math.round(p95 / n), err: Math.round(err / n * 100) / 100,
+                    dev: dev.length, devTotal: DEV_TOTAL, offline: offline.length, lowbat: lowbat.length, devBad: devBad,
+                    alarms: alarms, open: open, urgent: urgent, tkOpen: tkOpen, pend: pend, roll: roll,
+                    score: SC.clamp(Math.round(score), 0, 100),
+                    parts: { svc: Math.round(svcScore), dev: Math.round(devScore), alm: Math.round(almScore), chg: Math.round(chgScore) }
+                };
+            }
+
+            function renderLive() {
+                const t = totals();
+                const clock = q('#oc-clock');
+                if (clock) clock.textContent = SC.stamp(new Date(), true);
+                put('#oc-live', [
+                    '综合健康 <b>' + t.score + '</b> 分', '<i class="sep"></i>',
+                    '服务 <b>' + (t.hc['健康'] + t.hc['维护']) + '/' + t.svc + '</b> 正常',
+                    '实例 <b>' + (t.inst - t.iso) + '</b> 在运行（异常 ' + t.bad + ' · 摘流 ' + t.iso + '）',
+                    '<i class="sep"></i>',
+                    '待处理告警 <b>' + t.open.length + '</b>（紧急 ' + t.urgent.length + '）',
+                    '设备离线 <b>' + t.offline + '</b>/' + t.dev + ' 抽检样本',
+                    '<i class="sep"></i>',
+                    '变更待审 <b>' + t.pend.length + '</b> · 维修工单 <b>' + t.tkOpen.length + '</b>',
+                    '<span class="mono">快照同步 ' + (ArchLink.timeLabel ? ArchLink.timeLabel(SNAP.at) : '未同步') +
+                    ' · 最近巡检 ' + (ST.lastSweep ? ago(ST.lastSweep) : '尚未执行') + '</span>'
+                ].join(' '));
+            }
+
+            /* ==========================================================================
+               8. 运维总览
+               ========================================================================== */
+            const SLA_LINKS = [
+                ['案件上报-处置链路', '99.98', 320, '城管'],
+                ['物联数据采集链路', '99.95', 180, '接入'],
+                ['视频 AI 识别链路', '99.72', 860, '数据'],
+                ['统一认证与会话', '99.99', 96, '平台'],
+                ['数据共享接口', '99.90', 420, '数据'],
+                ['停车计费与支付', '99.96', 260, '停车']
+            ];
+
+            function renderSla() {
+                const t = totals();
+                put('#oc-sla', SLA_LINKS.map(function (r, i) {
+                    resetSeed(hashSeed(r[0]) + i);
+                    const jitter = (t.bad + t.offline) * 0.02;
+                    const avail = Number((parseFloat(r[1]) - jitter).toFixed(2));
+                    const rt = Math.round(r[2] * (1 + jitter / 6));
+                    const ok = avail >= 99.9;
+                    const pct = (avail - 99.5) / 0.5 * 100;
+                    return '<div class="bar-row"><div class="bl"><b>' + SC.esc(r[0]) + '</b>' +
+                        '<span>承诺 99.90% · 阈值 ' + r[2] + ' ms</span></div>' +
+                        '<div>' + barMini(SC.clamp(pct, 4, 100), ok ? GREEN : AMBER) + '</div>' +
+                        '<div class="bv">' + (ok ? '<span class="sla-ok">' : '<span style="color:' + AMBER + '">') +
+                        avail + '%</span><br>P95 ' + rt + ' ms</div></div>';
+                }).join('') +
+                    '<div class="sc-hint" style="margin-top:10px">口径：核心链路按月统计，异常实例与离线设备按影响面折算损耗；当前折算影响 ' +
+                    (t.bad + t.offline) + ' 项。</div>');
+            }
+
+            function renderAttn() {
+                const t = totals();
+                const items = [];
+                SVC_ROWS.forEach(function (s) {
+                    const h = svcHealth(s);
+                    if (h === '告警') {
+                        items.push({
+                            bad: true, mod: 'service', id: s.id,
+                            tx: s.name + ' 有 ' + badIdx(s).length + ' 个实例异常',
+                            meta: h + ' · ' + s.domain + '域 · ' + s.inst + ' 实例 · 负责人 ' + s.owner
+                        });
+                    }
+                });
+                t.urgent.forEach(function (a) {
+                    items.push({ bad: true, mod: 'alarm', id: a.id, tx: '【紧急】' + a.title, meta: a.obj + ' · 已持续 ' + dur(a.at) + ' · 时限 ' + a.sla + ' 分钟' });
+                });
+                if (t.offline) {
+                    items.push({ bad: t.offline >= 2, mod: 'device', tx: t.offline + ' 台末端设备心跳缺失超过 1 小时', meta: '抽检样本 ' + t.dev + ' 台 · 低电 ' + t.lowbat.length + ' 台' });
+                }
+                if (t.pend.length) {
+                    items.push({ bad: t.pend.some(c => c.risk === '高'), mod: 'change', tx: t.pend.length + ' 张变更单待审批', meta: '其中高风险 ' + t.pend.filter(c => c.risk === '高').length + ' 张，须在维护窗口内执行' });
+                }
+                if (t.tkOpen.length) {
+                    items.push({ bad: false, mod: 'device', tx: t.tkOpen.length + ' 张维修工单未闭环', meta: '含待接单 ' + ST.tickets.filter(x => x.status === '待接单').length + ' 张' });
+                }
+                put('#oc-attn', items.slice(0, 8).map(function (it) {
+                    return '<div class="attn-item' + (it.bad ? ' bad' : '') + '" data-mod="' + it.mod + '"' +
+                        (it.id ? ' data-id="' + SC.esc(it.id) + '"' : '') + '><div class="ax"><b>' + SC.esc(it.tx) + '</b>' +
+                        '<div class="sc-hint">' + SC.esc(it.meta) + '</div></div>' +
+                        '<span class="sc-tag ' + (it.bad ? 'bad' : 'warn') + '">前往处理</span></div>';
+                }).join('') || '<div class="sc-hint">✅ 当前没有需要立即处理的事项。</div>');
+                qa('#oc-attn .attn-item').forEach(function (n) {
+                    n.addEventListener('click', function () {
+                        goModule(n.dataset.mod);
+                        if (n.dataset.id && n.dataset.mod === 'service') setTimeout(function () { openSvc(n.dataset.id); }, 80);
+                        if (n.dataset.id && n.dataset.mod === 'alarm') setTimeout(function () { openAlarm(n.dataset.id); }, 80);
+                    });
+                });
+            }
+
+            function renderOverview() {
+                const t = totals();
+                put('#oc-kv', kvBox([
+                    ['综合健康指数', '<span style="color:' + (t.score >= 90 ? GREEN : t.score >= 80 ? AMBER : RED) + '">' + t.score + '</span> 分'],
+                    ['服务 / 实例', t.svc + ' 个 · ' + (t.inst - t.iso) + '/' + t.inst + ' 运行'],
+                    ['待处理告警', t.open.length + ' 条（紧急 ' + t.urgent.length + '）'],
+                    ['设备抽检在线率', SC.pct((1 - t.offline / t.dev) * 100, 1) + '（' + t.dev + ' 台样本）'],
+                    ['维修工单未闭环', t.tkOpen.length + ' 张'],
+                    ['变更待审批', t.pend.length + ' 张'],
+                    ['平均 P95 延迟', t.p95 + ' ms'],
+                    ['平均错误率', SC.pct(t.err, 2)]
+                ]));
+
+                drawChart('gauge', '#c-oc-gauge', 'gauge', {
+                    value: t.score, min: 0, max: 100, unit: '分', label: '平台综合健康指数',
+                    color: t.score >= 90 ? GREEN : t.score >= 80 ? AMBER : RED,
+                    segments: [{ to: 75, color: RED }, { to: 90, color: AMBER }, { to: 100, color: GREEN }]
+                });
+                put('#oc-gauge-sub', '分项得分：服务 ' + t.parts.svc + ' · 设备 ' + t.parts.dev + ' · 告警 ' + t.parts.alm +
+                    ' · 变更 ' + t.parts.chg + '（权重 40% / 25% / 25% / 10%）');
+
+                const doms = DOMAINS.filter(d => d.total > 0);
+                drawChart('dom', '#c-oc-dom', 'bar', {
+                    labels: doms.map(d => d.name), unit: ' 实例', stacked: true,
+                    series: [
+                        { name: '正常实例', color: GREEN, data: doms.map(d => SVC_ROWS.filter(s => s.domain === d.name).reduce((a, s) => a + s.inst - isoIdx(s).length - badIdx(s).length, 0)) },
+                        { name: '异常实例', color: RED, data: doms.map(d => SVC_ROWS.filter(s => s.domain === d.name).reduce((a, s) => a + badIdx(s).length, 0)) },
+                        { name: '摘流实例', color: GRAY, data: doms.map(d => SVC_ROWS.filter(s => s.domain === d.name).reduce((a, s) => a + isoIdx(s).length, 0)) }
+                    ]
+                });
+                SC.chart.legend(q('#lg-oc-dom'), [
+                    { name: '正常实例', color: GREEN }, { name: '异常实例', color: RED }, { name: '摘流实例', color: GRAY }
+                ]);
+
+                const labels = [], score = [], almCnt = [];
+                for (let i = 23; i >= 0; i--) {
+                    labels.push(SC.pad2(new Date(Date.now() - i * HOUR).getHours()) + ':00');
+                    resetSeed(hashSeed('oc-score') + (23 - i));
+                    const dip = i <= 6 ? 6 : 0;
+                    score.push(SC.clamp(Math.round(t.score + sri(-3, 3) - dip + (t.bad ? 2 : 0)), 40, 100));
+                    almCnt.push(Math.max(0, Math.round(t.open.length / 3 + sri(1, 9) + (i <= 6 ? 6 : 0))));
+                }
+                drawChart('trend', '#c-oc-trend', 'line', {
+                    labels: labels, smooth: true, unit: '',
+                    series: [
+                        { name: '健康指数', color: ACCENT, data: score, fill: true },
+                        { name: '小时告警量', color: AMBER, data: almCnt, dash: [6, 4], fill: false }
+                    ]
+                });
+                SC.chart.legend(q('#lg-oc-trend'), [
+                    { name: '健康指数', color: ACCENT, value: t.score + ' 分' },
+                    { name: '小时告警量', color: AMBER, value: almCnt[23] + ' 条' }
+                ]);
+
+                put('#oc-domains', DOMAINS.map(function (d) {
+                    return '<div class="h-card" data-dom="' + SC.esc(d.name) + '" style="border-left-color:' +
+                        (d.health === '健康' ? GREEN : d.health === '告警' ? RED : d.health === '降级' ? AMBER : ACCENT) + '"' +
+                        ' title="点击进入该域服务清单">' +
+                        '<div class="hc-top"><span>' + SC.esc(d.name) + '</span>' + hTag(d.health) + '</div>' +
+                        '<div class="hc-num">' + d.ok + '<small>/' + d.total + ' 服务正常</small></div>' +
+                        '<div class="hc-meta">' + (d.page ? '场景页 ' + SC.esc(window.ArchLink ? ArchLink.labelOf(d.page) : d.page) : '平台公共域') + '</div></div>';
+                }).join(''));
+                qa('#oc-domains .h-card').forEach(function (n) {
+                    n.addEventListener('click', function () {
+                        svcDomain = n.dataset.dom;
+                        svcFilter = '';
+                        goModule('service');
+                        setTimeout(renderService, 40);
+                    });
+                });
+
+                renderSla();
+                renderAttn();
+                renderLog();
+            }
+
+            /* 全平台巡检：汇总服务、设备、告警、变更四类检查结果 */
+            function runSweep() {
+                const t0 = totals();
+                const healed = [];
+                SVC_ROWS.forEach(function (s) {
+                    const bad = badIdx(s);
+                    if (bad.length) {
+                        const st = svcState(s.id);
+                        st.fixed.push(bad[0]);
+                        st.restarted.push(bad[0]);
+                        st.inspAt = Date.now();
+                        healed.push(s.name);
+                    } else {
+                        svcState(s.id).inspAt = Date.now();
+                    }
+                });
+                ST.sweeps = (ST.sweeps || 0) + 1;
+                ST.lastSweep = Date.now();
+                saveST();
+                const t1 = totals();
+                note(healed.length ? 'ok' : 'info', '全平台健康巡检完成：自愈重启 ' + healed.length + ' 个服务实例，异常实例 ' + t0.bad + ' → ' + t1.bad);
+                const rows = [
+                    ['服务巡检', t1.svc + ' 个服务 / ' + t1.inst + ' 实例', (t1.hc['告警'] + t1.hc['降级']) + ' 个服务仍需关注'],
+                    ['实例自愈', '重启并回捞 ' + healed.length + ' 个异常实例', healed.slice(0, 3).join('、') || '无需自愈'],
+                    ['设备巡检', '抽检 ' + t1.dev + ' 台（台账 ' + SC.num(t1.devTotal) + ' 台）', '离线 ' + t1.offline + ' 台 · 低电 ' + t1.lowbat.length + ' 台'],
+                    ['告警核对', '待处理 ' + t1.open.length + ' 条', '紧急 ' + t1.urgent.length + ' 条，超时 ' + t1.open.filter(a => a.sla && Date.now() - a.at > a.sla * MIN).length + ' 条'],
+                    ['变更核对', '待审批 ' + t1.pend.length + ' 张', '高风险 ' + t1.pend.filter(c => c.risk === '高').length + ' 张，本月回滚 ' + t1.roll.length + ' 张'],
+                    ['健康指数', t1.score + ' 分', '较巡检前 ' + (t1.score >= t0.score ? '+' : '') + (t1.score - t0.score) + ' 分']
+                ];
+                const api = SC.modal.open({
+                    title: '🔍 全平台健康巡检报告', size: 'lg',
+                    body: '<div class="sc-kv">' + kvBox(rows.map(r => [r[0], '<b>' + SC.esc(r[1]) + '</b>'])) + '</div>' +
+                        '<div class="sc-section-title">检查明细</div>' +
+                        '<table class="data-table"><thead><tr><th>项目</th><th>结果</th><th>说明</th></tr></thead><tbody>' +
+                        rows.map(r => '<tr><td>' + SC.esc(r[0]) + '</td><td>' + SC.esc(r[1]) + '</td><td>' + SC.esc(r[2]) + '</td></tr>').join('') +
+                        '</tbody></table>' +
+                        (healed.length ? '<div class="sc-note" style="margin-top:12px">自愈动作已下发并验证通过：' + SC.esc(healed.join('、')) +
+                            '。异常实例由运维采集中台自动重启，无需人工介入。</div>' : '') +
+                        '<div class="sc-hint" style="margin-top:10px">巡检时间 ' + SC.stamp(new Date(), true) + '，累计执行 ' + ST.sweeps + ' 次。</div>',
+                    footer: [
+                        { text: '⬇ 导出巡检明细', kind: 'ghost', onClick: function () { exportSweep(rows); } },
+                        { text: '前往服务健康', kind: '', onClick: function () { goModule('service'); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+                void api;
+                SC.toast('巡检完成，健康指数 ' + t1.score + ' 分（' + (t1.score >= t0.score ? '+' : '') + (t1.score - t0.score) + '）', { type: t1.score >= t0.score ? 'success' : 'warn' });
+                renderLive();
+                renderOverview();
+            }
+            function exportSweep(rows) {
+                SC.csv.download('全平台巡检明细-' + SC.today(), rows.map(r => [r[0], r[1], r[2]]));
+                SC.toast('已导出巡检明细', { type: 'success' });
+            }
+
+            /* 运维日报 */
+            function openDaily() {
+                const t = totals();
+                ST.daily = (ST.daily || 0) + 1;
+                saveST();
+                const dev = devList();
+                const byKind = KIND_DEF.map(function (k) {
+                    const rows = dev.filter(d => d.pfx === k[0]);
+                    const off = rows.filter(d => d.status === '离线').length;
+                    return [k[1], '台账 ' + SC.num(k[3]) + ' 台 / 抽检 ' + rows.length + ' 台', '离线 ' + off + ' 台'];
+                });
+                SC.modal.open({
+                    title: '📋 运维日报 · ' + SC.today(), size: 'lg',
+                    body: '<div class="sc-kv">' + kvBox([
+                        ['综合健康指数', t.score + ' 分'],
+                        ['服务可用', (t.hc['健康'] + t.hc['维护']) + '/' + t.svc],
+                        ['告警总量', t.alarms.length + ' 条（待处理 ' + t.open.length + '）'],
+                        ['设备在线率', SC.pct((1 - t.offline / t.dev) * 100, 1)],
+                        ['工单闭环率', SC.pct(ST.tickets.length ? (ST.tickets.filter(x => x.status === '已完成' || x.status === '已关闭').length / ST.tickets.length) * 100 : 0, 1)],
+                        ['变更执行', ST.chg.filter(c => c.status === '成功').length + ' 成功 / ' + t.roll.length + ' 回滚'],
+                        ['当日巡检', ST.sweeps + ' 次'],
+                        ['值班岗位', DUTY_ROSTER.length + ' 班']
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">一、平台服务运行</div>' +
+                        '<p class="sc-hint">平均 P95 ' + t.p95 + ' ms、平均错误率 ' + SC.pct(t.err, 2) + '，异常实例 ' + t.bad + ' 个、摘流 ' + t.iso +
+                        ' 个。' + (t.hc['告警'] ? '其中 ' + t.hc['告警'] + ' 个服务处于告警，需在下个窗口前收敛。' : '全部服务处于健康或计划维护状态。') + '</p>' +
+                        '<div class="sc-section-title">二、末端设备</div>' +
+                        '<table class="data-table"><thead><tr><th>设备类型</th><th>规模</th><th>抽检异常</th></tr></thead><tbody>' +
+                        byKind.map(r => '<tr><td>' + SC.esc(r[0]) + '</td><td>' + SC.esc(r[1]) + '</td><td>' + SC.esc(r[2]) + '</td></tr>').join('') +
+                        '</tbody></table>' +
+                        '<div class="sc-section-title">三、告警与变更</div>' +
+                        '<p class="sc-hint">紧急告警 ' + t.urgent.length + ' 条，超时限 ' +
+                        t.open.filter(a => a.sla && Date.now() - a.at > a.sla * MIN).length + ' 条；待审批变更 ' + t.pend.length +
+                        ' 张，本月累计回滚 ' + t.roll.length + ' 张。</p>' +
+                        '<div class="sc-section-title">四、明日重点</div>' +
+                        '<p class="sc-hint">' + (t.offline ? '完成 ' + t.offline + ' 台离线设备的现场维修；' : '设备在线率达标；') +
+                        (t.pend.length ? '推进 ' + t.pend.length + ' 张变更单审批并在窗口内执行；' : '无待执行变更；') +
+                        '按 ' + DUTY_ROSTER[0].team + ' 排班继续 7×24 值守。</p>',
+                    footer: [
+                        { text: '⬇ 导出日报', kind: 'ghost', onClick: function () { exportDaily(); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+                note('info', '生成运维日报（第 ' + ST.daily + ' 期）');
+            }
+            function exportDaily() {
+                const t = totals();
+                SC.csv.download('运维日报-' + SC.today(), [
+                    ['指标', '数值'],
+                    ['综合健康指数', t.score],
+                    ['服务数', t.svc],
+                    ['实例数', t.inst],
+                    ['异常实例', t.bad],
+                    ['待处理告警', t.open.length],
+                    ['紧急告警', t.urgent.length],
+                    ['设备抽检数', t.dev],
+                    ['离线设备', t.offline],
+                    ['未闭环工单', t.tkOpen.length],
+                    ['待审批变更', t.pend.length]
+                ]);
+                SC.toast('日报已导出', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               9. 服务健康
+               ========================================================================== */
+            let svcFilter = '';
+            let svcDomain = '';
+
+            function svcRowHTML(s) {
+                const h = svcHealth(s);
+                const m = svcMetric(s);
+                const bad = badIdx(s).length, iso = isoIdx(s).length;
+                return '<tr data-id="' + SC.esc(s.id) + '" data-health="' + h + '" data-domain="' + SC.esc(s.domain) + '">' +
+                    '<td><b>' + SC.esc(s.name) + '</b><div class="sc-hint mono" style="font-size:.76em">' + SC.esc(s.id) + ' · ' + SC.esc(s.owner) + '</div></td>' +
+                    '<td>' + SC.esc(s.domain) + '</td>' +
+                    '<td class="mono">' + SC.esc(s.ver) + '</td>' +
+                    '<td>' + instBar(s) + ' ' + (s.inst - iso - bad) + '/' + s.inst + '</td>' +
+                    '<td>' + hTag(h) + '</td>' +
+                    '<td class="sc-cell-num">' + SC.num(m.qps) + '</td>' +
+                    '<td class="sc-cell-num">' + m.p95 + ' ms</td>' +
+                    '<td class="sc-cell-num">' + SC.pct(m.err, 2) + '</td>' +
+                    '<td>' + barMini(m.cpu) + '<span class="sc-hint" style="font-size:.78em">' + m.cpu + '%</span></td>' +
+                    '<td><button class="sc-btn sm ghost" data-act="sweep" data-id="' + SC.esc(s.id) + '">巡检</button></td></tr>';
+            }
+
+            function renderService() {
+                const t = totals();
+                put('#svc-kv', kvBox([
+                    ['服务 / 实例', t.svc + ' 个 · ' + t.inst + ' 实例'],
+                    ['正常服务', (t.hc['健康'] + t.hc['维护']) + ' 个'],
+                    ['异常实例', t.bad + ' 个（已摘流 ' + t.iso + '）'],
+                    ['平均 P95', t.p95 + ' ms'],
+                    ['平均错误率', SC.pct(t.err, 2)],
+                    ['累计巡检', (ST.sweeps || 0) + ' 次' + (ST.lastSweep ? ' · 最近 ' + ago(ST.lastSweep) : '')]
+                ]));
+
+                const counts = {};
+                SVC_ROWS.forEach(function (s) { const h = svcHealth(s); counts[h] = (counts[h] || 0) + 1; });
+                const order = ['健康', '维护', '降级', '告警'];
+                put('#svc-chips', '<span class="sc-chip' + (!svcFilter && !svcDomain ? ' active' : '') + '" data-health="" data-dom="">全部 ' + SVC_ROWS.length + '</span>' +
+                    order.map(function (h) {
+                        return '<span class="sc-chip' + (svcFilter === h ? ' active' : '') + '" data-health="' + h + '">' +
+                            H_ICON[h] + ' ' + h + ' ' + (counts[h] || 0) + '</span>';
+                    }).join('') +
+                    '<span class="sc-hint" style="margin-left:6px">' + (svcDomain ? '域筛选：' + SC.esc(svcDomain) + '　' : '') + '</span>');
+
+                const rank = { '告警': 0, '降级': 1, '未知': 2, '维护': 3, '健康': 4 };
+                const list = SVC_ROWS.slice().sort(function (a, b) {
+                    const ra = rank[svcHealth(a)], rb = rank[svcHealth(b)];
+                    if (ra !== rb) return ra - rb;
+                    return svcMetric(b).cpu - svcMetric(a).cpu;
+                });
+                q('#tbl-svc tbody').innerHTML = list.map(svcRowHTML).join('');
+                const ctrl = SC.table.enhance(q('#tbl-svc'), { pageSize: 10, search: '#tbl-search-svc', keyAttr: 'id' });
+                ctrl.setFilter(function (r) {
+                    if (svcFilter && r.tr.dataset.health !== svcFilter) return false;
+                    if (svcDomain && r.tr.dataset.domain !== svcDomain) return false;
+                    return true;
+                });
+
+                const top = SVC_ROWS.map(function (s) {
+                    const m = svcMetric(s);
+                    return { name: s.name, cores: Math.round(s.inst * m.cpu / 100 * 2 * 10) / 10, health: svcHealth(s) };
+                }).sort((a, b) => b.cores - a.cores).slice(0, 8);
+                drawChart('svcres', '#c-svc-res', 'bar', {
+                    labels: top.map(x => x.name), horizontal: true, unit: ' 核',
+                    series: [{
+                        name: 'CPU 折算核数', color: ACCENT,
+                        data: top.map(x => x.cores)
+                    }]
+                });
+
+                const insp = LOG.filter(function (r) { return /巡检|自愈|重启|摘流|回捞/.test(r.tx); }).slice(0, 12);
+                put('#svc-insp-log', insp.length ? insp.map(function (r) {
+                    return '<div class="li"><span class="t">' + SC.stamp(r.t) + '</span><span class="lv ' + r.lv + '">' +
+                        ({ info: '信息', warn: '预警', alarm: '告警', ok: '正常' }[r.lv] || r.lv) + '</span><span class="tx">' + SC.esc(r.tx) + '</span></div>';
+                }).join('') : '<div class="sc-hint">暂无巡检与自愈记录，可点击右上角「一键全量巡检」。</div>');
+            }
+
+            function svcTrendSeries(key, base, jitter) {
+                const pts = [], labels = [];
+                resetSeed(hashSeed(key + '#t'));
+                for (let i = 29; i >= 0; i--) {
+                    labels.push(SC.pad2(new Date(Date.now() - i * MIN).getMinutes()) + "分");
+                    pts.push(Math.max(0, Math.round(base + (srnd() - 0.5) * jitter)));
+                }
+                return { labels: labels, pts: pts };
+            }
+
+            function openSvc(id) {
+                const s = byId(id);
+                if (!s) return;
+                const api = SC.modal.open({ title: '服务详情', body: '<div></div>', footer: [{ text: '关闭', kind: 'ghost' }] });
+                function bodyHTML() {
+                    const h = svcHealth(s);
+                    const m = svcMetric(s);
+                    const ns = nodes(s);
+                    const href = pageOfDomain(s.domain);
+                    return '<div class="sc-kv">' + kvBox([
+                        ['服务名称', SC.esc(s.name)],
+                        ['服务标识', '<span class="mono">' + SC.esc(s.id) + '</span>'],
+                        ['所属域 / 负责人', SC.esc(s.domain) + ' · ' + SC.esc(s.owner)],
+                        ['当前健康', hTag(h)],
+                        ['实例可用', (s.inst - isoIdx(s).length - badIdx(s).length) + ' / ' + s.inst + '（摘流 ' + isoIdx(s).length + '）'],
+                        ['版本', SC.esc(s.ver)],
+                        ['QPS / P95', SC.num(m.qps) + ' / ' + m.p95 + ' ms'],
+                        ['错误率 / 可用性', SC.pct(m.err, 2) + ' / ' + m.up + '%'],
+                        ['CPU / 内存', m.cpu + '% / ' + m.mem + '%'],
+                        ['最近巡检', s && svcState(s.id).inspAt ? ago(svcState(s.id).inspAt) : '从未'],
+                        ['架构联动', '<a href="' + href + '">' + (window.ArchLink ? ArchLink.labelOf((window.ArchLink.pageForDomain(s.domain) || '')) || '查看域档案' : '域档案') + ' ↗</a>']
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">近 30 分钟指标</div>' +
+                        '<div class="sc-chart"><canvas></canvas></div>' +
+                        '<div class="sc-section-title">实例清单</div>' +
+                        '<table class="data-table"><thead><tr><th>实例</th><th>可用区</th><th>状态</th><th>CPU</th><th>内存</th><th>RT</th><th>QPS</th><th>启动时长</th><th data-no-sort>操作</th></tr></thead><tbody>' +
+                        ns.map(function (n) {
+                            const act = n.state === '异常' ? 'restart' : n.state === '已摘流' ? 'back' : 'isolate';
+                            const label = n.state === '异常' ? '重启' : n.state === '已摘流' ? '回捞' : '摘流';
+                            return '<tr><td class="mono">' + SC.esc(n.name) + '</td><td>' + SC.esc(n.az) + '</td>' +
+                                '<td>' + tag(n.state, n.state === '运行中' ? 'ok' : n.state === '异常' ? 'bad' : 'off') + '</td>' +
+                                '<td class="sc-cell-num">' + n.cpu + '%</td><td class="sc-cell-num">' + n.mem + '%</td>' +
+                                '<td class="sc-cell-num">' + n.rt + ' ms</td><td class="sc-cell-num">' + SC.num(n.qps) + '</td>' +
+                                '<td>' + dur(n.since) + '</td>' +
+                                '<td><button class="sc-btn sm ' + (act === 'restart' ? 'danger' : 'ghost') + '" data-node="' + n.i + '" data-op="' + act + '">' + label + '</button></td></tr>';
+                        }).join('') + '</tbody></table>' +
+                        '<div class="sc-hint" style="margin-top:8px">重启会把异常实例重新纳入服务；摘流用于灰度观察，实例保留但不接流量。</div>';
+                }
+                function paint() {
+                    api.setTitle('🧩 ' + s.name + ' · ' + s.domain + '域');
+                    api.body.innerHTML = bodyHTML();
+                    api.footer.innerHTML = '';
+                    const cv = api.body.querySelector('.sc-chart canvas');
+                    const m = svcMetric(s);
+                    const tr = svcTrendSeries(s.id, m.qps, m.qps * 0.34);
+                    const tr2 = svcTrendSeries(s.id + '#rt', m.p95, m.p95 * 0.5);
+                    if (cv && SC.chart) {
+                        CH['svc-modal'] = SC.chart.line(cv, {
+                            labels: tr.labels, smooth: true, unit: '',
+                            series: [
+                                { name: 'QPS', color: ACCENT, data: tr.pts, fill: true },
+                                { name: 'P95 延迟(ms)', color: AMBER, data: tr2.pts, dash: [6, 4], fill: false }
+                            ]
+                        });
+                    }
+                    const acts = [
+                        { text: '🩺 立即巡检', kind: 'primary', run: function () { sweepOne(s.id); } },
+                        { text: '♻ 重启全部异常实例', kind: 'danger', run: function () { restartAll(s.id); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ];
+                    acts.forEach(function (cfg) {
+                        const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                        btn.addEventListener('click', function () {
+                            if (!cfg.run) { api.close(); return; }
+                            cfg.run();
+                            const fresh = byId(s.id);
+                            if (fresh) Object.assign(s, fresh);
+                            paint();
+                            renderService();
+                            renderLive();
+                        });
+                        api.footer.appendChild(btn);
+                    });
+                    api.body.addEventListener('click', function (ev) {
+                        const btn = ev.target.closest('button[data-op]');
+                        if (!btn) return;
+                        nodeOp(s.id, Number(btn.dataset.node), btn.dataset.op);
+                        const fresh = byId(s.id);
+                        if (fresh) Object.assign(s, fresh);
+                        paint();
+                        renderService();
+                        renderLive();
+                    });
+                }
+                paint();
+            }
+
+            function nodeOp(id, idx, op) {
+                const s = byId(id);
+                if (!s) return;
+                const st = svcState(id);
+                if (op === 'restart') {
+                    if (st.fixed.indexOf(idx) < 0) st.fixed.push(idx);
+                    if (st.extra.indexOf(idx) > -1) st.extra.splice(st.extra.indexOf(idx), 1);
+                    st.restarted.push(idx);
+                    saveST();
+                    note('ok', s.name + ' 实例 #' + (idx + 1) + ' 已重启并重新纳入服务');
+                    SC.toast('实例 #' + (idx + 1) + ' 重启指令已下发', { type: 'success' });
+                } else if (op === 'isolate') {
+                    if (st.iso.indexOf(idx) < 0) st.iso.push(idx);
+                    saveST();
+                    note('warn', s.name + ' 实例 #' + (idx + 1) + ' 已从负载均衡摘流');
+                    SC.toast('已摘流，实例不再接流量', { type: 'warn' });
+                } else if (op === 'back') {
+                    st.iso = st.iso.filter(i => i !== idx);
+                    saveST();
+                    note('ok', s.name + ' 实例 #' + (idx + 1) + ' 已回捞并恢复接流');
+                    SC.toast('实例已回捞接流', { type: 'success' });
+                }
+            }
+            function restartAll(id) {
+                const s = byId(id);
+                if (!s) return;
+                const st = svcState(id);
+                const bad = badIdx(s);
+                if (!bad.length) { SC.toast('该服务当前没有异常实例', { type: 'info' }); return; }
+                bad.forEach(function (i) { if (st.fixed.indexOf(i) < 0) { st.fixed.push(i); st.restarted.push(i); } });
+                st.extra = [];
+                saveST();
+                note('ok', s.name + ' 批量重启 ' + bad.length + ' 个异常实例并完成健康检查');
+                SC.toast('已重启 ' + bad.length + ' 个异常实例', { type: 'success' });
+            }
+            function sweepOne(id) {
+                const s = byId(id);
+                if (!s) return;
+                const st = svcState(id);
+                const bad = badIdx(s);
+                st.inspAt = Date.now();
+                if (bad.length) {
+                    st.fixed.push(bad[0]);
+                    st.restarted.push(bad[0]);
+                    saveST();
+                    note('ok', s.name + ' 巡检发现 ' + bad.length + ' 个异常实例，已自愈重启 1 个');
+                    SC.toast('巡检完成：发现 ' + bad.length + ' 个异常实例并重启 1 个', { type: 'warn' });
+                } else {
+                    saveST();
+                    note('info', s.name + ' 巡检通过：' + s.inst + ' 个实例健康检查全部成功');
+                    SC.toast('巡检通过，' + s.inst + ' 个实例全部健康', { type: 'success' });
+                }
+            }
+            function sweepAllService() {
+                let healed = 0;
+                SVC_ROWS.forEach(function (s) {
+                    const st = svcState(s.id);
+                    const bad = badIdx(s);
+                    st.inspAt = Date.now();
+                    if (bad.length) { st.fixed.push(bad[0]); st.restarted.push(bad[0]); healed++; }
+                });
+                ST.sweeps = (ST.sweeps || 0) + 1;
+                ST.lastSweep = Date.now();
+                saveST();
+                note('ok', '服务全量巡检完成，重启自愈 ' + healed + ' 个异常实例');
+                SC.toast('巡检完成，自愈 ' + healed + ' 个异常实例', { type: 'success' });
+                renderLive();
+                renderService();
+            }
+            function exportSvc() {
+                SC.csv.download('服务健康-' + SC.today(), [['服务', '标识', '域', '版本', '实例', '健康', 'QPS', 'P95(ms)', '错误率(%)', 'CPU(%)', '负责人']].concat(
+                    SVC_ROWS.map(function (s) {
+                        const m = svcMetric(s);
+                        return [s.name, s.id, s.domain, s.ver, (s.inst - isoIdx(s).length - badIdx(s).length) + '/' + s.inst, svcHealth(s), m.qps, m.p95, m.err, m.cpu, s.owner];
+                    })));
+                SC.toast('服务健康报表已导出', { type: 'success' });
+            }
+            /* ==========================================================================
+               10. 设备运维
+               ========================================================================== */
+            let devKind = '';
+            let devState = '';
+            let tkFilter = '';
+
+            function devRowHTML(d) {
+                return '<tr data-id="' + SC.esc(d.id) + '" data-kind="' + SC.esc(d.pfx) + '" data-state="' + SC.esc(d.status) + '">' +
+                    '<td class="mono"><b>' + SC.esc(d.id) + '</b></td>' +
+                    '<td>' + SC.esc(d.kind) + '</td>' +
+                    '<td>' + SC.esc(d.point) + '<div class="sc-hint" style="font-size:.76em">' + SC.esc(d.owner) + '</div></td>' +
+                    '<td>' + SC.esc(d.access) + '</td>' +
+                    '<td>' + barMini(d.sig, d.sig < 30 ? RED : d.sig < 60 ? AMBER : ACCENT) + '<span class="sc-hint" style="font-size:.78em">' + d.sig + '%</span></td>' +
+                    '<td class="sc-cell-num">' + (d.batt >= 100 ? '市电' : d.batt + '%') + '</td>' +
+                    '<td>' + ago(d.last) + '</td>' +
+                    '<td>' + tag(d.status, DEV_TAG[d.status] || 'info') + '</td>' +
+                    '<td><button class="sc-btn sm ghost" data-act="diag" data-id="' + SC.esc(d.id) + '">诊断</button>' +
+                    (d.status !== '离线' ? '' : ' <button class="sc-btn sm danger" data-act="ticket" data-id="' + SC.esc(d.id) + '">派单</button>') + '</td></tr>';
+            }
+
+            function renderDevice() {
+                const list = devList();
+                const off = list.filter(d => d.status === '离线');
+                const t = totals();
+                put('#dev-kv', kvBox([
+                    ['设备台账', SC.num(t.devTotal) + ' 台'],
+                    ['抽检样本', list.length + ' 台（覆盖 ' + KIND_DEF.length + ' 类）'],
+                    ['样本在线率', SC.pct((1 - off.length / list.length) * 100, 1)],
+                    ['离线 / 异常', off.length + ' / ' + list.filter(d => d.status === '异常').length + ' 台'],
+                    ['低电预警', list.filter(d => d.status === '低电').length + ' 台'],
+                    ['维修工单未闭环', t.tkOpen.length + ' 张'],
+                    ['巡检任务', ST.task.at ? ago(ST.task.at) + '下发 · 覆盖 ' + (ST.task.cover || 0) + '%' : '尚未下发']
+                ]));
+
+                put('#dev-chips', '<span class="sc-chip' + (!devKind && !devState ? ' active' : '') + '" data-kind="" data-state="">全部 ' + list.length + '</span>' +
+                    KIND_DEF.map(function (k) {
+                        const n = list.filter(d => d.pfx === k[0]).length;
+                        return '<span class="sc-chip' + (devKind === k[0] ? ' active' : '') + '" data-kind="' + k[0] + '" data-state="">' +
+                            SC.esc(k[1]) + ' ' + n + '</span>';
+                    }).join('') +
+                    ['在线', '离线', '异常', '低电', '维护'].map(function (s) {
+                        const n = list.filter(d => d.status === s).length;
+                        if (!n) return '';
+                        return '<span class="sc-chip' + (devState === s ? ' active' : '') + '" data-state="' + s + '" data-kind="" style="border-style:dashed">' +
+                            s + ' ' + n + '</span>';
+                    }).join(''));
+
+                q('#tbl-dev tbody').innerHTML = list.map(devRowHTML).join('');
+                const ctrl = SC.table.enhance(q('#tbl-dev'), { pageSize: 10, search: '#tbl-search-dev', keyAttr: 'id' });
+                ctrl.setFilter(function (r) {
+                    if (devKind && r.tr.dataset.kind !== devKind) return false;
+                    if (devState && r.tr.dataset.state !== devState) return false;
+                    return true;
+                });
+
+                const labels = [], rate = [], miss = [];
+                for (let i = 11; i >= 0; i--) {
+                    labels.push(SC.pad2(new Date(Date.now() - i * HOUR).getHours()) + ':00');
+                    resetSeed(hashSeed('dev-rate') + (11 - i));
+                    const r = SC.clamp(99.4 - off.length * 0.6 + sri(-8, 8) / 10, 82, 99.9);
+                    rate.push(Number(r.toFixed(1)));
+                    miss.push(Math.max(0, Math.round((100 - r) * DEV_TOTAL / 100 / 12)));
+                }
+                drawChart('devtrend', '#c-dev-trend', 'line', {
+                    labels: labels, smooth: true,
+                    series: [
+                        { name: '在线率(%)', color: ACCENT, data: rate, fill: true },
+                        { name: '心跳缺失(台)', color: RED, data: miss, dash: [6, 4], fill: false }
+                    ]
+                });
+                SC.chart.legend(q('#lg-dev-trend'), [
+                    { name: '在线率(%)', color: ACCENT, value: rate[11] + '%' },
+                    { name: '心跳缺失(台)', color: RED, value: miss[11] + ' 台' }
+                ]);
+
+                drawChart('devpie', '#c-dev-pie', 'pie', {
+                    labels: KIND_DEF.map(k => k[1]),
+                    data: KIND_DEF.map(k => k[3]),
+                    colors: KIND_DEF.map(k => k[4]),
+                    centerTop: SC.num(t.devTotal), centerBottom: '在册设备', unit: ' 台'
+                });
+
+                renderTickets();
+            }
+
+            function tkRowHTML(x) {
+                const act = x.status === '待接单' ? { a: 'take', t: '接单' } :
+                    x.status === '处理中' ? { a: 'done', t: '完成' } :
+                        x.status === '已完成' ? { a: 'close', t: '归档' } : null;
+                return '<tr data-no="' + SC.esc(x.no) + '" data-state="' + SC.esc(x.status) + '">' +
+                    '<td class="mono"><b>' + SC.esc(x.no) + '</b></td>' +
+                    '<td class="mono">' + SC.esc(x.dev) + '<div class="sc-hint" style="font-size:.76em">' + SC.esc(x.point || x.kind || '') + '</div></td>' +
+                    '<td>' + SC.esc(x.desc) + '<div class="sc-hint" style="font-size:.76em">来源：' + SC.esc(x.src) + '</div></td>' +
+                    '<td>' + tag(x.pri, TK_PRI_TAG[x.pri] || 'info') + '</td>' +
+                    '<td>' + SC.esc(x.owner) + '</td>' +
+                    '<td>' + ago(x.at) + '</td>' +
+                    '<td>' + tag(x.status, TK_TAG[x.status] || 'info') + '</td>' +
+                    '<td>' + (act ? '<button class="sc-btn sm ghost" data-act="' + act.a + '" data-no="' + SC.esc(x.no) + '">' + act.t + '</button>'
+                        : '<span class="sc-hint">已闭环</span>') + '</td></tr>';
+            }
+
+            function renderTickets() {
+                const all = ST.tickets.slice().sort((a, b) => b.at - a.at);
+                const cnt = function (s) { return all.filter(x => x.status === s).length; };
+                put('#tk-chips', '<span class="sc-chip' + (!tkFilter ? ' active' : '') + '" data-ck="">全部 ' + all.length + '</span>' +
+                    ['待接单', '处理中', '已完成', '已关闭'].map(function (s) {
+                        if (!cnt(s)) return '';
+                        return '<span class="sc-chip' + (tkFilter === s ? ' active' : '') + '" data-ck="' + s + '">' + s + ' ' + cnt(s) + '</span>';
+                    }).join('') +
+                    ' <button class="sc-btn sm ghost" data-act="tk-export">⬇ 导出工单</button>');
+                q('#tbl-ticket tbody').innerHTML = all.map(tkRowHTML).join('') ||
+                    '<tr class="sc-empty-row"><td colspan="8">暂无维修工单</td></tr>';
+                const ctrl = SC.table.enhance(q('#tbl-ticket'), { pageSize: 6, search: false, keyAttr: 'no' });
+                ctrl.setFilter(function (r) { return !tkFilter || r.tr.dataset.state === tkFilter; });
+            }
+
+            function createTicket(dev, desc, pri, src) {
+                const no = 'WO-' + SC.today().slice(2).replace(/-/g, '') + SC.pad2(ST.tickets.length + 1);
+                ST.tickets.unshift({
+                    no: no, dev: dev.id, kind: dev.kind, point: dev.point, desc: desc, pri: pri || '中',
+                    owner: srp(['李国强', '王振宇', '周敏', '陈立']), at: Date.now(), status: '待接单', src: src || '告警转工单'
+                });
+                saveST();
+                return no;
+            }
+
+            function tkOp(no, act) {
+                const x = ST.tickets.filter(t => t.no === no)[0];
+                if (!x) return;
+                const map = { take: ['处理中', '接单'], done: ['已完成', '闭环'], close: ['已关闭', '归档'] };
+                const m = map[act];
+                if (!m) return;
+                x.status = m[0];
+                saveST();
+                note(act === 'done' ? 'ok' : 'info', '工单 ' + no + '（' + x.dev + '）' + m[1] + '，状态置为' + x.status);
+                SC.toast('工单 ' + no + ' 已' + m[1], { type: act === 'done' ? 'success' : 'info' });
+                renderTickets();
+                renderLive();
+            }
+
+            function devDiag(id) {
+                const d = devById(id);
+                if (!d) return;
+                const r = hashSeed(id + Math.floor(Date.now() / DAY)) % 100;
+                let res, kind;
+                if (d.status === '离线') {
+                    res = r > 55 ? '通信模块无响应，判定为电源或模块硬件故障，需现场处理' : 'NB-IoT 信号弱于 -112dBm，重选基站后有机会自恢复';
+                    kind = 'bad';
+                } else if (d.status === '异常') {
+                    res = '上报数据量正常但读数长期恒定，判定为传感器探头失效'; kind = 'bad';
+                } else if (d.status === '低电') {
+                    res = '电池内阻偏高，剩余容量不足以支撑一个上报周期'; kind = 'warn';
+                } else {
+                    res = '自检通过：链路、时钟、采样与上报队列均正常'; kind = 'ok';
+                }
+                patchDev(id, { diagAt: Date.now(), diag: res });
+                note(kind === 'ok' ? 'info' : 'warn', '设备 ' + id + ' 远程诊断：' + res);
+                SC.modal.open({
+                    title: '📡 远程诊断结果 · ' + id, size: 'sm',
+                    body: '<p>' + SC.esc(res) + '</p>' +
+                        '<div class="sc-hint" style="margin-top:10px">设备：' + SC.esc(d.kind) + ' · ' + SC.esc(d.point) +
+                        '<br>接入：' + SC.esc(d.access) + ' · 信号 ' + d.sig + '% · 状态 ' + d.status + '</div>',
+                    footer: kind === 'ok' ? [{ text: '关闭', kind: 'ghost' }] : [
+                        { text: '下发自愈指令', kind: 'primary', onClick: function () { devReset(id); } },
+                        { text: '生成维修工单', kind: 'danger', onClick: function () { ticketFor(id); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+                renderDevice();
+            }
+
+            function devReset(id) {
+                const d = devById(id);
+                if (!d) return;
+                patchDev(id, { status: '在线', sig: Math.max(62, d.sig || 40) + 34, last: Date.now(), batt: Math.max(d.batt, 46) });
+                note('ok', '设备 ' + id + ' 远程复位成功，心跳已恢复（信号 ' + Math.min(99, (d.sig || 40) + 34) + '%）');
+                SC.toast('复位指令已下发，设备重新上线', { type: 'success' });
+                renderDevice();
+                renderLive();
+                renderOverview();
+            }
+
+            function ticketFor(id) {
+                const d = devById(id);
+                if (!d) return;
+                SC.modal.form({
+                    title: '🧾 生成维修工单 · ' + id,
+                    fields: [
+                        { name: 'desc', label: '故障描述', type: 'textarea', required: true, col: 1, value: d.diag || (d.kind + ' ' + d.status) },
+                        { name: 'pri', label: '优先级', type: 'select', options: ['高', '中', '低'], value: d.status === '离线' ? '高' : '中' },
+                        { name: 'owner', label: '责任人', type: 'select', options: ['李国强', '王振宇', '周敏', '陈立'] },
+                        { name: 'plan', label: '计划到场时间', type: 'date', hint: '现场班组须在承诺时间内到场' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const no = createTicket(d, v.desc, v.pri, '远程诊断');
+                    if (v.owner) {
+                        ST.tickets[0].owner = v.owner;
+                        saveST();
+                    }
+                    note('warn', '设备 ' + id + ' 生成维修工单 ' + no + '（' + v.pri + '优先级，责任人 ' + ST.tickets[0].owner + '）');
+                    SC.toast('工单 ' + no + ' 已生成并派发', { type: 'success' });
+                    renderDevice();
+                    renderLive();
+                });
+            }
+
+            function dispatchInspect() {
+                SC.modal.form({
+                    title: '📡 下发设备巡检任务',
+                    fields: [
+                        { name: 'scope', label: '巡检范围', type: 'select', options: ['全域末端设备', '仅离线与异常设备', '排水与桥隧监测设备', '照明回路与单灯控制器'], col: 1 },
+                        { name: 'team', label: '执行班组', type: 'select', options: ['现场运维班', '物联网组', '市政业务组', '照明业务组'], col: 1 },
+                        {
+                            name: 'depth', label: '检查项', type: 'checkgroup', required: true, col: 1, options: [
+                                { value: 'hb', label: '心跳与上报完整性' },
+                                { value: 'qty', label: '读数合理性与阶跃检查' },
+                                { value: 'pwr', label: '供电与电池内阻' },
+                                { value: 'ver', label: '固件版本与配置一致性' }
+                            ]
+                        },
+                        { name: 'ratio', label: '抽样比例', type: 'range', min: 10, max: 100, step: 10, value: 40, unit: '%', col: 1 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const items = v.depth || [];
+                    const list = devList();
+                    const scope = v.scope.indexOf('仅离线') > -1 ? list.filter(d => d.status !== '在线') : list;
+                    const found = scope.filter(function (d, i) { return i % 3 === 0 && d.status === '在线' && hashSeed(d.id + items.join('')) % 9 === 0; });
+                    found.forEach(function (d) { patchDev(d.id, { status: '异常', diag: '巡检发现：' + items.length + ' 项检查中有读数阶跃与心跳缺失' }); });
+                    ST.task = { at: Date.now(), scope: v.scope, team: v.team, depth: items.join('、'), found: found.length, cover: Number(v.ratio) };
+                    saveST();
+                    note(found.length ? 'warn' : 'ok', '巡检任务下发（' + v.scope + '，' + v.team + '，抽样 ' + v.ratio + '%，' + items.length + ' 项检查）：新发现 ' + found.length + ' 台设备异常');
+                    SC.toast('巡检完成，发现 ' + found.length + ' 台设备需处理', { type: found.length ? 'warn' : 'success' });
+                    renderDevice();
+                    renderLive();
+                });
+            }
+
+            function batchTicket() {
+                const running = ST.tickets.filter(t => t.status === '待接单' || t.status === '处理中').map(t => t.dev);
+                const off = devList().filter(d => d.status === '离线' && running.indexOf(d.id) < 0);
+                if (!off.length) { SC.toast('离线设备均已有未闭环工单，无需重复派单', { type: 'info' }); return; }
+                SC.modal.confirm({
+                    title: '离线设备批量派单',
+                    html: '<p>将对 <b>' + off.length + '</b> 台心跳缺失设备生成维修工单：</p>' +
+                        '<p class="mono sc-hint" style="margin-top:8px;line-height:1.8">' +
+                        off.map(d => d.id + ' · ' + d.kind + ' · ' + d.point + ' · 最后上报 ' + ago(d.last)).join('<br>') + '</p>' +
+                        '<p style="margin-top:10px">优先级统一取「高」，责任人按设备归属班组自动分配，工单生成后可在下方列表流转。</p>',
+                    okText: '批量派单'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    const nos = off.map(d => createTicket(d, d.kind + '心跳缺失超过 ' + dur(d.last) + '，现场核查供电与通信模块', '高', '离线治理'));
+                    saveST();
+                    note('warn', '批量生成 ' + nos.length + ' 张维修工单：' + nos.join('、'));
+                    SC.toast('已生成 ' + nos.length + ' 张工单', { type: 'success' });
+                    renderDevice();
+                    renderLive();
+                    renderOverview();
+                });
+            }
+
+            function exportDev() {
+                SC.csv.download('设备台账-' + SC.today(), [['设备编号', '类型', '点位', '接入方式', '信号(%)', '电量(%)', '最后上报', '状态', '归属班组', '诊断结论']].concat(
+                    devList().map(function (d) {
+                        return [d.id, d.kind, d.point, d.access, d.sig, d.batt >= 100 ? '市电' : d.batt, SC.stamp(d.last, true), d.status, d.owner, d.diag || ''];
+                    })));
+                SC.csv.download('维修工单-' + SC.today(), [['工单号', '设备', '描述', '优先级', '责任人', '生成时间', '状态', '来源']].concat(
+                    ST.tickets.map(t => [t.no, t.dev, t.desc, t.pri, t.owner, SC.stamp(t.at, true), t.status, t.src])));
+                SC.toast('设备台账与工单已导出', { type: 'success' });
+            }
+
+            function openDevice(id) {
+                const d = devById(id);
+                if (!d) return;
+                const series = [];
+                resetSeed(hashSeed(id + '#h'));
+                for (let i = 23; i >= 0; i--) {
+                    series.push(d.status === '离线' && i < 7 ? 0 : Math.max(0, Math.round((d.rt + (srnd() - 0.5) * 60) * 10) / 10));
+                }
+                const labels = [];
+                for (let i = 23; i >= 0; i--) { labels.push(SC.pad2(new Date(Date.now() - i * HOUR).getHours()) + ':00'); }
+                const api = SC.modal.open({ title: '📡 设备档案 · ' + id, size: 'lg', body: '<div></div>', footer: [{ text: '关闭', kind: 'ghost' }] });
+                api.body.innerHTML = '<div class="sc-kv">' + kvBox([
+                    ['设备编号', '<span class="mono">' + SC.esc(id) + '</span>'],
+                    ['类型 / 接入', SC.esc(d.kind) + ' · ' + SC.esc(d.access)],
+                    ['安装点位', SC.esc(d.point)],
+                    ['归属班组', SC.esc(d.owner)],
+                    ['运行状态', tag(d.status, DEV_TAG[d.status] || 'info')],
+                    ['同类在册', SC.num(d.total) + ' 台'],
+                    ['信号 / 电量', d.sig + '% / ' + (d.batt >= 100 ? '市电供电' : d.batt + '%')],
+                    ['最后上报', ago(d.last) + '（' + SC.stamp(d.last, true) + '）'],
+                    ['诊断结论', d.diag ? SC.esc(d.diag) + '（' + ago(d.diagAt) + '）' : '尚未诊断']
+                ]) + '</div>' +
+                    '<div class="sc-section-title">近 24 小时上报时延（ms）</div>' +
+                    '<div class="sc-chart"><canvas></canvas></div>' +
+                    '<div class="sc-section-title">运维记录</div>' +
+                    '<div class="sc-timeline">' + [
+                        { d: 'done', h: '设备上线注册', m: SC.esc(d.access) + ' 接入成功，归属 ' + d.owner },
+                        { d: 'done', h: '最近一次配置下发', m: '采样频率与上报模板版本一致，无配置漂移' },
+                        { d: d.status === '在线' ? 'done' : 'todo', h: d.status === '在线' ? '心跳检查通过' : '心跳缺失，等待处置', m: d.diag || '尚未执行远程诊断' },
+                        { d: 'todo', h: '下次例行巡检', m: '按季度计划纳入现场班组任务' }
+                    ].map(function (x) {
+                        return '<div class="sc-tl-item ' + x.d + '"><div class="h">' + SC.esc(x.h) + '</div><div class="m">' + SC.esc(x.m) + '</div></div>';
+                    }).join('') + '</div>';
+                const cv = api.body.querySelector('.sc-chart canvas');
+                if (cv && SC.chart) {
+                    CH['dev-modal'] = SC.chart.line(cv, {
+                        labels: labels, unit: ' ms', smooth: false,
+                        series: [{ name: '上报时延', color: ACCENT, data: series, fill: true }]
+                    });
+                }
+                api.footer.innerHTML = '';
+                [
+                    { text: '🔍 远程诊断', kind: 'primary', run: function () { devDiag(id); } },
+                    { text: '♻ 远程复位', kind: 'danger', run: function () { devReset(id); } },
+                    { text: '🧾 生成工单', kind: '', run: function () { ticketFor(id); } },
+                    { text: '关闭', kind: 'ghost' }
+                ].forEach(function (cfg) {
+                    const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                    btn.addEventListener('click', function () {
+                        if (!cfg.run) { api.close(); return; }
+                        cfg.run();
+                        /* 动作会弹自己的结果窗并刷新列表，关掉当前档案窗避免展示旧状态 */
+                        api.close();
+                    });
+                    api.footer.appendChild(btn);
+                });
+            }
+
+            /* ==========================================================================
+               11. 告警中心
+               ========================================================================== */
+            let almLevel = '';
+            let almSrc = '';
+
+            function almLeft(a) {
+                if (!a.sla) return '无需时限';
+                const left = a.sla * MIN - (Date.now() - a.at);
+                if (a.state === '已恢复' || a.state === '已关闭') return '已闭环';
+                const m = Math.round(Math.abs(left) / MIN);
+                return (left >= 0 ? '剩余 ' : '超时 ') + (m < 60 ? m + ' 分钟' : (m / 60).toFixed(1) + ' 小时');
+            }
+
+            function almRowHTML(a) {
+                const op = a.state === '待确认' ? '<button class="sc-btn sm" data-act="ack" data-id="' + a.id + '">确认</button>' :
+                    a.state === '处理中' ? '<button class="sc-btn sm ghost" data-act="assign" data-id="' + a.id + '">转派</button>' :
+                        '<button class="sc-btn sm ghost" data-act="reopen" data-id="' + a.id + '">重新打开</button>';
+                return '<tr data-id="' + SC.esc(a.id) + '" data-level="' + SC.esc(a.level) + '" data-src="' + SC.esc(a.src) + '" data-state="' + SC.esc(a.state) + '">' +
+                    '<td>' + tag(a.level, LVL_TAG[a.level]) + '</td>' +
+                    '<td><b>' + SC.esc(a.title) + '</b><div class="sc-hint" style="font-size:.76em">重复 ' + a.cnt + ' 次 · 建议：' + SC.esc(a.advice) + '</div></td>' +
+                    '<td class="mono">' + SC.esc(a.obj) + '</td>' +
+                    '<td>' + SC.esc(ALM_SRC_NAME[a.src] || a.src) + ' · ' + SC.esc(a.domain) + '</td>' +
+                    '<td>' + SC.stamp(a.at) + '</td>' +
+                    '<td>' + dur(a.at) + '</td>' +
+                    '<td>' + (a.sla ? almLeft(a) : '提示级') + '</td>' +
+                    '<td>' + tag(a.state, ASM_TAG[a.state]) + (a.silence > Date.now() ? ' <span class="sc-tag off">静默中</span>' : '') +
+                    '<div class="sc-hint" style="font-size:.76em">' + SC.esc(a.owner) + '</div></td>' +
+                    '<td>' + op + ' <button class="sc-btn sm ghost" data-act="silence" data-id="' + a.id + '">静默</button></td></tr>';
+            }
+
+            function renderAlarm() {
+                const list = almList();
+                const open = list.filter(a => a.state === '待确认' || a.state === '处理中');
+                const overdue = open.filter(a => a.sla && Date.now() - a.at > a.sla * MIN);
+                const silenced = list.filter(a => a.silence > Date.now());
+                const responded = list.filter(a => a.state !== '待确认');
+                put('#alm-kv', kvBox([
+                    ['告警总量', list.length + ' 条（24 小时）'],
+                    ['紧急 / 重要', list.filter(a => a.level === '紧急').length + ' / ' + list.filter(a => a.level === '重要').length],
+                    ['待确认', list.filter(a => a.state === '待确认').length + ' 条'],
+                    ['处理中', list.filter(a => a.state === '处理中').length + ' 条'],
+                    ['超时限未处置', overdue.length + ' 条'],
+                    ['静默中', silenced.length + ' 条'],
+                    ['平均响应', (responded.length ? Math.round(responded.reduce((a, x) => a + 6 + hashSeed(x.id) % 22, 0) / responded.length) : 0) + ' 分钟'],
+                    ['启用规则', RULES.filter(r => r.on).length + '/' + RULES.length + ' 条']
+                ]));
+
+                const lvls = ['紧急', '重要', '次要', '提示'];
+                const lc = { '紧急': RED, '重要': AMBER, '次要': BLUE, '提示': GRAY };
+                const buckets = [], bLabels = [];
+                for (let i = 11; i >= 0; i--) { bLabels.push(SC.pad2(new Date(Date.now() - i * 2 * HOUR).getHours()) + ':00'); }
+                lvls.forEach(function (lv) {
+                    buckets.push(lv);
+                });
+                const series = lvls.map(function (lv) {
+                    const data = [];
+                    for (let b = 0; b < 12; b++) {
+                        resetSeed(hashSeed('alm-' + lv) + b);
+                        const now = b === 11;
+                        const inB = now ? list.filter(a => a.level === lv && (a.state === '待确认' || a.state === '处理中')).length : 0;
+                        data.push(Math.max(0, sri(0, lv === '紧急' ? 4 : 9) + inB));
+                    }
+                    return { name: lv, color: lc[lv], data: data };
+                });
+                drawChart('almtrend', '#c-alm-trend', 'bar', { labels: bLabels, unit: ' 条', stacked: true, series: series });
+                SC.chart.legend(q('#lg-alm-trend'), lvls.map(function (lv) {
+                    return { name: lv, color: lc[lv], value: list.filter(a => a.level === lv).length + ' 条' };
+                }));
+
+                const srcs = Object.keys(ALM_SRC_NAME);
+                drawChart('almsrc', '#c-alm-src', 'pie', {
+                    labels: srcs.map(s => ALM_SRC_NAME[s]),
+                    data: srcs.map(s => list.filter(a => a.src === s).length),
+                    colors: [BLUE, ACCENT, PURPLE, AMBER, RED],
+                    centerTop: String(list.length), centerBottom: '告警条数', unit: ' 条'
+                });
+
+                put('#alm-chips', '<span class="sc-chip' + (!almLevel && !almSrc ? ' active' : '') + '" data-lvl="" data-src="">全部 ' + list.length + '</span>' +
+                    lvls.map(function (lv) {
+                        const n = list.filter(a => a.level === lv && (a.state === '待确认' || a.state === '处理中')).length;
+                        return '<span class="sc-chip' + (almLevel === lv ? ' active' : '') + '" data-lvl="' + lv + '" data-src="">' + lv + ' 待处理 ' + n + '</span>';
+                    }).join('') +
+                    srcs.map(function (s) {
+                        return '<span class="sc-chip' + (almSrc === s ? ' active' : '') + '" data-src="' + s + '" data-lvl="" style="border-style:dashed">' +
+                            ALM_SRC_NAME[s] + ' ' + list.filter(a => a.src === s).length + '</span>';
+                    }).join(''));
+
+                q('#tbl-alm tbody').innerHTML = list.slice().sort(function (a, b) {
+                    const r = { '待确认': 0, '处理中': 1, '已恢复': 2, '已关闭': 3 };
+                    const lr = { '紧急': 0, '重要': 1, '次要': 2, '提示': 3 };
+                    if (r[a.state] !== r[b.state]) return r[a.state] - r[b.state];
+                    if (lr[a.level] !== lr[b.level]) return lr[a.level] - lr[b.level];
+                    return b.at - a.at;
+                }).map(almRowHTML).join('');
+                const ctrl = SC.table.enhance(q('#tbl-alm'), { pageSize: 10, search: '#tbl-search-alm', keyAttr: 'id' });
+                ctrl.setFilter(function (row) {
+                    const tr = row.tr;
+                    if (almLevel && tr.dataset.level !== almLevel) return false;
+                    if (almSrc && tr.dataset.src !== almSrc) return false;
+                    return true;
+                });
+                put('#alm-note', '当前口径：' + (almLevel || '全级别') + ' / ' + (almSrc ? ALM_SRC_NAME[almSrc] : '全来源') +
+                    '，待处理 ' + open.length + ' 条，超时限 ' + overdue.length + ' 条。' +
+                    (overdue.length ? '超时限告警已同步短信通知值班长。' : '处置时限全部达标。') +
+                    '点击行查看告警详情、关联对象与处置时间线。');
+            }
+
+            function almById(id) {
+                for (let i = 0; i < ALARMS.length; i++) { if (ALARMS[i].id === id) return ALARMS[i]; }
+                return null;
+            }
+            function ackAlarm(id) {
+                const a = almById(id);
+                if (!a) return;
+                setAlm(id, { state: '处理中' });
+                note('warn', '告警 ' + id + '（' + a.title + '）已确认，转入处置中，责任人 ' + almState(a).owner);
+                SC.toast('已确认并转入处置', { type: 'success' });
+                renderAlarm();
+                renderLive();
+                renderOverview();
+            }
+            function batchAck() {
+                const list = almList().filter(a => a.state === '待确认' && a.level !== '提示');
+                if (!list.length) { SC.toast('没有待确认的告警', { type: 'info' }); return; }
+                SC.modal.confirm({
+                    title: '批量确认待处理告警',
+                    html: '<p>将把 <b>' + list.length + '</b> 条待确认告警转入处置中（提示级不参与批量确认）：</p>' +
+                        '<p class="sc-hint" style="margin-top:8px;line-height:1.8">' +
+                        list.slice(0, 8).map(a => a.id + ' · ' + a.level + ' · ' + a.title + ' · ' + a.obj).join('<br>') +
+                        (list.length > 8 ? '<br>…共 ' + list.length + ' 条' : '') + '</p>',
+                    okText: '全部确认'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    list.forEach(a => setAlm(a.id, { state: '处理中' }));
+                    note('warn', '批量确认 ' + list.length + ' 条告警并转入处置');
+                    SC.toast('已确认 ' + list.length + ' 条告警', { type: 'success' });
+                    renderAlarm();
+                    renderLive();
+                });
+            }
+            function assignAlarm(id) {
+                const a = almById(id);
+                if (!a) return;
+                SC.modal.form({
+                    title: '👤 转派告警 · ' + id,
+                    fields: [
+                        { name: 'owner', label: '接手人', type: 'select', options: ['张宇轩', '李国强', '王振宇', '周敏', '陈立', '赵婉'], col: 1 },
+                        { name: 'level', label: '处置级别', type: 'select', options: ['立即处置', '窗口内处置', '观察等待自愈'], col: 1 },
+                        { name: 'plan', label: '处置方案', type: 'textarea', required: true, col: 1, value: a.advice }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    setAlm(id, { state: '处理中', owner: v.owner, note: v.level + '：' + v.plan });
+                    note('warn', '告警 ' + id + ' 转派给 ' + v.owner + '，处置级别「' + v.level + '」');
+                    SC.toast('已转派给 ' + v.owner, { type: 'success' });
+                    renderAlarm();
+                });
+            }
+            function closeAlarm(id) {
+                const a = almById(id);
+                if (!a) return;
+                setAlm(id, { state: '已恢复' });
+                note('ok', '告警 ' + id + '（' + a.title + '）确认恢复并闭环');
+                SC.toast('告警已闭环', { type: 'success' });
+                renderAlarm();
+                renderLive();
+                renderOverview();
+            }
+            function silenceAlarm(id) {
+                const a = almById(id);
+                if (!a) return;
+                SC.modal.form({
+                    title: '🤫 静默告警 · ' + id,
+                    fields: [
+                        { name: 'min', label: '静默时长', type: 'select', options: ['15 分钟', '30 分钟', '1 小时', '4 小时'], col: 1 },
+                        { name: 'why', label: '静默原因', type: 'select', options: ['变更窗口内预期抖动', '已知重复告警，等待规则收敛', '第三方依赖故障，已在跟踪'], col: 1 },
+                        { name: 'note', label: '备注', type: 'textarea', col: 1 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const m = { '15 分钟': 15, '30 分钟': 30, '1 小时': 60, '4 小时': 240 }[v.min] || 30;
+                    setAlm(id, { silence: Date.now() + m * MIN, note: v.why + (v.note ? ' · ' + v.note : '') });
+                    note('info', '告警 ' + id + ' 静默 ' + m + ' 分钟：' + v.why);
+                    SC.toast('已静默 ' + m + ' 分钟，到期自动恢复提醒', { type: 'warn' });
+                    renderAlarm();
+                });
+            }
+
+            function openRules() {
+                const api = SC.modal.open({
+                    title: '🧩 告警规则与静默策略', size: 'lg',
+                    body: '<div></div>',
+                    footer: [{ text: '保存配置', kind: 'primary' }, { text: '关闭', kind: 'ghost' }]
+                });
+                function paint() {
+                    api.body.innerHTML = '<div class="sc-hint">关闭规则后，新的同类告警不再产生；已有告警仍需人工闭环。</div>' +
+                        '<div class="sc-section-title">告警规则</div>' +
+                        RULES.map(function (r) {
+                            return '<div class="rule-row"><div class="rr-n"><b>' + SC.esc(r.name) + '</b>' +
+                                '<span>' + SC.esc(r.id) + ' · ' + SC.esc(r.desc) + '</span></div>' +
+                                '<div class="rr-v">窗口 ' + r.win + ' ' + (r.id === 'AR-01' || r.id === 'AR-04' ? '次' : r.id === 'AR-08' ? '分钟' : '分钟') + '</div>' +
+                                '<span class="sc-switch' + (r.on ? ' on' : '') + '" data-rule="' + r.id + '"><i></i></span></div>';
+                        }).join('') +
+                        '<div class="sc-section-title">全局静默</div>' +
+                        '<div class="sc-kv">' + kvBox([
+                            ['当前状态', ST.silence > Date.now() ? tag('静默至 ' + SC.stamp(ST.silence), 'off') : tag('未启用', 'ok')],
+                            ['启用规则数', RULES.filter(r => r.on).length + ' / ' + RULES.length],
+                            ['抖动抑制', ruleById('AR-08').on ? '已开启（10 分钟合并）' : '已关闭，重复告警将逐条产生']
+                        ]) + '</div>' +
+                        '<div class="sc-inline" style="margin-top:12px">' +
+                        '<button class="sc-btn sm" data-act="gsil">🤫 维护窗口全局静默 30 分钟</button>' +
+                        '<button class="sc-btn sm ghost" data-act="gclear">解除全局静默</button>' +
+                        '<button class="sc-btn sm ghost" data-act="reset">恢复默认规则</button></div>';
+                    api.body.querySelectorAll('.sc-switch[data-rule]').forEach(function (sw) {
+                        sw.addEventListener('click', function () {
+                            const r = ruleById(sw.dataset.rule);
+                            if (!r) return;
+                            r.on = !r.on;
+                            ST.rules[r.id] = r.on;
+                            saveST();
+                            note('info', '告警规则「' + r.name + '」已' + (r.on ? '启用' : '关闭'));
+                            paint();
+                            renderAlarm();
+                        });
+                    });
+                    api.body.addEventListener('click', function (ev) {
+                        const btn = ev.target.closest('button[data-act]');
+                        if (!btn) return;
+                        if (btn.dataset.act === 'gsil') {
+                            ST.silence = Date.now() + 30 * MIN;
+                            saveST();
+                            note('warn', '开启维护窗口全局静默 30 分钟');
+                            SC.toast('全局静默已开启 30 分钟', { type: 'warn' });
+                        } else if (btn.dataset.act === 'gclear') {
+                            ST.silence = 0;
+                            saveST();
+                            note('info', '解除全局静默');
+                            SC.toast('全局静默已解除', { type: 'info' });
+                        } else {
+                            RULE_SEED.forEach(function (r) { RULES.filter(x => x.id === r[0])[0].on = !!r[3]; ST.rules[r[0]] = !!r[3]; });
+                            saveST();
+                            SC.toast('已恢复默认规则配置', { type: 'success' });
+                        }
+                        paint();
+                        renderAlarm();
+                    });
+                }
+                paint();
+                api.footer.querySelector('.sc-btn.primary').addEventListener('click', function () {
+                    saveST();
+                    renderAlarm();
+                    renderLive();
+                    SC.toast('告警规则配置已保存', { type: 'success' });
+                    api.close();
+                    return false;
+                });
+            }
+
+            function openAlarm(id) {
+                const a = almById(id);
+                if (!a) return;
+                const st = almState(a);
+                const svc = a.src === 'service' ? byId(a.obj) : null;
+                const dev = a.src === 'device' ? devById(a.obj) : null;
+                const rel = svc ? '当前健康 ' + svcHealth(svc) + '，' + svc.inst + ' 个实例中异常 ' + badIdx(svc).length + ' 个，P95 ' + svcMetric(svc).p95 + ' ms'
+                    : dev ? '设备状态 ' + dev.status + '，信号 ' + dev.sig + '%，最后上报 ' + ago(dev.last)
+                        : '该对象为链路或基础设施指标，无独立服务档案';
+                const tl = [
+                    { d: 'done', h: '触发：' + SC.stamp(a.at, true), m: a.title + '（重复 ' + a.cnt + ' 次）' },
+                    { d: 'done', h: '通知：运行监控班', m: '短信 + 平台内推送，责任人 ' + st.owner },
+                    { d: st.state === '待确认' ? 'todo' : 'done', h: '确认：' + st.state, m: st.note || (st.state === '待确认' ? '等待值班确认' : '已按建议处置') },
+                    { d: st.state === '已恢复' || st.state === '已关闭' ? 'done' : 'todo', h: '恢复校验', m: st.state === '已恢复' ? '指标回到阈值以内，告警自动闭环' : '尚未确认恢复' }
+                ];
+                SC.modal.open({
+                    title: '🚨 告警详情 · ' + id,
+                    body: '<div class="sc-kv">' + kvBox([
+                        ['级别', tag(a.level, LVL_TAG[a.level])],
+                        ['状态', tag(st.state, ASM_TAG[st.state])],
+                        ['告警内容', SC.esc(a.title)],
+                        ['告警对象', '<span class="mono">' + SC.esc(a.obj) + '</span>'],
+                        ['来源 / 域', (ALM_SRC_NAME[a.src] || a.src) + ' · ' + a.domain],
+                        ['触发时间', SC.stamp(a.at, true) + '（' + dur(a.at) + '前）'],
+                        ['处置时限', a.sla ? a.sla + ' 分钟 · ' + almLeft(a) : '提示级不设时限'],
+                        ['责任人', SC.esc(st.owner)],
+                        ['关联对象', rel]
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">处置时间线</div>' +
+                        '<div class="sc-timeline">' + tl.map(function (x) {
+                            return '<div class="sc-tl-item ' + x.d + '"><div class="h">' + x.h + '</div><div class="m">' + x.m + '</div></div>';
+                        }).join('') + '</div>' +
+                        '<div class="sc-note' + (a.level === '紧急' ? ' warn' : '') + '" style="margin-top:12px">处置建议：' + SC.esc(a.advice) + '</div>' +
+                        (svc ? '<div class="sc-hint" style="margin-top:10px"><a href="' + pageOfDomain(svc.domain) + '">前往 ' + SC.esc(svc.domain) + '域场景页核查业务影响 ↗</a></div>' : ''),
+                    footer: [
+                        { text: '确认处置', kind: 'primary', onClick: function () { ackAlarm(id); SC.modal.closeTop(); } },
+                        { text: '转派', kind: '', onClick: function () { assignAlarm(id); } },
+                        { text: '闭环恢复', kind: 'ghost', onClick: function () { closeAlarm(id); SC.modal.closeTop(); } },
+                        { text: '关闭', kind: 'ghost' }
+                    ]
+                });
+            }
+
+            function exportAlarms() {
+                SC.csv.download('告警台账-' + SC.today(), [['编号', '级别', '内容', '对象', '来源', '域', '触发时间', '持续', '时限', '状态', '责任人']].concat(
+                    almList().map(function (a) {
+                        return [a.id, a.level, a.title, a.obj, ALM_SRC_NAME[a.src] || a.src, a.domain, SC.stamp(a.at, true), dur(a.at), a.sla ? almLeft(a) : '无', a.state, a.owner];
+                    })));
+                SC.toast('告警台账已导出', { type: 'success' });
+            }
+            /* ==========================================================================
+               12. 变更与值班
+               ========================================================================== */
+            let chgFilter = '';
+
+            function chgRowHTML(c) {
+                const act = c.status === '待审批' ? '<button class="sc-btn sm" data-act="approve" data-no="' + c.no + '">审批</button>' :
+                    c.status === '待执行' ? '<button class="sc-btn sm danger" data-act="exec" data-no="' + c.no + '">执行</button>' :
+                        c.status === '进行中' ? '<button class="sc-btn sm danger" data-act="exec" data-no="' + c.no + '">继续</button>' :
+                            c.status === '成功' ? '<button class="sc-btn sm ghost" data-act="review" data-no="' + c.no + '">复盘</button>' :
+                                '<button class="sc-btn sm ghost" data-act="resubmit" data-no="' + c.no + '">重新提交</button>';
+                return '<tr data-no="' + SC.esc(c.no) + '" data-state="' + SC.esc(c.status) + '" data-risk="' + SC.esc(c.risk) + '">' +
+                    '<td class="mono"><b>' + SC.esc(c.no) + '</b></td>' +
+                    '<td>' + SC.esc(c.type) + '</td>' +
+                    '<td><b>' + SC.esc(c.title) + '</b><div class="sc-hint" style="font-size:.76em">提交人 ' + SC.esc(c.owner) + ' · 评审 ' + SC.esc(c.review) + '</div></td>' +
+                    '<td class="mono">' + SC.esc(c.svc) + '</td>' +
+                    '<td>' + SC.esc(c.win) + '</td>' +
+                    '<td>' + tag(c.risk + '风险', RISK_TAG[c.risk]) + '</td>' +
+                    '<td>' + tag(c.status, CHG_TAG[c.status] || 'info') +
+                    (c.status === '进行中' ? '<div class="sc-hint" style="font-size:.76em">步骤 ' + c.done + '/' + c.steps.length + '</div>' : '') + '</td>' +
+                    '<td>' + act + '</td></tr>';
+            }
+
+            function renderChange() {
+                const t = totals();
+                ST.chg.forEach(function (c) { if (c.status === '进行中' && !c.done) c.done = 1; });
+                const month = ST.chg.filter(c => Date.now() - c.at < 30 * DAY);
+                put('#chg-kv', kvBox([
+                    ['变更单总量', ST.chg.length + ' 张'],
+                    ['待审批', ST.chg.filter(c => c.status === '待审批').length + ' 张'],
+                    ['待执行 / 进行中', ST.chg.filter(c => c.status === '待执行' || c.status === '进行中').length + ' 张'],
+                    ['执行成功', ST.chg.filter(c => c.status === '成功').length + ' 张'],
+                    ['回滚', t.roll.length + ' 张'],
+                    ['高风险占比', SC.pct(ST.chg.filter(c => c.risk === '高').length / ST.chg.length * 100, 1)],
+                    ['近 30 天变更', month.length + ' 张'],
+                    ['交接记录', (ST.duty.handovers || []).length + ' 次']
+                ]));
+
+                const states = ['待审批', '待执行', '进行中', '成功', '已回滚'];
+                put('#chg-chips', '<span class="sc-chip' + (!chgFilter ? ' active' : '') + '" data-st="">全部 ' + ST.chg.length + '</span>' +
+                    states.map(function (s) {
+                        const n = ST.chg.filter(c => c.status === s).length;
+                        if (!n) return '';
+                        return '<span class="sc-chip' + (chgFilter === s ? ' active' : '') + '" data-st="' + s + '">' + s + ' ' + n + '</span>';
+                    }).join('') +
+                    '<span class="sc-hint" style="margin-left:6px">高风险变更需二级审批，且只能在下个维护窗口执行。</span>');
+
+                q('#tbl-chg tbody').innerHTML = ST.chg.slice().sort((a, b) => b.at - a.at).map(chgRowHTML).join('');
+                const ctrl = SC.table.enhance(q('#tbl-chg'), { pageSize: 8, search: false, keyAttr: 'no' });
+                ctrl.setFilter(function (r) { return !chgFilter || r.tr.dataset.state === chgFilter; });
+
+                renderDuty();
+                renderDutyTl();
+                renderPlans();
+            }
+
+            function renderDuty() {
+                const today = dutyToday(0), next = dutyToday(1);
+                const last = (ST.duty.handovers || [])[0];
+                put('#oc-duty', today.map(function (r, i) {
+                    return '<div class="duty-card cur"><div class="dc-role">' + SC.esc(r.role) + ' · 今日</div>' +
+                        '<div class="dc-name">' + SC.esc(r.name) + '</div>' +
+                        '<div class="dc-line">' + SC.esc(r.team) + ' · ' + SC.esc(r.tag) + '<br>呼叫 ' + SC.esc(r.phone) +
+                        (next[i] ? '<br>下一班 ' + SC.esc(next[i].name) : '') + '</div></div>';
+                }).join('') +
+                    '<div class="duty-card"><div class="dc-role">值班长 · 升级路径</div><div class="dc-name">张宇轩</div>' +
+                    '<div class="dc-line">紧急告警 15 分钟未响应自动升级<br>' +
+                    '最近交接 ' + (last ? ago(last.at) + '（' + SC.esc(last.to) + ' 接班）' : '尚无记录') + '</div></div>');
+            }
+
+            function renderDutyTl() {
+                const items = (ST.duty.handovers || []).map(function (h) {
+                    return { d: 'done', h: '值班交接 · ' + SC.esc(h.from) + ' → ' + SC.esc(h.to), m: SC.stamp(h.at, true) + ' · ' + SC.esc(h.content) };
+                }).concat(LOG.filter(function (r) { return /变更|审批|执行|回滚|演练/.test(r.tx); }).slice(0, 10).map(function (r) {
+                    return { d: r.lv === 'ok' ? 'done' : 'todo', h: ({ info: '信息', warn: '预警', alarm: '告警', ok: '正常' }[r.lv] || r.lv) + ' · ' + SC.stamp(r.t), m: SC.esc(r.tx) };
+                }));
+                put('#duty-tl', items.length ? items.map(function (x) {
+                    return '<div class="sc-tl-item ' + x.d + '"><div class="h">' + x.h + '</div><div class="m">' + x.m + '</div></div>';
+                }).join('') : '<div class="sc-hint">暂无交接与变更记录，可发起值班交接或新建变更单。</div>');
+            }
+
+            function renderPlans() {
+                put('#plan-list', PLANS.map(function (p) {
+                    const at = ST.plans[p.id] || 0;
+                    const fresh = at && Date.now() - at < 90 * DAY;
+                    return '<div class="plan-card"><div class="pc-name">' + SC.esc(p.name) + '</div>' +
+                        '<div class="pc-body">' + SC.esc(p.id) + ' · 目标 ' + p.minutes + ' 分钟内恢复<br>处置：' + SC.esc(p.action) + '</div>' +
+                        '<div style="margin-top:8px;display:flex;align-items:center;gap:8px">' +
+                        tag(fresh ? '演练合格' : '待演练', fresh ? 'ok' : 'warn') +
+                        '<span class="sc-hint" style="font-size:.78em">' + (at ? '最近 ' + ago(at) : p.cycle + '一次') + '</span>' +
+                        '<button class="sc-btn sm ghost" data-drill="' + p.id + '" style="margin-left:auto">发起演练</button></div></div>';
+                }).join(''));
+                qa('#plan-list button[data-drill]').forEach(function (b) {
+                    b.addEventListener('click', function () { drillPlan(b.dataset.drill); });
+                });
+            }
+
+            function approve(no) {
+                const c = chgById(no);
+                if (!c) return;
+                SC.modal.confirm({
+                    title: '变更审批 · ' + no,
+                    html: '<p><b>' + SC.esc(c.title) + '</b></p>' +
+                        '<p class="sc-hint" style="margin-top:6px">类型 ' + c.type + ' · 风险 ' + c.risk + ' · 窗口 ' + c.win +
+                        ' · 影响 ' + c.svc + '</p>' +
+                        '<p style="margin-top:10px">审批后进入待执行队列，须在维护窗口内由值班员执行；' +
+                        (c.risk === '高' ? '本单为<b>高风险</b>，需同时确认回滚方案。' : '回滚方案已绑定上一版本。') + '</p>',
+                    okText: c.risk === '高' ? '确认回滚方案并通过审批' : '通过审批'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    c.status = '待执行';
+                    c.log.push({ t: Date.now(), tx: '审批通过，进入待执行队列（审批人 值班长 张宇轩）' });
+                    saveST();
+                    note('ok', '变更单 ' + no + '「' + c.title + '」审批通过，转入待执行');
+                    SC.toast('已通过审批，可在窗口内执行', { type: 'success' });
+                    renderChange();
+                    renderLive();
+                    renderOverview();
+                });
+            }
+
+            function execute(no) {
+                const c = chgById(no);
+                if (!c) return;
+                if (c.status === '待审批') { SC.toast('请先完成变更审批', { type: 'error' }); return; }
+                const start = c.done || 0;
+                const api = SC.modal.open({
+                    title: '⚙️ 执行变更 · ' + no, size: 'sm',
+                    body: '<div class="sc-hint">正在按标准作业步骤执行，窗口 ' + c.win + '。</div>' +
+                        '<div class="sc-progress" style="margin:12px 0"><i style="width:0%"></i></div>' +
+                        '<div class="sc-log" id="exec-log"></div>',
+                    footer: [{ text: '中止执行', kind: 'danger' }]
+                });
+                const bar = api.body.querySelector('.sc-progress i');
+                const logHost = api.body.querySelector('#exec-log');
+                let i = start;
+                let timer = null;
+                function paintLog() {
+                    logHost.innerHTML = c.steps.map(function (s, si) {
+                        const lv = si < i ? 'ok' : si === i ? 'warn' : 'info';
+                        const tx = si < i ? '完成：' + s : si === i ? '执行中：' + s : '待执行：' + s;
+                        return '<div class="li"><span class="t">' + SC.stamp(Date.now() - (c.steps.length - si) * 900) + '</span>' +
+                            '<span class="lv ' + lv + '">' + (si < i ? '正常' : si === i ? '进行中' : '等待') + '</span>' +
+                            '<span class="tx">' + SC.esc(tx) + '</span></div>';
+                    }).join('');
+                }
+                function finish(aborted) {
+                    clearInterval(timer);
+                    if (aborted) {
+                        c.status = '已回滚';
+                        c.log.push({ t: Date.now(), tx: '人工中止，已回滚至变更前版本' });
+                        note('alarm', '变更单 ' + no + ' 执行被中止并回滚，需复盘后重新提交');
+                        SC.toast('变更已中止并回滚', { type: 'error' });
+                    } else {
+                        c.status = '成功';
+                        c.done = c.steps.length;
+                        c.log.push({ t: Date.now(), tx: '全部步骤执行完成，健康检查通过，变更成功' });
+                        note('ok', '变更单 ' + no + '「' + c.title + '」执行成功（' + c.steps.length + ' 个步骤）');
+                        SC.toast('变更执行完成，健康检查通过', { type: 'success' });
+                    }
+                    saveST();
+                    api.close();
+                    renderChange();
+                    renderLive();
+                    renderOverview();
+                }
+                paintLog();
+                timer = setInterval(function () {
+                    i++;
+                    c.done = i;
+                    bar.style.width = Math.round(i / c.steps.length * 100) + '%';
+                    paintLog();
+                    if (i >= c.steps.length) { finish(false); }
+                }, 620);
+                c.status = '进行中';
+                api.footer.querySelector('.sc-btn').addEventListener('click', function () {
+                    if (c.status === '成功') { api.close(); return; }
+                    finish(true);
+                });
+            }
+
+            function openChange(no) {
+                const c = chgById(no);
+                if (!c) return;
+                const svc = byId(c.svc);
+                const acts = [
+                    { text: '✔ 审批通过', kind: 'primary', show: c.status === '待审批', run: function () { approve(no); api.close(); } },
+                    { text: '⚙ 立即执行', kind: 'danger', show: c.status === '待执行' || c.status === '进行中', run: function () { execute(no); api.close(); } },
+                    { text: '↤ 回滚', kind: 'danger', show: c.status === '成功', run: function () { rollback(no); api.close(); } },
+                    { text: '关闭', kind: 'ghost' }
+                ];
+                const api = SC.modal.open({
+                    title: '🧾 变更单 · ' + no, size: 'lg',
+                    body: '<div class="sc-kv">' + kvBox([
+                        ['变更内容', SC.esc(c.title)],
+                        ['类型 / 风险', c.type + ' · ' + tag(c.risk + '风险', RISK_TAG[c.risk])],
+                        ['当前状态', tag(c.status, CHG_TAG[c.status] || 'info')],
+                        ['影响服务', '<span class="mono">' + SC.esc(c.svc) + '</span>' + (svc ? '（' + svc.name + '）' : '')],
+                        ['变更窗口', c.win + ' · 提交于 ' + ago(c.at)],
+                        ['提交 / 评审', c.owner + ' / ' + c.review]
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">执行步骤</div>' +
+                        '<div class="sc-timeline">' + c.steps.map(function (s, i) {
+                            const done = (c.done || 0) > i || c.status === '成功';
+                            return '<div class="sc-tl-item ' + (done ? 'done' : 'todo') + '"><div class="h">' + SC.esc(s) + '</div>' +
+                                '<div class="m">' + (done ? '已完成' : '待执行') + '</div></div>';
+                        }).join('') + '</div>' +
+                        '<div class="sc-section-title">变更日志</div>' +
+                        (c.log.length ? '<div class="sc-log">' + c.log.slice().reverse().map(function (r) {
+                            return '<div class="li"><span class="t">' + SC.stamp(r.t) + '</span><span class="lv info">记录</span><span class="tx">' + SC.esc(r.tx) + '</span></div>';
+                        }).join('') + '</div>' : '<div class="sc-hint">暂无执行日志。</div>') +
+                        (svc ? '<div class="sc-note" style="margin-top:12px">关联服务当前健康 ' + svcHealth(svc) +
+                            '，实例 ' + (svc.inst - badIdx(svc).length - isoIdx(svc).length) + '/' + svc.inst + ' 可用。</div>' : ''),
+                    footer: [{ text: '关闭', kind: 'ghost' }]
+                });
+                api.footer.innerHTML = '';
+                acts.filter(function (a) { return a.show !== false; }).forEach(function (a) {
+                    const btn = SC.el('<button class="sc-btn ' + (a.kind || '') + '">' + SC.esc(a.text) + '</button>');
+                    btn.addEventListener('click', function () { if (a.run) a.run(); else api.close(); });
+                    api.footer.appendChild(btn);
+                });
+            }
+
+            function rollback(no) {
+                const c = chgById(no);
+                if (!c) return;
+                SC.modal.confirm({
+                    title: '回滚变更 · ' + no, danger: true,
+                    html: '<p>将把 <b>' + SC.esc(c.title) + '</b> 回滚至变更前版本。</p>' +
+                        '<p class="sc-hint" style="margin-top:8px">影响服务 ' + SC.esc(c.svc) + '，预计中断 30~90 秒；回滚后需重新提交审批。</p>',
+                    okText: '确认回滚'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    c.status = '已回滚';
+                    c.done = 0;
+                    c.log.push({ t: Date.now(), tx: '执行回滚，版本退回 ' + c.svc + ' 上一稳定版' });
+                    saveST();
+                    note('alarm', '变更单 ' + no + ' 已回滚，服务退回上一版本');
+                    SC.toast('已回滚，请观察指标恢复', { type: 'warn' });
+                    renderChange();
+                    renderLive();
+                });
+            }
+
+            function review(no) {
+                const c = chgById(no);
+                if (!c) return;
+                SC.modal.open({
+                    title: '📖 变更复盘 · ' + no, size: 'md',
+                    body: '<div class="sc-kv">' + kvBox([
+                        ['结果', tag(c.status, CHG_TAG[c.status] || 'info')],
+                        ['步骤数', c.steps.length + ' 步'],
+                        ['耗时', dur(Date.now() - c.at)],
+                        ['健康影响', '服务指标无退化，无新增告警'],
+                        ['可优化项', '建议把「' + c.steps[c.steps.length - 1] + '」纳入自动化作业']
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">经验沉淀</div>' +
+                        '<p class="sc-hint">本次变更在窗口内完成，回滚方案未启用；同类变更可作为低影响发布纳入例行作业，' +
+                        '减少人工审批成本。</p>',
+                    footer: [{
+                        text: '写入运维知识库', kind: 'primary', onClick: function () {
+                            note('info', '变更 ' + no + ' 复盘结论已写入运维知识库');
+                            SC.toast('已写入知识库', { type: 'success' });
+                        }
+                    }, { text: '关闭', kind: 'ghost' }]
+                });
+            }
+
+            function resubmit(no) {
+                const c = chgById(no);
+                if (!c) return;
+                c.status = '待审批';
+                c.done = 0;
+                c.at = Date.now();
+                c.log.push({ t: Date.now(), tx: '复盘后重新提交审批，补充回滚验证步骤' });
+                saveST();
+                note('info', '变更单 ' + no + ' 重新提交审批');
+                SC.toast('已重新提交审批', { type: 'success' });
+                renderChange();
+                renderLive();
+            }
+
+            function newChange() {
+                SC.modal.form({
+                    title: '➕ 新建变更单', size: 'lg',
+                    fields: [
+                        { name: 'title', label: '变更内容', type: 'text', required: true, col: 1, placeholder: '如：照明控制服务升级至 2.5.0 并调整调光策略' },
+                        { name: 'type', label: '变更类型', type: 'select', options: ['发布', '配置', '扩容', '演练'], col: 1 },
+                        { name: 'risk', label: '风险等级', type: 'select', options: ['低', '中', '高'], col: 1 },
+                        {
+                            name: 'svc', label: '影响服务', type: 'select', col: 1, hint: '取平台架构页服务目录',
+                            options: function () {
+                                return [{ value: 'multi-domain', label: '跨域公共组件' }].concat(SVC_ROWS.map(s => ({ value: s.id, label: s.name + '（' + s.domain + '）' })));
+                            }
+                        },
+                        { name: 'win', label: '变更窗口', type: 'text', col: 1, value: '02:00-04:00', validate: function (v) { return /^\d{2}:\d{2}-\d{2}:\d{2}$/.test(v) ? '' : '格式应为 02:00-04:00'; } },
+                        { name: 'steps', label: '执行步骤', type: 'textarea', required: true, col: 1, value: '审批通过\n灰度 1 个实例\n观察 30 分钟\n全量放开', hint: '每行一个步骤，按顺序执行' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const steps = String(v.steps).split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+                    if (!steps.length) { SC.toast('请至少填写一个执行步骤', { type: 'error' }); return; }
+                    const no = 'CH-2610' + SC.pad2(ST.chg.length + 1);
+                    ST.chg.unshift({
+                        no: no, type: v.type, title: v.title, svc: v.svc, risk: v.risk, steps: steps,
+                        status: '待审批', owner: '当前值班员', review: v.risk === '高' ? '平台架构组 + 运维组' : '运维组',
+                        win: v.win, at: Date.now(), done: 0,
+                        log: [{ t: Date.now(), tx: '提交变更单，等待审批' }]
+                    });
+                    saveST();
+                    note('info', '新建变更单 ' + no + '「' + v.title + '」（' + v.risk + '风险，' + steps.length + ' 个步骤）');
+                    SC.toast('变更单 ' + no + ' 已提交审批', { type: 'success' });
+                    renderChange();
+                    renderLive();
+                    renderOverview();
+                });
+            }
+
+            function handover() {
+                const today = dutyToday(0), next = dutyToday(1);
+                SC.modal.form({
+                    title: '🔄 值班交接',
+                    fields: [
+                        { name: 'from', label: '交班人', type: 'select', options: today.map(r => r.name), col: 1 },
+                        { name: 'to', label: '接班人', type: 'select', options: next.map(r => r.name), col: 1 },
+                        {
+                            name: 'pend', label: '待办事项', type: 'checkgroup', col: 1, options: [
+                                { value: 'alm', label: '紧急告警 ' + totals().urgent.length + ' 条未闭环' },
+                                { value: 'chg', label: '变更窗口 ' + (ST.chg.filter(c => c.status === '待执行').length) + ' 张待执行' },
+                                { value: 'dev', label: '离线设备维修跟进' },
+                                { value: 'plan', label: '预案演练计划确认' }
+                            ]
+                        },
+                        { name: 'note', label: '交接说明', type: 'textarea', required: true, col: 1, placeholder: '当前态势、风险提示、需重点观察的指标' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    if (!v.pend || !v.pend.length) { SC.toast('请至少勾选一项待办事项', { type: 'error' }); return; }
+                    ST.duty.handovers.unshift({ at: Date.now(), from: v.from, to: v.to, content: v.note, pend: v.pend.join('、') });
+                    saveST();
+                    note('ok', '值班交接完成：' + v.from + ' → ' + v.to + '，待办 ' + v.pend.length + ' 项');
+                    SC.toast('交接记录已归档', { type: 'success' });
+                    renderChange();
+                    renderDutyTl();
+                });
+            }
+
+            function swapDuty() {
+                SC.modal.form({
+                    title: '🔁 申请换班',
+                    fields: [
+                        { name: 'date', label: '换班日期', type: 'date', required: true, col: 1, value: SC.today() },
+                        { name: 'role', label: '岗位', type: 'select', options: DUTY_ROSTER.map(r => r.role), col: 1 },
+                        { name: 'to', label: '接手人', type: 'select', options: ['张宇轩', '刘思远', '孙雅琪', '李国强', '何康', '彭晓', '王振宇', '袁浩', '周敏', '陈立', '赵婉'], col: 1 },
+                        { name: 'why', label: '换班原因', type: 'select', options: ['现场工单占用', '请假就医', '参加应急演练', '重大活动保障'], col: 1 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    ST.duty.swaps.push({ date: v.date, role: v.role, to: v.to, why: v.why });
+                    saveST();
+                    note('info', v.date + ' ' + v.role + ' 换班为 ' + v.to + '（' + v.why + '）');
+                    SC.toast('换班已登记，排班表已更新', { type: 'success' });
+                    renderDuty();
+                });
+            }
+
+            function dutyLog() {
+                SC.modal.form({
+                    title: '📝 追加值班日志',
+                    fields: [
+                        { name: 'lv', label: '记录类型', type: 'select', options: ['日常观察', '风险提示', '处置经过', '升级通报'], col: 1 },
+                        { name: 'tx', label: '日志内容', type: 'textarea', required: true, col: 1, placeholder: '如：22:40 照明回路重试后恢复，持续观察 30 分钟' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    note(v.lv === '升级通报' ? 'alarm' : v.lv === '风险提示' ? 'warn' : 'info', '【' + v.lv + '】' + v.tx);
+                    SC.toast('值班日志已记录', { type: 'success' });
+                    renderDutyTl();
+                });
+            }
+
+            function drillPlan(id) {
+                const p = PLANS.filter(x => x.id === id)[0];
+                if (!p) return;
+                SC.modal.confirm({
+                    title: '发起预案演练 · ' + p.id,
+                    html: '<p><b>' + SC.esc(p.name) + '</b></p>' +
+                        '<p class="sc-hint" style="margin-top:6px">目标 ' + p.minutes + ' 分钟内恢复 · 演练周期 ' + p.cycle + '</p>' +
+                        '<p style="margin-top:10px">演练将临时占用监控大屏与值班资源，不影响生产流量。确认发起？</p>',
+                    okText: '发起演练'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    ST.plans[id] = Date.now();
+                    p.drill = Date.now();
+                    saveST();
+                    const used = Math.max(3, Math.round(p.minutes * (0.6 + (hashSeed(id) % 40) / 100)));
+                    note('ok', '预案「' + p.name + '」演练完成，实际恢复用时 ' + used + ' 分钟（目标 ' + p.minutes + ' 分钟）');
+                    SC.toast('演练完成：' + used + ' 分钟，达标', { type: used <= p.minutes ? 'success' : 'warn' });
+                    renderPlans();
+                    renderDutyTl();
+                });
+            }
+
+            function exportChg() {
+                SC.csv.download('变更记录-' + SC.today(), [['单号', '类型', '内容', '影响服务', '窗口', '风险', '状态', '提交人', '评审', '提交时间']].concat(
+                    ST.chg.map(c => [c.no, c.type, c.title, c.svc, c.win, c.risk, c.status, c.owner, c.review, SC.stamp(c.at, true)])));
+                SC.csv.download('值班交接-' + SC.today(), [['时间', '交班', '接班', '待办', '说明']].concat(
+                    (ST.duty.handovers || []).map(h => [SC.stamp(h.at, true), h.from, h.to, h.pend, h.content])));
+                SC.toast('变更记录与交接台账已导出', { type: 'success' });
+            }
+
+            /* ==========================================================================
+               13. 事件绑定与启动
+               ========================================================================== */
+            function bindTable(sel, onRow, onAct) {
+                const host = q(sel);
+                if (!host || host.dataset.bound) return;
+                host.dataset.bound = '1';
+                host.addEventListener('click', function (ev) {
+                    if (ev.target.closest('a')) return;
+                    const btn = ev.target.closest('button[data-act]');
+                    if (btn) { onAct(btn.dataset.act, btn.dataset); return; }
+                    if (ev.target.closest('input,select,textarea,.sc-chip,.sc-tag,.sc-switch,.sc-bar-mini')) return;
+                    const tr = ev.target.closest('tbody tr');
+                    if (!tr || tr.classList.contains('sc-empty-row')) return;
+                    onRow(tr.dataset.id || tr.dataset.no || tr.dataset.name, tr);
+                });
+            }
+
+            /* 告警时限随时钟流逝，仅刷新相关单元格，避免整表重绘丢失分页与滚动 */
+            function refreshAging() {
+                if (activeModule() !== 'alarm') return;
+                qa('#tbl-alm tbody tr[data-id]').forEach(function (tr) {
+                    if (tr.hidden) return;
+                    const a = almById(tr.dataset.id);
+                    if (!a) return;
+                    const st = almState(a);
+                    const cells = tr.children;
+                    if (cells[5]) cells[5].textContent = dur(a.at);
+                    if (cells[6]) cells[6].textContent = a.sla ? almLeft(a) : '提示级';
+                    if (cells[7] && cells[7].firstChild) cells[7].firstChild.textContent = st.state;
+                });
+            }
+
+            function bindAll() {
+                /* 总览 */
+                if (q('#btn-oc-sweep')) q('#btn-oc-sweep').addEventListener('click', runSweep);
+                if (q('#btn-oc-daily')) q('#btn-oc-daily').addEventListener('click', openDaily);
+                const domCv = q('#c-oc-dom');
+                if (domCv) {
+                    domCv.addEventListener('click', function (ev) {
+                        const inst = CH.dom;
+                        if (!inst || !inst.geo || !inst.geo.hit) return;
+                        const r = domCv.getBoundingClientRect();
+                        const hit = inst.geo.hit(ev.clientX - r.left, ev.clientY - r.top);
+                        const doms = DOMAINS.filter(d => d.total > 0);
+                        if (hit && doms[hit.index]) {
+                            svcDomain = doms[hit.index].name;
+                            svcFilter = '';
+                            goModule('service');
+                            setTimeout(renderService, 40);
+                        }
+                    });
+                }
+
+                /* 服务 */
+                const svcChips = q('#svc-chips');
+                if (svcChips) {
+                    svcChips.addEventListener('click', function (ev) {
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        svcFilter = chip.dataset.health || '';
+                        if (chip.dataset.dom !== undefined) svcDomain = chip.dataset.dom || '';
+                        renderService();
+                    });
+                }
+                bindTable('#tbl-svc', function (id) { openSvc(id); }, function (act, data) {
+                    if (act === 'sweep') { sweepOne(data.id); renderService(); renderLive(); }
+                });
+                if (q('#btn-svc-sweep')) q('#btn-svc-sweep').addEventListener('click', sweepAllService);
+                if (q('#btn-svc-export')) q('#btn-svc-export').addEventListener('click', exportSvc);
+
+                /* 设备 */
+                const devChips = q('#dev-chips');
+                if (devChips) {
+                    devChips.addEventListener('click', function (ev) {
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        if (chip.dataset.kind !== undefined) devKind = chip.dataset.kind || '';
+                        if (chip.dataset.state !== undefined) devState = chip.dataset.state || '';
+                        if (!chip.dataset.kind && !chip.dataset.state) { devKind = ''; devState = ''; }
+                        renderDevice();
+                    });
+                }
+                bindTable('#tbl-dev', function (id) { openDevice(id); }, function (act, data) {
+                    if (act === 'diag') devDiag(data.id);
+                    if (act === 'ticket') ticketFor(data.id);
+                });
+                const tkChips = q('#tk-chips');
+                if (tkChips) {
+                    tkChips.addEventListener('click', function (ev) {
+                        const btn = ev.target.closest('button[data-act="tk-export"]');
+                        if (btn) { exportDev(); return; }
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        tkFilter = chip.dataset.ck || '';
+                        renderTickets();
+                    });
+                }
+                bindTable('#tbl-ticket', function (no) {
+                    const x = ST.tickets.filter(t => t.no === no)[0];
+                    if (!x) return;
+                    SC.modal.open({
+                        title: '🧾 工单详情 · ' + x.no,
+                        body: '<div class="sc-kv">' + kvBox([
+                            ['设备', '<span class="mono">' + SC.esc(x.dev) + '</span>'],
+                            ['类型 / 点位', SC.esc(x.kind || '') + ' · ' + SC.esc(x.point || '')],
+                            ['故障描述', SC.esc(x.desc)],
+                            ['优先级', tag(x.pri, TK_PRI_TAG[x.pri] || 'info')],
+                            ['责任人', SC.esc(x.owner)],
+                            ['状态', tag(x.status, TK_TAG[x.status] || 'info')],
+                            ['生成时间', SC.stamp(x.at, true) + '（' + dur(x.at) + '前）'],
+                            ['来源', SC.esc(x.src)]
+                        ]) + '</div>' +
+                            '<div class="sc-timeline" style="margin-top:12px">' + [
+                                { d: 'done', h: '工单生成', m: x.src + ' · 自动指派 ' + x.owner },
+                                { d: x.status === '待接单' ? 'todo' : 'done', h: '到场确认', m: x.status === '待接单' ? '等待班组接单' : '班组已接单并到场' },
+                                { d: x.status === '已完成' || x.status === '已关闭' ? 'done' : 'todo', h: '修复验证', m: x.status === '已完成' || x.status === '已关闭' ? '心跳恢复，读数正常' : '尚未完成' }
+                            ].map(function (r) {
+                                return '<div class="sc-tl-item ' + r.d + '"><div class="h">' + r.h + '</div><div class="m">' + SC.esc(r.m) + '</div></div>';
+                            }).join('') + '</div>',
+                        footer: [{ text: '关闭', kind: 'ghost' }]
+                    });
+                }, function (act, data) {
+                    if (['take', 'done', 'close'].indexOf(act) > -1) tkOp(data.no, act);
+                });
+                if (q('#btn-dev-inspect')) q('#btn-dev-inspect').addEventListener('click', dispatchInspect);
+                if (q('#btn-dev-ticket')) q('#btn-dev-ticket').addEventListener('click', batchTicket);
+                if (q('#btn-dev-export')) q('#btn-dev-export').addEventListener('click', exportDev);
+
+                /* 告警 */
+                const almChips = q('#alm-chips');
+                if (almChips) {
+                    almChips.addEventListener('click', function (ev) {
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        if (chip.dataset.lvl !== undefined) almLevel = chip.dataset.lvl || '';
+                        if (chip.dataset.src !== undefined) almSrc = chip.dataset.src || '';
+                        if (!chip.dataset.lvl && !chip.dataset.src) { almLevel = ''; almSrc = ''; }
+                        renderAlarm();
+                    });
+                }
+                bindTable('#tbl-alm', function (id) { openAlarm(id); }, function (act, data) {
+                    if (act === 'ack') ackAlarm(data.id);
+                    else if (act === 'assign') assignAlarm(data.id);
+                    else if (act === 'silence') silenceAlarm(data.id);
+                    else if (act === 'reopen') {
+                        setAlm(data.id, { state: '待确认' });
+                        note('warn', '告警 ' + data.id + ' 重新打开，等待确认');
+                        SC.toast('告警已重新打开', { type: 'warn' });
+                        renderAlarm();
+                    }
+                });
+                if (q('#btn-alm-ack')) q('#btn-alm-ack').addEventListener('click', batchAck);
+                if (q('#btn-alm-rules')) q('#btn-alm-rules').addEventListener('click', openRules);
+                if (q('#btn-alm-export')) q('#btn-alm-export').addEventListener('click', exportAlarms);
+
+                /* 变更与值班 */
+                const chgChips = q('#chg-chips');
+                if (chgChips) {
+                    chgChips.addEventListener('click', function (ev) {
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        chgFilter = chip.dataset.st || '';
+                        renderChange();
+                    });
+                }
+                bindTable('#tbl-chg', function (no) { openChange(no); }, function (act, data) {
+                    if (act === 'approve') approve(data.no);
+                    else if (act === 'exec') execute(data.no);
+                    else if (act === 'review') review(data.no);
+                    else if (act === 'resubmit') resubmit(data.no);
+                });
+                if (q('#btn-chg-new')) q('#btn-chg-new').addEventListener('click', newChange);
+                if (q('#btn-chg-export')) q('#btn-chg-export').addEventListener('click', exportChg);
+                if (q('#btn-duty-handover')) q('#btn-duty-handover').addEventListener('click', handover);
+                if (q('#btn-duty-swap')) q('#btn-duty-swap').addEventListener('click', swapDuty);
+                if (q('#btn-duty-log')) q('#btn-duty-log').addEventListener('click', dutyLog);
+
+                /* 模块切换后重绘（charts.js 只听 resize，隐藏容器里的 canvas 尺寸不准） */
+                qa('.module-btn').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        setTimeout(function () { renderModule(activeModule()); }, 30);
+                    });
+                });
+            }
+
+            const RENDER = {
+                overview: renderOverview,
+                service: renderService,
+                device: renderDevice,
+                alarm: renderAlarm,
+                change: renderChange
+            };
+            function renderModule(name) {
+                if (RENDER[name]) RENDER[name]();
+            }
+
+            /* 支持架构页带参跳转：?svc= 直达服务详情，?domain= 过滤该域 */
+            function readParams() {
+                const m = function (k) {
+                    const r = new RegExp('[?&]' + k + '=([^&#]*)').exec(location.search);
+                    return r ? decodeURIComponent(r[1].replace(/\+/g, ' ')) : '';
+                };
+                const dom = m('domain');
+                if (dom && DOMAINS.some(function (d) { return d.name === dom; })) svcDomain = dom;
+                const svc = m('svc');
+                if (svc && byId(svc)) {
+                    goModule('service');
+                    setTimeout(function () { renderService(); openSvc(svc); }, 120);
+                    return true;
+                }
+                if (dom) {
+                    goModule('service');
+                    setTimeout(renderService, 80);
+                    return true;
+                }
+                return false;
+            }
+
+            function init() {
+                renderLive();
+                renderOverview();
+                seedLog();
+                bindAll();
+                readParams();
+                setInterval(renderLive, 1000);
+                setInterval(refreshAging, 20000);
+                setInterval(function () {
+                    LOG.unshift(logLine());
+                    if (LOG.length > 40) LOG.length = 40;
+                    if (activeModule() === 'overview') renderLog();
+                }, 5200);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+
+</html>
