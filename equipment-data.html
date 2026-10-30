@@ -404,7 +404,7 @@
             <div class="device-card">
                 <div class="device-icon">🔧</div>
                 <div class="device-value" id="kpi-total">0</div>
-                <div class="device-label">在册设备</div>
+                <div class="device-label">建档设备（抽检）</div>
                 <div class="device-sub" id="kpi-total-sub">在线 0 / 离线 0</div>
             </div>
             <div class="device-card">
@@ -426,6 +426,10 @@
                 <div class="device-sub" id="kpi-data-sub">存储占用 0 GB</div>
             </div>
         </div>
+
+        <p class="sc-hint" style="margin:12px 2px 0">口径说明：全市末端感知设备在册 <b>978,542</b> 台 / <b>23</b> 类（按杭州市域体量估算，
+            与数据中台「末端设备接入清单」、运维中心设备台账一致）；本页为<strong>抽检建档台账</strong>，
+            按设备分类权重抽取样本逐台建档，批量作业与健康预测均在样本范围内可演练。</p>
 
         <div class="module-nav">
             <button class="module-btn active" data-module="device-management">🔧 设备管理</button>
@@ -1643,7 +1647,7 @@
                 const keys = Object.keys(STATUS);
                 const SCOLORS = ['#27ae60', '#3498db', '#95a5a6', '#e74c3c', '#f39c12'];
                 setChart('statusPie', SC.chart.pie, document.getElementById('c-status-pie'), {
-                    labels: keys, donut: true, centerBottom: '在册设备',
+                    labels: keys, donut: true, centerBottom: '建档设备',
                     data: keys.map(k => devices.filter(d => d.status === k).length), colors: SCOLORS
                 });
                 SC.chart.legend(document.getElementById('l-status-pie'), keys.map(function (k, i) {
@@ -1808,7 +1812,7 @@
                 const attn = attnDevices();
                 const rows = [
                     ['统计时点', SC.stamp(new Date())],
-                    ['在册设备', s.total + ' 台'],
+                    ['建档设备（抽检）', s.total + ' 台'],
                     ['在线率', s.rate.toFixed(1) + '%'],
                     ['平均健康分', avg.toFixed(1) + '（' + healthGrade(avg).text + '）'],
                     ['预警设备', attn.length + ' 台'],
@@ -2954,8 +2958,8 @@
                 log('info', '设备目录口径升级至 v' + EQ_CAT_VER + '：保留原台账，自动补齐 ' + catalogAdded + ' 台新增类别设备（环卫、燃气、液位、视频抓拍、作业终端等）');
                 SC.toast('设备目录已升级，新增 ' + catalogAdded + ' 台类别补齐设备', { type: 'info', duration: 4200 });
             }
-            log('ok', '设备与数据管理模块已加载：在册 ' + devices.length + ' 台设备 / ' + Object.keys(TYPES).length + ' 类目录，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
-            SC.toast('设备台账已就绪，共 ' + devices.length + ' 台在册设备', { type: 'success' });
+            log('ok', '设备与数据管理模块已加载：建档 ' + devices.length + ' 台抽检设备 / ' + Object.keys(TYPES).length + ' 类目录，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
+            SC.toast('设备台账已就绪，共 ' + devices.length + ' 台建档设备', { type: 'success' });
         })();
     </script>
 

@@ -203,7 +203,7 @@
             <div class="parking-stat-card">
                 <div class="parking-stat-icon">🏢</div>
                 <div class="parking-stat-value" id="kpi-lots" data-animated="1">0</div>
-                <div class="parking-stat-label">联网停车场</div>
+                <div class="parking-stat-label">联网停车场（示范片区）</div>
             </div>
             <div class="parking-stat-card">
                 <div class="parking-stat-icon">🚗</div>
@@ -288,12 +288,13 @@
         <!-- ============ 车场管理 ============ -->
         <div id="lot-management-module" class="module-content">
             <div class="content-header">
-                <h3>🏢 车场台账</h3>
+                <h3>🏢 车场台账（示范片区在管）</h3>
                 <div class="content-actions">
                     <input type="text" placeholder="搜索车场名称 / 地址 / 运营单位..." class="search-input">
                     <button class="sc-btn sm primary" id="btn-add-lot">➕ 接入车场</button>
                 </div>
             </div>
+            <p class="sc-hint" id="lot-scope-hint" style="margin:0 2px 12px"></p>
             <div class="sc-chips" id="lot-chips"></div>
             <div class="data-table-container">
                 <table class="data-table" id="lot-table">
@@ -469,6 +470,9 @@
                 street: { label: '路内泊位', rate: { free: 0, first: 12, day: 12, night: 3, cap: 80, dayStart: 8, dayEnd: 20, member: 0 } },
                 hospital: { label: '医院周边', rate: { free: 45, first: 8, day: 6, night: 2, cap: 45, dayStart: 7, dayEnd: 21, member: 10 } }
             };
+            /* 全市泊位级感知设备在册量：与数据中台末端设备清单 / 运维中心设备台账的 MKR 地磁车检器保持一致
+               （按杭州市域体量估算）；本页 lots 为示范片区在管样本，不放大到全市量级 */
+            const MKR_CITY = 86400;
             const lots = SC.store.get('parking', 'lots', null) || [
                 { id: 'P01', name: '湖滨银泰停车场', type: 'mall', addr: '延安路 245 号', cap: 1234, op: '银泰商业', status: '营业中' },
                 { id: 'P02', name: '市民中心停车场', type: 'mall', addr: '解放东路 18 号', cap: 856, op: '城投入股', status: '营业中' },
@@ -728,6 +732,12 @@
                     const n = k === '全部' ? lots.length : lots.filter(l => statusOf(l) === k).length;
                     return '<button class="sc-chip' + (k === lotChip ? ' active' : '') + '" data-k="' + k + '">' + k + ' ' + n + '</button>';
                 }).join('');
+                /* 台账口径说明：示范片区样本与全市在册量分开表述，避免与条幅的设备量互相矛盾 */
+                const cap = lots.reduce((s, l) => s + l.cap, 0);
+                const hint = document.getElementById('lot-scope-hint');
+                if (hint) hint.innerHTML = '口径说明：本页为<strong>示范片区在管</strong>的 ' + lots.length +
+                    ' 座联网车场 / <b>' + SC.num(cap) + '</b> 个泊位，车位级平面、出入口流水与计费试算均在该样本范围内演练；' +
+                    '全市口径对应数据中台 MKR 类地磁车检器在册 <b>' + SC.num(MKR_CITY) + '</b> 台（按杭州市域体量估算，与页首停车域条幅一致）。';
             }
 
             function statusOf(l) {

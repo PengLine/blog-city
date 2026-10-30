@@ -1531,7 +1531,8 @@
                         else if (t.name === '社区服务点') name = road + '社区服务点';
                         else name = region + pick(id + ':h', HALL_KINDS) + '服务大厅';
                         const status = pick(id + ':st', OUTLET_STATUS);
-                        /* 人证核验一体机（口径对应数据中台 AUT 类 486 台）：信息采集与人证比对 */
+                        /* 人证核验一体机（全市口径对应数据中台 AUT 类在册 4,260 台，含银行 / 医院 / 社区自助点位）：
+                           本页只列示范片区网点，单网点按类型配 0~6 台 */
                         const kiosk = t.name === '政务服务中心' ? rint(id + ':k1', 3, 6)
                             : t.name === '社区服务点' ? rint(id + ':k1', 0, 2) : rint(id + ':k1', 1, 4);
                         const kioskOn = status === '整修暂停' ? 0 : (kiosk ? rint(id + ':k2', Math.max(0, kiosk - 1), kiosk) : 0);
@@ -2666,7 +2667,7 @@
                     ' 个服务窗口，可受理 <b>' + SC.num(DB.outlets.reduce(function (s, o) { return s + o.items; }, 0)) + '</b> 类事项。' +
                     '另配置人证核验一体机 <b>' + kioskAll + '</b> 台（在线 ' + kioskOnline + ' 台），今日采集并比对 <b>' + SC.num(verifyAll) + '</b> 人次。';
                 $('sp-hint').textContent = '数据口径：近 30 日办件量含窗口与自助终端；网点状态每 30 分钟同步一次；' +
-                    '核验一体机信息采集与人证比对结果经 HTTP SDK 推送至数据中台（全市 AUT 类在册 486 台）。';
+                    '核验一体机信息采集与人证比对结果经 HTTP SDK 推送至数据中台（全市 AUT 类在册 4,260 台，本页为示范片区网点）。';
             }
 
             function applyOutletFilter() {

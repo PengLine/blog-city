@@ -410,7 +410,7 @@
                 <div class="stat-card">
                     <div class="stat-icon">🚛</div>
                     <div class="stat-value" id="s-veh">--</div>
-                    <div class="stat-label">环卫车辆总数</div>
+                    <div class="stat-label">环卫车辆（示范片区在管）</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">🗑️</div>
@@ -1332,7 +1332,7 @@
                 }
             }
 
-            /* 回收站称重一体机台账：14 座站点，与数据中台 RCY 类 1,180 台在册量保持口径一致 */
+            /* 回收站称重一体机台账：本页 14 座示范站点，全市口径对齐数据中台 RCY 类在册 4,860 台 */
             function buildRecyclers() {
                 const SUF = ['再生资源回收站', '分类回收驿站', '两网融合中转站', '低值回收投放点'];
                 for (let i = 0; i < 14; i++) {
@@ -1838,7 +1838,8 @@
                     const recy = list.reduce((n, s) => n + s.recy, 0) / list.length;
                     const needCal = list.filter(s => s.cal > 240).length;
                     host.innerHTML =
-                        kv('在册站点', list.length + ' 座') +
+                        kv('在册站点', list.length + ' 座（示范片区）') +
+                        kv('全市称重机', '4,860 台（数据中台 RCY 类在册）') +
                         kv('称重机在线', on + ' / ' + list.length) +
                         kv('今日回收单', orders + ' 单') +
                         kv('今日称重', SC.num(todayKg / 1000, 2) + ' t') +

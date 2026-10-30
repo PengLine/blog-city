@@ -320,7 +320,7 @@
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-icon">💡</div>
-                <div class="metric-value" id="kpi-total" data-animated="1" style="color: #ffd700;">12,345</div>
+                <div class="metric-value" id="kpi-total" data-animated="1" style="color: #ffd700;">512,600</div>
                 <div class="metric-label">接入灯数</div>
                 <div class="metric-trend trend-up"><span>↑</span><span>123</span></div>
             </div>
@@ -943,11 +943,12 @@
                 night: { label: '夜间模式', tag: '🌙', zone: { main: 100, landscape: 85, courtyard: 90, signal: 100 } },
                 midnight: { label: '午夜模式', tag: '🌃', zone: { main: 45, landscape: 20, courtyard: 40, signal: 100 } }
             };
+            /* 照明资产规模按杭州市域体量维护：四类合计 512,600 盏，与数据中台 LTC 路灯单灯控制器在册量一一对应 */
             const ZONES = [
-                { id: 'main', name: '主干道路灯', icon: '💡', count: 8567, watt: 250, scene: 'road' },
-                { id: 'landscape', name: '景观照明', icon: '🌟', count: 2345, watt: 120, scene: 'building' },
-                { id: 'courtyard', name: '庭院灯', icon: '🏮', count: 1234, watt: 60, scene: 'yard' },
-                { id: 'signal', name: '交通信号灯', icon: '🚦', count: 199, watt: 45, scene: 'signal' }
+                { id: 'main', name: '主干道路灯', icon: '💡', count: 336800, watt: 250, scene: 'road' },
+                { id: 'landscape', name: '景观照明', icon: '🌟', count: 92400, watt: 120, scene: 'building' },
+                { id: 'courtyard', name: '庭院灯', icon: '🏮', count: 68900, watt: 60, scene: 'yard' },
+                { id: 'signal', name: '交通信号灯', icon: '🚦', count: 14500, watt: 45, scene: 'signal' }
             ];
             const FAULT_TYPES = ['不亮', '闪烁', '灯杆倾斜', '漏电告警', '光衰严重', '时控失灵', '电缆故障'];
             const TEAMS = ['路灯一班', '路灯二班', '应急抢修组', '外包维保单位'];
