@@ -867,32 +867,158 @@
             /* =====================================================================
                1. 静态字典
                ===================================================================== */
+            /* 类型目录与数据中台「末端设备接入清单」、运维中心设备台账保持同一口径：
+               摄像头（球机/枪机/半球/门店抓拍）、认证一体机、手环与车载定位、各类液位水位计、
+               井盖、消防栓、燃气、焚烧炉、路灯、果壳箱、回收站、环卫车、运输船、巡更仪 */
             const TYPES = {
                 sensor: {
-                    label: '传感器设备', icon: '📡', weight: 46,
-                    items: ['温度传感器', '水位计', '空气质量监测仪', '噪声监测仪', '管网流量计', '烟感探测器', '智能井盖', '光照传感器'],
-                    models: ['S-T200', 'S-W310', 'S-A400', 'S-N150'], protocols: ['MQTT', 'LoRaWAN', 'Modbus RTU'],
+                    label: '传感器设备', icon: '📡', weight: 34,
+                    items: ['温度传感器', '水位计', '空气质量监测仪', '噪声监测仪', '管网流量计', '烟感探测器', '智能井盖', '光照传感器',
+                        '雷达液位计', '超声波液位计', '低洼积水水位计', '智能消防栓水压计', '可燃气体探测器', '管网压力变送器'],
+                    models: ['S-T200', 'S-W310', 'S-A400', 'S-N150', 'S-L820', 'S-P60'],
+                    protocols: ['MQTT', 'LoRaWAN', 'Modbus RTU', 'NB-IoT'],
                     fwLatest: 'v3.4.2', vendors: ['华感科技', '辰测物联', '万集仪表'], power: ['电池', '市电']
                 },
                 camera: {
-                    label: '监控设备', icon: '📷', weight: 26,
-                    items: ['治安球机', '卡口相机', '路网枪机', '全景相机', '城管取证相机'],
-                    models: ['C-B450', 'C-K800', 'C-P360'], protocols: ['GB28181', 'RTSP', 'HTTP'],
+                    label: '监控设备', icon: '📷', weight: 20,
+                    items: ['治安球机', '卡口相机', '路网枪机', '全景相机', '城管取证相机', '人脸抓拍枪机', '半球摄像机', '商家门店抓拍机'],
+                    models: ['C-B450', 'C-K800', 'C-P360', 'C-D200'], protocols: ['GB28181', 'RTSP', 'HTTP'],
                     fwLatest: 'v5.1.0', vendors: ['海康', '大华', '宇视'], power: ['市电', 'PoE']
                 },
                 ctrl: {
-                    label: '控制设备', icon: '🎛️', weight: 18,
-                    items: ['交通信号机', '停车场道闸', '泵站控制柜', '照明回路控制器', '管网阀门执行器', '风机变频柜'],
-                    models: ['K-S100', 'K-G320', 'K-P560'], protocols: ['Modbus TCP', 'MQTT', 'PLC-S7'],
+                    label: '控制设备', icon: '🎛️', weight: 14,
+                    items: ['交通信号机', '停车场道闸', '泵站控制柜', '照明回路控制器', '管网阀门执行器', '风机变频柜',
+                        '路灯单灯控制器', '焚烧炉助燃风机控制柜'],
+                    models: ['K-S100', 'K-G320', 'K-P560', 'K-L40'], protocols: ['Modbus TCP', 'MQTT', 'PLC-S7'],
                     fwLatest: 'v2.8.5', vendors: ['浙控自动化', '和利时', '汇川'], power: ['市电']
                 },
                 gateway: {
-                    label: '网关设备', icon: '🖥️', weight: 10,
-                    items: ['边缘计算网关', '片区汇聚网关', '协议转换网关'],
+                    label: '网关设备', icon: '🖥️', weight: 6,
+                    items: ['边缘计算网关', '片区汇聚网关', '协议转换网关', '视频AI边缘盒子', '物联NB-IoT汇聚网关'],
                     models: ['G-E1000', 'G-A600', 'G-C300'], protocols: ['MQTT', 'HTTP', 'CoAP'],
                     fwLatest: 'v4.2.1', vendors: ['移远', '映翰通', '有人物联'], power: ['市电']
+                },
+                mobile: {
+                    label: '移动作业终端', icon: '🚚', weight: 12,
+                    items: ['环卫收运车终端', '运输船智能终端', '执法车辆定位终端', '智能作业手环', '电子巡更仪', '车载视频终端'],
+                    models: ['M-V210', 'M-B150', 'M-W90', 'M-S60'],
+                    protocols: ['4G Cat.1', 'MQTT', 'NB-IoT', 'BLE 网关', 'AIS/北斗'],
+                    fwLatest: 'v1.9.3', vendors: ['中移物联', '海能达', '华测导航', '移远'], power: ['电池', '车载取电', '市电']
+                },
+                site: {
+                    label: '环卫处置设施', icon: '🗑️', weight: 14,
+                    items: ['智能果壳箱', '分类回收站称重机', '焚烧炉烟气监测站', '人证核验一体机', '垃圾中转站地磅', '公厕异味监测仪'],
+                    models: ['F-C800', 'F-R320', 'F-E500', 'F-V120'],
+                    protocols: ['Modbus TCP', 'MQTT', 'HTTP', '地磅仪表'],
+                    fwLatest: 'v2.3.1', vendors: ['先河环保', '中联重科', '洁雅环境', '梅特勒'], power: ['市电', 'UPS']
                 }
             };
+            /** 各类设备的上报速率区间（msg/s），用于今日采集量与峰值吞吐估算 */
+            const MSG_RATE = { sensor: [1, 6], camera: [2, 18], ctrl: [1, 3], gateway: [3, 20], mobile: [1, 9], site: [1, 5] };
+            /** 设备目录口径版本：类型字典或权重调整时递增，浏览器已有台账按此版本号做增量补齐 */
+            const EQ_CAT_VER = 2;
+            /** 冷启动建档基数（台） */
+            const DEVICE_BASE = 120;
+            /** 设备汰换单台预算（万元/台） */
+            const UNIT_PRICE = { sensor: 0.6, camera: 1.2, ctrl: 2.4, gateway: 1.8, mobile: 0.9, site: 3.6 };
+            /** 各类设备的易损部件名称，用于详情页部件劣化列表 */
+            const PART_LABEL = { sensor: '敏感探头', camera: '镜头/云台', ctrl: '继电器/执行机', gateway: '风扇/机箱', mobile: '定位模组/电池', site: '称重单元/探头' };
+            /** 各类设备的标准巡检项 */
+            const INSPECT_ITEM = { sensor: '量程校准', camera: '镜头清洁', ctrl: '回路绝缘检查', gateway: '机房除尘与链路巡检', mobile: '车载支架与天线检查', site: '清掏与探头标定' };
+
+            /* =====================================================================
+               1b. 物模型（测点目录）
+               测点标识与数据中台「末端设备接入清单」的 DEV_MODEL 保持一致，便于跳页对码；
+               未在 THING_MODEL 中单独建档的设备，退化为按类型套用 MODEL_BASE 通用测点
+               ===================================================================== */
+            const MODEL_BASE = {
+                sensor: [['value', '模拟量主测点', 'DOUBLE', '-', '1/min', '26.4'], ['heart', '心跳序号', 'INT', '-', '1/h', '7712'], ['batt', '电池电压', 'DOUBLE', 'V', '1/h', '3.42'], ['dev_stat', '设备自诊断码', 'STRING', '-', 'on_change', 'OK']],
+                camera: [['channel_id', 'GB28181 通道编号', 'STRING', '-', 'on_event', '340200000013200001'], ['obj_type', '抓拍对象类型', 'STRING', '-', 'on_event', 'person'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.93'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/a.jpg']],
+                ctrl: [['cmd_ack', '指令应答序号', 'STRING', '-', 'on_command', 'A8812'], ['on_off', '输出状态', 'BOOLEAN', '-', '1/min', 'true'], ['power_w', '有功功率', 'DOUBLE', 'W', '1/5min', '84.2'], ['fault_code', '故障码', 'STRING', '-', 'on_change', '']],
+                gateway: [['conn', '在线终端数', 'INT', '-', '1/min', '2140'], ['cpu_pct', 'CPU 占用', 'DOUBLE', '%', '1/min', '36.5'], ['msg_out', '转发速率', 'DOUBLE', 'msg/s', '1/min', '486'], ['link_stat', '链路状态', 'STRING', '-', 'on_change', 'online']],
+                mobile: [['lng', '经度', 'DOUBLE', 'GCJ02', '1/10s', '120.155'], ['lat', '纬度', 'DOUBLE', 'GCJ02', '1/10s', '30.271'], ['spd', '速度', 'DOUBLE', 'km/h', '1/10s', '32.4'], ['fence_hit', '越界判定', 'BOOLEAN', '-', 'on_change', 'true']],
+                site: [['weight_kg', '称重净重', 'DOUBLE', 'kg', '1/5min', '12.4'], ['fill_pct', '满溢度', 'DOUBLE', '%', '1/10min', '86'], ['battery', '电池百分比', 'DOUBLE', '%', '1/h', '63'], ['lid_open', '开盖次数', 'INT', '次', 'on_change', '23']]
+            };
+            const THING_MODEL = {
+                /* ---- 传感器：液位 / 水位 / 燃气 / 消防 / 井盖 ---- */
+                '水位计': [['level_m', '水位', 'DOUBLE', 'm', '1/min', '0.82'], ['press_kpa', '管压', 'DOUBLE', 'kPa', '1/min', '126.4'], ['flow', '瞬时流量', 'DOUBLE', 'm³/s', '1/min', '74.2'], ['collect_time', '采集时间', 'DATETIME', '-', '1/min', '']],
+                '雷达液位计': [['distance_cm', '雷达到液面距离', 'DOUBLE', 'cm', '1/min', '184.2'], ['level_m', '换算液位', 'DOUBLE', 'm', '1/min', '3.16'], ['temp_c', '量程补偿温度', 'DOUBLE', '℃', '1/min', '17.4'], ['snr', '回波信噪比', 'DOUBLE', 'dB', '1/h', '22.6']],
+                '超声波液位计': [['level_m', '超声波液位', 'DOUBLE', 'm', '1/min', '2.41'], ['sound_speed', '声速', 'DOUBLE', 'm/s', '1/h', '343.1'], ['blanking', '盲区距离', 'DOUBLE', 'm', '1/d', '0.32'], ['cond', '探头受潮指数', 'DOUBLE', '-', '1/h', '0.08']],
+                '低洼积水水位计': [['level_cm', '积水深度', 'DOUBLE', 'cm', '1/5min', '34.6'], ['alarm_lvl', '预警阈值等级', 'STRING', '-', 'on_change', 'L2'], ['batt', '电池电压', 'DOUBLE', 'V', '1/h', '3.42'], ['temp', '井房温度', 'DOUBLE', '℃', '1/h', '18.7']],
+                '智能井盖': [['tilt_deg', '盖板倾角', 'DOUBLE', '°', '1/min', '12.4'], ['displacement', '位移', 'DOUBLE', 'cm', '1/min', '3.1'], ['water_depth', '井内水位', 'DOUBLE', 'm', '1/5min', '0.22'], ['open_evt', '打开事件次数', 'INT', '次', 'on_change', '1']],
+                '智能消防栓水压计': [['press_mpa', '栓口水压', 'DOUBLE', 'MPa', '1/min', '0.42'], ['flow_ls', '瞬时放水流量', 'DOUBLE', 'L/s', '1/min', '0.0'], ['shock_g', '碰撞加速度', 'DOUBLE', 'g', 'on_change', '0.3'], ['valve_stat', '阀门开关状态', 'STRING', '-', '1/h', 'closed'], ['leak_flag', '渗漏判定', 'BOOLEAN', '-', 'on_change', 'false']],
+                '可燃气体探测器': [['press_kpa', '管网压力', 'DOUBLE', 'kPa', '1/min', '2.84'], ['ch4_pct', '甲烷浓度', 'DOUBLE', '%LEL', '1/30s', '1.6'], ['co_ppm', '一氧化碳', 'DOUBLE', 'ppm', '1/30s', '3'], ['leak_lvl', '泄漏等级', 'STRING', '-', 'on_change', 'L1'], ['valve_sig', '附属阀门信号', 'STRING', '-', 'on_change', 'open']],
+                '管网压力变送器': [['press_kpa', '管压', 'DOUBLE', 'kPa', '1/min', '126.4'], ['press_min', '分钟最小压力', 'DOUBLE', 'kPa', '1/min', '118.2'], ['dp_10min', '十分钟压差', 'DOUBLE', 'kPa', '10min', '-2.4'], ['leak_flag', '渗漏判定', 'BOOLEAN', '-', 'on_change', 'false']],
+                /* ---- 监控：人 / 车 / 商家门店抓拍 ---- */
+                '治安球机': [['channel_id', 'GB28181 通道编号', 'STRING', '-', 'on_event', '340200000013200001'], ['ptz', '云台方位/俯仰角', 'ARRAY', '°', 'on_command', '[127,-8]'], ['obj_type', '抓拍对象类型', 'STRING', '-', 'on_event', 'person'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.93'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/a.jpg']],
+                '卡口相机': [['cross_id', '卡口编号', 'STRING', '-', 'on_event', 'K33010012'], ['plate_no', '车牌（分级掩码）', 'STRING', '-', 'on_event', '浙A·***23'], ['pass_time', '过车时刻', 'DATETIME', '-', 'on_event', ''], ['speed', '分道速度', 'DOUBLE', 'km/h', 'on_event', '47.6'], ['vio_code', '违法代码', 'STRING', '-', 'on_event', '']],
+                '路网枪机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200088'], ['scene', '布控场景类型', 'STRING', '-', 'on_change', 'store_front'], ['obj_list', '抓拍对象集合', 'ARRAY', '-', 'on_event', '["bike","goods"]'], ['frame_no', '帧序号幂等键', 'BIGINT', '-', 'on_event', '8842135']],
+                '人脸抓拍枪机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200104'], ['face_box', '人脸框坐标', 'ARRAY', 'px', 'on_event', '[1024,318,96,112]'], ['quality', '抓拍质量分', 'DOUBLE', '-', 'on_event', '0.87'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.94']],
+                '半球摄像机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200177'], ['obj_type', '对象类型', 'STRING', '-', 'on_event', 'person'], ['indoor', '室内外标识', 'STRING', '-', 'on_change', 'indoor'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.90']],
+                '商家门店抓拍机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200233'], ['shop_code', '门店编码', 'STRING', '-', 'on_change', 'SH-3301204'], ['biz_order', '门前三包判定', 'STRING', '-', 'on_event', 'pass'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/shop.jpg']],
+                /* ---- 控制：路灯与泵站 ---- */
+                '路灯单灯控制器': [['circuit', '回路号', 'STRING', '-', '1/min', 'L07-03'], ['on_off', '开关状态', 'BOOLEAN', '-', '1/min', 'true'], ['dim_pct', '调光比例', 'DOUBLE', '%', '1/min', '60'], ['power_w', '有功功率', 'DOUBLE', 'W', '1/5min', '84.2'], ['cmd_ack', '指令应答序号', 'STRING', '-', 'on_command', 'A8812']],
+                '照明回路控制器': [['circuit', '回路号', 'STRING', '-', '1/min', 'L02-11'], ['on_off', '开关状态', 'BOOLEAN', '-', '1/min', 'true'], ['power_w', '有功功率', 'DOUBLE', 'W', '1/5min', '2460.0'], ['energy_kwh', '当日电能', 'DOUBLE', 'kWh', '1/h', '18.6']],
+                '泵站控制柜': [['run_stat', '运行状态', 'STRING', '-', '1/min', 'auto'], ['level_m', '集水池液位', 'DOUBLE', 'm', '1/min', '2.36'], ['pump_amp', '泵组电流', 'DOUBLE', 'A', '1/min', '86.4'], ['fault_code', '故障码', 'STRING', '-', 'on_change', '']],
+                '焚烧炉助燃风机控制柜': [['freq_hz', '变频频率', 'DOUBLE', 'Hz', '1/min', '38.6'], ['burn_air', '助燃风量', 'DOUBLE', 'm³/h', '1/min', '4260'], ['furnace_c', '炉膛温度', 'DOUBLE', '℃', '1/min', '1042'], ['on_off', '运行指令', 'BOOLEAN', '-', 'on_command', 'true']],
+                /* ---- 网关：视频AI 与 NB-IoT ---- */
+                '视频AI边缘盒子': [['algo_ver', '算法版本号', 'STRING', '-', '1/d', 'face-v3.2'], ['infer_qps', '推理吞吐', 'DOUBLE', 'frame/s', '1/min', '46.8'], ['cache_frames', '积压帧数', 'INT', '帧', '1/min', '12'], ['chip_temp', '模组温度', 'DOUBLE', '℃', '1/min', '61.2']],
+                '物联NB-IoT汇聚网关': [['conn', '在线终端数', 'INT', '-', '1/min', '2140'], ['reg_fail', '注册失败数', 'INT', '次', '1/h', '3'], ['msg_out', '转发速率', 'DOUBLE', 'msg/s', '1/min', '486'], ['link_stat', '链路状态', 'STRING', '-', 'on_change', 'online']],
+                /* ---- 移动作业终端：车 / 船 / 手环 / 巡更 ---- */
+                '环卫收运车终端': [['veh_no', '环卫车牌', 'STRING', '-', '1/10s', '浙A·5**10'], ['task_no', '收运任务单号', 'STRING', '-', 'on_change', 'RT261030012'], ['load', '车载载重', 'DOUBLE', 'kg', '1/min', '4820'], ['box_state', '装载/倾倒状态', 'STRING', '-', 'on_change', 'loaded'], ['route_id', '线路编号', 'STRING', '-', 'on_change', 'R-19']],
+                '运输船智能终端': [['mmsi', '船舶MMSI', 'STRING', '-', '1/min', '413002026'], ['sog', '对地航速', 'DOUBLE', 'kn', '1/min', '6.2'], ['cargo_w', '装载量', 'DOUBLE', 't', '1/min', '118.5'], ['port_code', '进出港编码', 'STRING', '-', 'on_change', 'PT-03']],
+                '执法车辆定位终端': [['veh_no', '车牌/自编车辆号', 'STRING', '-', '1/10s', '浙A·8**21'], ['lng', '经度', 'DOUBLE', 'GCJ02', '1/10s', '120.21'], ['lat', '纬度', 'DOUBLE', 'GCJ02', '1/10s', '30.25'], ['spd', '速度', 'DOUBLE', 'km/h', '1/10s', '32.4'], ['odr', '当日里程', 'DOUBLE', 'km', '1/h', '46.8']],
+                '智能作业手环': [['user_id', '人员工号', 'STRING', '-', '1/10s', 'G10472'], ['heart_rate', '心率', 'INT', '次/min', '1/10s', '96'], ['lng', '经度', 'DOUBLE', 'GCJ02', '1/10s', '120.155'], ['lat', '纬度', 'DOUBLE', 'GCJ02', '1/10s', '30.271'], ['fence_hit', '是否越界', 'BOOLEAN', '-', 'on_change', 'true'], ['sos', 'SOS 按下次数', 'INT', '次', 'on_change', '0']],
+                '电子巡更仪': [['patrol_no', '巡更班组号', 'STRING', '-', 'on_change', 'P-07'], ['point_id', '打点编号', 'STRING', '-', 'on_change', 'XJ-118'], ['punch_time', '打点时间', 'DATETIME', '-', 'on_change', ''], ['photo_ref', '现场照片附件', 'STRING', 'oss', 'on_change', '']],
+                '车载视频终端': [['channel_id', '车载通道编号', 'STRING', '-', 'on_event', 'MOV-08-01'], ['obj_type', '识别对象', 'STRING', '-', 'on_event', 'road_intrusion'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.88'], ['lng', '绑定定位', 'DOUBLE', 'GCJ02', 'on_event', '120.21']],
+                /* ---- 环卫与处置设施 ---- */
+                '智能果壳箱': [['fill_pct', '满溢度', 'DOUBLE', '%', '1/10min', '86'], ['lid_open', '开盖次数', 'INT', '次', 'on_change', '23'], ['weight_kg', '估算重量', 'DOUBLE', 'kg', '1/10min', '31.4'], ['smoke', '箱内烟感', 'BOOLEAN', '-', 'on_change', 'false'], ['battery', '电池百分比', 'DOUBLE', '%', '1/h', '63']],
+                '分类回收站称重机': [['station_id', '回收站编号', 'STRING', '-', 'on_change', 'HS-0116'], ['cat_code', '分类代码', 'STRING', '-', 'on_change', 'paper'], ['weight_kg', '称重净重', 'DOUBLE', 'kg', 'on_change', '12.4'], ['order_no', '回收订单号', 'STRING', '-', 'on_change', 'R2610300451'], ['member_hash', '会员号哈希', 'STRING', '-', 'on_change', '7a1c']],
+                '焚烧炉烟气监测站': [['so2_mg', '二氧化硫折算', 'DOUBLE', 'mg/m³', '1/min', '18.4'], ['nox_mg', '氮氧化物折算', 'DOUBLE', 'mg/m³', '1/min', '62.1'], ['dust_mg', '颗粒物', 'DOUBLE', 'mg/m³', '1/min', '7.2'], ['o2_pct', '含氧量', 'DOUBLE', '%', '1/min', '9.4'], ['std_flag', '达标标记', 'STRING', '-', 'on_change', 'pass']],
+                '人证核验一体机': [['verify_id', '核验流水号', 'STRING', '-', 'on_event', 'V202610300912-118'], ['id_no_hash', '证件号 SM3 哈希', 'STRING', '-', 'on_event', '9f2c'], ['match_score', '人证比对得分', 'DOUBLE', '-', 'on_event', '0.982'], ['gate', '窗口/闸机编号', 'STRING', '-', 'on_change', 'A03'], ['result', '核验结果', 'STRING', '-', 'on_event', 'pass']],
+                '垃圾中转站地磅': [['truck_no', '车牌', 'STRING', '-', 'on_change', '浙A·6**88'], ['gross', '毛重', 'DOUBLE', 'kg', 'on_change', '12864', 'fix'], ['tare', '皮重', 'DOUBLE', 'kg', 'on_change', '6200', 'fix'], ['net', '净重（毛重减皮重）', 'DOUBLE', 'kg', 'on_change', '6664', 'fix'], ['operator', '过磅员', 'STRING', '-', 'on_change', 'B-12']],
+                '公厕异味监测仪': [['nh3_ppm', '氨浓度', 'DOUBLE', 'ppm', '1/min', '3.6'], ['h2s_ppm', '硫化氢', 'DOUBLE', 'ppm', '1/min', '1.2'], ['pm25', '颗粒物', 'DOUBLE', 'µg/m³', '1/min', '42'], ['odor_lvl', '异味等级', 'STRING', '-', 'on_change', 'L2'], ['vacant', '空位状态', 'INT', '个', '1/min', '2']]
+            };
+            /** 字符串稳定散列（用作同一测点在不同设备上的读数差异） */
+            function strHash(s) {
+                let h = 2166136261;
+                for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+                return h >>> 0;
+            }
+            /** 设备物模型：优先按设备名称取专用测点，否则套用类型通用测点 */
+            function thingModel(d) { return THING_MODEL[d.name] || MODEL_BASE[d.type] || []; }
+            /** 测点当前值：设备离线/故障时计为缺报，数值型测点按设备编号哈希做小幅波动；
+               标为 fix 的派生测点（如地磅净重）不参与波动，以保持与相关测点的算式一致 */
+            function modelValue(p, d) {
+                if (p[2] === 'DATETIME') return SC.stamp(d.lastSeen).slice(5, 16);
+                if (d.status === '离线' || d.status === '故障') return '缺报';
+                if (p[2] !== 'INT' && p[2] !== 'BIGINT' && p[2] !== 'DOUBLE') return p[5] || '—';
+                if (p[6] === 'fix') return p[5];
+                const num = Number(p[5]);
+                if (!isFinite(num) || num === 0) return p[5];
+                const scaled = num * (0.6 + (strHash(d.id + p[0]) % 90) / 100);
+                return p[2] === 'DOUBLE' ? scaled.toFixed(2) : String(Math.round(scaled));
+            }
+            /** 按物模型拼装上报报文样例 */
+            function modelPayload(d) {
+                const o = { dev_id: d.id, ts: SC.stamp(d.lastSeen) };
+                thingModel(d).forEach(function (p) {
+                    if (p[2] === 'DATETIME') o[p[0]] = SC.stamp(d.lastSeen);
+                    else if (p[2] === 'BOOLEAN') o[p[0]] = p[5] === 'true';
+                    else if (p[2] === 'INT' || p[2] === 'BIGINT' || p[2] === 'DOUBLE') o[p[0]] = p[5] === '' ? null : (p[2] === 'DOUBLE' ? Number(p[5]) : parseInt(p[5], 10));
+                    else o[p[0]] = p[5];
+                });
+                return JSON.stringify(o);
+            }
+            function modelTable(d) {
+                const rows = thingModel(d);
+                return '<table class="data-table"><thead><tr><th>测点标识</th><th>名称</th><th>数据类型</th><th>单位</th><th>采样频率</th><th>当前值</th></tr></thead><tbody>' +
+                    rows.map(function (p) {
+                        return '<tr><td><code>' + p[0] + '</code></td><td>' + SC.esc(p[1]) + '</td><td>' + p[2] + '</td>' +
+                            '<td>' + (p[3] === '-' ? '—' : SC.esc(p[3])) + '</td><td>' + SC.esc(p[4]) + '</td>' +
+                            '<td><span class="sc-cell-num">' + SC.esc(modelValue(p, d)) + '</span></td></tr>';
+                    }).join('') + '</tbody></table>';
+            }
             const ZONES = ['高新片区', '老城片区', '滨江片区', '经济园区', '中心广场', '环城快速', '高铁新城', '大学城'];
             const STATUS = {
                 '在线': 'ok', '休眠': 'info', '离线': 'off', '故障': 'bad', '检修': 'warn'
@@ -905,51 +1031,56 @@
                 const list = [];
                 let seq = 0;
                 Object.keys(TYPES).forEach(function (tk) {
-                    const T = TYPES[tk];
-                    const count = Math.round(T.weight / 100 * 78);
+                    const count = Math.round(TYPES[tk].weight / 100 * DEVICE_BASE);
                     for (let i = 0; i < count; i++) {
                         seq++;
-                        const uptimeDays = ri(20, 1180);
-                        const install = new Date(Date.now() - uptimeDays * 86400000);
-                        const status = weightedStatus(tk);
-                        const signal = status === '离线' ? ri(0, 22) : ri(46, 99);
-                        const d = {
-                            id: 'DEV-' + String(seq).padStart(4, '0'),
-                            name: pick(T.items),
-                            type: tk,
-                            model: pick(T.models),
-                            protocol: pick(T.protocols),
-                            zone: pick(ZONES),
-                            vendor: pick(T.vendors),
-                            power: pick(T.power),
-                            serial: 'SN' + ri(10000000, 99999999),
-                            fw: fwVersion(T.fwLatest),
-                            status: status,
-                            signal: signal,
-                            battery: ri(18, 100),
-                            temp: ri(24, 82),
-                            loss: Number(rf(0, status === '在线' ? 1.6 : 6).toFixed(2)),
-                            offline: ri(0, status === '故障' ? 9 : 3),
-                            faultCount: ri(0, status === '故障' ? 5 : 2),
-                            mttr: Number(rf(0.6, 6.5).toFixed(1)),
-                            uptimeDays: uptimeDays,
-                            install: SC.stamp(install, false).slice(0, 10),
-                            msgRate: tk === 'camera' ? ri(2, 18) : tk === 'sensor' ? ri(1, 6) : ri(1, 3),
-                            lastSeen: Date.now() - ri(3, status === '在线' ? 120 : 60 * 72) * 1000,
-                            healthHistory: [],
-                            notes: []
-                        };
-                        d.health = calcHealth(d);
-                        d.healthHistory = buildHistory(d);
-                        list.push(d);
+                        list.push(makeDevice(tk, null, seq));
                     }
                 });
                 return list;
             }
+            /** 生成一台设备档案；name 为空时按类型目录随机取，seq 为台账流水号 */
+            function makeDevice(tk, name, seq) {
+                const T = TYPES[tk];
+                const uptimeDays = ri(20, 1180);
+                const install = new Date(Date.now() - uptimeDays * 86400000);
+                const status = weightedStatus(tk);
+                const signal = status === '离线' ? ri(0, 22) : ri(46, 99);
+                const mr = MSG_RATE[tk] || [1, 3];
+                const d = {
+                    id: 'DEV-' + String(seq).padStart(4, '0'),
+                    name: name || pick(T.items),
+                    type: tk,
+                    model: pick(T.models),
+                    protocol: pick(T.protocols),
+                    zone: pick(ZONES),
+                    vendor: pick(T.vendors),
+                    power: pick(T.power),
+                    serial: 'SN' + ri(10000000, 99999999),
+                    fw: fwVersion(T.fwLatest),
+                    status: status,
+                    signal: signal,
+                    battery: ri(18, 100),
+                    temp: ri(24, 82),
+                    loss: Number(rf(0, status === '在线' ? 1.6 : 6).toFixed(2)),
+                    offline: ri(0, status === '故障' ? 9 : 3),
+                    faultCount: ri(0, status === '故障' ? 5 : 2),
+                    mttr: Number(rf(0.6, 6.5).toFixed(1)),
+                    uptimeDays: uptimeDays,
+                    install: SC.stamp(install, false).slice(0, 10),
+                    msgRate: ri(mr[0], mr[1]),
+                    lastSeen: Date.now() - ri(3, status === '在线' ? 120 : 60 * 72) * 1000,
+                    healthHistory: [],
+                    notes: []
+                };
+                d.health = calcHealth(d);
+                d.healthHistory = buildHistory(d);
+                return d;
+            }
             function weightedStatus(tk) {
                 const r = rnd();
-                // 控制类与网关优先级高，故障率刻意压低一点，符合真实运维口径
-                const faultRate = tk === 'ctrl' ? 0.035 : tk === 'gateway' ? 0.02 : 0.045;
+                // 控制类与网关优先级高，故障率刻意压低一点；车载穿戴件震动大、环卫设施腐蚀重，故障率上浮
+                const faultRate = tk === 'ctrl' ? 0.035 : tk === 'gateway' ? 0.02 : tk === 'mobile' ? 0.055 : tk === 'site' ? 0.05 : 0.045;
                 if (r < 0.79) return '在线';
                 if (r < 0.79 + 0.07) return '休眠';
                 if (r < 0.79 + 0.07 + 0.06) return '离线';
@@ -1012,10 +1143,41 @@
             /* =====================================================================
                3. 持久化
                ===================================================================== */
-            let devices = SC.store.get('equipment', 'devices', null);
-            if (!devices || !devices.length) {
+            /* 台账持久化策略：设备明细整表存档（保留用户的处置记录），
+               但类型目录只做「增量补齐」——口径升级时保留既有设备，为目录中缺失的设备名称各补 1 台 */
+            let devices = SC.store.get('equipment', 'devices', null) || [];
+            let catalogAdded = 0;
+            if (!devices.length) {
                 devices = buildDevices();
-                SC.store.set('equipment', 'devices', devices);
+            } else if (SC.store.get('equipment', 'catVer', 0) !== EQ_CAT_VER) {
+                catalogAdded = mergeCatalog(devices).length;
+            }
+            SC.store.set('equipment', 'catVer', EQ_CAT_VER);
+            SC.store.set('equipment', 'devices', devices);
+            /** 目录增量合并：返回新补齐的设备数组，使用独立随机流以免扰动全局序列 */
+            function mergeCatalog(list) {
+                const keep = seed, added = [];
+                seed = 20260915;
+                let maxSeq = 0;
+                const has = {};
+                list.forEach(function (d) {
+                    has[d.type + '|' + d.name] = 1;
+                    const n = Number(String(d.id).split('-')[1]) || 0;
+                    if (n > maxSeq) maxSeq = n;
+                });
+                Object.keys(TYPES).forEach(function (tk) {
+                    TYPES[tk].items.forEach(function (name) {
+                        if (has[tk + '|' + name]) return;
+                        has[tk + '|' + name] = 1;
+                        maxSeq++;
+                        const d = makeDevice(tk, name, maxSeq);
+                        d.notes.push({ t: SC.stamp(new Date()), who: '目录同步', txt: '设备目录口径升级自动建档：' + TYPES[tk].label + '「' + name + '」' });
+                        added.push(d);
+                    });
+                });
+                seed = keep;
+                list.push.apply(list, added);
+                return added;
             }
             let opslog = SC.store.get('equipment', 'opslog', []);
             function saveDevices() { SC.store.set('equipment', 'devices', devices); }
@@ -1288,7 +1450,9 @@
                 { id: 'GW-03', name: '老城片区网关', conn: 2110, lat: 176, loss: 1.42, zone: '老城片区', ver: 'v4.1.8' },
                 { id: 'GW-04', name: '经济园区网关', conn: 1420, lat: 96, loss: 0.26, zone: '经济园区', ver: 'v4.2.1' },
                 { id: 'GW-05', name: '交通信号与网关', conn: 980, lat: 64, loss: 0.08, zone: '环城快速', ver: 'v4.2.1' },
-                { id: 'GW-06', name: '视频专网网关', conn: 760, lat: 210, loss: 0.62, zone: '中心广场', ver: 'v4.0.9' }
+                { id: 'GW-06', name: '视频专网网关', conn: 760, lat: 210, loss: 0.62, zone: '中心广场', ver: 'v4.0.9' },
+                { id: 'GW-07', name: '环卫车载终端汇聚网关', conn: 1180, lat: 142, loss: 0.54, zone: '高铁新城', ver: 'v4.2.1' },
+                { id: 'GW-08', name: 'NB-IoT 低位传感汇聚网关', conn: 2640, lat: 236, loss: 0.94, zone: '大学城', ver: 'v4.2.0' }
             ];
             function gwStatus(g) {
                 if (g.loss > 1 || g.lat > 200) return { t: '劣化', c: 'bad' };
@@ -1355,7 +1519,11 @@
                 { sys: '停车诱导系统', items: 2180, full: 99.8, timely: 96.4, bad: 0.12 },
                 { sys: '环境空气监测', items: 640, full: 99.1, timely: 99.6, bad: 0.44 },
                 { sys: '交通信号平台', items: 1520, full: 98.6, timely: 99.1, bad: 0.68 },
-                { sys: '城管执法终端', items: 980, full: 95.2, timely: 92.6, bad: 2.41 }
+                { sys: '城管执法终端', items: 980, full: 95.2, timely: 92.6, bad: 2.41 },
+                { sys: '环卫清运调度', items: 1860, full: 96.4, timely: 94.8, bad: 1.86 },
+                { sys: '视频抓拍解析', items: 5240, full: 99.2, timely: 97.6, bad: 0.28 },
+                { sys: '燃气消防监测', items: 420, full: 98.8, timely: 99.1, bad: 0.36 },
+                { sys: '人员定位手环', items: 2140, full: 94.6, timely: 91.2, bad: 3.12 }
             ];
             function dqGrade(q) {
                 const score = (q.full - 90) * 1.6 + (q.timely - 90) * 1.4 - q.bad * 6;
@@ -1623,7 +1791,7 @@
                     if (!cand.length) return;
                     plan.push({
                         batch: '2026-' + quarters[i % 4], type: TYPES[tk].label, n: cand.length,
-                        budget: Number((cand.length * (tk === 'camera' ? 1.2 : tk === 'ctrl' ? 2.4 : 0.6)).toFixed(1)),
+                        budget: Number((cand.length * (UNIT_PRICE[tk] || 0.6)).toFixed(1)),
                         reason: cand.filter(d => d.uptimeDays > 1200).length + ' 台超期服役 / ' +
                             cand.filter(d => d.health < 68).length + ' 台健康分低于 68'
                     });
@@ -1702,7 +1870,7 @@
                 },
                 {
                     id: 'API-04', name: '告警事件订阅推送', method: 'POST', path: '/v1/alarm/subscribe', caller: '应急指挥中心', calls: 8620, success: 97.12, avg: 158, state: '启用', secure: true,
-                    params: { topics: ['device.offline', 'pump.high_level'], callback: 'https://123.31.1.10:8443/alarm/cb' },
+                    params: { topics: ['device.offline', 'pump.high_level', 'wrist.loc_cross', 'gas.leak', 'bin.full'], callback: 'https://123.31.1.10:8443/alarm/cb' },
                     build: function (q) { return { code: 0, msg: 'subscribed', trace: traceId(), data: { subscriptionId: 'SUB-' + ri(1000, 9999), topics: q.topics, expireAt: SC.stamp(Date.now() + 86400000 * 7) } }; }
                 },
                 {
@@ -1724,6 +1892,21 @@
                     id: 'API-08', name: '历史数据回溯查询', method: 'GET', path: '/v1/telemetry/history', caller: '排水调度系统', calls: 15930, success: 99.31, avg: 620, state: '停用', secure: true,
                     params: { deviceId: 'DEV-0021', metric: 'level', from: SC.today() + 'T00:00', to: SC.today() + 'T23:59' },
                     build: function (q) { return { code: 0, msg: 'ok', trace: traceId(), data: { metric: q.metric, points: 288, series: Array.from({ length: 6 }, (_, i) => Number(rf(0.3, 2.4).toFixed(2))) } }; }
+                },
+                {
+                    id: 'API-09', name: '水位液位批量查询', method: 'GET', path: '/v1/facility/level', caller: '排水调度系统', calls: 47820, success: 99.58, avg: 74, state: '启用', secure: false,
+                    params: { kinds: ['低洼积水水位计', '雷达液位计', '超声波液位计', '智能井盖'], zone: '滨江片区', threshold: 0.3 },
+                    build: function (q) { return { code: 0, msg: 'ok', trace: traceId(), data: { scanned: 612, over: ri(2, 9), unit: 'm', sample: q.kinds, list: Array.from({ length: 4 }, () => ({ deviceId: 'DEV-' + String(ri(1, devices.length)).padStart(4, '0'), level: Number((rf(0.05, 0.85) * (Number(q.threshold) || 0.3) * 3).toFixed(3)) })) } }; }
+                },
+                {
+                    id: 'API-10', name: '轨迹越界告警回调', method: 'POST', path: '/v1/track/geofence', caller: '环卫清运调度中心', calls: 96420, success: 98.86, avg: 38, state: '启用', secure: true,
+                    params: { deviceId: 'DEV-0013', kind: '环卫收运车终端', fenceId: 'FENCE-07', action: 'ALARM' },
+                    build: function (q) { return { code: 0, msg: 'dispatched', trace: traceId(), data: { alarmId: 'ALT-' + ri(100000, 999999), pipeline: 'MQTT → Flink → 告警中心', fenceId: q.fenceId, deviceId: q.deviceId, speedKmh: ri(0, 46), delayMs: ri(120, 860) } }; }
+                },
+                {
+                    id: 'API-11', name: '垃圾称重与满溢上报', method: 'POST', path: '/v1/waste/weight', caller: '分类回收运营平台', calls: 28460, success: 99.12, avg: 96, state: '启用', secure: false,
+                    params: { deviceId: 'DEV-0027', gross: 1286.4, tare: 620.0, binLevel: 82 },
+                    build: function (q) { return { code: 0, msg: 'accepted', trace: traceId(), data: { net: Number((q.gross - q.tare).toFixed(1)), station: pick(ZONES), needPickup: q.binLevel > 80, ticketId: 'WO-' + ri(10000, 99999) } }; }
                 }
             ];
             function traceId() { return Math.random().toString(36).slice(2, 10).toUpperCase(); }
@@ -1858,7 +2041,10 @@
                 { id: 'S-03', name: '视频目录同步', src: '视联网平台 → 共享交换', cycle: '每小时', last: Date.now() - 1860000, rows: 4820, cost: 46.2, state: '成功', enabled: true, pct: 100 },
                 { id: 'S-04', name: '能耗数据上报', src: '照明系统 → 能耗平台', cycle: '每日 02:00', last: Date.now() - 7200000, rows: 96400, cost: 122.8, state: '失败', enabled: true, pct: 100 },
                 { id: 'S-05', name: '地理信息图层', src: 'GIS 平台 → 设施工库', cycle: '每日 04:00', last: Date.now() - 3600000, rows: 284, cost: 312.4, state: '成功', enabled: false, pct: 100 },
-                { id: 'S-06', name: '基础设施编码对码', src: '城管系统 → 主数据', cycle: '每 30 分钟', last: Date.now() - 900000, rows: 18640, cost: 12.6, state: '成功', enabled: true, pct: 100 }
+                { id: 'S-06', name: '基础设施编码对码', src: '城管系统 → 主数据', cycle: '每 30 分钟', last: Date.now() - 900000, rows: 18640, cost: 12.6, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-07', name: '环卫车辆轨迹同步', src: '车载终端 → 轨迹库', cycle: '每 5 分钟', last: Date.now() - 240000, rows: 962400, cost: 21.6, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-08', name: 'CEMS 排放数据上报', src: '焚烧炉监测站 → 环保平台', cycle: '每 2 小时', last: Date.now() - 5400000, rows: 18420, cost: 64.2, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-09', name: '抓拍结构化入库', src: '边缘AI盒子 → 视图库', cycle: '准实时（30 秒）', last: Date.now() - 90000, rows: 274680, cost: 88.4, state: '运行中', enabled: true, pct: 62 }
             ];
             function renderSyncs() {
                 document.querySelector('#sync-table tbody').innerHTML = syncs.map(function (s) {
@@ -1929,7 +2115,9 @@
                 { id: 'SUB-03', who: '街道网格化管理', scope: '城管执法事件 / 视频预置位', way: 'API 拉取', used: 12, total: 50, state: '待审批', expire: '-' },
                 { id: 'SUB-04', who: '环保分局', scope: '空气监测 / 噪声监测', way: '定时库表交换', used: 45, total: 60, state: '已通过', expire: '2027-03-31' },
                 { id: 'SUB-05', who: '能源集团', scope: '路灯回路能耗', way: 'API 拉取', used: 99, total: 100, state: '已通过', expire: '2026-10-31' },
-                { id: 'SUB-06', who: '第三方运营公司', scope: '停车收费明细', way: 'API 拉取', used: 0, total: 20, state: '已驳回', expire: '-' }
+                { id: 'SUB-06', who: '第三方运营公司', scope: '停车收费明细', way: 'API 拉取', used: 0, total: 20, state: '已驳回', expire: '-' },
+                { id: 'SUB-07', who: '环卫清运调度中心', scope: '环卫车轨迹 / 果壳箱满溢 / 回收站称重', way: '消息推送', used: 31, total: 80, state: '已通过', expire: '2027-06-30' },
+                { id: 'SUB-08', who: '城镇燃气安全平台', scope: '可燃气体 / 管网压力 / 消防栓水压', way: 'API 拉取', used: 6, total: 30, state: '待审批', expire: '-' }
             ];
             function renderSubs() {
                 document.querySelector('#sub-table tbody').innerHTML = subs.map(function (s) {
@@ -2227,7 +2415,9 @@
                 sensor: ['远程校准', '立即上报', '采集频率调整', '自检'],
                 camera: ['抓拍', '预置位调用', '重启', '码率调整'],
                 ctrl: ['回路测试', '切换自动模式', '重启', '固件自检'],
-                gateway: ['链路重连', '配置下发', '重启', '清空缓存']
+                gateway: ['链路重连', '配置下发', '重启', '清空缓存'],
+                mobile: ['轨迹上报频率调整', '电子围栏下发', '远程断油电提醒', '终端重启'],
+                site: ['称重去皮校准', '满溢抽检', '开锁投料口', 'CEMS 标定']
             };
             function kvItem(k, v) { return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
             function openCmd(d) {
@@ -2265,7 +2455,7 @@
                 const parts = [
                     { n: '主板/电源模块', v: Math.min(99, d.health + 6) },
                     { n: '通信模组', v: Math.min(99, d.health + (d.signal > 70 ? 8 : -9)) },
-                    { n: d.type === 'camera' ? '镜头/云台' : d.type === 'sensor' ? '敏感探头' : d.type === 'ctrl' ? '继电器/执行机' : '风扇/机箱', v: Math.min(99, d.health - Math.round(d.uptimeDays / 260)) },
+                    { n: PART_LABEL[d.type] || '风扇/机箱', v: Math.min(99, d.health - Math.round(d.uptimeDays / 260)) },
                     { n: '存储介质', v: Math.min(99, d.health + Math.round(d.loss * -1.5) + 4) }
                 ];
                 const body =
@@ -2286,6 +2476,10 @@
                     kvItem('采集频率', d.msgRate + ' msg/s') +
                     kvItem('最近上报', agoText(d.lastSeen)) +
                     '</div>' +
+                    '<div class="sc-section-title">物模型与测点（' + thingModel(d).length + ' 个测点，标识与数据中台采集口径对齐）</div>' +
+                    modelTable(d) +
+                    '<div class="sc-hint" style="margin:10px 0 4px">上报报文样例</div>' +
+                    '<div class="sc-code">' + SC.esc(modelPayload(d)) + '</div>' +
                     '<div class="sc-split" style="margin-top:20px">' +
                     '<div><div class="sc-panel-title"><h3 style="font-size:1em">健康分走势（近 8 周）</h3></div>' +
                     '<div class="sc-chart sm"><canvas data-c="hist"></canvas></div></div>' +
@@ -2316,6 +2510,7 @@
                     footer: [
                         { text: '⟳ 下发指令', kind: 'ghost', onClick: () => openCmd(d) },
                         { text: '🛠 登记维护', kind: 'ghost', onClick: () => openMaint(d) },
+                        { text: '🛰 数据中台采集档案', kind: 'ghost', onClick: () => { location.href = 'data-platform.html'; } },
                         { text: '删除设备', kind: 'danger', onClick: () => removeDevice(d) },
                         { text: '关闭', kind: 'primary' }
                     ]
@@ -2360,7 +2555,7 @@
                 });
                 ev.push({ h: '上报心跳 ' + d.msgRate + ' msg/s，丢包率 ' + d.loss.toFixed(2) + '%', m: agoText(d.lastSeen), cls: 'done' });
                 ev.push({ h: '固件校验通过（' + d.fw + '）', m: d.install + ' 入网初始化', cls: '' });
-                ev.push({ h: '待办：下周巡检 ' + (d.type === 'camera' ? '镜头清洁' : '量程校准'), m: '计划中', cls: 'todo' });
+                ev.push({ h: '待办：下周巡检 ' + (INSPECT_ITEM[d.type] || '量程校准'), m: '计划中', cls: 'todo' });
                 return ev;
             }
             function openMaint(d) {
@@ -2417,10 +2612,13 @@
                         { name: 'type', label: '设备类型', type: 'select', options: types, col: 1, required: true },
                         { name: 'zone', label: '安装区域', type: 'select', options: ZONES, col: 1, required: true },
                         {
-                            name: 'protocol', label: '接入协议', type: 'select', options: TYPES.sensor.protocols.concat(TYPES.camera.protocols, TYPES.ctrl.protocols, TYPES.gateway.protocols)
-                                .filter((v, i, a) => a.indexOf(v) === i), col: 1, required: true
+                            name: 'protocol', label: '接入协议', type: 'select',
+                            options: Object.keys(TYPES).reduce((a, k) => a.concat(TYPES[k].protocols), []).filter((v, i, a) => a.indexOf(v) === i), col: 1, required: true
                         },
-                        { name: 'power', label: '供电方式', type: 'select', options: ['市电', 'PoE', '电池', '太阳能'], col: 1, required: true },
+                        {
+                            name: 'power', label: '供电方式', type: 'select',
+                            options: Object.keys(TYPES).reduce((a, k) => a.concat(TYPES[k].power), []).filter((v, i, a) => a.indexOf(v) === i), col: 1, required: true
+                        },
                         { name: 'vendor', label: '厂商', col: 1, value: '华感科技', required: true },
                         { name: 'msgRate', label: '上报频率', type: 'number', min: 1, max: 30, value: 2, unit: 'msg/s', col: 1 },
                         { name: 'install', label: '启用日期', type: 'date', value: SC.today(), col: 1, required: true },
@@ -2576,7 +2774,7 @@
                 const id = btn.closest('tr').dataset.id;
                 const d = byId(id);
                 if (!d) return;
-                if (btn.dataset.act === 'view') openDetail(d);
+                if (btn.dataset.act === 'view') openDetail(d.id);
                 if (btn.dataset.act === 'cmd') openCmd(d);
             });
 
@@ -2752,7 +2950,11 @@
                 });
             });
 
-            log('ok', '设备与数据管理模块已加载：在册 ' + devices.length + ' 台设备，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
+            if (catalogAdded) {
+                log('info', '设备目录口径升级至 v' + EQ_CAT_VER + '：保留原台账，自动补齐 ' + catalogAdded + ' 台新增类别设备（环卫、燃气、液位、视频抓拍、作业终端等）');
+                SC.toast('设备目录已升级，新增 ' + catalogAdded + ' 台类别补齐设备', { type: 'info', duration: 4200 });
+            }
+            log('ok', '设备与数据管理模块已加载：在册 ' + devices.length + ' 台设备 / ' + Object.keys(TYPES).length + ' 类目录，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
             SC.toast('设备台账已就绪，共 ' + devices.length + ' 台在册设备', { type: 'success' });
         })();
     </script>

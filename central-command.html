@@ -1216,6 +1216,7 @@
 
     <script src="assets/js/common.js"></script>
     <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/device-catalog.js"></script>
     <script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script>
@@ -1873,7 +1874,18 @@
 
             /* ======================= 视频与智能抓拍 ======================= */
 
-            const CAM_TYPES = [['球机', '📹'], ['枪机', '🎥'], ['卡口', '🚦'], ['高空瞭望', '🔭']];
+            /* 点位类型与数据中台「末端设备接入清单」的三类视频感知设备对应：
+               视频监控球机 CAM / 枪机半球抓拍一体机 SPR / 卡口电子警察 DME */
+            const CAM_TYPES = [['球机', '📹'], ['枪机', '🎥'], ['半球', '📷'], ['卡口', '🚦'], ['门店抓拍', '🏪'], ['高空瞭望', '🔭']];
+            /* 各型点位的抓拍对象与接入方式：与设备数据页物模型标识同源 */
+            const CAM_SUBJ = {
+                '球机': { subj: '人员、车辆与门店前秩序', access: 'GB28181 直连', code: 'CAM' },
+                '枪机': { subj: '重点部位定点抓拍、人员人脸', access: 'ONVIF + 边缘 AI', code: 'SPR' },
+                '半球': { subj: '室内商家经营行为、人员抓拍', access: 'ONVIF + 边缘 AI', code: 'SPR' },
+                '卡口': { subj: '过车与车牌识别、违法取证', access: 'GB28181 + 识别服务', code: 'DME' },
+                '门店抓拍': { subj: '商家外摆、跨店经营与人员聚集', access: 'ONVIF + 边缘 AI', code: 'SPR' },
+                '高空瞭望': { subj: '片区全景、火情与人群聚集', access: 'GB28181 直连', code: 'CAM' }
+            };
 
             function buildCams() {
                 const list = [];
@@ -1882,11 +1894,15 @@
                     const region = pickRegion(key + ':rg');
                     const road = pick(key + ':rd', roadsOf(region));
                     const ct = pick(key + ':ct', CAM_TYPES);
+                    const sj = CAM_SUBJ[ct[0]] || { subj: '视频图像', access: 'GB28181 直连', code: 'CAM' };
                     list.push({
                         id: 'CAM-' + pad3(i + 1),
                         name: road + pick(key + ':pt', ['路口', '中段', '东侧', '西侧']) + ct[0],
                         icon: ct[1],
                         type: ct[0],
+                        subj: sj.subj,
+                        access: sj.access,
+                        devCode: sj.code,
                         region: region,
                         road: road,
                         online: seedNum(key + ':on') > 0.11,
@@ -4037,7 +4053,9 @@
                 const html = '<div class="sc-kv">' + kvHTML([
                     ['点位编号', c.id],
                     ['点位名称', SC.esc(c.name)],
-                    ['设备类型', SC.esc(c.type)],
+                    ['设备类型', SC.esc(c.type) + '（' + SC.esc(c.devCode) + '）'],
+                    ['抓拍对象', SC.esc(c.subj)],
+                    ['接入方式', SC.esc(c.access)],
                     ['所属片区', SC.esc(c.region)],
                     ['所在路段', SC.esc(c.road)],
                     ['在线状态', c.online ? tag('在线', 'ok') : tag('离线', 'off')],
@@ -4051,7 +4069,10 @@
                             + '</td><td>' + (a.confidence * 100).toFixed(0) + '%</td><td>'
                             + tag(a.status, a.status === '待确认' ? 'warn' : (a.status === '已确认' ? 'ok' : 'off'))
                             + '</td></tr>').join('') + '</tbody></table>'
-                        : '<div class="sc-hint">该点位近 7 日无智能抓拍记录</div>');
+                        : '<div class="sc-hint">该点位近 7 日无智能抓拍记录</div>')
+                    + '<div class="sc-hint" style="margin-top:10px">点位测点（channel_id / obj_type / conf / img_ref）与上报报文'
+                    + '见<a href="equipment-data.html?from=central-command.html" style="color:#00897b"> 设备数据页物模型</a>，'
+                    + '采集通道分布见<a href="data-platform.html?module=collect&from=central-command.html" style="color:#00897b"> 数据中台采集</a>。</div>';
                 SC.modal.open({ title: '点位详情 · ' + c.id, size: 'md', body: html, footer: [{ text: '关闭', kind: 'ghost' }] });
             }
 

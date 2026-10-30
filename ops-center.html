@@ -494,8 +494,8 @@
                 </div>
                 <div class="sc-panel">
                     <div class="sc-panel-title">
-                        <h3>设备类型分布</h3>
-                        <span class="sc-hint">点击行下方筹码可按类型筛选</span>
+                        <h3>接入方式族分布</h3>
+                        <span class="sc-hint">23 类设备按接入方式聚合，点击筹码可按类型筛选</span>
                     </div>
                     <div class="sc-chart"><canvas id="c-dev-pie"></canvas></div>
                 </div>
@@ -695,7 +695,7 @@
         (function () {
             'use strict';
             const NS = 'oc';
-            const OC_VER = 1;
+            const OC_VER = 2;
             const MIN = 60000, HOUR = 3600000, DAY = 86400000;
             const ACCENT = '#12a594', ACCENT_2 = '#0d7c70', GREEN = '#20bf6b', AMBER = '#f7b731', RED = '#eb3b5a';
             const BLUE = '#0f8bd9', GRAY = '#8fa3a0', PURPLE = '#7b61ff';
@@ -912,30 +912,53 @@
 
             /* ==========================================================================
                4. 设备运维：类型台账 + 末端设备清单
+               口径与数据中台「末端设备接入清单」、设备数据页设备类型一致（共 23 类 / 39,263 台）
+               列义：编码 / 名称 / 接入方式 / 在册数量 / 主色 / 接入方式族 / 抽检样本数
+               新类别必须追加到末尾：样本 id 与随机流均依赖行序，插入会打乱已有设备编号
                ========================================================================== */
             const KIND_DEF = [
-                ['CAM', '视频监控球机', 'GB28181 直连', 3126, BLUE],
-                ['MNH', '智能井盖探测器', 'NB-IoT', 1482, ACCENT],
-                ['WLV', '管网水位计', 'NB-IoT', 864, GREEN],
-                ['LTC', '路灯单灯控制器', 'LoRa', 12480, AMBER],
-                ['GPS', '车载定位终端', '4G Cat.1', 1268, PURPLE],
-                ['MKR', '地磁车检器', 'Sub-1G', 2140, RED],
-                ['STR', '桥隧应变计', '光纤光栅', 318, '#00b4d8'],
-                ['MET', '区域气象站', '4G', 96, GRAY]
+                ['CAM', '视频监控球机', 'GB28181 直连', 3126, BLUE, '视频 AI 抓拍', 6],
+                ['MNH', '智能井盖探测器', 'NB-IoT', 1482, ACCENT, 'IoT 遥测', 6],
+                ['WLV', '管网水位计', 'NB-IoT', 864, GREEN, 'IoT 遥测', 6],
+                ['LTC', '路灯单灯控制器', 'LoRa', 12480, AMBER, '控制下发', 6],
+                ['GPS', '车载定位终端', '4G Cat.1', 1268, PURPLE, '车载与船载', 6],
+                ['MKR', '地磁车检器', 'Sub-1G', 2140, RED, 'IoT 遥测', 6],
+                ['STR', '桥隧应变计', '光纤光栅', 318, '#00b4d8', 'IoT 遥测', 6],
+                ['MET', '区域气象站', '4G', 96, GRAY, 'IoT 遥测', 4],
+                ['SPR', '枪机半球抓拍一体机', 'ONVIF + 边缘 AI', 1862, '#5c7cfa', '视频 AI 抓拍', 4],
+                ['DME', '卡口电子警察', 'GB28181 + 识别服务', 940, '#4c6ef5', '视频 AI 抓拍', 4],
+                ['AUT', '人证核验一体机', 'HTTP SDK 推送', 486, '#f783ac', '人员与场所终端', 4],
+                ['WBC', '智能手环', 'BLE 网关 + MQTT', 2140, '#ff922b', '人员与场所终端', 4],
+                ['PAT', '电子巡更仪', '4G + NFC 打点', 926, '#845ef7', '人员与场所终端', 4],
+                ['LVL', '低洼水位计', 'NB-IoT / CoAP', 612, '#20c997', 'IoT 遥测', 4],
+                ['RLV', '雷达液位计', 'NB-IoT', 268, '#38d9a9', 'IoT 遥测', 4],
+                ['ULV', '超声波液位计', 'MQTT / 4G', 341, '#63e6be', 'IoT 遥测', 4],
+                ['HYD', '智能消防栓终端', 'NB-IoT', 1940, '#e03131', 'IoT 遥测', 4],
+                ['GAS', '燃气管网探测终端', 'Modbus 网关', 758, '#c92a2a', 'IoT 遥测', 4],
+                ['INC', '焚烧炉 CEMS 监测站', 'Modbus TCP', 68, '#f59f00', 'IoT 遥测', 4],
+                ['BIN', '智能果壳箱', 'NB-IoT', 5240, '#74b816', 'IoT 遥测', 4],
+                ['RCY', '回收站称重一体机', 'HTTP + 地磅网关', 1180, '#94d82d', '人员与场所终端', 4],
+                ['SVW', '环卫作业车终端', '4G / 5G + MQ', 682, '#7048e8', '车载与船载', 4],
+                ['SHP', '运输船智能终端', 'AIS / 北斗终端', 46, '#4263eb', '车载与船载', 4]
             ];
+            /* 电池供电类型：决定抽检样本是否需要电量与低电预警 */
+            const BAT_KIND = { MNH: 1, LTC: 1, MKR: 1, WLV: 1, WBC: 1, PAT: 1, LVL: 1, RLV: 1, ULV: 1, HYD: 1, BIN: 1 };
             const DEV_TOTAL = KIND_DEF.reduce(function (a, k) { return a + k[3]; }, 0);
+            const DEV_FAMILY = ['视频 AI 抓拍', 'IoT 遥测', '控制下发', '车载与船载', '人员与场所终端'];
             const POINTS = [
                 '人民路口', '解放大道·建设大道', '中山门桥', '湖滨南路污水泵站', '高铁站南广场', '工业园东路',
                 '老城文化街', '长江隧道东口', '市民中心地库', '环城快速 K12', '纺织厂生活区', '新港物流园',
                 '凤凰山路灯 03 回路', '滨河公园北 gate', '实验小学门口', '开发区污水检查井 27', '第三加油站',
-                '云溪桥主缆', '高铁停车场 B 区', '环城北路气象观测点'
+                '云溪桥主缆', '高铁停车场 B 区', '环城北路气象观测点',
+                '下铁关低洼段', '调蓄池 2 号', '燃气管网调压箱 08', '焚烧厂 2 号炉房', '东门分类回收站',
+                '环卫中转运码头', '中山路消火栓 116', '市民中心服务大厅 A03', '执法巡更 07 号线', '卡口 K33010012'
             ];
             const DEV_OWNER = ['物联网组', '市政业务组', '照明业务组', '环卫业务组', '停车业务组', '排水业务组', '视频平台组'];
 
             resetSeed(20260714);
             const DEVICES = [];
             KIND_DEF.forEach(function (k, ki) {
-                const n = k[0] === 'MET' ? 4 : 6;
+                const n = k[6] || 6;
                 for (let i = 0; i < n; i++) {
                     const total = k[3];
                     const id = k[0] + '-' + SC.pad2(ki + 1) + SC.pad2(Math.floor(total / 40 + i * 7)) + sri(10, 99);
@@ -947,9 +970,10 @@
                     else if (r > 0.71) status = '维护';
                     DEVICES.push({
                         id: id, kind: k[1], pfx: k[0], access: k[2], total: total, color: k[4],
-                        point: POINTS[(ki * 3 + i) % POINTS.length], owner: DEV_OWNER[(ki + i) % DEV_OWNER.length],
+                        family: k[5], owner: DEV_OWNER[(ki + i) % DEV_OWNER.length],
+                        point: POINTS[(ki * 3 + i) % POINTS.length],
                         status: status, sig: status === '离线' ? 0 : sri(28, 99),
-                        batt: /NB|LoRa|Sub/.test(k[2]) ? (status === '低电' ? sri(4, 17) : sri(38, 99)) : 100,
+                        batt: BAT_KIND[k[0]] ? (status === '低电' ? sri(4, 17) : sri(38, 99)) : 100,
                         last: Date.now() - (status === '离线' ? sri(42, 1500) : sri(1, 24)) * MIN,
                         rt: sri(6, 240), err: sri(0, 42) / 10
                     });
@@ -974,7 +998,9 @@
             /* 历史维修工单（首次进入时落盘，之后可流转状态） */
             function seedTickets() {
                 resetSeed(20260718);
-                const kinds = ['井盖探测器通信中断', '球机镜头污损、识别置信度下降', '水位计读数长期恒定', '单灯控制器无法下发调光指令', '车载终端重复上报同一轨迹点'];
+                const kinds = ['井盖探测器通信中断', '球机镜头污损、识别置信度下降', '水位计读数长期恒定', '单灯控制器无法下发调光指令', '车载终端重复上报同一轨迹点',
+                    '果壳箱满溢度异常偏高', '手环定位漂移触发越界误报', '焚烧炉 CEMS 采样探头堵塞', '燃气探测器本底值漂移', '消防栓压力突变疑似渗漏',
+                    '卡口补光灯损坏、夜间识别率下降', '回收站称重与订单量偏差'];
                 const out = [];
                 for (let i = 0; i < 5; i++) {
                     const d = DEVICES[sri(0, DEVICES.length - 1)];
@@ -1008,18 +1034,37 @@
                 ['提示', '证书有效期不足 30 天', 'sec', 'gateway-tls', '平台', '安排轮换窗口'],
                 ['提示', '备份任务耗时上升但未超时', 'infra', 'job-center', '基础设施', '继续观察'],
                 ['重要', '异常登录尝试触发安全基线', 'sec', 'auth-center', '平台', '核实来源 IP 并按需封禁'],
-                ['次要', '地磁车检器心跳缺失', 'device', 'MKR-0508', '停车', '远程唤醒自检']
+                ['次要', '地磁车检器心跳缺失', 'device', 'MKR-0508', '停车', '远程唤醒自检'],
+                /* 新增末端设备告警：对象位写 @编码，运行时解析为该类型首台抽检样本的真实编号 */
+                ['紧急', '燃气甲烷浓度越 20%LEL 判定泄漏', 'device', '@GAS', '市政', '远程关阀并通知燃气抢险队到场'],
+                ['紧急', '低洼处积水超 L3 阈值', 'device', '@LVL', '排水', '联动泵站启排并上报防汛值班'],
+                ['重要', '手环越界告警（作业区外）', 'device', '@WBC', '城管', '核实人员位置并呼叫班组长'],
+                ['重要', '焚烧炉氮氧化物折算超限', 'device', '@INC', '环卫', '降负荷核查脱硝系统并留样复测'],
+                ['重要', '消防栓水压骤降疑似放水', 'device', '@HYD', '市政', '派单现场核查并同步消防'],
+                ['次要', '果壳箱满溢度超 85%', 'device', '@BIN', '环卫', '纳入下一轮收运调度']
             ];
             resetSeed(20260721);
-            /* 前 14 条用架构页真实服务标识，后续扩展条按类型轮转真实对象，避免凭空捏造名称 */
+            /** 告警对象解析：@编码 形式取该类型首台抽检样本，避免凭空捏造设备编号 */
+            function almObj(r) {
+                if (r[2] !== 'device' || String(r[3]).charAt(0) !== '@') return r[3];
+                const hit = DEVICES.filter(function (d) { return d.pfx === r[3].slice(1); });
+                return hit.length ? hit[0].id : r[3];
+            }
+            /* 前 20 条用架构页真实服务标识，后续扩展条按类型轮转真实对象，避免凭空捏造名称 */
             const ALARMS = ALM_TPL.concat(ALM_TPL.map(function (r, i) {
                 const c = r.slice();
                 c[0] = ['紧急', '重要', '重要', '次要', '次要', '提示'][i % 6];
-                if (r[2] === 'service' && SVC_ROWS.length) c[3] = SVC_ROWS[(i * 3 + 2) % SVC_ROWS.length].id;
-                else if (r[2] === 'device' && DEVICES.length) c[3] = DEVICES[(i * 5 + 3) % DEVICES.length].id;
+                if (r[2] === 'service' && SVC_ROWS.length) {
+                    c[3] = SVC_ROWS[(i * 3 + 2) % SVC_ROWS.length].id;
+                } else if (r[2] === 'device' && DEVICES.length) {
+                    /* 同类轮转：告警标题写的是哪类设备，对象就必须落到那类设备上 */
+                    const pfx = String(r[3]).charAt(0) === '@' ? r[3].slice(1) : String(r[3]).slice(0, 3);
+                    const pool = DEVICES.filter(function (d) { return d.pfx === pfx; });
+                    c[3] = (pool.length ? pool[i % pool.length] : DEVICES[(i * 5 + 3) % DEVICES.length]).id;
+                }
                 return c;
             })).map(function (r, i) {
-                const obj = r[3];
+                const obj = almObj(r);
                 const age = r[0] === '紧急' ? sri(4, 160) : r[0] === '重要' ? sri(20, 420) : sri(40, 1400);
                 let state = '待确认';
                 if (r[0] === '提示') state = i % 3 ? '已关闭' : '待确认';
@@ -1461,10 +1506,10 @@
                 ST.daily = (ST.daily || 0) + 1;
                 saveST();
                 const dev = devList();
-                const byKind = KIND_DEF.map(function (k) {
+                const byKind = KIND_DEF.slice().sort(function (a, b) { return b[3] - a[3]; }).map(function (k) {
                     const rows = dev.filter(d => d.pfx === k[0]);
                     const off = rows.filter(d => d.status === '离线').length;
-                    return [k[1], '台账 ' + SC.num(k[3]) + ' 台 / 抽检 ' + rows.length + ' 台', '离线 ' + off + ' 台'];
+                    return [k[1], k[5], '台账 ' + SC.num(k[3]) + ' 台 / 抽检 ' + rows.length + ' 台', '离线 ' + off + ' 台'];
                 });
                 SC.modal.open({
                     title: '📋 运维日报 · ' + SC.today(), size: 'lg',
@@ -1482,8 +1527,8 @@
                         '<p class="sc-hint">平均 P95 ' + t.p95 + ' ms、平均错误率 ' + SC.pct(t.err, 2) + '，异常实例 ' + t.bad + ' 个、摘流 ' + t.iso +
                         ' 个。' + (t.hc['告警'] ? '其中 ' + t.hc['告警'] + ' 个服务处于告警，需在下个窗口前收敛。' : '全部服务处于健康或计划维护状态。') + '</p>' +
                         '<div class="sc-section-title">二、末端设备</div>' +
-                        '<table class="data-table"><thead><tr><th>设备类型</th><th>规模</th><th>抽检异常</th></tr></thead><tbody>' +
-                        byKind.map(r => '<tr><td>' + SC.esc(r[0]) + '</td><td>' + SC.esc(r[1]) + '</td><td>' + SC.esc(r[2]) + '</td></tr>').join('') +
+                        '<table class="data-table"><thead><tr><th>设备类型</th><th>接入方式族</th><th>规模</th><th>抽检异常</th></tr></thead><tbody>' +
+                        byKind.map(r => '<tr><td>' + SC.esc(r[0]) + '</td><td>' + SC.esc(r[1]) + '</td><td>' + SC.esc(r[2]) + '</td><td>' + SC.esc(r[3]) + '</td></tr>').join('') +
                         '</tbody></table>' +
                         '<div class="sc-section-title">三、告警与变更</div>' +
                         '<p class="sc-hint">紧急告警 ' + t.urgent.length + ' 条，超时限 ' +
@@ -1510,6 +1555,8 @@
                     ['异常实例', t.bad],
                     ['待处理告警', t.open.length],
                     ['紧急告警', t.urgent.length],
+                    ['设备类型数', KIND_DEF.length],
+                    ['在册设备', DEV_TOTAL],
                     ['设备抽检数', t.dev],
                     ['离线设备', t.offline],
                     ['未闭环工单', t.tkOpen.length],
@@ -1796,6 +1843,7 @@
                 const t = totals();
                 put('#dev-kv', kvBox([
                     ['设备台账', SC.num(t.devTotal) + ' 台'],
+                    ['设备类型', KIND_DEF.length + ' 类 / ' + DEV_FAMILY.length + ' 个接入族'],
                     ['抽检样本', list.length + ' 台（覆盖 ' + KIND_DEF.length + ' 类）'],
                     ['样本在线率', SC.pct((1 - off.length / list.length) * 100, 1)],
                     ['离线 / 异常', off.length + ' / ' + list.filter(d => d.status === '异常').length + ' 台'],
@@ -1805,16 +1853,21 @@
                 ]));
 
                 put('#dev-chips', '<span class="sc-chip' + (!devKind && !devState ? ' active' : '') + '" data-kind="" data-state="">全部 ' + list.length + '</span>' +
-                    KIND_DEF.map(function (k) {
-                        const n = list.filter(d => d.pfx === k[0]).length;
-                        return '<span class="sc-chip' + (devKind === k[0] ? ' active' : '') + '" data-kind="' + k[0] + '" data-state="">' +
-                            SC.esc(k[1]) + ' ' + n + '</span>';
-                    }).join('') +
                     ['在线', '离线', '异常', '低电', '维护'].map(function (s) {
                         const n = list.filter(d => d.status === s).length;
                         if (!n) return '';
                         return '<span class="sc-chip' + (devState === s ? ' active' : '') + '" data-state="' + s + '" data-kind="" style="border-style:dashed">' +
                             s + ' ' + n + '</span>';
+                    }).join('') +
+                    /* 23 类设备筹码按接入方式族分组，避免同类相邻混乱难找 */
+                    DEV_FAMILY.map(function (f) {
+                        const ks = KIND_DEF.filter(function (k) { return k[5] === f; });
+                        return '<span class="sc-hint" style="align-self:center;margin-left:6px">' + SC.esc(f) + '</span>' +
+                            ks.map(function (k) {
+                                const n = list.filter(d => d.pfx === k[0]).length;
+                                return '<span class="sc-chip' + (devKind === k[0] ? ' active' : '') + '" data-kind="' + k[0] + '" data-state="">' +
+                                    SC.esc(k[1]) + ' ' + n + '</span>';
+                            }).join('');
                     }).join(''));
 
                 q('#tbl-dev tbody').innerHTML = list.map(devRowHTML).join('');
@@ -1845,10 +1898,14 @@
                     { name: '心跳缺失(台)', color: RED, value: miss[11] + ' 台' }
                 ]);
 
+                /* 图表按接入方式族聚合：23 类切片过多，图例不可读 */
+                const famColor = { '视频 AI 抓拍': BLUE, 'IoT 遥测': GREEN, '控制下发': AMBER, '车载与船载': PURPLE, '人员与场所终端': ACCENT_2 };
+                const famData = DEV_FAMILY.map(function (f) {
+                    return KIND_DEF.filter(function (k) { return k[5] === f; }).reduce(function (a, k) { return a + k[3]; }, 0);
+                });
                 drawChart('devpie', '#c-dev-pie', 'pie', {
-                    labels: KIND_DEF.map(k => k[1]),
-                    data: KIND_DEF.map(k => k[3]),
-                    colors: KIND_DEF.map(k => k[4]),
+                    labels: DEV_FAMILY, data: famData,
+                    colors: DEV_FAMILY.map(function (f) { return famColor[f] || GRAY; }),
                     centerTop: SC.num(t.devTotal), centerBottom: '在册设备', unit: ' 台'
                 });
 
@@ -1981,8 +2038,8 @@
                 SC.modal.form({
                     title: '📡 下发设备巡检任务',
                     fields: [
-                        { name: 'scope', label: '巡检范围', type: 'select', options: ['全域末端设备', '仅离线与异常设备', '排水与桥隧监测设备', '照明回路与单灯控制器'], col: 1 },
-                        { name: 'team', label: '执行班组', type: 'select', options: ['现场运维班', '物联网组', '市政业务组', '照明业务组'], col: 1 },
+                        { name: 'scope', label: '巡检范围', type: 'select', options: ['全域末端设备', '仅离线与异常设备', '排水与桥隧监测设备', '照明回路与单灯控制器', '视频与卡口抓拍设备', '燃气与消防监测设备', '垃圾收运与焚烧处理设备'], col: 1 },
+                        { name: 'team', label: '执行班组', type: 'select', options: ['现场运维班', '物联网组', '市政业务组', '照明业务组', '环卫业务组', '视频平台组'], col: 1 },
                         {
                             name: 'depth', label: '检查项', type: 'checkgroup', required: true, col: 1, options: [
                                 { value: 'hb', label: '心跳与上报完整性' },

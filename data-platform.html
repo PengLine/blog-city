@@ -381,7 +381,7 @@
             <div class="content-header">
                 <h3>📥 数据采集</h3>
                 <div class="sc-inline">
-                    <input class="search-input" id="col-search" placeholder="搜索通道 / 源系统 / 目标表…">
+                    <input class="search-input" id="col-search" placeholder="搜索通道 / 源系统 / 目标表 / 设备类型…">
                     <button class="sc-btn" id="btn-col-check">🩺 通道巡检</button>
                     <button class="sc-btn primary" id="btn-col-add">➕ 新增接入</button>
                     <button class="sc-btn ghost" id="btn-col-export">⬇ 导出</button>
@@ -429,6 +429,38 @@
                         <span class="sc-hint">按通道数</span>
                     </div>
                     <div class="sc-chart sm"><canvas id="c-col-kind"></canvas></div>
+                </div>
+            </div>
+
+            <div class="sc-panel" style="margin-top:18px">
+                <div class="sc-panel-title">
+                    <h3>🔧 末端设备接入清单</h3>
+                    <span class="sc-hint">按设备类型约定在册数量与上报口径，点击行查看物模型与报文样例</span>
+                    <div class="sc-inline">
+                        <button class="sc-btn sm" id="btn-dev-trial">▶ 批量试采</button>
+                        <button class="sc-btn ghost sm" id="btn-dev-export">⬇ 导出目录</button>
+                    </div>
+                </div>
+                <div class="sc-chips" id="dev-chips" style="margin-bottom:12px"></div>
+                <div class="data-table-container">
+                    <table class="data-table" id="dev-table">
+                        <thead>
+                            <tr>
+                                <th>设备类型</th>
+                                <th>分类 / 接入</th>
+                                <th>在册数量</th>
+                                <th>上报频率</th>
+                                <th>采集通道</th>
+                                <th>昨日上报</th>
+                                <th>在线率</th>
+                                <th>状态</th>
+                                <th>业务口径</th>
+                                <th>归属域</th>
+                                <th data-no-sort>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -686,10 +718,10 @@
                ========================================================================== */
             let ST = SC.store.get(NS, 'state', null);
             if (!ST || ST.ver !== DP_VER) {
-                ST = { ver: DP_VER, chans: [], off: {}, live: {}, rules: {}, jobs: {}, archived: [], grants: [], pushes: [], checks: 0 };
+                ST = { ver: DP_VER, chans: [], off: {}, live: {}, devk: {}, rules: {}, jobs: {}, archived: [], grants: [], pushes: [], checks: 0 };
             }
-            ['chans', 'off', 'live', 'rules', 'jobs', 'archived', 'grants', 'pushes'].forEach(function (k) {
-                if (!ST[k]) ST[k] = (k === 'off' || k === 'live' || k === 'rules' || k === 'jobs') ? {} : [];
+            ['chans', 'off', 'live', 'devk', 'rules', 'jobs', 'archived', 'grants', 'pushes'].forEach(function (k) {
+                if (!ST[k]) ST[k] = (k === 'off' || k === 'live' || k === 'devk' || k === 'rules' || k === 'jobs') ? {} : [];
             });
             function saveST() { SC.store.set(NS, 'state', ST); }
             /* 运行态覆写（试采 / 巡检结果），与基线种子合并，不污染原始数据 */
@@ -704,9 +736,9 @@
             const KINDS = ['IoT 消息', '数据库 CDC', '视频 AI', '文件交换', 'API 拉取', '移动端上报', '共享交换'];
 
             const CH_SEED = [
-                ['CH-01', '排水管网压力采集', 'IoT 消息', '排水物联平台', '15 秒', 'JSON', 'ods_drain_pressure_rt', '水务业务组'],
+                ['CH-01', '排水管网压力与水位', 'IoT 消息', '排水物联平台', '15 秒', 'JSON', 'ods_drain_pressure_rt', '水务业务组'],
                 ['CH-02', '照明单灯状态上报', 'IoT 消息', '照明集中控制器', '1 分钟', 'MQTT', 'ods_light_status_rt', '照明业务组'],
-                ['CH-03', '环卫车辆 GPS 轨迹', 'IoT 消息', '车载终端 T-Box', '5 秒', 'Protobuf', 'ods_env_vehicle_gps', '环卫业务组'],
+                ['CH-03', '车辆轨迹（环卫车 / 执法车）', 'IoT 消息', '车载终端 T-Box', '5 秒', 'Protobuf', 'ods_env_vehicle_gps', '环卫业务组'],
                 ['CH-04', '城管案件库增量', '数据库 CDC', '城管业务主库', '30 秒', 'Binlog', 'ods_case_incident_rt', '数字城管组'],
                 ['CH-05', '停车泊位状态', '数据库 CDC', '停车计费库', '1 分钟', 'WAL', 'ods_park_slot_rt', '停车业务组'],
                 ['CH-06', '街面事件识别结果', '视频 AI', '边缘 AI 节点', '2 分钟', 'JSON', 'dwd_video_event', '算法组'],
@@ -717,7 +749,23 @@
                 ['CH-11', '政务服务事项库', '共享交换', '市政务共享平台', '每日 02:00', 'XML', 'ods_gov_item', '数据平台组'],
                 ['CH-12', '公共区域能耗', 'IoT 消息', '智能电表网关', '15 分钟', 'Modbus', 'ods_energy_meter', '基础设施组'],
                 ['CH-13', '执法记录仪影像', '文件交换', '执法终端上传', '每小时', 'MP4', 'ods_law_media', '视频平台组'],
-                ['CH-14', '地下管线台账', '共享交换', '城建档案馆', '每周一', 'SHP', 'ods_pipeline_ledger', '市政业务组']
+                ['CH-14', '地下管线台账', '共享交换', '城建档案馆', '每周一', 'SHP', 'ods_pipeline_ledger', '市政业务组'],
+                /* 末端感知设备接入通道（与设备目录 DEV_SEED 一一对应） */
+                ['CH-15', '摄像头人车抓拍', '视频 AI', '球机 / 枪机 / 半球抓拍节点', '事件触发', 'JSON', 'ods_snap_object_rt', '视频平台组'],
+                ['CH-16', '卡口过车与车牌', '视频 AI', '卡口识别服务', '1 秒', 'JSON', 'ods_vio_pass_rt', '视频平台组'],
+                ['CH-17', '人证核验采集记录', 'API 拉取', '认证一体机管理平台', '实时', 'JSON', 'ods_id_verify_rt', '公共服务组'],
+                ['CH-18', '手环人员定位流', 'IoT 消息', '手环定位汇聚网关', '5 秒', 'MQTT', 'ods_wrist_loc_rt', '物联网组'],
+                ['CH-19', '运输船 AIS 与载重', 'IoT 消息', '船舶 AIS / 北斗终端', '10 秒', 'NMEA', 'ods_ship_track_rt', '环卫业务组'],
+                ['CH-20', '低洼积水水位', 'IoT 消息', '低洼水位计', '15 秒', 'CoAP', 'ods_lowland_level_rt', '排水业务组'],
+                ['CH-21', '雷达液位监测', 'IoT 消息', '雷达液位计', '5 分钟', 'NB-IoT', 'ods_radar_level_rt', '排水业务组'],
+                ['CH-22', '超声波液位监测', 'IoT 消息', '超声波液位计', '5 分钟', 'MQTT', 'ods_usonic_level_rt', '排水业务组'],
+                ['CH-23', '智能井盖状态', 'IoT 消息', '井盖位移探测器', '10 分钟', 'CoAP', 'ods_manhole_state_rt', '市政业务组'],
+                ['CH-24', '消防栓水压监测', 'IoT 消息', '智能消防栓终端', '15 分钟', 'NB-IoT', 'ods_hydrant_press_rt', '市政业务组'],
+                ['CH-25', '燃气压力与可燃气体', 'IoT 消息', '燃气管网探测终端', '1 分钟', 'Modbus', 'ods_gas_leak_rt', '市政业务组'],
+                ['CH-26', '焚烧炉烟气排放', 'IoT 消息', '焚烧炉 CEMS 站房', '1 分钟', 'Modbus TCP', 'ods_flue_emission_rt', '环卫业务组'],
+                ['CH-27', '果壳箱满溢状态', 'IoT 消息', '智能果壳箱', '30 分钟', 'NB-IoT', 'ods_bin_overflow_rt', '环卫业务组'],
+                ['CH-28', '回收站称重流水', 'API 拉取', '回收站称重一体机', '每单实时', 'JSON', 'ods_recycle_weight_rt', '环卫业务组'],
+                ['CH-29', '电子巡更打点记录', '移动端上报', '巡更仪终端', '实时', 'JSON', 'ods_patrol_punch_rt', '数字城管组']
             ];
 
             resetSeed(20260512);
@@ -759,6 +807,176 @@
                 return base.concat(ST.chans.map(function (r) {
                     return Object.assign({ retry: 0, fields: r.fields || 12, rate: 99.5, lag: 30, size: 6, status: '正常' }, r);
                 }));
+            }
+
+            /* ==========================================================================
+               2b. 末端设备接入目录（与运维中心设备台账、设备数据页设备类型共用一套口径）
+               ========================================================================== */
+            const DEV_VENDORS = ['海康威视', '大华股份', '浙江宇视', '华为物联', '三川智慧', '新天科技', '本地集成商', '先河环保'];
+            /* 编码 / 名称 / 分类 / 接入方式 / 在册数量 / 上报频率 / 关联通道 / 通道分摊比 / 业务口径 / 归属域 */
+            const DEV_SEED = [
+                ['CAM', '视频监控球机', '视频感知', 'GB28181 直连', 3126, '事件触发', 'CH-15', 0.58, '人员、车辆与商家门店前秩序抓拍', '街面'],
+                ['SPR', '枪机半球抓拍一体机', '视频感知', 'ONVIF + 边缘 AI', 1862, '事件触发', 'CH-15', 0.42, '重点部位定点抓拍、商家经营行为识别', '街面'],
+                ['DME', '卡口电子警察', '视频感知', 'GB28181 + 识别服务', 940, '1 秒', 'CH-16', 1, '过车与车牌识别、违法取证', '街面'],
+                ['AUT', '人证核验一体机', '公共服务终端', 'HTTP SDK 推送', 486, '实时', 'CH-17', 1, '信息采集、人证比对与访客登记', '公共服务'],
+                ['WBC', '智能手环', '人员穿戴', 'BLE 网关 + MQTT', 2140, '5 秒', 'CH-18', 1, '作业人员定位、越界与 SOS 告警', '城管'],
+                ['PAT', '电子巡更仪', '人员作业', '4G + NFC 打点', 926, '实时', 'CH-29', 1, '到岗记录与巡查轨迹', '城管'],
+                ['GPS', '车载定位终端', '移动载具', '4G Cat.1', 1268, '5 秒', 'CH-03', 0.38, '执法车辆定位轨迹（MQ → Flink → 告警）', '街面'],
+                ['SVW', '环卫作业车终端', '移动载具', '4G / 5G + MQ', 682, '5 秒', 'CH-03', 0.62, '垃圾收运与运输轨迹、车载满溢状态', '环卫'],
+                ['SHP', '运输船智能终端', '移动载具', 'AIS / 北斗 + 载重', 46, '10 秒', 'CH-19', 1, '垃圾运输航线、载重与进出港上报', '环卫'],
+                ['LVL', '低洼水位计', '水务感知', 'NB-IoT / CoAP', 612, '15 秒', 'CH-20', 1, '下立交与低洼处积水水位、内涝预警', '排水'],
+                ['WLV', '管网水位计', '水务感知', 'NB-IoT', 864, '15 秒', 'CH-01', 1, '检查井与管网水位监测', '排水'],
+                ['RLV', '雷达液位计', '水务感知', 'NB-IoT', 268, '5 分钟', 'CH-21', 1, '非接触式液位、泵站前池监测', '排水'],
+                ['ULV', '超声波液位计', '水务感知', 'MQTT / 4G', 341, '5 分钟', 'CH-22', 1, '调蓄池与河道液位监测', '排水'],
+                ['MNH', '智能井盖探测器', '市政设施', 'NB-IoT', 1482, '10 分钟', 'CH-23', 1, '井盖位移倾覆与井内水位', '市政'],
+                ['HYD', '智能消防栓终端', '市政设施', 'NB-IoT', 1940, '15 分钟', 'CH-24', 1, '水压监测、放水与碰撞告警', '市政'],
+                ['GAS', '燃气管网探测终端', '市政设施', 'Modbus 网关', 758, '1 分钟', 'CH-25', 1, '压力与可燃气体检测、防止泄漏', '市政'],
+                ['STR', '桥隧应变计', '结构安全', '光纤光栅', 318, '10 分钟', 'CH-07', 1, '桥梁隧道结构形变监测', '市政'],
+                ['MET', '区域气象站', '环境监测', '4G', 96, '5 分钟', 'CH-09', 1, '雨量风速与气象预警联动', '排水'],
+                ['INC', '焚烧炉 CEMS 监测站', '环保设施', 'Modbus TCP', 68, '1 分钟', 'CH-26', 1, '烟气气体与排放检测、达标核算', '环卫'],
+                ['BIN', '智能果壳箱', '环卫设施', 'NB-IoT', 5240, '30 分钟', 'CH-27', 1, '满溢状态与开盖计数', '环卫'],
+                ['RCY', '回收站称重一体机', '环卫设施', 'HTTP + 地磅网关', 1180, '每单实时', 'CH-28', 1, '站点数据与分类称重计量', '环卫'],
+                ['LTC', '路灯单灯控制器', '照明控制', 'LoRa', 12480, '1 分钟', 'CH-02', 1, '单灯开关调光控制与故障回传', '照明'],
+                ['MKR', '地磁车检器', '交通感知', 'Sub-1G', 2140, '1 分钟', 'CH-05', 1, '泊位占用检测与周转统计', '停车']
+            ];
+
+            /* 物模型：上报字段与报文样例（用于入湖字段映射与联调对稿） */
+            const DEV_MODEL = {
+                CAM: {
+                    f: [['channel_id', 'STRING', 'GB28181 通道编号'], ['ptz', 'ARRAY', '云台方位 / 俯仰角'], ['obj_type', 'STRING', '人 / 车 / 商家外摆'], ['conf', 'DOUBLE', '识别置信度'], ['img_ref', 'STRING', '抓拍图对象地址']],
+                    m: '{"dev_id":"CAM-0107-33","ts":"2026-10-30T09:12:41+08:00","channel_id":"340200000013200001","ptz":[127,-8],"obj_type":"person","conf":0.93,"img_ref":"oss://snap/2026-10-30/CAM-0107-33.jpg"}'
+                },
+                SPR: {
+                    f: [['channel_id', 'STRING', '监控通道编号'], ['scene', 'STRING', '布控场景类型'], ['obj_list', 'ARRAY', '抓拍对象集合'], ['mask', 'STRING', '敏感信息脱标记'], ['frame_no', 'BIGINT', '帧序号幂等键']],
+                    m: '{"dev_id":"SPR-0215-07","ts":"2026-10-30T09:12:40+08:00","scene":"store_front","obj_list":["bike","goods"],"frame_no":8842135,"mask":"plate"}'
+                },
+                DME: {
+                    f: [['cross_id', 'STRING', '卡口编号'], ['plate_no', 'STRING', '车牌（分级掩码）'], ['pass_time', 'DATETIME', '过车时刻'], ['speed', 'DOUBLE', '分道速度'], ['vio_code', 'STRING', '违法代码']],
+                    m: '{"dev_id":"DME-0301-12","cross_id":"K33010012","plate_no":"浙A·***23","pass_time":"2026-10-30 09:12:39","speed":47.6,"vio_code":""}'
+                },
+                AUT: {
+                    f: [['verify_id', 'STRING', '核验流水号'], ['id_no_hash', 'STRING', '证件号 SM3 哈希'], ['match_score', 'DOUBLE', '人证比对得分'], ['gate', 'STRING', '窗口 / 闸机编号'], ['result', 'STRING', '通过 / 不通过']],
+                    m: '{"dev_id":"AUT-0402-05","verify_id":"V20261030091240-118","id_no_hash":"9f2c…","match_score":0.982,"gate":"A03","result":"pass"}'
+                },
+                WBC: {
+                    f: [['user_id', 'STRING', '人员工号'], ['lng', 'DOUBLE', '经度 GCJ02'], ['lat', 'DOUBLE', '纬度 GCJ02'], ['heart_rate', 'INT', '心率'], ['fence_hit', 'BOOLEAN', '是否越界'], ['sos', 'INT', 'SOS 按下次数']],
+                    m: '{"dev_id":"WBC-0504-21","user_id":"G10472","lng":120.155,"lat":30.271,"heart_rate":96,"fence_hit":true,"sos":0}'
+                },
+                PAT: {
+                    f: [['patrol_no', 'STRING', '巡更班组号'], ['point_id', 'STRING', '打点编号'], ['punch_time', 'DATETIME', '打点时间'], ['geo', 'STRUCT', '打点定位'], ['photo_ref', 'STRING', '现场照片附件']],
+                    m: '{"dev_id":"PAT-0601-09","patrol_no":"P-07","point_id":"XJ-118","punch_time":"2026-10-30 09:12:05","geo":[120.16,30.28],"photo_ref":""}'
+                },
+                GPS: {
+                    f: [['veh_no', 'STRING', '车牌 / 自编车辆号'], ['lng', 'DOUBLE', '经度'], ['lat', 'DOUBLE', '纬度'], ['spd', 'DOUBLE', '速度 km/h'], ['heading', 'DOUBLE', '航向角'], ['odr', 'DOUBLE', '当日里程']],
+                    m: '{"dev_id":"GPS-0703-14","veh_no":"浙A·8**21","lng":120.21,"lat":30.25,"spd":32.4,"heading":118,"odr":46.8}'
+                },
+                SVW: {
+                    f: [['veh_no', 'STRING', '环卫车牌'], ['task_no', 'STRING', '收运任务单号'], ['load', 'DOUBLE', '车载载重 kg'], ['box_state', 'STRING', '装载 / 倾倒状态'], ['route_id', 'STRING', '线路编号']],
+                    m: '{"dev_id":"SVW-0802-03","veh_no":"浙A·5**10","task_no":"RT261030012","load":4820,"box_state":"loaded","route_id":"R-19"}'
+                },
+                SHP: {
+                    f: [['mmsi', 'STRING', '船舶 MMSI'], ['pos', 'STRUCT', 'AIS 经纬度'], ['sog', 'DOUBLE', '对地航速'], ['cargo_w', 'DOUBLE', '装载量 t'], ['port_code', 'STRING', '进出港编码']],
+                    m: '{"dev_id":"SHP-0901-02","mmsi":"413002026","pos":[121.42,30.31],"sog":6.2,"cargo_w":118.5,"port_code":"PT-03"}'
+                },
+                LVL: {
+                    f: [['level_cm', 'DOUBLE', '积水深度'], ['alarm_lvl', 'STRING', '预警阈值等级'], ['batt', 'DOUBLE', '电池电压'], ['temp', 'DOUBLE', '井房温度'], ['heart', 'INT', '心跳序号']],
+                    m: '{"dev_id":"LVL-1002-08","level_cm":34.6,"alarm_lvl":"L2","batt":3.42,"temp":18.7,"heart":7712}'
+                },
+                WLV: {
+                    f: [['level_m', 'DOUBLE', '水位 m'], ['press_kpa', 'DOUBLE', '压力 kPa'], ['flow', 'DOUBLE', '瞬时流量'], ['dev_stat', 'STRING', '设备自诊断码'], ['collect_time', 'DATETIME', '采集时间']],
+                    m: '{"dev_id":"WLV-0307-11","level_m":0.82,"press_kpa":126.4,"flow":74.2,"dev_stat":"OK","collect_time":"2026-10-30 09:12:15"}'
+                },
+                RLV: {
+                    f: [['distance_cm', 'DOUBLE', '雷达到液面距离'], ['level_m', 'DOUBLE', '换算液位'], ['temp_c', 'DOUBLE', '量程补偿温度'], ['snr', 'DOUBLE', '回波信噪比'], ['wave_no', 'INT', '波形序号']],
+                    m: '{"dev_id":"RLV-1103-04","distance_cm":184.2,"level_m":3.16,"temp_c":17.4,"snr":22.6,"wave_no":40918}'
+                },
+                ULV: {
+                    f: [['level_m', 'DOUBLE', '超声波液位'], ['sound_speed', 'DOUBLE', '声速 m/s'], ['blanking', 'DOUBLE', '盲区距离'], ['cond', 'DOUBLE', '探头受潮指数'], ['heart', 'INT', '心跳序号']],
+                    m: '{"dev_id":"ULV-1201-06","level_m":2.41,"sound_speed":343.1,"blanking":0.32,"cond":0.08,"heart":5123}'
+                },
+                MNH: {
+                    f: [['tilt_deg', 'DOUBLE', '盖板倾角'], ['displacement', 'DOUBLE', '位移 cm'], ['water_depth', 'DOUBLE', '井内水位'], ['open_evt', 'INT', '打开事件次数'], ['battery', 'DOUBLE', '电池百分比']],
+                    m: '{"dev_id":"MNH-0219-17","tilt_deg":12.4,"displacement":3.1,"water_depth":0.22,"open_evt":1,"battery":74}'
+                },
+                HYD: {
+                    f: [['press_mpa', 'DOUBLE', '栓口水压'], ['flow_ls', 'DOUBLE', '瞬时放水流量'], ['shock_g', 'DOUBLE', '碰撞加速度'], ['valve_stat', 'STRING', '阀门开关状态'], ['leak_flag', 'BOOLEAN', '渗漏判定']],
+                    m: '{"dev_id":"HYD-1304-22","press_mpa":0.42,"flow_ls":0.0,"shock_g":0.3,"valve_stat":"closed","leak_flag":false}'
+                },
+                GAS: {
+                    f: [['press_kpa', 'DOUBLE', '管网压力'], ['ch4_pct', 'DOUBLE', '甲烷浓度 %LEL'], ['co_ppm', 'DOUBLE', '一氧化碳'], ['leak_lvl', 'STRING', '泄漏等级'], ['valve_sig', 'STRING', '附属阀门信号']],
+                    m: '{"dev_id":"GAS-1402-05","press_kpa":2.84,"ch4_pct":1.6,"co_ppm":3,"leak_lvl":"L1","valve_sig":"open"}'
+                },
+                STR: {
+                    f: [['strain_ue', 'DOUBLE', '微应变值'], ['deflect_mm', 'DOUBLE', '挠度变形'], ['cable_temp', 'DOUBLE', '索体温度'], ['threshold_pct', 'DOUBLE', '阈值占用比'], ['ch_no', 'INT', '光纤通道号']],
+                    m: '{"dev_id":"STR-1501-02","strain_ue":86.4,"deflect_mm":12.7,"cable_temp":21.3,"threshold_pct":41,"ch_no":4}'
+                },
+                MET: {
+                    f: [['rain_mm', 'DOUBLE', '时段雨量'], ['wind_ms', 'DOUBLE', '风速'], ['gust_ms', 'DOUBLE', '阵风'], ['temp_c', 'DOUBLE', '气温'], ['alert_code', 'STRING', '预警信号等级']],
+                    m: '{"dev_id":"MET-1601-01","rain_mm":12.4,"wind_ms":6.8,"gust_ms":11.2,"temp_c":19.4,"alert_code":"blue"}'
+                },
+                INC: {
+                    f: [['so2_mg', 'DOUBLE', '二氧化硫折算'], ['nox_mg', 'DOUBLE', '氮氧化物折算'], ['dust_mg', 'DOUBLE', '颗粒物'], ['o2_pct', 'DOUBLE', '含氧量'], ['furnace_c', 'DOUBLE', '炉膛温度'], ['std_flag', 'STRING', '达标标记']],
+                    m: '{"dev_id":"INC-1701-01","so2_mg":18.4,"nox_mg":62.1,"dust_mg":7.2,"o2_pct":9.4,"furnace_c":1042,"std_flag":"pass"}'
+                },
+                BIN: {
+                    f: [['fill_pct', 'DOUBLE', '满溢度'], ['lid_open', 'INT', '开盖次数'], ['weight_kg', 'DOUBLE', '估算重量'], ['smoke', 'BOOLEAN', '箱内烟感'], ['battery', 'DOUBLE', '电池百分比']],
+                    m: '{"dev_id":"BIN-1803-42","fill_pct":86,"lid_open":23,"weight_kg":31.4,"smoke":false,"battery":63}'
+                },
+                RCY: {
+                    f: [['station_id', 'STRING', '回收站编号'], ['cat_code', 'STRING', '分类代码'], ['weight_kg', 'DOUBLE', '称重净重'], ['order_no', 'STRING', '回收订单号'], ['member_hash', 'STRING', '会员号哈希']],
+                    m: '{"dev_id":"RCY-1902-08","station_id":"HS-0116","cat_code":"paper","weight_kg":12.4,"order_no":"R2610300451","member_hash":"7a1c…"}'
+                },
+                LTC: {
+                    f: [['circuit', 'STRING', '回路号'], ['on_off', 'BOOLEAN', '开关状态'], ['dim_pct', 'DOUBLE', '调光比例'], ['power_w', 'DOUBLE', '有功功率'], ['fault_code', 'STRING', '故障码'], ['cmd_ack', 'STRING', '指令应答序号']],
+                    m: '{"dev_id":"LTC-0421-31","circuit":"L07-03","on_off":true,"dim_pct":60,"power_w":84.2,"fault_code":"","cmd_ack":"A8812"}'
+                },
+                MKR: {
+                    f: [['slot_id', 'STRING', '泊位编号'], ['occupied', 'BOOLEAN', '占用状态'], ['field_avg', 'DOUBLE', '地磁均值'], ['stay_min', 'DOUBLE', '停留时长'], ['charge_state', 'STRING', '计费状态']],
+                    m: '{"dev_id":"MKR-0508-19","slot_id":"P-B-118","occupied":true,"field_avg":-0.32,"stay_min":47,"charge_state":"paying"}'
+                }
+            };
+
+            resetSeed(20260730);
+            const DEV_KINDS = DEV_SEED.map(function (r, i) {
+                const rnd = hashSeed(r[0] + '#dev');
+                return {
+                    code: r[0], name: r[1], cat: r[2], access: r[3], count: r[4], freq: r[5],
+                    ch: r[6], share: r[7], biz: r[8], domain: r[9],
+                    online: Number((93.4 + (rnd % 63) / 10).toFixed(1)),
+                    lowbat: /NB-IoT|LoRa|Sub-1G|CoAP|BLE/.test(r[3]) ? sri(3, 92) : 0,
+                    fault: sri(0, 41),
+                    vendor: DEV_VENDORS[i % DEV_VENDORS.length],
+                    since: Date.now() - sri(120, 900) * DAY,
+                    model: DEV_MODEL[r[0]] || { f: [], m: '' }
+                };
+            });
+            const DEVK_TAG = { '正常': 'ok', '缺报偏多': 'warn', '暂停接入': 'off' };
+
+            /** 设备目录运行态：基线种子叠加本地存档里的暂停 / 试采结果，不污染种子 */
+            function devKindList() {
+                return DEV_KINDS.map(function (d) {
+                    const ch = chanById(d.ch) || { kind: 'IoT 消息', name: d.ch, rows: 0, status: '正常' };
+                    const out = Object.assign({}, d, {
+                        mode: ch.kind, chName: ch.name, chStatus: ch.status,
+                        daily: Math.round(ch.rows * d.share),
+                        status: d.online < 94 ? '缺报偏多' : '正常'
+                    });
+                    const o = ST.devk[d.code];
+                    if (!o) return out;
+                    if (o.paused) { out.paused = true; out.status = '暂停接入'; out.online = 0; out.daily = 0; }
+                    if (o.trial) { out.trial = o.trial; out.trialAt = o.trialAt; }
+                    if (o.synced) { out.synced = o.synced; }
+                    return out;
+                });
+            }
+            function devKindByCode(code) {
+                const list = devKindList();
+                for (let i = 0; i < list.length; i++) { if (list[i].code === code) return list[i]; }
+                return null;
+            }
+            function patchDevKind(code, patch) {
+                ST.devk[code] = Object.assign({}, ST.devk[code] || {}, patch);
+                saveST();
             }
 
             /* 字段映射：按通道 id 稳定生成 */
@@ -840,7 +1058,20 @@
                 ['JB-07', '停车周转率计算', '批式', 'ods_park_slot_rt', 'ads_park_turnover_1d', 8],
                 ['JB-08', '桥隧形变阈值判定', '流式', 'ods_bridge_sensor', 'dwd_bridge_deform', 4],
                 ['JB-09', '政务事项主数据合并', '批式', 'ods_gov_item', 'dim_gov_item_std', 3],
-                ['JB-10', '数据质量稽核', '批式', '全部 DWD 层', 'ads_dq_report_1d', 5]
+                ['JB-10', '数据质量稽核', '批式', '全部 DWD 层', 'ads_dq_report_1d', 5],
+                /* 新增设备类整编作业 */
+                ['JB-11', '抓拍对象结构化与脱敏', '流式', 'ods_snap_object_rt', 'dwd_snap_object_std', 14],
+                ['JB-12', '手环定位越界告警', '流式', 'ods_wrist_loc_rt', 'dwd_person_alarm', 10],
+                ['JB-13', '船迹纠偏与电子围栏', '流式', 'ods_ship_track_rt', 'dwd_ship_track', 4],
+                ['JB-14', '液位水位超限判定', '流式', 'ods_lowland_level_rt', 'dwd_level_exceed_alarm', 8],
+                ['JB-15', '燃气泄漏秒级判定', '流式', 'ods_gas_leak_rt', 'dwd_gas_leak_alarm', 6],
+                ['JB-16', '井盖与消防栓状态归并', '微批', 'ods_manhole_state_rt', 'dws_facility_state_1h', 5],
+                ['JB-17', '焚烧炉排放达标核算', '流式', 'ods_flue_emission_rt', 'ads_emit_exceed_1d', 3],
+                ['JB-18', '果壳箱满溢收运调度', '微批', 'ods_bin_overflow_rt', 'ads_bin_dispatch_task_1d', 6],
+                ['JB-19', '回收站称重计量核对', '批式', 'ods_recycle_weight_rt', 'dws_recycle_weight_1d', 4],
+                ['JB-20', '人证核验记录归集', '流式', 'ods_id_verify_rt', 'dwd_id_verify_std', 5],
+                ['JB-21', '巡更到岗率统计', '批式', 'ods_patrol_punch_rt', 'ads_patrol_kpi_1d', 3],
+                ['JB-22', '设备物模型主数据归一', '批式', '全部 ODS 设备表', 'dim_device_kind_std', 4]
             ];
 
             resetSeed(20260520);
@@ -916,7 +1147,36 @@
                 ['ads_light_energy_1d', '应用层', '照明', 96, 2, '永久'],
                 ['ads_park_turnover_1d', '应用层', '停车', 148, 3, '永久'],
                 ['ads_dq_report_1d', '应用层', '平台', 62, 1, '永久'],
-                ['dim_gov_item_std', '维度层', '公共服务', 12, 1, '永久']
+                ['dim_gov_item_std', '维度层', '公共服务', 12, 1, '永久'],
+                /* 新增设备接入类贴源表 */
+                ['ods_snap_object_rt', '贴源层', '街面', 2860, 128, '热存 30 天'],
+                ['ods_vio_pass_rt', '贴源层', '街面', 4120, 96, '热存 30 天'],
+                ['ods_id_verify_rt', '贴源层', '公共服务', 386, 34, '热存 180 天'],
+                ['ods_wrist_loc_rt', '贴源层', '城管', 5480, 168, '热存 15 天'],
+                ['ods_ship_track_rt', '贴源层', '环卫', 128, 12, '热存 90 天'],
+                ['ods_lowland_level_rt', '贴源层', '排水', 1860, 86, '热存 30 天'],
+                ['ods_radar_level_rt', '贴源层', '排水', 420, 24, '热存 90 天'],
+                ['ods_usonic_level_rt', '贴源层', '排水', 546, 26, '热存 90 天'],
+                ['ods_manhole_state_rt', '贴源层', '市政', 682, 22, '热存 180 天'],
+                ['ods_hydrant_press_rt', '贴源层', '市政', 964, 18, '热存 180 天'],
+                ['ods_gas_leak_rt', '贴源层', '市政', 1240, 32, '热存 365 天'],
+                ['ods_flue_emission_rt', '贴源层', '环卫', 186, 14, '热存 365 天'],
+                ['ods_bin_overflow_rt', '贴源层', '环卫', 2140, 28, '热存 90 天'],
+                ['ods_recycle_weight_rt', '贴源层', '环卫', 862, 36, '热存 365 天'],
+                ['ods_patrol_punch_rt', '贴源层', '城管', 1480, 20, '热存 90 天'],
+                /* 新增设备类加工层表 */
+                ['dwd_snap_object_std', '明细层', '街面', 2240, 106, '热存 90 天'],
+                ['dwd_person_alarm', '明细层', '城管', 68, 4, '永久'],
+                ['dwd_level_exceed_alarm', '明细层', '排水', 124, 6, '永久'],
+                ['dwd_gas_leak_alarm', '明细层', '市政', 12, 1, '永久'],
+                ['dwd_ship_track', '明细层', '环卫', 96, 18, '热存 60 天'],
+                ['dwd_id_verify_std', '明细层', '公共服务', 312, 22, '热存 365 天'],
+                ['dws_facility_state_1h', '汇总层', '设备', 486, 22, '永久'],
+                ['dws_recycle_weight_1d', '汇总层', '环卫', 42, 6, '永久'],
+                ['ads_emit_exceed_1d', '应用层', '环卫', 6, 1, '永久'],
+                ['ads_bin_dispatch_task_1d', '应用层', '环卫', 88, 3, '永久'],
+                ['ads_patrol_kpi_1d', '应用层', '城管', 24, 2, '永久'],
+                ['dim_device_kind_std', '维度层', '设备', 1, 1, '永久']
             ];
             resetSeed(20260601);
             const TABLES = TBL_SEED.map(function (r, i) {
@@ -943,7 +1203,15 @@
                 ['AP-07', '/api/v1/gov/item', '目录查询', '公共服务', '公共服务、客户端', 2],
                 ['AP-08', '/api/v1/bridge/deform', '阈值告警', '市政', '综合指挥', 3],
                 ['AP-09', '/api/v1/dq/report', '质量报告', '平台', '平台架构组', 1],
-                ['AP-10', '/api/v1/weather/alert', '共享交换', '平台', '智慧排水、综合指挥', 2]
+                ['AP-10', '/api/v1/weather/alert', '共享交换', '平台', '智慧排水、综合指挥', 2],
+                ['AP-11', '/api/v1/snap/object', '事件订阅', '街面', '智慧街面、综合指挥', 3],
+                ['AP-12', '/api/v1/person/location', '实时查询', '城管', '综合指挥、客户端', 3],
+                ['AP-13', '/api/v1/water/level', '时序查询', '排水', '智慧排水、决策分析', 2],
+                ['AP-14', '/api/v1/gas/leak', '阈值告警', '市政', '综合指挥、智慧市政', 3],
+                ['AP-15', '/api/v1/waste/weight', '批量查询', '环卫', '智慧环卫、公共服务', 1],
+                ['AP-16', '/api/v1/emission/std', '指标推送', '环卫', '决策分析、智慧环卫', 2],
+                ['AP-17', '/api/v1/facility/state', '时序查询', '设备', '智慧市政、运维中心', 2],
+                ['AP-18', '/api/v1/patrol/record', '轨迹回放', '城管', '数字城管、客户端', 1]
             ];
             resetSeed(20260610);
             const APIS = API_SEED.map(function (r) {
@@ -984,14 +1252,15 @@
 
             /* 业务域数据资产（点击进入场景页） */
             const DP_DOMAINS = [
-                { name: '城管', icon: '🏠', page: 'digital-city-management.html', tables: 6, size: 170 },
-                { name: '街面', icon: '🚦', page: 'smart-street.html', tables: 4, size: 127 },
-                { name: '环卫', icon: '🗑️', page: 'smart-environment.html', tables: 5, size: 374 },
-                { name: '市政', icon: '🏗️', page: 'smart-municipal.html', tables: 4, size: 96 },
-                { name: '排水', icon: '💧', page: 'smart-drainage.html', tables: 5, size: 210 },
+                { name: '城管', icon: '🏠', page: 'digital-city-management.html', tables: 8, size: 206 },
+                { name: '街面', icon: '🚦', page: 'smart-street.html', tables: 7, size: 188 },
+                { name: '环卫', icon: '🗑️', page: 'smart-environment.html', tables: 12, size: 452 },
+                { name: '市政', icon: '🏗️', page: 'smart-municipal.html', tables: 8, size: 132 },
+                { name: '排水', icon: '💧', page: 'smart-drainage.html', tables: 9, size: 262 },
                 { name: '照明', icon: '💡', page: 'smart-lighting.html', tables: 4, size: 88 },
                 { name: '停车', icon: '🅿️', page: 'smart-parking.html', tables: 3, size: 42 },
-                { name: '公共服务', icon: '🏛️', page: 'public-service.html', tables: 4, size: 33 }
+                { name: '公共服务', icon: '🏛️', page: 'public-service.html', tables: 6, size: 48 },
+                { name: '设备', icon: '🔧', page: 'equipment-data.html', tables: 3, size: 58 }
             ];
             resetSeed(20260626);
             DP_DOMAINS.forEach(function (d) {
@@ -1061,7 +1330,9 @@
                     water: Math.round(used / cap * 1000) / 10,
                     tables: TABLES.length, archived: TABLES.filter(t => t.archived).length,
                     apis: APIS.length, calls: APIS.reduce((a, x) => a + x.today, 0),
-                    subs: SUBS.length, quality: qualityScore()
+                    subs: SUBS.length, quality: qualityScore(),
+                    devKinds: DEV_KINDS.length, devTotal: DEV_KINDS.reduce(function (a, d) { return a + d.count; }, 0),
+                    devPaused: devKindList().filter(function (d) { return d.paused; }).length
                 };
             }
 
@@ -1146,11 +1417,12 @@
                     ['数据资产', t.tables + ' 张表'],
                     ['存储水位', SC.pct(t.water, 1)],
                     ['对外接口', t.apis + ' 个'],
+                    ['末端设备', t.devKinds + ' <small>类 / ' + SC.num(t.devTotal) + '</small> 台'],
                     ['场景订阅', t.subs + ' 路']
                 ]));
 
                 const vals = {
-                    collect: [t.on + '/' + t.chans, '通道', KINDS.length + ' 种采集方式并行，日入湖 ' + SC.num(t.rows / 10000, 0) + ' 万条'],
+                    collect: [t.on + '/' + t.chans, '通道', '接入 ' + t.devKinds + ' 类 / ' + SC.num(t.devTotal) + ' 台末端设备，' + KINDS.length + ' 种采集方式并行'],
                     process: [JOBS.length, '作业', '清洗规则 ' + RULES.filter(r => r.on).length + '/' + RULES.length + ' 条生效，质量均分 ' + SC.pct(t.quality, 1)],
                     storage: [t.tables, '表资产', '五层存储共用 ' + SC.num(t.used) + ' TB，已归档 ' + t.archived + ' 张'],
                     share: [t.apis, '接口', '场景订阅 ' + t.subs + ' 路，今日调用 ' + SC.num(t.calls / 10000, 1) + ' 万次']
@@ -1262,9 +1534,12 @@
             function renderCollect() {
                 const list = chanList();
                 const on = list.filter(c => c.status !== '停用');
+                const devs = devKindList();
                 put('#col-kv', kvBox([
                     ['通道总数', list.length],
                     ['在线运行', on.length],
+                    ['设备类型', devs.length + ' 类'],
+                    ['在册设备', SC.num(devs.reduce(function (a, d) { return a + d.count; }, 0)) + ' 台'],
                     ['今日入湖', SC.num(on.reduce((a, c) => a + c.rows, 0) / 10000, 1) + ' 万行'],
                     ['平均成功率', SC.pct(on.reduce((a, c) => a + c.rate, 0) / (on.length || 1), 2)],
                     ['最大时延', Math.max.apply(null, on.map(c => c.lag).concat([0])) + ' 秒'],
@@ -1300,6 +1575,7 @@
                     colors: kinds.map(function (k, i) { return SC.chartPalette[i % SC.chartPalette.length]; })
                 });
 
+                renderDevKinds();
                 renderChanTrend();
             }
 
@@ -1325,6 +1601,232 @@
                     { name: '入湖量 万行', color: ACCENT, value: SC.num(rows.reduce((a, v) => a + v, 0), 1) },
                     { name: '失败行数', color: RED, value: SC.num(fails.reduce((a, v) => a + v, 0), 1) }
                 ]);
+            }
+
+            /* ---------------- 末端设备接入清单：目录 / 物模型 / 试采 ---------------- */
+            let devDom = '';
+
+            function devKindRow(d) {
+                return '<tr data-id="' + d.code + '" data-dom="' + SC.esc(d.domain) + '">' +
+                    '<td><b>' + SC.esc(d.name) + '</b><div class="sc-hint mono" style="font-size:.78em">' + d.code +
+                    ' · ' + d.model.f.length + ' 个物模型字段</div></td>' +
+                    '<td>' + SC.esc(d.cat) + '<div class="sc-hint" style="font-size:.78em">' + SC.esc(d.access) + '</div></td>' +
+                    '<td>' + SC.num(d.count) + ' 台</td>' +
+                    '<td>' + SC.esc(d.freq) + '</td>' +
+                    '<td><span class="mono">' + d.ch + '</span><div class="sc-hint" style="font-size:.78em">' + SC.esc(d.chName) + '</div></td>' +
+                    '<td>' + (d.daily ? SC.num(d.daily / 10000, 1) + ' 万条' : '-') + '</td>' +
+                    '<td>' + SC.pct(d.online, 1) + '</td>' +
+                    '<td>' + tag(d.status, DEVK_TAG[d.status] || 'info') +
+                    (d.trial ? '<div class="sc-hint" style="font-size:.78em">试采：' + SC.esc(d.trial) + '</div>' : '') + '</td>' +
+                    '<td><span class="sc-hint" style="font-size:.86em">' + SC.esc(d.biz) + '</span></td>' +
+                    '<td>' + SC.esc(d.domain) + '</td>' +
+                    '<td><button class="sc-btn sm ' + (d.paused ? 'primary' : 'ghost') + '" data-act="pause" data-code="' + d.code + '">' +
+                    (d.paused ? '恢复' : '暂停') + '</button></td></tr>';
+            }
+
+            function renderDevKinds() {
+                const el = q('#dev-table');
+                if (!el) return;
+                const list = devKindList();
+                const domains = [];
+                list.forEach(function (d) { if (domains.indexOf(d.domain) < 0) domains.push(d.domain); });
+                put('#dev-chips', '<span class="sc-chip' + (devDom === '' ? ' active' : '') + '" data-dom="">全部 ' +
+                    list.length + ' 类 / ' + SC.num(list.reduce(function (a, d) { return a + d.count; }, 0)) + ' 台</span>' +
+                    domains.map(function (k) {
+                        const sub = list.filter(function (d) { return d.domain === k; });
+                        return '<span class="sc-chip' + (devDom === k ? ' active' : '') + '" data-dom="' + SC.esc(k) + '">' +
+                            SC.esc(k) + ' ' + sub.length + ' 类 · ' + SC.num(sub.reduce(function (a, d) { return a + d.count; }, 0)) + ' 台</span>';
+                    }).join(''));
+
+                el.querySelector('tbody').innerHTML = list.map(devKindRow).join('');
+                /* enhance 对同一张表是幂等的，重新填 tbody 后靠 setFilter 触发重绘 */
+                const ctrl = SC.table.enhance(el, { pageSize: 10, search: '#col-search', keyAttr: 'id' });
+                ctrl.setFilter(function (r) { return !devDom || r.tr.dataset.dom === devDom; });
+            }
+
+            function devKindTrend(d) {
+                const perHour = Math.max(1, d.daily / 24);
+                const rows = seriesFor(d.code + '-devh', 24, perHour / 10000, perHour / 10000 * 0.4);
+                const miss = rows.map(function (v, i) {
+                    return Math.max(0, Math.round(v * (100 - d.online) * 10 * (0.7 + ((i % 4) / 10))) / 10);
+                });
+                return { rows: rows, miss: miss, labels: hourLabels(24) };
+            }
+
+            function openDevKind(code) {
+                const d = devKindByCode(code);
+                if (!d) return;
+                const api = SC.modal.open({
+                    title: '🔧 ' + d.name + ' · 接入档案（' + code + '）', size: 'lg',
+                    body: '<div></div>', footer: [{ text: '关闭', kind: 'ghost' }]
+                });
+                function bodyHTML() {
+                    const cur = devKindByCode(code);
+                    return '<div class="sc-kv">' + kvBox([
+                        ['在册数量', SC.num(cur.count) + ' 台'],
+                        ['设备分类', SC.esc(cur.cat)],
+                        ['接入方式', SC.esc(cur.access)],
+                        ['上报频率', SC.esc(cur.freq)],
+                        ['采集方式', SC.esc(cur.mode)],
+                        ['昨日上报', cur.daily ? SC.num(cur.daily / 10000, 1) + ' 万条' : '已暂停'],
+                        ['在线率', SC.pct(cur.online, 1)],
+                        ['接入状态', tag(cur.status, DEVK_TAG[cur.status] || 'info')],
+                        ['低电告警数', cur.lowbat ? cur.lowbat + ' 台' : '市电供电'],
+                        ['故障在修', cur.fault + ' 台'],
+                        ['主力厂商', SC.esc(cur.vendor)],
+                        ['接入时长', Math.round((Date.now() - cur.since) / DAY) + ' 天']
+                    ]) + '</div>' +
+                        '<div class="sc-section-title">业务口径</div>' +
+                        '<div class="sc-hint">' + SC.esc(cur.biz) + '（归属 ' + SC.esc(cur.domain) + ' 域，数据落库 ' +
+                        SC.esc((chanById(cur.ch) || { table: '-' }).table) + '）</div>' +
+                        '<div class="sc-section-title">物模型上报字段</div>' +
+                        '<div class="data-table-container"><table class="data-table"><thead><tr><th>字段</th><th>类型</th><th>业务含义</th></tr></thead><tbody>' +
+                        cur.model.f.map(function (f) {
+                            return '<tr><td class="mono">' + SC.esc(f[0]) + '</td><td>' + SC.esc(f[1]) + '</td><td>' + SC.esc(f[2]) + '</td></tr>';
+                        }).join('') + '</tbody></table></div>' +
+                        '<div class="sc-section-title">报文样例</div>' +
+                        '<div class="sc-code">' + SC.esc(cur.model.m) + '</div>' +
+                        '<div class="sc-section-title">近 24 小时上报量（万条）</div>' +
+                        '<div class="sc-chart"><canvas></canvas></div>';
+                }
+                api.body.innerHTML = bodyHTML();
+                const tr = devKindTrend(d);
+                const cv = api.body.querySelector('.sc-chart canvas');
+                if (cv && SC.chart) {
+                    CH['devk-modal'] = SC.chart.line(cv, {
+                        labels: tr.labels, unit: '', zeroBased: true,
+                        series: [
+                            { name: '上报量 万条', color: ACCENT, data: tr.rows },
+                            { name: '缺报 百条', color: RED, fill: false, dash: [5, 4], data: tr.miss }
+                        ]
+                    });
+                }
+                api.footer.innerHTML = '';
+                [
+                    { text: '▶ 本类试采', kind: 'primary', run: function (done) { trialDevKinds([code], done); } },
+                    {
+                        text: d.paused ? '▶ 恢复接入' : '⏸ 暂停接入', kind: d.paused ? 'primary' : 'danger',
+                        run: function (done) { setDevKindPause(code, done); }
+                    },
+                    { text: '📥 采集通道', kind: '', run: function () { api.close(); openChannel(d.ch); } },
+                    {
+                        text: '🏙 前往场景页', kind: '', run: function () {
+                            const dm = DP_DOMAINS.filter(function (x) { return x.name === d.domain; })[0];
+                            location.href = dm ? domainHref(dm) : 'equipment-data.html';
+                        }
+                    },
+                    { text: '关闭', kind: 'ghost' }
+                ].forEach(function (cfg) {
+                    const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
+                    btn.addEventListener('click', function () {
+                        if (!cfg.run) { api.close(); return; }
+                        /* 暂停 / 试采是异步确认的，完成回调里再关档案窗，避免展示旧状态 */
+                        cfg.run(function () { api.close(); });
+                    });
+                    api.footer.appendChild(btn);
+                });
+            }
+
+            function setDevKindPause(code, done) {
+                const d = devKindByCode(code);
+                if (!d) return;
+                if (d.paused) {
+                    patchDevKind(code, { paused: false });
+                    renderCollect();
+                    renderLive();
+                    note('ok', '设备类型「' + d.name + '」已恢复接入，通道 ' + d.ch + ' 继续入湖');
+                    SC.toast('已恢复接入：' + d.name, { type: 'success' });
+                    if (done) done();
+                    return;
+                }
+                SC.modal.confirm({
+                    title: '确认暂停设备接入',
+                    html: '暂停后 <b>' + SC.esc(d.name) + '</b>（在册 ' + SC.num(d.count) + ' 台）的上报不再写入 ' +
+                        '<span class="mono">' + SC.esc(d.chName) + '</span> 目标表，<b>不影响同一通道上其他设备类型</b>。',
+                    okText: '确认暂停', danger: true
+                }).then(function (ok) {
+                    if (!ok) { if (done) done(); return; }
+                    patchDevKind(code, { paused: true });
+                    renderCollect();
+                    renderLive();
+                    note('warn', '设备类型「' + d.name + '」已暂停接入，昨日上报 ' + SC.num(d.daily / 10000, 1) + ' 万条不再入湖');
+                    SC.toast('已暂停接入：' + d.name, { type: 'warn' });
+                    if (done) done();
+                });
+            }
+
+            /** 批量试采：codes 为空时弹勾选框，从设备详情窗传入单类则直接跑 */
+            function trialDevKinds(codes, done) {
+                const avail = devKindList().filter(function (d) { return !d.paused; });
+                if (!avail.length) { SC.toast('全部设备类型已暂停接入，无法发起试采', { type: 'warn' }); return; }
+                if (codes && codes.length) { runTrial(codes, 100, true); if (done) done(); return; }
+                SC.modal.form({
+                    title: '▶ 末端设备批量试采', submitText: '开始试采', size: 'lg',
+                    fields: [
+                        {
+                            type: 'static', col: 1,
+                            html: '<div class="sc-note">试采按各类设备上报频率抽取样本报文，校验物模型字段、量纲与字典映射；结论写入接入档案，不覆盖正式目标表。</div>'
+                        },
+                        {
+                            name: 'kinds', label: '试采设备类型', type: 'checkgroup', full: true, required: true,
+                            options: function () {
+                                return avail.map(function (d) {
+                                    return { value: d.code, label: d.name + '（' + d.code + ' · 在册 ' + SC.num(d.count) + ' 台）' };
+                                });
+                            }
+                        },
+                        { name: 'n', label: '每类抽取报文数', type: 'number', min: 10, max: 500, step: 10, value: 100, col: 1 },
+                        { name: 'strict', label: '字典与量纲校验', type: 'switch', onText: '严格校验', value: true, col: 1 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    if (!(v.kinds || []).length) { SC.toast('请至少勾选一类设备', { type: 'error' }); return; }
+                    runTrial(v.kinds, v.n, v.strict);
+                });
+            }
+
+            function runTrial(codes, n, strict) {
+                const rows = [];
+                codes.forEach(function (code) {
+                    const d = devKindByCode(code);
+                    if (!d) return;
+                    resetSeed(hashSeed(code + '#trial'));
+                    const got = Math.max(10, Math.min(n, d.count));
+                    const miss = sri(0, Math.max(1, Math.round(got * 0.04)));
+                    const bad = strict ? sri(0, 3) : sri(0, 1);
+                    const verdict = miss / got > 0.03 ? '缺报偏高' : (bad > 0 ? '字段待补' : '校验通过');
+                    patchDevKind(code, { trial: verdict, trialAt: Date.now(), synced: got, paused: false });
+                    rows.push({ name: d.name, code: code, got: got, ok: got - miss - bad, miss: miss, bad: bad, verdict: verdict, field: d.model.f.length });
+                });
+                if (!rows.length) return;
+                renderCollect();
+                renderLive();
+                note('ok', '末端设备试采完成：' + rows.length + ' 类，抽取报文 ' +
+                    SC.num(rows.reduce(function (a, r) { return a + r.got; }, 0)) + ' 条');
+                SC.toast('试采完成，' + rows.length + ' 类设备已回写接入档案', { type: 'success' });
+                SC.modal.open({
+                    title: '✅ 试采结果 · ' + SC.stamp(new Date(), true), size: 'lg',
+                    body: '<div class="data-table-container"><table class="data-table"><thead><tr>' +
+                        '<th>设备类型</th><th>编码</th><th>物模型字段</th><th>抽取报文</th><th>校验通过</th><th>缺报</th><th>字段异常</th><th>结论</th>' +
+                        '</tr></thead><tbody>' + rows.map(function (r) {
+                            return '<tr><td>' + SC.esc(r.name) + '</td><td class="mono">' + r.code + '</td><td>' + r.field + '</td><td>' +
+                                SC.num(r.got) + '</td><td>' + SC.num(r.ok) + '</td><td>' + r.miss + '</td><td>' + r.bad + '</td><td>' +
+                                tag(r.verdict, r.verdict === '校验通过' ? 'ok' : 'warn') + '</td></tr>';
+                        }).join('') + '</tbody></table></div>' +
+                        '<div class="sc-hint">结论已回写至设备接入清单的“状态”列；如结论为缺报偏高，建议先核对现场供电与网络信号。</div>',
+                    footer: [{ text: '知道了', kind: 'primary' }]
+                });
+            }
+
+            function exportDevCatalog() {
+                const rows = [['编码', '设备类型', '分类', '接入方式', '在册数量', '上报频率', '采集方式', '关联通道', '目标表', '昨日上报条数', '在线率%', '业务口径', '归属域', '物模型字段', '接入状态']];
+                devKindList().forEach(function (d) {
+                    const ch = chanById(d.ch) || { table: '', name: d.ch };
+                    rows.push([d.code, d.name, d.cat, d.access, d.count, d.freq, d.mode, d.ch + ' ' + ch.name, ch.table,
+                    d.daily, d.online, d.biz, d.domain, d.model.f.map(function (f) { return f[0]; }).join('|'), d.status]);
+                });
+                SC.csv.download('末端设备接入目录_' + SC.today() + '.csv', rows);
+                SC.toast('已导出 ' + (rows.length - 1) + ' 类设备接入口径', { type: 'success' });
             }
 
             /* 巡检：检查连通性、超时与权限，结果落存运行态 */
@@ -1535,6 +2037,9 @@
                 APIS.forEach(function (a) {
                     rows.push(['数据接口', a.id + ' ' + a.path, a.type, a.domain, a.qps + ' QPS', a.status, a.owner]);
                 });
+                devKindList().forEach(function (d) {
+                    rows.push(['末端设备', d.code + ' ' + d.name, d.access + ' → ' + d.ch, d.chName, d.count + ' 台', d.status, d.domain]);
+                });
                 SC.csv.download('数据中台资产清单_' + SC.today() + '.csv', rows);
                 SC.toast('已导出 ' + (rows.length - 1) + ' 条资产记录', { type: 'success' });
             }
@@ -1550,6 +2055,7 @@
                     ['存储占用', SC.num(t.used) + ' TB'],
                     ['质量均分', SC.pct(t.quality, 1)],
                     ['对外接口', t.apis + ' 个'],
+                    ['末端设备', t.devKinds + ' 类 / ' + SC.num(t.devTotal) + ' 台'],
                     ['场景订阅', t.subs + ' 路']
                 ]) + '</div>' +
                     '<div class="sc-section-title">分层资产分布</div>' +
@@ -2426,6 +2932,22 @@
                 if (q('#btn-col-check')) q('#btn-col-check').addEventListener('click', checkChannels);
                 if (q('#btn-col-add')) q('#btn-col-add').addEventListener('click', addChannel);
                 if (q('#btn-col-export')) q('#btn-col-export').addEventListener('click', exportChannels);
+
+                /* 末端设备接入清单 */
+                const devChips = q('#dev-chips');
+                if (devChips) {
+                    devChips.addEventListener('click', function (ev) {
+                        const chip = ev.target.closest('.sc-chip');
+                        if (!chip) return;
+                        devDom = chip.dataset.dom || '';
+                        renderDevKinds();
+                    });
+                }
+                bindTable('#dev-table', function (code) { openDevKind(code); }, function (act, data) {
+                    if (act === 'pause') setDevKindPause(data.code);
+                });
+                if (q('#btn-dev-trial')) q('#btn-dev-trial').addEventListener('click', function () { trialDevKinds(); });
+                if (q('#btn-dev-export')) q('#btn-dev-export').addEventListener('click', exportDevCatalog);
 
                 /* 整编 */
                 bindTable('#job-table', function (id) { procSel = id; openJob(id); }, function (act, data) {

@@ -1245,6 +1245,7 @@
                                     <th>人员</th>
                                     <th>部门 / 岗位</th>
                                     <th>状态</th>
+                                    <th>手环 / 巡更</th>
                                     <th>最后定位</th>
                                     <th>今日轨迹</th>
                                     <th>今日上报</th>
@@ -1712,6 +1713,7 @@
 
     <script src="assets/js/common.js"></script>
     <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/device-catalog.js"></script>
     <script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script>
@@ -3155,7 +3157,7 @@
                19. 扩展业务数据：中队 / 车辆 / 人员 / 视频 / 网格 / 坐席 / 值班 / 执法督查
                全部固定存档于 NS='dcm' 的 ext 键，版本不一致时重建
                ========================================================================== */
-            const EXT_VER = 3;
+            const EXT_VER = 4;   /* v4：人员台账补充智能手环与电子巡更仪接入口径 */
 
             /** 独立随机序列，避免与案卷台账的伪随机种子互相影响 */
             let xseed = 20260715;
@@ -3301,9 +3303,20 @@
             function buildStaff() {
                 return STAFF_ROWS.map(function (r, i) {
                     const online = i < 16 ? '在线' : i < 20 ? '忙碌' : '离线';
+                    /* 智能手环 WBC 与电子巡更仪 PAT 为数据中台在册的两类人员终端，
+                       定位链路统一为 MQTT → Flink 轨迹计算 → 告警中心 */
+                    const wear = online === '离线' ? 0 : 1;
                     return {
                         id: 'RY-' + String(10201 + i), name: r[0], dept: r[1], post: r[2], team: r[3],
                         terminal: 'DSJ-' + String(xri(20000, 99999)),
+                        wrist: 'SB-' + String(xri(40000, 49999)),
+                        wristBatt: xri(18, 99),
+                        heart: xri(62, 104),
+                        fenceHit: xri(0, 3),
+                        sos: xrnd() < 0.06 ? 1 : 0,
+                        patrol: 'XG-' + String(xri(60000, 69999)),
+                        punches: xri(4, 26),
+                        wear: wear,
                         online: online,
                         x: Number((0.06 + xrnd() * 0.88).toFixed(4)),
                         y: Number((0.06 + xrnd() * 0.88).toFixed(4)),
@@ -4536,6 +4549,9 @@
                 const off = EXT.staff.length - on - busy;
                 const reports = EXT.staff.reduce((n, s) => n + s.todayReports, 0);
                 const km = EXT.staff.reduce((n, s) => n + s.todayKm, 0);
+                const wearing = EXT.staff.filter(s => s.wear).length;
+                const fence = EXT.staff.reduce((n, s) => n + (s.fenceHit || 0), 0);
+                const punches = EXT.staff.reduce((n, s) => n + s.punches, 0);
                 if (host) {
                     const kv = function (k, v, sub) {
                         return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v sc-num-lg">' + v + '</div>' +
@@ -4546,7 +4562,10 @@
                         kv('在线 / 忙碌', on + ' / ' + busy, '在线率 ' + SC.pct(on / EXT.staff.length * 100)) +
                         kv('离线', off + ' 人', '超 30 分钟未定位') +
                         kv('今日上报', reports + ' 件', '人均 ' + SC.num(reports / EXT.staff.length, 1) + ' 件') +
-                        kv('今日里程', SC.num(km, 1) + ' km', '巡检轨迹累计');
+                        kv('今日里程', SC.num(km, 1) + ' km', '巡检轨迹累计') +
+                        kv('手环在册', wearing + ' / ' + EXT.staff.length + ' 人',
+                            '定位 5 秒上报，越界 ' + fence + ' 次（MQTT → Flink → 告警）') +
+                        kv('巡更打点', punches + ' 次', '电子巡更仪到岗记录');
                 }
 
                 const tb = document.querySelector('#staff-table tbody');
@@ -4557,6 +4576,11 @@
                             '<div class="sc-hint" style="font-size:.74em">' + SC.esc(s.id) + ' · ' + SC.esc(s.team) + '</div></td>' +
                             '<td>' + SC.esc(s.dept) + '<div class="sc-hint" style="font-size:.74em">' + SC.esc(s.post) + '</div></td>' +
                             '<td>' + staffOnlineTag(s.online) + '</td>' +
+                            '<td>' + (s.wear
+                                ? '<span class="sc-tag ok">' + SC.esc(s.wrist) + '</span>' +
+                                (s.sos ? ' <span class="sc-tag bad">SOS</span>' : '')
+                                : '<span class="sc-tag off">未佩戴</span>') +
+                            '<div class="sc-hint" style="font-size:.74em">巡更 ' + SC.esc(s.patrol) + ' · 打点 ' + s.punches + ' 次</div></td>' +
                             '<td>' + (s.online === '离线' ? last + ' 分钟前' : '刚刚') + '</td>' +
                             '<td class="sc-cell-num">' + SC.num(s.todayKm, 1) + ' km</td>' +
                             '<td class="sc-cell-num">' + s.todayReports + '</td>' +
@@ -4684,11 +4708,17 @@
                     kv('所属队伍', SC.esc(s.team)) +
                     kv('当前状态', staffOnlineTag(s.online)) +
                     kv('执法记录仪', SC.esc(s.terminal) + '<div class="sc-hint">电量 ' + s.battery + ' %</div>') +
+                    kv('智能手环', s.wear
+                        ? SC.esc(s.wrist) + '<div class="sc-hint">心率 ' + s.heart + ' 次/分 · 电量 ' + s.wristBatt + ' % · 越界 ' + (s.fenceHit || 0) + ' 次' + (s.sos ? ' · 含 SOS 求助' : '') + '</div>'
+                        : '<span class="sc-tag off">未佩戴</span><div class="sc-hint">离线超 30 分钟未上报定位</div>') +
+                    kv('电子巡更仪', SC.esc(s.patrol) + '<div class="sc-hint">今日 NFC 打点 ' + s.punches + ' 次 · 到岗记录已归档</div>') +
                     kv('今日轨迹', SC.num(s.todayKm, 1) + ' km<div class="sc-hint">上报 ' + s.todayReports + ' 件</div>') +
                     kv('联系电话', s.phone) +
                     kv('最后定位', s.online === '离线' ? Math.round((Date.now() - s.lastSeen) / MIN) + ' 分钟前' : '刚刚') +
                     '</div>' +
-                    '<div class="sc-note" style="margin-top:14px">实时坐标：' + (120.15 + s.x * 0.06).toFixed(4) + '°E, ' + (30.28 + s.y * 0.05).toFixed(4) + '°N</div>' +
+                    '<div class="sc-note" style="margin-top:14px">实时坐标：' + (120.15 + s.x * 0.06).toFixed(4) + '°E, ' + (30.28 + s.y * 0.05).toFixed(4) + '°N'
+                    + '<div class="sc-hint" style="margin-top:4px">手环与巡更仪定位经 MQTT 接入数据中台，由 Flink 轨迹作业判定越界/到岗后推送告警中心；'
+                    + '测点口径见<a href="equipment-data.html?from=digital-city-management.html" style="color:#00897b"> 设备数据页</a>。</div></div>' +
                     '<div class="sc-section-title">历史轨迹</div>' +
                     '<div class="sc-seg" id="st-day"><button data-day="0" class="active">今天</button><button data-day="1">昨天</button><button data-day="2">前天</button></div>' +
                     '<div class="sc-chart" style="margin-top:12px"><canvas id="st-canvas"></canvas></div>' +
@@ -5768,8 +5798,8 @@
                     if (item) openStaffDetail(item.dataset.sid);
                 });
                 document.getElementById('btn-staff-export').addEventListener('click', function () {
-                    const header = ['工号', '姓名', '部门', '岗位', '队伍', '终端', '在线状态', '今日里程', '今日上报', '电量', '电话', '最后定位'];
-                    const data = EXT.staff.map(s => [s.id, s.name, s.dept, s.post, s.team, s.terminal, s.online, s.todayKm, s.todayReports, s.battery, s.phone, SC.stamp(new Date(s.lastSeen), true)]);
+                    const header = ['工号', '姓名', '部门', '岗位', '队伍', '终端', '智能手环', '巡更仪', '今日打点', '在线状态', '今日里程', '今日上报', '电量', '电话', '最后定位'];
+                    const data = EXT.staff.map(s => [s.id, s.name, s.dept, s.post, s.team, s.terminal, s.wrist, s.patrol, s.punches, s.online, s.todayKm, s.todayReports, s.battery, s.phone, SC.stamp(new Date(s.lastSeen), true)]);
                     SC.csv.download('人员台账_' + SC.today() + '.csv', [header].concat(data));
                     SC.toast('已导出 ' + data.length + ' 名人员', { type: 'success' });
                 });
