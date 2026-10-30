@@ -390,6 +390,7 @@
                     <button class="sc-btn sm ghost" id="btn-analysis-export">⬇ 导出分析数据</button>
                 </div>
             </div>
+            <p class="sc-hint" id="ad-scope-hint" style="margin:0 2px 12px"></p>
             <div class="sc-split">
                 <div class="sc-panel" style="margin-bottom:0">
                     <div class="sc-panel-title">
@@ -1038,10 +1039,15 @@
                     ? '⚠️ ' + SC.esc(over.map(l => l.name).join('、')) + ' 已饱和，建议：① 诱导屏提前分流；② 开放周边路内夜间泊位；③ ' +
                     SC.pad2(peakHour) + ':00 前后增派现场引导人员。'
                     : '✅ 当前供需平衡，维持常规引导策略即可。';
+                /* 分析类图表同样按示范片区样本口径表述，图表图例与顶部口径说明保持一致 */
+                const adHint = document.getElementById('ad-scope-hint');
+                if (adHint) adHint.innerHTML = '口径说明：以下流量、收入、使用率热力与周转率均基于<strong>示范片区在管</strong>的 ' +
+                    lots.length + ' 座车场 / <b>' + SC.num(totalCap) + '</b> 个泊位样本；全市泊位级感知设备见数据中台 MKR 类在册 <b>' +
+                    SC.num(MKR_CITY) + '</b> 台。';
                 SC.chart.line(document.getElementById('chart-occupy'), {
                     labels, unit: '%', minimal: false, xEvery: 4, padL: 40,
                     thresholds: [{ value: 85, label: '饱和线 85%', color: '#e74c3c' }],
-                    series: [{ name: '全市使用率', data: labels.map((_, h) => Math.round(SC.clamp(48 + Math.sin(h / 24 * Math.PI * 2 - 1.2) * 34 + SC.sim.rand(-5, 5), 5, 99))), color: '#0077b6' }]
+                    series: [{ name: '示范片区使用率', data: labels.map((_, h) => Math.round(SC.clamp(48 + Math.sin(h / 24 * Math.PI * 2 - 1.2) * 34 + SC.sim.rand(-5, 5), 5, 99))), color: '#0077b6' }]
                 });
             }
 

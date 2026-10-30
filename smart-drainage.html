@@ -393,7 +393,7 @@
         <div class="flood-warning lv-green" id="warn-banner">
             <div class="warning-content">
                 <div class="warning-title" id="warn-title">🟢 运行平稳</div>
-                <div class="warning-desc" id="warn-desc">全市排水管网液位正常，暂无内涝风险。</div>
+                <div class="warning-desc" id="warn-desc">示范片区泵站与管网液位正常，暂无内涝风险。</div>
             </div>
             <div class="sc-inline">
                 <button class="warning-action" id="btn-plan">📋 查看响应预案</button>
@@ -443,6 +443,10 @@
                 <div class="metric-label">待处置告警</div>
             </div>
         </div>
+
+        <p class="sc-hint" style="margin:12px 2px 0">口径说明：本页泵站 / 河道断面 / 低洼点 / 雨水井为<strong>示范片区在管</strong>监测点样本，
+            调度与告警闭环均在此范围内演练；全市口径对应数据中台排水域在册 <b>22,926</b> 台 / <b>5</b> 类（液位水位四类 2.23 万，
+            按杭州市域体量估算，与页首排水域条幅一致）。</p>
 
         <div class="module-nav">
             <button class="module-btn active" data-module="real-time-monitor">📡 实时监控</button>
@@ -1691,7 +1695,7 @@
                 const w = {
                     id: 'YJ2026' + SC.pad2(warnSeq++), level: lv.key,
                     type: over ? '液位超警戒' : '降雨预警',
-                    pos: over ? over.name : '全市域',
+                    pos: over ? over.name : '示范片区全域',
                     value: over ? over.level.toFixed(2) + ' m（警戒 ' + over.warn.toFixed(2) + '）' : '降雨 ' + state.rain + ' mm/h',
                     time: SC.stamp(new Date()), status: '待确认', owner: '', reason
                 };
@@ -1722,7 +1726,7 @@
             function step(minutes) {
                 state.simMinutes += minutes;
                 state.todayRain += state.rain / 60 * minutes;
-                const inflowM3h = state.rain / 1000 * 60 * 12000;   // 全市汇水面积近似 1.2 万 m² 折算入管网
+                const inflowM3h = state.rain / 1000 * 60 * 12000;   // 片区汇水面积近似 1.2 万 m² 折算入管网
                 stations.forEach(function (s) {
                     // 降雨产流按汇水面积折算到该站（均摊），叠加地下渗流基础来水
                     const rainIn = inflowM3h / stations.length * (s.surface / 2600);

@@ -455,7 +455,8 @@
                     </table>
                 </div>
                 <div class="sc-hint" style="margin-top:8px">
-                    此处为实时运行视图（亮度 / 电压 / 状态）；杆件档案、经纬度与资产信息在「🗂️ 灯信息维护」中维护，两边共用同一份台账。
+                    此处为实时运行视图（亮度 / 电压 / 状态），仅覆盖<strong>示范片区在管</strong>路段的灯杆样本（与「🗂️ 灯信息维护」共用同一份台账）；
+                    全市口径对应数据中台 LTC 类路灯单灯控制器在册 <b>512,600</b> 台（按杭州市域体量估算，与页首照明域条幅一致）。
                 </div>
             </div>
         </div>
@@ -2158,7 +2159,9 @@
             });
 
             function bulk(label, fn) {
-                SC.modal.confirm({ text: '确认对全部 4 个回路执行「' + label + '」？该操作会立即下发至现场控制器。' })
+                /* 全域批量指令的受影响台数按照明资产在册量派生，与数据中台 LTC 类口径保持一致 */
+                const hit = ZONES.reduce((s, z) => s + z.count, 0);
+                SC.modal.confirm({ text: '确认对全部 ' + ZONES.length + ' 类照明资产（在册 ' + SC.num(hit) + ' 台单灯控制器）执行「' + label + '」？该操作会立即下发至现场控制器。' })
                     .then(function (ok) {
                         if (!ok) return;
                         state.zones.forEach(fn);
@@ -2166,7 +2169,7 @@
                         renderZones();
                         paintPower();
                         drawScene();
-                        SC.toast(label + '指令已下发（12,345 台设备）', { type: 'success' });
+                        SC.toast(label + '指令已下发（' + SC.num(hit) + ' 台设备）', { type: 'success' });
                     });
             }
 
