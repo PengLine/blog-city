@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>设备+数据 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/ui-kit.css">
     <style>
         .container {
             background: #f0f2f5;
@@ -70,10 +71,11 @@
         }
 
         .device-value {
-            font-size: 2.5em;
+            font-size: 2.2em;
             font-weight: bold;
             color: #26c6da;
             margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
         }
 
         .device-label {
@@ -81,116 +83,311 @@
             color: #7f8c8d;
         }
 
-        .device-grid {
+        .device-sub {
+            font-size: 0.78em;
+            color: #b2bec3;
+            margin-top: 6px;
+        }
+
+        /* 类型筛选卡 */
+        .type-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 22px;
         }
 
-        .device-item {
+        .type-card {
             background: white;
-            padding: 25px;
+            border: 2px solid transparent;
+            padding: 18px 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
-        .device-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            border: 2px solid #26c6da;
+        .type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13);
         }
 
-        .device-header {
+        .type-card.active {
+            border-color: #26c6da;
+            box-shadow: 0 4px 16px rgba(38, 198, 218, 0.28);
+        }
+
+        .type-card .th {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .device-name {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .device-status {
-            font-size: 0.8em;
-            padding: 4px 10px;
-            border-radius: 10px;
-        }
-
-        .device-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .info-label {
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-
-        .info-value {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .data-flow-section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .data-flow-section h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 1.3em;
-        }
-
-        .data-flow {
-            height: 100px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 20px;
-        }
-
-        .data-node {
-            text-align: center;
-        }
-
-        .node-icon {
-            font-size: 2em;
             margin-bottom: 10px;
+            font-weight: bold;
+            color: #2c3e50;
         }
 
-        .node-label {
+        .type-card .tn {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .type-card .tr {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.8em;
             color: #7f8c8d;
+            margin-top: 6px;
         }
 
-        .data-arrow {
-            font-size: 2em;
-            color: #26c6da;
+        /* 数据流水线 */
+        .pipe {
+            display: flex;
+            align-items: stretch;
+            gap: 4px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 6px 0 12px;
+        }
+
+        .pipe-node {
+            flex: 1 1 150px;
+            min-width: 150px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
+            border: 1px solid #eef2f6;
+        }
+
+        .pipe-node .pi {
+            font-size: 1.6em;
+        }
+
+        .pipe-node .pv {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #00acc1;
+            font-variant-numeric: tabular-nums;
+            margin-top: 4px;
+        }
+
+        .pipe-node .pl {
+            font-size: 0.78em;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .pipe-node.bump .pv {
+            animation: bump 0.5s ease;
+        }
+
+        @keyframes bump {
+            0% {
+                transform: scale(1);
+            }
+
+            40% {
+                transform: scale(1.16);
+                color: #e67e22;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pipe-link {
+            flex: 0 0 42px;
+            align-self: center;
+            height: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pipe-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dfe6ec;
+        }
+
+        .pipe-link::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -40%;
+            width: 40%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #26c6da, transparent);
+            animation: pipeRun 1.3s linear infinite;
+        }
+
+        .pipe-link.slow::after {
+            animation-duration: 3s;
+            background: linear-gradient(90deg, transparent, #f39c12, transparent);
+        }
+
+        @keyframes pipeRun {
+            to {
+                left: 110%;
+            }
+        }
+
+        /* 关注清单 */
+        .attn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .attn-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: #f8f9fa;
+            border-left: 3px solid #e67e22;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.86em;
+        }
+
+        .attn-item.bad {
+            border-left-color: #e74c3c;
+        }
+
+        .attn-item .ax {
+            flex: 1;
+        }
+
+        /* 批量任务面板 */
+        .job-panel {
+            border: 1px dashed #26c6da;
+            background: #f2fbfd;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+        }
+
+        .job-panel[hidden] {
+            display: none;
+        }
+
+        .job-list {
+            max-height: 160px;
+            overflow-y: auto;
+            font-size: 0.82em;
+            margin-top: 10px;
+        }
+
+        .job-list .ji {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 3px 0;
+            border-bottom: 1px dashed #d8eaef;
+        }
+
+        /* 接口调试 */
+        .dbg-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 20px;
+        }
+
+        .http-pill {
+            display: inline-block;
+            min-width: 52px;
+            text-align: center;
+            font-size: 0.72em;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 2px 6px;
+            background: #27ae60;
+            color: white;
+        }
+
+        .http-pill.warn {
+            background: #f39c12;
+        }
+
+        .http-pill.bad {
+            background: #e74c3c;
+        }
+
+        .conn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .conn-card {
+            border: 1px solid #eef2f6;
+            border-radius: 10px;
+            padding: 16px;
+            background: #fbfcfd;
+        }
+
+        .conn-card .ch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .conn-step {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px dashed #eef2f6;
+        }
+
+        .conn-step.ok {
+            color: #27ae60;
+        }
+
+        .conn-step.bad {
+            color: #e74c3c;
+        }
+
+        .cred {
+            font-family: Consolas, monospace;
+            font-size: 0.8em;
+            color: #5b6b7b;
+            letter-spacing: 1px;
+        }
+
+        .gauge-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .gauge-row .sc-chart {
+            height: 130px;
         }
 
         @media (max-width: 768px) {
-            .data-flow {
-                flex-direction: column;
-                height: auto;
-                gap: 20px;
+            .dbg-grid {
+                grid-template-columns: 1fr;
             }
 
-            .data-arrow {
-                transform: rotate(90deg);
+            .pipe-link {
+                display: none;
             }
         }
     </style>
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%232c3e50%27/%3E%3Crect x=%2712%27 y=%2730%27 width=%2710%27 height=%2722%27 fill=%27%233498db%27/%3E%3Crect x=%2727%27 y=%2718%27 width=%2710%27 height=%2734%27 fill=%27%232ecc71%27/%3E%3Crect x=%2742%27 y=%2726%27 width=%2710%27 height=%2726%27 fill=%27%23f39c12%27/%3E%3C/svg%3E">
 </head>
 
 <body>
@@ -198,7 +395,7 @@
         <header>
             <div>
                 <h1>🔧 设备+数据管理</h1>
-                <p>设备管理与数据分析平台</p>
+                <p>物联设备全生命周期管理 · 数据链路监控 · 健康预测 · 系统集成</p>
             </div>
             <a href="index.html" class="nav-btn">🔙 返回主页面</a>
         </header>
@@ -206,210 +403,2566 @@
         <div class="device-overview">
             <div class="device-card">
                 <div class="device-icon">🔧</div>
-                <div class="device-value">12,345</div>
-                <div class="device-label">设备总数</div>
+                <div class="device-value" id="kpi-total">0</div>
+                <div class="device-label">建档设备（抽检）</div>
+                <div class="device-sub" id="kpi-total-sub">在线 0 / 离线 0</div>
             </div>
             <div class="device-card">
                 <div class="device-icon">✅</div>
-                <div class="device-value">98%</div>
-                <div class="device-label">在线率</div>
+                <div class="device-value" id="kpi-online">0%</div>
+                <div class="device-label">设备在线率</div>
+                <div class="device-sub" id="kpi-online-sub">目标 ≥ 98% · 达标</div>
             </div>
             <div class="device-card">
                 <div class="device-icon">⚠️</div>
-                <div class="device-value">23</div>
-                <div class="device-label">故障设备</div>
+                <div class="device-value" id="kpi-fault">0</div>
+                <div class="device-label">异常与告警</div>
+                <div class="device-sub" id="kpi-fault-sub">故障 0 · 检修 0</div>
             </div>
             <div class="device-card">
                 <div class="device-icon">📊</div>
-                <div class="device-value">10TB</div>
-                <div class="device-label">数据量</div>
+                <div class="device-value" id="kpi-data">0</div>
+                <div class="device-label">今日采集条数（万条）</div>
+                <div class="device-sub" id="kpi-data-sub">存储占用 0 GB</div>
             </div>
         </div>
 
-        <div class="device-grid">
-            <div class="device-item">
-                <div class="device-header">
-                    <div class="device-name">传感器设备</div><span class="device-status status-normal">在线</span>
-                </div>
-                <div class="device-info">
-                    <div>
-                        <div class="info-label">数量</div>
-                        <div class="info-value">5,678</div>
-                    </div>
-                    <div>
-                        <div class="info-label">故障率</div>
-                        <div class="info-value">1.2%</div>
-                    </div>
-                </div>
-            </div>
-            <div class="device-item">
-                <div class="device-header">
-                    <div class="device-name">监控设备</div><span class="device-status status-normal">在线</span>
-                </div>
-                <div class="device-info">
-                    <div>
-                        <div class="info-label">数量</div>
-                        <div class="info-value">3,456</div>
-                    </div>
-                    <div>
-                        <div class="info-label">故障率</div>
-                        <div class="info-value">0.8%</div>
-                    </div>
+        <p class="sc-hint" style="margin:12px 2px 0">口径说明：全市末端感知设备在册 <b>978,542</b> 台 / <b>23</b> 类（按杭州市域体量估算，
+            与数据中台「末端设备接入清单」、运维中心设备台账一致）；本页为<strong>抽检建档台账</strong>，
+            按设备分类权重抽取样本逐台建档，批量作业与健康预测均在样本范围内可演练。</p>
+
+        <div class="module-nav">
+            <button class="module-btn active" data-module="device-management">🔧 设备管理</button>
+            <button class="module-btn" data-module="data-monitor">📊 数据监控</button>
+            <button class="module-btn" data-module="data-analysis">📈 数据分析</button>
+            <button class="module-btn" data-module="system-integration">🔗 系统集成</button>
+        </div>
+
+        <div id="device-management-module" class="module-content active">
+            <div class="content-header">
+                <h3>🔧 设备管理</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="dev-search" placeholder="搜索编号 / 名称 / 型号 / 区域…">
+                    <button class="sc-btn" id="btn-attn">🩺 健康预警清单</button>
+                    <button class="sc-btn primary" id="btn-add-device">＋ 设备入网</button>
                 </div>
             </div>
-            <div class="device-item">
-                <div class="device-header">
-                    <div class="device-name">控制设备</div><span class="device-status status-warning">部分离线</span>
+
+            <div class="type-grid" id="type-grid"></div>
+
+            <div class="job-panel" id="job-panel" hidden>
+                <div class="sc-panel-title" style="margin-bottom:10px">
+                    <h3 style="font-size:1.05em" id="job-title">批量任务</h3>
+                    <div class="sc-inline">
+                        <button class="sc-btn sm" id="job-retry" hidden>↻ 重试失败项</button>
+                        <button class="sc-btn sm ghost" id="job-close">关闭</button>
+                    </div>
                 </div>
-                <div class="device-info">
-                    <div>
-                        <div class="info-label">数量</div>
-                        <div class="info-value">2,345</div>
-                    </div>
-                    <div>
-                        <div class="info-label">故障率</div>
-                        <div class="info-value">2.5%</div>
-                    </div>
+                <div class="sc-progress">
+                    <i id="job-bar"></i>
+                </div>
+                <div class="sc-hint" id="job-stat" style="margin-top:8px">准备中…</div>
+                <div class="job-list" id="job-list"></div>
+            </div>
+
+            <div class="sc-chips" id="dev-status-chips"></div>
+
+            <div class="sc-inline" style="margin-bottom:14px">
+                <span class="sc-hint">批量操作：</span>
+                <button class="sc-btn sm" id="btn-batch-reboot">⟳ 远程重启</button>
+                <button class="sc-btn sm" id="btn-batch-ota">⬆ 固件 OTA</button>
+                <button class="sc-btn sm" id="btn-batch-inspect">🛠 转检修</button>
+                <button class="sc-btn sm ghost" id="btn-batch-clear">清除选择</button>
+                <span class="sc-hint" id="sel-hint">未选择设备</span>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table" id="dev-table">
+                    <thead>
+                        <tr>
+                            <th>设备编号</th>
+                            <th>设备名称</th>
+                            <th>类型</th>
+                            <th>安装区域</th>
+                            <th>协议</th>
+                            <th>固件</th>
+                            <th>信号</th>
+                            <th>健康分</th>
+                            <th>状态</th>
+                            <th data-no-sort>最近上报</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-note" style="margin-top:18px">
+                健康分由「在线率、丢包率、离线频次、设备温度、信号强度、固件版本、连续运行时长」七项加权得出（详见健康预警清单），
+                并按历史劣化速率外推剩余寿命；所有台账变更、批量指令与工单流转均写入本地操作日志，可导出审计。
+            </div>
+        </div>
+
+        <div id="data-monitor-module" class="module-content">
+            <div class="content-header">
+                <h3>📊 数据监控</h3>
+                <div class="sc-inline">
+                    <span class="sc-live"><span class="sc-live-dot"></span><span data-live-label>实时</span>
+                        <button class="sc-btn sm ghost" id="mon-live-btn">⏸ 暂停</button>
+                    </span>
                 </div>
             </div>
-            <div class="device-item">
-                <div class="device-header">
-                    <div class="device-name">网关设备</div><span class="device-status status-normal">在线</span>
-                </div>
-                <div class="device-info">
-                    <div>
-                        <div class="info-label">数量</div>
-                        <div class="info-value">866</div>
+
+            <div class="pipe" id="pipe"></div>
+
+            <div class="sc-split">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>接入吞吐（消息/秒）</h3>
+                        <div class="sc-seg" id="tp-range">
+                            <button class="active" data-range="real">实时</button>
+                            <button data-range="today">今日 24h</button>
+                            <button data-range="week">近 7 天</button>
+                        </div>
                     </div>
-                    <div>
-                        <div class="info-label">故障率</div>
-                        <div class="info-value">0.5%</div>
+                    <div class="sc-chart lg">
+                        <canvas id="tp-chart"></canvas>
+                    </div>
+                    <div id="tp-legend"></div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>链路质量</h3>
+                        <span class="sc-hint" id="gauge-time">--</span>
+                    </div>
+                    <div class="gauge-row">
+                        <div class="sc-chart"><canvas id="g-latency"></canvas></div>
+                        <div class="sc-chart"><canvas id="g-loss"></canvas></div>
+                        <div class="sc-chart"><canvas id="g-store"></canvas></div>
+                    </div>
+                    <div class="sc-section-title">接入网关</div>
+                    <div class="data-table-container">
+                        <table class="data-table" id="gw-table">
+                            <thead>
+                                <tr>
+                                    <th>网关</th>
+                                    <th>连接数</th>
+                                    <th>平均时延</th>
+                                    <th>丢包率</th>
+                                    <th>状态</th>
+                                    <th data-no-sort>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <div class="module-nav">
-                <button class="module-btn active" data-module="device-management">🔧 设备管理</button>
-                <button class="module-btn" data-module="data-monitor">📊 数据监控</button>
-                <button class="module-btn" data-module="data-analysis">📈 数据分析</button>
-                <button class="module-btn" data-module="system-integration">🔗 系统集成</button>
+            <div class="sc-section-title">数据质量稽核（按来源系统）</div>
+            <div class="data-table-container">
+                <table class="data-table" id="dq-table">
+                    <thead>
+                        <tr>
+                            <th>来源系统</th>
+                            <th>接入项</th>
+                            <th>完整率</th>
+                            <th>及时率</th>
+                            <th>异常值</th>
+                            <th>近 12 小时走势</th>
+                            <th>评级</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
 
-            <div id="device-management-module" class="module-content active">
-                <div class="content-header">
-                    <h3>🔧 设备管理</h3>
+            <div class="sc-split">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>链路运行日志</h3>
+                        <button class="sc-btn sm ghost" id="btn-mon-log-export">⬇ 导出日志</button>
+                    </div>
+                    <div class="sc-log" id="mon-log"></div>
                 </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>存储与写入</h3>
+                    </div>
+                    <div class="sc-kv" id="store-kv"></div>
+                    <div class="sc-chart sm" style="margin-top:12px">
+                        <canvas id="store-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="data-analysis-module" class="module-content">
+            <div class="content-header">
+                <h3>📈 数据分析</h3>
+                <div class="sc-inline">
+                    <div class="sc-seg" id="an-scope">
+                        <button class="active" data-scope="state">状态分析</button>
+                        <button data-scope="fault">故障分析</button>
+                        <button data-scope="collect">采集趋势</button>
+                        <button data-scope="life">寿命与汰换</button>
+                    </div>
+                    <button class="sc-btn primary" id="btn-report">📄 生成分析报告</button>
+                </div>
+            </div>
+
+            <div id="an-state">
+                <div class="sc-split">
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>设备类型与在线率</h3>
+                        </div>
+                        <div class="sc-chart">
+                            <canvas id="c-type-bar"></canvas>
+                        </div>
+                        <div id="l-type-bar"></div>
+                    </div>
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>运行状态分布</h3>
+                        </div>
+                        <div class="sc-chart">
+                            <canvas id="c-status-pie"></canvas>
+                        </div>
+                        <div id="l-status-pie"></div>
+                    </div>
+                </div>
+                <div class="sc-section-title">区域覆盖与接入密度</div>
+                <div class="sc-chart">
+                    <canvas id="c-zone-bar"></canvas>
+                </div>
+            </div>
+
+            <div id="an-fault" hidden>
+                <div class="sc-kv" id="fault-kv"></div>
+                <div class="sc-split" style="margin-top:20px">
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>近 30 天故障类型分布</h3>
+                        </div>
+                        <div class="sc-chart">
+                            <canvas id="c-fault-bar"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>故障与修复趋势</h3>
+                        </div>
+                        <div class="sc-chart">
+                            <canvas id="c-fault-line"></canvas>
+                        </div>
+                        <div id="l-fault-line"></div>
+                    </div>
+                </div>
+                <div class="sc-section-title">高故障率设备 TOP</div>
                 <div class="data-table-container">
-                    <table class="data-table">
+                    <table class="data-table" id="risk-table">
                         <thead>
                             <tr>
-                                <th>设备编号</th>
-                                <th>设备名称</th>
-                                <th>设备类型</th>
-                                <th>状态</th>
-                                <th>操作</th>
+                                <th>设备</th>
+                                <th>类型</th>
+                                <th>健康分</th>
+                                <th>离线次数</th>
+                                <th>丢包率</th>
+                                <th>平均修复时长</th>
+                                <th>预计剩余寿命</th>
+                                <th>风险</th>
+                                <th data-no-sort>操作</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>DEV-001</td>
-                                <td>温度传感器</td>
-                                <td>传感器</td>
-                                <td><span class="status-normal">在线</span></td>
-                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>DEV-002</td>
-                                <td>监控摄像头</td>
-                                <td>监控</td>
-                                <td><span class="status-normal">在线</span></td>
-                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
-                            </tr>
-                            <tr>
-                                <td>DEV-003</td>
-                                <td>智能控制器</td>
-                                <td>控制</td>
-                                <td><span class="status-alarm">离线</span></td>
-                                <td><button class="btn-sm">详情</button><button class="btn-sm">维护</button></td>
-                            </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="data-monitor-module" class="module-content">
-                <div class="data-flow-section">
-                    <h3>📊 数据流向监控</h3>
-                    <div class="data-flow">
-                        <div class="data-node">
-                            <div class="node-icon">📡</div>
-                            <div class="node-label">设备采集</div>
+            <div id="an-collect" hidden>
+                <div class="sc-panel-title">
+                    <h3>数据量趋势</h3>
+                    <div class="sc-seg" id="col-range">
+                        <button class="active" data-days="7">近 7 天</button>
+                        <button data-days="30">近 30 天</button>
+                        <button data-days="90">近 90 天</button>
+                    </div>
+                </div>
+                <div class="sc-chart lg">
+                    <canvas id="c-collect"></canvas>
+                </div>
+                <div id="l-collect"></div>
+                <div class="sc-split-2" style="margin-top:20px">
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>按业务域数据量占比</h3>
                         </div>
-                        <div class="data-arrow">→</div>
-                        <div class="data-node">
-                            <div class="node-icon">☁️</div>
-                            <div class="node-label">数据传输</div>
+                        <div class="sc-chart">
+                            <canvas id="c-domain-pie"></canvas>
                         </div>
-                        <div class="data-arrow">→</div>
-                        <div class="data-node">
-                            <div class="node-icon">💾</div>
-                            <div class="node-label">数据存储</div>
+                        <div id="l-domain-pie"></div>
+                    </div>
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>单位数据成本与共享调用</h3>
                         </div>
-                        <div class="data-arrow">→</div>
-                        <div class="data-node">
-                            <div class="node-icon">📈</div>
-                            <div class="node-label">数据分析</div>
+                        <div class="sc-kv" id="col-kv"></div>
+                        <div class="sc-chart sm" style="margin-top:14px">
+                            <canvas id="c-share-bar"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="data-analysis-module" class="module-content">
-                <div class="content-header">
-                    <h3>📈 数据分析</h3>
-                </div>
-                <div class="maintenance-grid">
-                    <div class="maintenance-card">
-                        <h4>设备状态分析</h4>
-                        <p>设备运行状态统计</p><button class="btn-primary">查看分析</button>
+            <div id="an-life" hidden>
+                <div class="sc-kv" id="life-kv"></div>
+                <div class="sc-split" style="margin-top:20px">
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>役龄分布与健康度</h3>
+                        </div>
+                        <div class="sc-chart">
+                            <canvas id="c-life-bar"></canvas>
+                        </div>
                     </div>
-                    <div class="maintenance-card">
-                        <h4>数据趋势分析</h4>
-                        <p>数据采集趋势分析</p><button class="btn-primary">查看分析</button>
-                    </div>
-                    <div class="maintenance-card">
-                        <h4>故障预警</h4>
-                        <p>设备故障预测分析</p><button class="btn-primary">查看预警</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="system-integration-module" class="module-content">
-                <div class="content-header">
-                    <h3>🔗 系统集成</h3>
-                </div>
-                <div class="maintenance-grid">
-                    <div class="maintenance-card">
-                        <h4>API接口</h4>
-                        <p>对外API接口管理</p><button class="btn-primary">配置</button>
-                    </div>
-                    <div class="maintenance-card">
-                        <h4>数据同步</h4>
-                        <p>数据同步配置</p><button class="btn-primary">配置</button>
-                    </div>
-                    <div class="maintenance-card">
-                        <h4>第三方集成</h4>
-                        <p>第三方系统集成</p><button class="btn-primary">配置</button>
+                    <div>
+                        <div class="sc-panel-title">
+                            <h3>未来 12 个月汰换计划</h3>
+                            <button class="sc-btn sm" id="btn-plan-export">⬇ 导出计划</button>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table" id="plan-table">
+                                <thead>
+                                    <tr>
+                                        <th>计划批次</th>
+                                        <th>设备类型</th>
+                                        <th>数量</th>
+                                        <th>预算(万元)</th>
+                                        <th>依据</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <footer>
-                <p>&copy; 2026 智慧城市管理平台. 版权所有.</p>
-            </footer>
         </div>
 
-        <script src="assets/js/common.js"></script>
+        <div id="system-integration-module" class="module-content">
+            <div class="content-header">
+                <h3>🔗 系统集成</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-add-api">＋ 注册接口</button>
+                    <button class="sc-btn primary" id="btn-sync-all">▶ 执行全部同步任务</button>
+                </div>
+            </div>
+
+            <div class="sc-section-title">服务接口清单</div>
+            <div class="data-table-container">
+                <table class="data-table" id="api-table">
+                    <thead>
+                        <tr>
+                            <th>接口名称</th>
+                            <th>方法</th>
+                            <th>路径</th>
+                            <th>调用方</th>
+                            <th>今日调用</th>
+                            <th>成功率</th>
+                            <th>平均耗时</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-section-title">接口调试台</div>
+            <div class="dbg-grid">
+                <div>
+                    <div class="sc-field" style="margin-bottom:12px">
+                        <label>选择接口</label>
+                        <select class="sc-input" id="dbg-api"></select>
+                    </div>
+                    <div class="sc-field" style="margin-bottom:12px">
+                        <label>请求参数（JSON）</label>
+                        <textarea class="sc-input" id="dbg-params" rows="8" spellcheck="false"></textarea>
+                    </div>
+                    <div class="sc-inline">
+                        <button class="sc-btn primary" id="dbg-run">▶ 发送请求</button>
+                        <label class="sc-switch" id="dbg-auth"><i></i><span>携带鉴权 Token</span></label>
+                        <span class="sc-hint">模拟网关将按真实链路返回时延与异常</span>
+                    </div>
+                    <div class="sc-section-title">调用记录</div>
+                    <div class="sc-log" id="dbg-log" style="height:160px"></div>
+                </div>
+                <div>
+                    <div class="sc-kv" id="dbg-stat"></div>
+                    <div class="sc-section-title">响应报文</div>
+                    <pre class="sc-code" id="dbg-resp">// 点击「发送请求」查看响应</pre>
+                </div>
+            </div>
+
+            <div class="sc-section-title">数据同步任务</div>
+            <div class="data-table-container">
+                <table class="data-table" id="sync-table">
+                    <thead>
+                        <tr>
+                            <th>任务</th>
+                            <th>源 → 目标</th>
+                            <th>周期</th>
+                            <th>上次执行</th>
+                            <th>同步行数</th>
+                            <th>耗时</th>
+                            <th>进度</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-section-title">数据共享订阅</div>
+            <div class="data-table-container">
+                <table class="data-table" id="sub-table">
+                    <thead>
+                        <tr>
+                            <th>订阅方</th>
+                            <th>数据范围</th>
+                            <th>推送方式</th>
+                            <th>配额使用</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-section-title">第三方系统连接</div>
+            <div class="conn-grid" id="conn-grid"></div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 智慧城市管理平台. 【余一叶知秋尽】版权所有.</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/arch-link.js"></script>
+    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/charts.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            /* =====================================================================
+               0. 稳定伪随机：让首次生成的台账在多次刷新间保持一致
+               ===================================================================== */
+            let seed = 20261028;
+            function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+            function ri(min, max) { return Math.floor(min + rnd() * (max - min + 1)); }
+            function rf(min, max) { return min + rnd() * (max - min); }
+            function pick(arr) { return arr[ri(0, arr.length - 1)]; }
+
+            /* =====================================================================
+               1. 静态字典
+               ===================================================================== */
+            /* 类型目录与数据中台「末端设备接入清单」、运维中心设备台账保持同一口径：
+               摄像头（球机/枪机/半球/门店抓拍）、认证一体机、手环与车载定位、各类液位水位计、
+               井盖、消防栓、燃气、焚烧炉、路灯、果壳箱、回收站、环卫车、运输船、巡更仪 */
+            const TYPES = {
+                sensor: {
+                    label: '传感器设备', icon: '📡', weight: 34,
+                    items: ['温度传感器', '水位计', '空气质量监测仪', '噪声监测仪', '管网流量计', '烟感探测器', '智能井盖', '光照传感器',
+                        '雷达液位计', '超声波液位计', '低洼积水水位计', '智能消防栓水压计', '可燃气体探测器', '管网压力变送器'],
+                    models: ['S-T200', 'S-W310', 'S-A400', 'S-N150', 'S-L820', 'S-P60'],
+                    protocols: ['MQTT', 'LoRaWAN', 'Modbus RTU', 'NB-IoT'],
+                    fwLatest: 'v3.4.2', vendors: ['华感科技', '辰测物联', '万集仪表'], power: ['电池', '市电']
+                },
+                camera: {
+                    label: '监控设备', icon: '📷', weight: 20,
+                    items: ['治安球机', '卡口相机', '路网枪机', '全景相机', '城管取证相机', '人脸抓拍枪机', '半球摄像机', '商家门店抓拍机'],
+                    models: ['C-B450', 'C-K800', 'C-P360', 'C-D200'], protocols: ['GB28181', 'RTSP', 'HTTP'],
+                    fwLatest: 'v5.1.0', vendors: ['海康', '大华', '宇视'], power: ['市电', 'PoE']
+                },
+                ctrl: {
+                    label: '控制设备', icon: '🎛️', weight: 14,
+                    items: ['交通信号机', '停车场道闸', '泵站控制柜', '照明回路控制器', '管网阀门执行器', '风机变频柜',
+                        '路灯单灯控制器', '焚烧炉助燃风机控制柜'],
+                    models: ['K-S100', 'K-G320', 'K-P560', 'K-L40'], protocols: ['Modbus TCP', 'MQTT', 'PLC-S7'],
+                    fwLatest: 'v2.8.5', vendors: ['浙控自动化', '和利时', '汇川'], power: ['市电']
+                },
+                gateway: {
+                    label: '网关设备', icon: '🖥️', weight: 6,
+                    items: ['边缘计算网关', '片区汇聚网关', '协议转换网关', '视频AI边缘盒子', '物联NB-IoT汇聚网关'],
+                    models: ['G-E1000', 'G-A600', 'G-C300'], protocols: ['MQTT', 'HTTP', 'CoAP'],
+                    fwLatest: 'v4.2.1', vendors: ['移远', '映翰通', '有人物联'], power: ['市电']
+                },
+                mobile: {
+                    label: '移动作业终端', icon: '🚚', weight: 12,
+                    items: ['环卫收运车终端', '运输船智能终端', '执法车辆定位终端', '智能作业手环', '电子巡更仪', '车载视频终端'],
+                    models: ['M-V210', 'M-B150', 'M-W90', 'M-S60'],
+                    protocols: ['4G Cat.1', 'MQTT', 'NB-IoT', 'BLE 网关', 'AIS/北斗'],
+                    fwLatest: 'v1.9.3', vendors: ['中移物联', '海能达', '华测导航', '移远'], power: ['电池', '车载取电', '市电']
+                },
+                site: {
+                    label: '环卫处置设施', icon: '🗑️', weight: 14,
+                    items: ['智能果壳箱', '分类回收站称重机', '焚烧炉烟气监测站', '人证核验一体机', '垃圾中转站地磅', '公厕异味监测仪'],
+                    models: ['F-C800', 'F-R320', 'F-E500', 'F-V120'],
+                    protocols: ['Modbus TCP', 'MQTT', 'HTTP', '地磅仪表'],
+                    fwLatest: 'v2.3.1', vendors: ['先河环保', '中联重科', '洁雅环境', '梅特勒'], power: ['市电', 'UPS']
+                }
+            };
+            /** 各类设备的上报速率区间（msg/s），用于今日采集量与峰值吞吐估算 */
+            const MSG_RATE = { sensor: [1, 6], camera: [2, 18], ctrl: [1, 3], gateway: [3, 20], mobile: [1, 9], site: [1, 5] };
+            /** 设备目录口径版本：类型字典或权重调整时递增，浏览器已有台账按此版本号做增量补齐 */
+            const EQ_CAT_VER = 2;
+            /** 冷启动建档基数（台） */
+            const DEVICE_BASE = 120;
+            /** 设备汰换单台预算（万元/台） */
+            const UNIT_PRICE = { sensor: 0.6, camera: 1.2, ctrl: 2.4, gateway: 1.8, mobile: 0.9, site: 3.6 };
+            /** 各类设备的易损部件名称，用于详情页部件劣化列表 */
+            const PART_LABEL = { sensor: '敏感探头', camera: '镜头/云台', ctrl: '继电器/执行机', gateway: '风扇/机箱', mobile: '定位模组/电池', site: '称重单元/探头' };
+            /** 各类设备的标准巡检项 */
+            const INSPECT_ITEM = { sensor: '量程校准', camera: '镜头清洁', ctrl: '回路绝缘检查', gateway: '机房除尘与链路巡检', mobile: '车载支架与天线检查', site: '清掏与探头标定' };
+
+            /* =====================================================================
+               1b. 物模型（测点目录）
+               测点标识与数据中台「末端设备接入清单」的 DEV_MODEL 保持一致，便于跳页对码；
+               未在 THING_MODEL 中单独建档的设备，退化为按类型套用 MODEL_BASE 通用测点
+               ===================================================================== */
+            const MODEL_BASE = {
+                sensor: [['value', '模拟量主测点', 'DOUBLE', '-', '1/min', '26.4'], ['heart', '心跳序号', 'INT', '-', '1/h', '7712'], ['batt', '电池电压', 'DOUBLE', 'V', '1/h', '3.42'], ['dev_stat', '设备自诊断码', 'STRING', '-', 'on_change', 'OK']],
+                camera: [['channel_id', 'GB28181 通道编号', 'STRING', '-', 'on_event', '340200000013200001'], ['obj_type', '抓拍对象类型', 'STRING', '-', 'on_event', 'person'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.93'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/a.jpg']],
+                ctrl: [['cmd_ack', '指令应答序号', 'STRING', '-', 'on_command', 'A8812'], ['on_off', '输出状态', 'BOOLEAN', '-', '1/min', 'true'], ['power_w', '有功功率', 'DOUBLE', 'W', '1/5min', '84.2'], ['fault_code', '故障码', 'STRING', '-', 'on_change', '']],
+                gateway: [['conn', '在线终端数', 'INT', '-', '1/min', '2140'], ['cpu_pct', 'CPU 占用', 'DOUBLE', '%', '1/min', '36.5'], ['msg_out', '转发速率', 'DOUBLE', 'msg/s', '1/min', '486'], ['link_stat', '链路状态', 'STRING', '-', 'on_change', 'online']],
+                mobile: [['lng', '经度', 'DOUBLE', 'GCJ02', '1/10s', '120.155'], ['lat', '纬度', 'DOUBLE', 'GCJ02', '1/10s', '30.271'], ['spd', '速度', 'DOUBLE', 'km/h', '1/10s', '32.4'], ['fence_hit', '越界判定', 'BOOLEAN', '-', 'on_change', 'true']],
+                site: [['weight_kg', '称重净重', 'DOUBLE', 'kg', '1/5min', '12.4'], ['fill_pct', '满溢度', 'DOUBLE', '%', '1/10min', '86'], ['battery', '电池百分比', 'DOUBLE', '%', '1/h', '63'], ['lid_open', '开盖次数', 'INT', '次', 'on_change', '23']]
+            };
+            const THING_MODEL = {
+                /* ---- 传感器：液位 / 水位 / 燃气 / 消防 / 井盖 ---- */
+                '水位计': [['level_m', '水位', 'DOUBLE', 'm', '1/min', '0.82'], ['press_kpa', '管压', 'DOUBLE', 'kPa', '1/min', '126.4'], ['flow', '瞬时流量', 'DOUBLE', 'm³/s', '1/min', '74.2'], ['collect_time', '采集时间', 'DATETIME', '-', '1/min', '']],
+                '雷达液位计': [['distance_cm', '雷达到液面距离', 'DOUBLE', 'cm', '1/min', '184.2'], ['level_m', '换算液位', 'DOUBLE', 'm', '1/min', '3.16'], ['temp_c', '量程补偿温度', 'DOUBLE', '℃', '1/min', '17.4'], ['snr', '回波信噪比', 'DOUBLE', 'dB', '1/h', '22.6']],
+                '超声波液位计': [['level_m', '超声波液位', 'DOUBLE', 'm', '1/min', '2.41'], ['sound_speed', '声速', 'DOUBLE', 'm/s', '1/h', '343.1'], ['blanking', '盲区距离', 'DOUBLE', 'm', '1/d', '0.32'], ['cond', '探头受潮指数', 'DOUBLE', '-', '1/h', '0.08']],
+                '低洼积水水位计': [['level_cm', '积水深度', 'DOUBLE', 'cm', '1/5min', '34.6'], ['alarm_lvl', '预警阈值等级', 'STRING', '-', 'on_change', 'L2'], ['batt', '电池电压', 'DOUBLE', 'V', '1/h', '3.42'], ['temp', '井房温度', 'DOUBLE', '℃', '1/h', '18.7']],
+                '智能井盖': [['tilt_deg', '盖板倾角', 'DOUBLE', '°', '1/min', '12.4'], ['displacement', '位移', 'DOUBLE', 'cm', '1/min', '3.1'], ['water_depth', '井内水位', 'DOUBLE', 'm', '1/5min', '0.22'], ['open_evt', '打开事件次数', 'INT', '次', 'on_change', '1']],
+                '智能消防栓水压计': [['press_mpa', '栓口水压', 'DOUBLE', 'MPa', '1/min', '0.42'], ['flow_ls', '瞬时放水流量', 'DOUBLE', 'L/s', '1/min', '0.0'], ['shock_g', '碰撞加速度', 'DOUBLE', 'g', 'on_change', '0.3'], ['valve_stat', '阀门开关状态', 'STRING', '-', '1/h', 'closed'], ['leak_flag', '渗漏判定', 'BOOLEAN', '-', 'on_change', 'false']],
+                '可燃气体探测器': [['press_kpa', '管网压力', 'DOUBLE', 'kPa', '1/min', '2.84'], ['ch4_pct', '甲烷浓度', 'DOUBLE', '%LEL', '1/30s', '1.6'], ['co_ppm', '一氧化碳', 'DOUBLE', 'ppm', '1/30s', '3'], ['leak_lvl', '泄漏等级', 'STRING', '-', 'on_change', 'L1'], ['valve_sig', '附属阀门信号', 'STRING', '-', 'on_change', 'open']],
+                '管网压力变送器': [['press_kpa', '管压', 'DOUBLE', 'kPa', '1/min', '126.4'], ['press_min', '分钟最小压力', 'DOUBLE', 'kPa', '1/min', '118.2'], ['dp_10min', '十分钟压差', 'DOUBLE', 'kPa', '10min', '-2.4'], ['leak_flag', '渗漏判定', 'BOOLEAN', '-', 'on_change', 'false']],
+                /* ---- 监控：人 / 车 / 商家门店抓拍 ---- */
+                '治安球机': [['channel_id', 'GB28181 通道编号', 'STRING', '-', 'on_event', '340200000013200001'], ['ptz', '云台方位/俯仰角', 'ARRAY', '°', 'on_command', '[127,-8]'], ['obj_type', '抓拍对象类型', 'STRING', '-', 'on_event', 'person'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.93'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/a.jpg']],
+                '卡口相机': [['cross_id', '卡口编号', 'STRING', '-', 'on_event', 'K33010012'], ['plate_no', '车牌（分级掩码）', 'STRING', '-', 'on_event', '浙A·***23'], ['pass_time', '过车时刻', 'DATETIME', '-', 'on_event', ''], ['speed', '分道速度', 'DOUBLE', 'km/h', 'on_event', '47.6'], ['vio_code', '违法代码', 'STRING', '-', 'on_event', '']],
+                '路网枪机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200088'], ['scene', '布控场景类型', 'STRING', '-', 'on_change', 'store_front'], ['obj_list', '抓拍对象集合', 'ARRAY', '-', 'on_event', '["bike","goods"]'], ['frame_no', '帧序号幂等键', 'BIGINT', '-', 'on_event', '8842135']],
+                '人脸抓拍枪机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200104'], ['face_box', '人脸框坐标', 'ARRAY', 'px', 'on_event', '[1024,318,96,112]'], ['quality', '抓拍质量分', 'DOUBLE', '-', 'on_event', '0.87'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.94']],
+                '半球摄像机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200177'], ['obj_type', '对象类型', 'STRING', '-', 'on_event', 'person'], ['indoor', '室内外标识', 'STRING', '-', 'on_change', 'indoor'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.90']],
+                '商家门店抓拍机': [['channel_id', '监控通道编号', 'STRING', '-', 'on_event', '340200000013200233'], ['shop_code', '门店编码', 'STRING', '-', 'on_change', 'SH-3301204'], ['biz_order', '门前三包判定', 'STRING', '-', 'on_event', 'pass'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/shop.jpg']],
+                /* ---- 控制：路灯与泵站 ---- */
+                '路灯单灯控制器': [['circuit', '回路号', 'STRING', '-', '1/min', 'L07-03'], ['on_off', '开关状态', 'BOOLEAN', '-', '1/min', 'true'], ['dim_pct', '调光比例', 'DOUBLE', '%', '1/min', '60'], ['power_w', '有功功率', 'DOUBLE', 'W', '1/5min', '84.2'], ['cmd_ack', '指令应答序号', 'STRING', '-', 'on_command', 'A8812']],
+                '照明回路控制器': [['circuit', '回路号', 'STRING', '-', '1/min', 'L02-11'], ['on_off', '开关状态', 'BOOLEAN', '-', '1/min', 'true'], ['power_w', '有功功率', 'DOUBLE', 'W', '1/5min', '2460.0'], ['energy_kwh', '当日电能', 'DOUBLE', 'kWh', '1/h', '18.6']],
+                '泵站控制柜': [['run_stat', '运行状态', 'STRING', '-', '1/min', 'auto'], ['level_m', '集水池液位', 'DOUBLE', 'm', '1/min', '2.36'], ['pump_amp', '泵组电流', 'DOUBLE', 'A', '1/min', '86.4'], ['fault_code', '故障码', 'STRING', '-', 'on_change', '']],
+                '焚烧炉助燃风机控制柜': [['freq_hz', '变频频率', 'DOUBLE', 'Hz', '1/min', '38.6'], ['burn_air', '助燃风量', 'DOUBLE', 'm³/h', '1/min', '4260'], ['furnace_c', '炉膛温度', 'DOUBLE', '℃', '1/min', '1042'], ['on_off', '运行指令', 'BOOLEAN', '-', 'on_command', 'true']],
+                /* ---- 网关：视频AI 与 NB-IoT ---- */
+                '视频AI边缘盒子': [['algo_ver', '算法版本号', 'STRING', '-', '1/d', 'face-v3.2'], ['infer_qps', '推理吞吐', 'DOUBLE', 'frame/s', '1/min', '46.8'], ['cache_frames', '积压帧数', 'INT', '帧', '1/min', '12'], ['chip_temp', '模组温度', 'DOUBLE', '℃', '1/min', '61.2']],
+                '物联NB-IoT汇聚网关': [['conn', '在线终端数', 'INT', '-', '1/min', '2140'], ['reg_fail', '注册失败数', 'INT', '次', '1/h', '3'], ['msg_out', '转发速率', 'DOUBLE', 'msg/s', '1/min', '486'], ['link_stat', '链路状态', 'STRING', '-', 'on_change', 'online']],
+                /* ---- 移动作业终端：车 / 船 / 手环 / 巡更 ---- */
+                '环卫收运车终端': [['veh_no', '环卫车牌', 'STRING', '-', '1/10s', '浙A·5**10'], ['task_no', '收运任务单号', 'STRING', '-', 'on_change', 'RT261030012'], ['load', '车载载重', 'DOUBLE', 'kg', '1/min', '4820'], ['box_state', '装载/倾倒状态', 'STRING', '-', 'on_change', 'loaded'], ['route_id', '线路编号', 'STRING', '-', 'on_change', 'R-19']],
+                '运输船智能终端': [['mmsi', '船舶MMSI', 'STRING', '-', '1/min', '413002026'], ['sog', '对地航速', 'DOUBLE', 'kn', '1/min', '6.2'], ['cargo_w', '装载量', 'DOUBLE', 't', '1/min', '118.5'], ['port_code', '进出港编码', 'STRING', '-', 'on_change', 'PT-03']],
+                '执法车辆定位终端': [['veh_no', '车牌/自编车辆号', 'STRING', '-', '1/10s', '浙A·8**21'], ['lng', '经度', 'DOUBLE', 'GCJ02', '1/10s', '120.21'], ['lat', '纬度', 'DOUBLE', 'GCJ02', '1/10s', '30.25'], ['spd', '速度', 'DOUBLE', 'km/h', '1/10s', '32.4'], ['odr', '当日里程', 'DOUBLE', 'km', '1/h', '46.8']],
+                '智能作业手环': [['user_id', '人员工号', 'STRING', '-', '1/10s', 'G10472'], ['heart_rate', '心率', 'INT', '次/min', '1/10s', '96'], ['lng', '经度', 'DOUBLE', 'GCJ02', '1/10s', '120.155'], ['lat', '纬度', 'DOUBLE', 'GCJ02', '1/10s', '30.271'], ['fence_hit', '是否越界', 'BOOLEAN', '-', 'on_change', 'true'], ['sos', 'SOS 按下次数', 'INT', '次', 'on_change', '0']],
+                '电子巡更仪': [['patrol_no', '巡更班组号', 'STRING', '-', 'on_change', 'P-07'], ['point_id', '打点编号', 'STRING', '-', 'on_change', 'XJ-118'], ['punch_time', '打点时间', 'DATETIME', '-', 'on_change', ''], ['photo_ref', '现场照片附件', 'STRING', 'oss', 'on_change', '']],
+                '车载视频终端': [['channel_id', '车载通道编号', 'STRING', '-', 'on_event', 'MOV-08-01'], ['obj_type', '识别对象', 'STRING', '-', 'on_event', 'road_intrusion'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.88'], ['lng', '绑定定位', 'DOUBLE', 'GCJ02', 'on_event', '120.21']],
+                /* ---- 环卫与处置设施 ---- */
+                '智能果壳箱': [['fill_pct', '满溢度', 'DOUBLE', '%', '1/10min', '86'], ['lid_open', '开盖次数', 'INT', '次', 'on_change', '23'], ['weight_kg', '估算重量', 'DOUBLE', 'kg', '1/10min', '31.4'], ['smoke', '箱内烟感', 'BOOLEAN', '-', 'on_change', 'false'], ['battery', '电池百分比', 'DOUBLE', '%', '1/h', '63']],
+                '分类回收站称重机': [['station_id', '回收站编号', 'STRING', '-', 'on_change', 'HS-0116'], ['cat_code', '分类代码', 'STRING', '-', 'on_change', 'paper'], ['weight_kg', '称重净重', 'DOUBLE', 'kg', 'on_change', '12.4'], ['order_no', '回收订单号', 'STRING', '-', 'on_change', 'R2610300451'], ['member_hash', '会员号哈希', 'STRING', '-', 'on_change', '7a1c']],
+                '焚烧炉烟气监测站': [['so2_mg', '二氧化硫折算', 'DOUBLE', 'mg/m³', '1/min', '18.4'], ['nox_mg', '氮氧化物折算', 'DOUBLE', 'mg/m³', '1/min', '62.1'], ['dust_mg', '颗粒物', 'DOUBLE', 'mg/m³', '1/min', '7.2'], ['o2_pct', '含氧量', 'DOUBLE', '%', '1/min', '9.4'], ['std_flag', '达标标记', 'STRING', '-', 'on_change', 'pass']],
+                '人证核验一体机': [['verify_id', '核验流水号', 'STRING', '-', 'on_event', 'V202610300912-118'], ['id_no_hash', '证件号 SM3 哈希', 'STRING', '-', 'on_event', '9f2c'], ['match_score', '人证比对得分', 'DOUBLE', '-', 'on_event', '0.982'], ['gate', '窗口/闸机编号', 'STRING', '-', 'on_change', 'A03'], ['result', '核验结果', 'STRING', '-', 'on_event', 'pass']],
+                '垃圾中转站地磅': [['truck_no', '车牌', 'STRING', '-', 'on_change', '浙A·6**88'], ['gross', '毛重', 'DOUBLE', 'kg', 'on_change', '12864', 'fix'], ['tare', '皮重', 'DOUBLE', 'kg', 'on_change', '6200', 'fix'], ['net', '净重（毛重减皮重）', 'DOUBLE', 'kg', 'on_change', '6664', 'fix'], ['operator', '过磅员', 'STRING', '-', 'on_change', 'B-12']],
+                '公厕异味监测仪': [['nh3_ppm', '氨浓度', 'DOUBLE', 'ppm', '1/min', '3.6'], ['h2s_ppm', '硫化氢', 'DOUBLE', 'ppm', '1/min', '1.2'], ['pm25', '颗粒物', 'DOUBLE', 'µg/m³', '1/min', '42'], ['odor_lvl', '异味等级', 'STRING', '-', 'on_change', 'L2'], ['vacant', '空位状态', 'INT', '个', '1/min', '2']]
+            };
+            /** 字符串稳定散列（用作同一测点在不同设备上的读数差异） */
+            function strHash(s) {
+                let h = 2166136261;
+                for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+                return h >>> 0;
+            }
+            /** 设备物模型：优先按设备名称取专用测点，否则套用类型通用测点 */
+            function thingModel(d) { return THING_MODEL[d.name] || MODEL_BASE[d.type] || []; }
+            /** 测点当前值：设备离线/故障时计为缺报，数值型测点按设备编号哈希做小幅波动；
+               标为 fix 的派生测点（如地磅净重）不参与波动，以保持与相关测点的算式一致 */
+            function modelValue(p, d) {
+                if (p[2] === 'DATETIME') return SC.stamp(d.lastSeen).slice(5, 16);
+                if (d.status === '离线' || d.status === '故障') return '缺报';
+                if (p[2] !== 'INT' && p[2] !== 'BIGINT' && p[2] !== 'DOUBLE') return p[5] || '—';
+                if (p[6] === 'fix') return p[5];
+                const num = Number(p[5]);
+                if (!isFinite(num) || num === 0) return p[5];
+                const scaled = num * (0.6 + (strHash(d.id + p[0]) % 90) / 100);
+                return p[2] === 'DOUBLE' ? scaled.toFixed(2) : String(Math.round(scaled));
+            }
+            /** 按物模型拼装上报报文样例 */
+            function modelPayload(d) {
+                const o = { dev_id: d.id, ts: SC.stamp(d.lastSeen) };
+                thingModel(d).forEach(function (p) {
+                    if (p[2] === 'DATETIME') o[p[0]] = SC.stamp(d.lastSeen);
+                    else if (p[2] === 'BOOLEAN') o[p[0]] = p[5] === 'true';
+                    else if (p[2] === 'INT' || p[2] === 'BIGINT' || p[2] === 'DOUBLE') o[p[0]] = p[5] === '' ? null : (p[2] === 'DOUBLE' ? Number(p[5]) : parseInt(p[5], 10));
+                    else o[p[0]] = p[5];
+                });
+                return JSON.stringify(o);
+            }
+            function modelTable(d) {
+                const rows = thingModel(d);
+                return '<table class="data-table"><thead><tr><th>测点标识</th><th>名称</th><th>数据类型</th><th>单位</th><th>采样频率</th><th>当前值</th></tr></thead><tbody>' +
+                    rows.map(function (p) {
+                        return '<tr><td><code>' + p[0] + '</code></td><td>' + SC.esc(p[1]) + '</td><td>' + p[2] + '</td>' +
+                            '<td>' + (p[3] === '-' ? '—' : SC.esc(p[3])) + '</td><td>' + SC.esc(p[4]) + '</td>' +
+                            '<td><span class="sc-cell-num">' + SC.esc(modelValue(p, d)) + '</span></td></tr>';
+                    }).join('') + '</tbody></table>';
+            }
+            const ZONES = ['高新片区', '老城片区', '滨江片区', '经济园区', '中心广场', '环城快速', '高铁新城', '大学城'];
+            const STATUS = {
+                '在线': 'ok', '休眠': 'info', '离线': 'off', '故障': 'bad', '检修': 'warn'
+            };
+
+            /* =====================================================================
+               2. 数据模型
+               ===================================================================== */
+            function buildDevices() {
+                const list = [];
+                let seq = 0;
+                Object.keys(TYPES).forEach(function (tk) {
+                    const count = Math.round(TYPES[tk].weight / 100 * DEVICE_BASE);
+                    for (let i = 0; i < count; i++) {
+                        seq++;
+                        list.push(makeDevice(tk, null, seq));
+                    }
+                });
+                return list;
+            }
+            /** 生成一台设备档案；name 为空时按类型目录随机取，seq 为台账流水号 */
+            function makeDevice(tk, name, seq) {
+                const T = TYPES[tk];
+                const uptimeDays = ri(20, 1180);
+                const install = new Date(Date.now() - uptimeDays * 86400000);
+                const status = weightedStatus(tk);
+                const signal = status === '离线' ? ri(0, 22) : ri(46, 99);
+                const mr = MSG_RATE[tk] || [1, 3];
+                const d = {
+                    id: 'DEV-' + String(seq).padStart(4, '0'),
+                    name: name || pick(T.items),
+                    type: tk,
+                    model: pick(T.models),
+                    protocol: pick(T.protocols),
+                    zone: pick(ZONES),
+                    vendor: pick(T.vendors),
+                    power: pick(T.power),
+                    serial: 'SN' + ri(10000000, 99999999),
+                    fw: fwVersion(T.fwLatest),
+                    status: status,
+                    signal: signal,
+                    battery: ri(18, 100),
+                    temp: ri(24, 82),
+                    loss: Number(rf(0, status === '在线' ? 1.6 : 6).toFixed(2)),
+                    offline: ri(0, status === '故障' ? 9 : 3),
+                    faultCount: ri(0, status === '故障' ? 5 : 2),
+                    mttr: Number(rf(0.6, 6.5).toFixed(1)),
+                    uptimeDays: uptimeDays,
+                    install: SC.stamp(install, false).slice(0, 10),
+                    msgRate: ri(mr[0], mr[1]),
+                    lastSeen: Date.now() - ri(3, status === '在线' ? 120 : 60 * 72) * 1000,
+                    healthHistory: [],
+                    notes: []
+                };
+                d.health = calcHealth(d);
+                d.healthHistory = buildHistory(d);
+                return d;
+            }
+            function weightedStatus(tk) {
+                const r = rnd();
+                // 控制类与网关优先级高，故障率刻意压低一点；车载穿戴件震动大、环卫设施腐蚀重，故障率上浮
+                const faultRate = tk === 'ctrl' ? 0.035 : tk === 'gateway' ? 0.02 : tk === 'mobile' ? 0.055 : tk === 'site' ? 0.05 : 0.045;
+                if (r < 0.79) return '在线';
+                if (r < 0.79 + 0.07) return '休眠';
+                if (r < 0.79 + 0.07 + 0.06) return '离线';
+                if (r < 0.79 + 0.07 + 0.06 + faultRate) return '故障';
+                return '检修';
+            }
+            function fwVersion(latest) {
+                const p = latest.replace('v', '').split('.').map(Number);
+                const back = ri(0, 3);
+                return 'v' + p[0] + '.' + Math.max(0, p[1] - back) + '.' + ri(0, 6);
+            }
+            function fwBehind(cur, latest) {
+                const a = cur.replace('v', '').split('.').map(Number);
+                const b = latest.replace('v', '').split('.').map(Number);
+                return (b[0] - a[0]) * 100 + (b[1] - a[1]);
+            }
+            function calcHealth(d) {
+                let s = 100;
+                if (d.status === '故障') s -= 34;
+                else if (d.status === '离线') s -= 20;
+                else if (d.status === '检修') s -= 12;
+                else if (d.status === '休眠') s -= 4;
+                if (d.loss > 2) s -= (d.loss - 2) * 3.2;
+                if (d.temp > 70) s -= (d.temp - 70) * 0.9;
+                if (d.signal < 60) s -= (60 - d.signal) * 0.35;
+                s -= d.offline * 1.6;
+                s -= d.faultCount * 1.2;
+                s -= fwBehind(d.fw, TYPES[d.type].fwLatest) * 2.2;
+                if (d.uptimeDays > 900) s -= (d.uptimeDays - 900) / 60;
+                return Math.round(SC.clamp(s, 6, 99));
+            }
+            function buildHistory(d) {
+                // 以当前健康分为终点，反推过去 8 个统计点的劣化轨迹
+                const drift = rf(-1.6, 0.6);
+                const arr = [];
+                for (let i = 7; i >= 0; i--) {
+                    arr.push(Math.round(SC.clamp(d.health - drift * i + rf(-2, 2), 5, 99)));
+                }
+                return arr;
+            }
+            /** 每周劣化速率（分/周） */
+            function healthSlope(d) {
+                const h = d.healthHistory;
+                return (h[h.length - 1] - h[0]) / (h.length - 1);
+            }
+            /** 预计跌破「预警线 55 分」的剩余天数；999 表示暂无劣化风险 */
+            function lifeDays(d) {
+                const slope = healthSlope(d) / 7;
+                if (d.health <= 55) return 0;
+                if (slope >= -0.02) return 999;
+                return Math.min(730, Math.round((d.health - 55) / -slope));
+            }
+            function healthGrade(v) {
+                if (v >= 85) return { tag: 'ok', text: 'A 良好' };
+                if (v >= 70) return { tag: 'info', text: 'B 关注' };
+                if (v >= 55) return { tag: 'warn', text: 'C 预警' };
+                return { tag: 'bad', text: 'D 高危' };
+            }
+
+            /* =====================================================================
+               3. 持久化
+               ===================================================================== */
+            /* 台账持久化策略：设备明细整表存档（保留用户的处置记录），
+               但类型目录只做「增量补齐」——口径升级时保留既有设备，为目录中缺失的设备名称各补 1 台 */
+            let devices = SC.store.get('equipment', 'devices', null) || [];
+            let catalogAdded = 0;
+            if (!devices.length) {
+                devices = buildDevices();
+            } else if (SC.store.get('equipment', 'catVer', 0) !== EQ_CAT_VER) {
+                catalogAdded = mergeCatalog(devices).length;
+            }
+            SC.store.set('equipment', 'catVer', EQ_CAT_VER);
+            SC.store.set('equipment', 'devices', devices);
+            /** 目录增量合并：返回新补齐的设备数组，使用独立随机流以免扰动全局序列 */
+            function mergeCatalog(list) {
+                const keep = seed, added = [];
+                seed = 20260915;
+                let maxSeq = 0;
+                const has = {};
+                list.forEach(function (d) {
+                    has[d.type + '|' + d.name] = 1;
+                    const n = Number(String(d.id).split('-')[1]) || 0;
+                    if (n > maxSeq) maxSeq = n;
+                });
+                Object.keys(TYPES).forEach(function (tk) {
+                    TYPES[tk].items.forEach(function (name) {
+                        if (has[tk + '|' + name]) return;
+                        has[tk + '|' + name] = 1;
+                        maxSeq++;
+                        const d = makeDevice(tk, name, maxSeq);
+                        d.notes.push({ t: SC.stamp(new Date()), who: '目录同步', txt: '设备目录口径升级自动建档：' + TYPES[tk].label + '「' + name + '」' });
+                        added.push(d);
+                    });
+                });
+                seed = keep;
+                list.push.apply(list, added);
+                return added;
+            }
+            let opslog = SC.store.get('equipment', 'opslog', []);
+            function saveDevices() { SC.store.set('equipment', 'devices', devices); }
+            function log(level, text) {
+                opslog.unshift({ t: Date.now(), lv: level, tx: text });
+                if (opslog.length > 300) opslog.length = 300;
+                SC.store.set('equipment', 'opslog', opslog);
+                paintOpslog();
+            }
+
+            const state = { type: 'all', status: 'all' };
+            let devCtrl = null;
+
+            /* =====================================================================
+               4. 概览与类型卡
+               ===================================================================== */
+            function statsOf(arr) {
+                const total = arr.length;
+                const on = arr.filter(d => d.status === '在线' || d.status === '休眠').length;
+                const bad = arr.filter(d => d.status === '故障' || d.status === '离线').length;
+                return { total: total, on: on, bad: bad, rate: total ? on / total * 100 : 0 };
+            }
+            function renderKpi() {
+                const s = statsOf(devices);
+                const maint = devices.filter(d => d.status === '检修').length;
+                const avgHealth = devices.reduce((a, d) => a + d.health, 0) / (devices.length || 1);
+                const msgToday = devices.reduce((a, d) => a + (d.status === '离线' || d.status === '故障' ? 0 : d.msgRate), 0) * 86400 / 10000;
+                document.getElementById('kpi-total').textContent = SC.num(s.total);
+                document.getElementById('kpi-total-sub').textContent = '在线 ' + s.on + ' · 检修 ' + maint + ' · 平均健康 ' + avgHealth.toFixed(1);
+                document.getElementById('kpi-online').textContent = s.rate.toFixed(1) + '%';
+                const target = s.rate >= 95;
+                document.getElementById('kpi-online-sub').textContent = '考核目标 ≥ 95% · ' + (target ? '达标' : '未达标');
+                document.getElementById('kpi-online').style.color = target ? '#26c6da' : '#e67e22';
+                document.getElementById('kpi-fault').textContent = SC.num(s.bad);
+                document.getElementById('kpi-fault-sub').textContent = '故障 ' + devices.filter(d => d.status === '故障').length +
+                    ' · 离线 ' + devices.filter(d => d.status === '离线').length;
+                document.getElementById('kpi-data').textContent = SC.num(msgToday, 1);
+                document.getElementById('kpi-data-sub').textContent = '存储占用 ' + SC.num(msgToday * 0.42, 1) + ' GB · 峰值 ' +
+                    SC.num(devices.reduce((a, d) => a + d.msgRate, 0), 0) + ' msg/s';
+            }
+            function renderTypeGrid() {
+                const host = document.getElementById('type-grid');
+                host.innerHTML = Object.keys(TYPES).map(function (tk) {
+                    const arr = devices.filter(d => d.type === tk);
+                    const s = statsOf(arr);
+                    const need = arr.filter(d => d.fw !== TYPES[tk].fwLatest).length;
+                    return '<div class="type-card' + (state.type === tk ? ' active' : '') + '" data-type="' + tk + '">' +
+                        '<div class="th"><span>' + TYPES[tk].icon + ' ' + TYPES[tk].label + '</span>' +
+                        '<span class="sc-tag ' + (s.rate > 92 ? 'ok' : s.rate > 82 ? 'warn' : 'bad') + '">' + s.rate.toFixed(0) + '%</span></div>' +
+                        '<div class="tn">' + s.total + ' <small style="font-size:.5em;color:#95a5a6">台</small></div>' +
+                        '<div class="sc-bar-mini"><i style="width:' + s.rate.toFixed(0) + '%;background:' + (s.rate > 92 ? '#27ae60' : '#f39c12') + '"></i></div>' +
+                        '<div class="tr"><span>异常 ' + s.bad + '</span><span>待升级 ' + need + '</span></div>' +
+                        '</div>';
+                }).join('');
+                host.querySelectorAll('.type-card').forEach(function (card) {
+                    card.addEventListener('click', function () {
+                        state.type = state.type === card.dataset.type ? 'all' : card.dataset.type;
+                        renderTypeGrid();
+                        renderChips();
+                        applyFilter();
+                    });
+                });
+            }
+            function renderChips() {
+                const host = document.getElementById('dev-status-chips');
+                const counts = { all: devices.length };
+                Object.keys(STATUS).forEach(k => counts[k] = devices.filter(d => d.status === k).length);
+                host.innerHTML = [['all', '全部'].concat([counts.all])]
+                    .concat(Object.keys(STATUS).map(k => [k, k].concat([counts[k]])))
+                    .map(function (c) {
+                        return '<button class="sc-chip' + (state.status === c[0] ? ' active' : '') + '" data-status="' + c[0] + '">'
+                            + (c[1] === 'all' ? '全部' : c[1]) + ' <b>' + c[2] + '</b></button>';
+                    }).join('');
+                host.querySelectorAll('.sc-chip').forEach(function (chip) {
+                    chip.addEventListener('click', function () {
+                        state.status = chip.dataset.status;
+                        renderChips();
+                        applyFilter();
+                    });
+                });
+            }
+            function applyFilter() {
+                if (!devCtrl) return;
+                devCtrl.setFilter(function (row) {
+                    const d = byId(row.id);
+                    if (!d) return false;
+                    return (state.type === 'all' || d.type === state.type) && (state.status === 'all' || d.status === state.status);
+                });
+            }
+            /* =====================================================================
+               8. 健康预警清单
+               ===================================================================== */
+            function byId(id) { return devices.filter(d => d.id === id)[0]; }
+            function attnDevices() {
+                return devices.filter(d => d.health < 70 || lifeDays(d) < 60 || d.status === '故障')
+                    .sort((a, b) => a.health - b.health);
+            }
+            function openAttn() {
+                const list = attnDevices();
+                const advice = function (d) {
+                    if (d.status === '故障') return '立即派单抢修';
+                    if (d.health < 55) return '列入本月更换';
+                    if (lifeDays(d) < 30) return '两周内安排预防性检修';
+                    if (d.loss > 3) return '排查通信链路/天线';
+                    if (d.fw !== TYPES[d.type].fwLatest) return '随下次巡检升级固件';
+                    return '加密巡检频次';
+                };
+                const body = '<div class="sc-note">共识别出 <b>' + list.length + '</b> 台需关注设备。预警规则：健康分 &lt; 70、预计 &lt; 60 天跌破预警线、或当前处于故障态。</div>' +
+                    (list.length ? '<div class="attn-list">' + list.slice(0, 40).map(function (d) {
+                        const g = healthGrade(d.health);
+                        return '<div class="attn-item ' + (g.tag === 'bad' ? 'bad' : '') + '" data-id="' + d.id + '">' +
+                            '<span class="sc-tag ' + g.tag + '">' + d.health + ' 分</span>' +
+                            '<span class="ax"><b>' + d.id + '</b> ' + SC.esc(d.name) + '<br><span class="sc-hint">' +
+                            SC.esc(d.zone) + ' · 丢包 ' + d.loss.toFixed(2) + '% · 离线 ' + d.offline + ' 次 · 役龄 ' + Math.round(d.uptimeDays / 30) + ' 月 · 预计剩余 <b>' +
+                            (lifeDays(d) >= 999 ? '稳定' : lifeDays(d) + ' 天') + '</b></span></span>' +
+                            '<span style="flex:0 0 auto"><span class="sc-tag info">' + advice(d) + '</span> ' +
+                            '<button class="sc-btn sm ghost" data-dispatch="' + d.id + '">派单</button></span></div>';
+                    }).join('') + '</div>' : '<div class="sc-note">当前无预警设备 🎉</div>');
+                const m = SC.modal.open({
+                    title: '🩺 设备健康预警清单', size: 'lg', body: body,
+                    footer: [
+                        {
+                            text: '⬇ 导出清单', kind: 'ghost', onClick: function () {
+                                SC.csv.download('健康预警_' + SC.today() + '.csv', [['设备编号', '名称', '类型', '区域', '健康分', '等级', '丢包率%', '离线次数', '预计剩余天数', '建议动作']]
+                                    .concat(list.map(d => [d.id, d.name, TYPES[d.type].label, d.zone, d.health, healthGrade(d.health).text, d.loss, d.offline, lifeDays(d), advice(d)])));
+                                SC.toast('已导出 ' + list.length + ' 条预警记录', { type: 'success' });
+                            }
+                        },
+                        { text: '一键全部转检修', kind: 'primary', onClick: function () { dispatchAll(list); } },
+                        { text: '关闭' }
+                    ]
+                });
+                m.body.querySelectorAll('[data-dispatch]').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        const d = byId(btn.dataset.dispatch);
+                        d.status = '检修'; d.health = calcHealth(d); d.lastSeen = Date.now();
+                        d.notes.unshift({ t: SC.stamp(new Date()), who: '调度中心', txt: '健康预警自动转检修：' + advice(d) });
+                        saveDevices();
+                        renderDevs(); renderKpi(); renderTypeGrid(); renderChips(); applyFilter();
+                        log('warn', d.id + ' 已转检修（预警派单）');
+                        btn.closest('.attn-item').style.opacity = '.45';
+                        btn.remove();
+                        SC.toast(d.id + ' 已转检修并通知班组', { type: 'success' });
+                    });
+                });
+            }
+            function dispatchAll(list) {
+                if (!list.length) { SC.toast('没有需要处理的设备', { type: 'warn' }); return; }
+                SC.modal.confirm({
+                    title: '批量转检修', danger: true, okText: '全部转检修',
+                    html: '将把 <b>' + list.length + '</b> 台预警设备置为检修态并生成工单。<br><span class="sc-hint">已在线设备会保留当前参数，检修完成后通过「登记维护」恢复。</span>'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    list.forEach(function (d) { d.status = '检修'; d.health = calcHealth(d); });
+                    saveDevices();
+                    renderDevs(); renderKpi(); renderTypeGrid(); renderChips(); applyFilter();
+                    SC.modal.closeTop();
+                    log('warn', '批量预警处置：' + list.length + ' 台设备转检修');
+                    SC.toast('已生成 ' + list.length + ' 张检修工单', { type: 'success' });
+                });
+            }
+
+            /* =====================================================================
+               9. 数据监控：链路与吞吐
+               ===================================================================== */
+            const SERIES = [
+                { name: 'MQTT 指标流', key: 'mqtt', color: '#26c6da', base: 6200, v: 6200 },
+                { name: 'HTTP/REST 业务上报', key: 'http', color: '#27ae60', base: 2400, v: 2400 },
+                { name: 'GB28181 视联网元', key: 'gb', color: '#f39c12', base: 1500, v: 1500 },
+                { name: 'Modbus/LoRa 采集', key: 'modbus', color: '#9b59b6', base: 900, v: 900 }
+            ];
+            const mon = { range: 'real', real: [], latency: 126, loss: 0.42, store: 61.2, events: [] };
+            let tpChart = null, liveMon = null;
+
+            function realSample() {
+                return SERIES.map(function (s) {
+                    s.v = SC.sim.walk(s.v, { min: s.base * 0.72, max: s.base * 1.28, volatility: s.base * 0.05 });
+                    return Math.round(s.v);
+                });
+            }
+            for (let i = 0; i < 60; i++) {
+                mon.real.push({ t: Date.now() - (59 - i) * 1000, v: realSample() });
+            }
+            const TODAY = SC.sim.dayCurve(4200, 5200, [8, 19]);
+            const TODAY_BY = SERIES.map(function (s, i) {
+                return TODAY.map(function (v) { return Math.round(v * (s.base / 10000) * (0.9 + (i % 3) * 0.06)); });
+            });
+            const WEEK = ['一', '二', '三', '四', '五', '六', '日'].map(function (d, i) {
+                const factor = i >= 5 ? 0.74 : 1;
+                return SERIES.map(function (s) { return Math.round(s.base * 86400 * 0.92 * factor / 10000); });
+            });
+
+            function tpConfig() {
+                if (mon.range === 'real') {
+                    return {
+                        labels: mon.real.map(r => SC.stamp(r.t).slice(14)),
+                        series: SERIES.map(function (s, i) {
+                            return { name: s.name, color: s.color, data: mon.real.map(r => r.v[i]), visible: s.visible !== false };
+                        }),
+                        unit: '', xEvery: 12
+                    };
+                }
+                if (mon.range === 'today') {
+                    return {
+                        labels: SC.sim.hours(24), xEvery: 3,
+                        series: SERIES.map(function (s, i) { return { name: s.name, color: s.color, data: TODAY_BY[i], visible: s.visible !== false }; }),
+                        unit: ''
+                    };
+                }
+                return {
+                    labels: WEEK.map(d => '周' + d), xEvery: 1, unit: ' 万条',
+                    series: SERIES.map(function (s, i) {
+                        return { name: s.name, color: s.color, data: WEEK.map(r => Math.round(r[i] / 1)), visible: s.visible !== false };
+                    })
+                };
+            }
+            function renderTpChart() {
+                const cfg = tpConfig();
+                if (tpChart) tpChart.update(cfg); else tpChart = SC.chart.line(document.getElementById('tp-chart'), cfg);
+                const last = mon.real[mon.real.length - 1];
+                SC.chart.legend(document.getElementById('tp-legend'), SERIES.map(function (s, i) {
+                    const v = mon.range === 'real' ? last.v[i] : mon.range === 'today' ? TODAY_BY[i][new Date().getHours()] : Math.round(WEEK[0][i]);
+                    return { name: s.name, color: s.color, value: (mon.range === 'week' ? v + ' 万条' : SC.num(v) + ' msg/s') };
+                }), function (i, on) {
+                    SERIES[i].visible = on;
+                    tpChart.update(tpConfig());
+                });
+            }
+
+            /* ---------- 数据流水线 ---------- */
+            const PIPE = [
+                { ic: '📡', label: '设备采集', val: () => SC.num(mon.real[mon.real.length - 1].v.reduce((a, b) => a + b, 0)), unit: 'msg/s' },
+                { ic: '🔀', label: '接入网关', val: () => SC.num(gateways.reduce((a, g) => a + g.conn, 0)) + ' 路', unit: '并发' },
+                { ic: '🛡', label: '安全清洗', val: () => SC.pct(99.6 - mon.loss / 10, 2), unit: '合法率' },
+                { ic: '💾', label: '时序入库', val: () => SC.num(mon.writeRate, 1) + ' 万/h', unit: '' },
+                { ic: '📈', label: '分析引擎', val: () => SC.num(28 + ri(0, 6)) + ' 个', unit: '任务' },
+                { ic: '🔗', label: '共享交换', val: () => SC.num(subs.filter(s => s.state === '已通过').length * 420 + ri(0, 60)), unit: '调用/h' }
+            ];
+            function renderPipe(bump) {
+                const host = document.getElementById('pipe');
+                if (!host.dataset.init) {
+                    host.innerHTML = PIPE.map(function (p, i) {
+                        return (i ? '<div class="pipe-link"></div>' : '') +
+                            '<div class="pipe-node" data-i="' + i + '"><div class="pi">' + p.ic + '</div>' +
+                            '<div class="pv"></div><div class="pl">' + p.label + '</div></div>';
+                    }).join('');
+                    host.dataset.init = '1';
+                }
+                host.querySelectorAll('.pipe-node').forEach(function (node) {
+                    const i = Number(node.dataset.i);
+                    const el = node.querySelector('.pv');
+                    const next = PIPE[i].val();
+                    if (el.textContent !== next) {
+                        el.textContent = next;
+                        if (bump) {
+                            node.classList.remove('bump');
+                            void node.offsetWidth;
+                            node.classList.add('bump');
+                        }
+                    }
+                    const link = node.nextElementSibling;
+                    if (link && link.classList.contains('pipe-link')) link.classList.toggle('slow', mon.loss > 1.2);
+                });
+            }
+
+            /* ---------- 接入网关 ---------- */
+            const gateways = [
+                { id: 'GW-01', name: '城市运行主网关', conn: 3260, lat: 82, loss: 0.12, zone: '高新片区', ver: 'v4.2.1' },
+                { id: 'GW-02', name: '滨江片区网关', conn: 1840, lat: 118, loss: 0.34, zone: '滨江片区', ver: 'v4.2.0' },
+                { id: 'GW-03', name: '老城片区网关', conn: 2110, lat: 176, loss: 1.42, zone: '老城片区', ver: 'v4.1.8' },
+                { id: 'GW-04', name: '经济园区网关', conn: 1420, lat: 96, loss: 0.26, zone: '经济园区', ver: 'v4.2.1' },
+                { id: 'GW-05', name: '交通信号与网关', conn: 980, lat: 64, loss: 0.08, zone: '环城快速', ver: 'v4.2.1' },
+                { id: 'GW-06', name: '视频专网网关', conn: 760, lat: 210, loss: 0.62, zone: '中心广场', ver: 'v4.0.9' },
+                { id: 'GW-07', name: '环卫车载终端汇聚网关', conn: 1180, lat: 142, loss: 0.54, zone: '高铁新城', ver: 'v4.2.1' },
+                { id: 'GW-08', name: 'NB-IoT 低位传感汇聚网关', conn: 2640, lat: 236, loss: 0.94, zone: '大学城', ver: 'v4.2.0' }
+            ];
+            function gwStatus(g) {
+                if (g.loss > 1 || g.lat > 200) return { t: '劣化', c: 'bad' };
+                if (g.lat > 150) return { t: '繁忙', c: 'warn' };
+                return { t: '正常', c: 'ok' };
+            }
+            function renderGw() {
+                document.querySelector('#gw-table tbody').innerHTML = gateways.map(function (g) {
+                    const s = gwStatus(g);
+                    return '<tr><td><b>' + g.id + '</b><div class="sc-hint">' + SC.esc(g.name) + '</div></td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(g.conn) + '</span></td>' +
+                        '<td><span class="sc-cell-num">' + g.lat + '</span> ms</td>' +
+                        '<td><span class="sc-cell-num">' + g.loss.toFixed(2) + '</span>%</td>' +
+                        '<td><span class="sc-tag ' + s.c + '">' + s.t + '</span></td>' +
+                        '<td><button class="sc-btn sm ghost" data-gw="' + g.id + '">诊断</button></td></tr>';
+                }).join('');
+                document.querySelectorAll('[data-gw]').forEach(function (btn) {
+                    btn.addEventListener('click', function () { openGwDiag(btn.dataset.gw); });
+                });
+            }
+            function openGwDiag(id) {
+                const g = gateways.filter(x => x.id === id)[0];
+                const lines = [
+                    ['接入终端数', SC.num(g.conn) + '（配额 ' + SC.num(Math.round(g.conn * 1.3)) + '）'],
+                    ['平均时延', g.lat + ' ms（P95 ' + Math.round(g.lat * 1.8) + ' ms）'],
+                    ['丢包率', g.loss.toFixed(2) + '%'],
+                    ['固件版本', g.ver],
+                    ['上行带宽', SC.num(g.conn * 0.12, 1) + ' Mbps / 峰值 ' + SC.num(g.conn * 0.21, 1) + ' Mbps'],
+                    ['会话保活', '成功 ' + SC.num(g.conn * 42) + ' / 失败 ' + Math.round(g.conn * g.loss / 100)]
+                ];
+                const body = '<div class="sc-kv">' + lines.map(l => kvItem(l[0], l[1])).join('') + '</div>' +
+                    '<div class="sc-section-title">近 20 分钟时延探测</div>' +
+                    '<div class="sc-chart sm"><canvas data-c="lat"></canvas></div>' +
+                    '<div class="sc-note' + (g.loss > 1 ? ' warn' : '') + '" style="margin-top:14px">' +
+                    (g.loss > 1 ? '丢包率超出 1% 阈值，建议优先检查光纤链路衰耗与天线驻波比；若持续劣化，可将部分终端切换至邻区网关。'
+                        : '链路质量良好。可在凌晨低峰窗口执行固件升级，升级期间终端会自动重连不中断采集。') + '</div>';
+                const m = SC.modal.open({
+                    title: '网关诊断 · ' + g.id + ' ' + g.name, size: 'md', body: body,
+                    footer: [
+                        {
+                            text: '重置会话', kind: 'ghost', onClick: function () {
+                                g.conn = Math.round(g.conn * 0.86); g.lat = Math.round(g.lat * 0.7); g.loss = Number((g.loss * 0.4).toFixed(2));
+                                renderGw(); log('ok', g.id + ' 会话已重置，时延回落至 ' + g.lat + 'ms');
+                                SC.toast('已强制重新登录 ' + SC.num(g.conn) + ' 个终端会话', { type: 'success' });
+                                m.close();
+                            }
+                        },
+                        { text: '关闭' }
+                    ]
+                });
+                const data = [];
+                for (let i = 0; i < 20; i++) data.push(Math.round(SC.clamp(g.lat + rf(-30, 60) + (i > 14 ? g.lat * 0.3 : 0), 20, 600)));
+                SC.chart.line(m.body.querySelector('[data-c=lat]'), {
+                    labels: data.map((_, i) => (i * 1) + 'min'), smooth: false, xEvery: 4, unit: ' ms',
+                    series: [{ name: '探测时延', data: data, color: '#e67e22' }],
+                    thresholds: [{ value: 200, label: '告警线 200ms', color: '#e74c3c' }]
+                });
+            }
+
+            /* ---------- 数据质量稽核 ---------- */
+            const quality = [
+                { sys: '照明监控系统', items: 1240, full: 99.4, timely: 98.2, bad: 0.32 },
+                { sys: '排水泵站 SCADA', items: 386, full: 97.1, timely: 99.3, bad: 1.28 },
+                { sys: '停车诱导系统', items: 2180, full: 99.8, timely: 96.4, bad: 0.12 },
+                { sys: '环境空气监测', items: 640, full: 99.1, timely: 99.6, bad: 0.44 },
+                { sys: '交通信号平台', items: 1520, full: 98.6, timely: 99.1, bad: 0.68 },
+                { sys: '城管执法终端', items: 980, full: 95.2, timely: 92.6, bad: 2.41 },
+                { sys: '环卫清运调度', items: 1860, full: 96.4, timely: 94.8, bad: 1.86 },
+                { sys: '视频抓拍解析', items: 5240, full: 99.2, timely: 97.6, bad: 0.28 },
+                { sys: '燃气消防监测', items: 420, full: 98.8, timely: 99.1, bad: 0.36 },
+                { sys: '人员定位手环', items: 2140, full: 94.6, timely: 91.2, bad: 3.12 }
+            ];
+            function dqGrade(q) {
+                const score = (q.full - 90) * 1.6 + (q.timely - 90) * 1.4 - q.bad * 6;
+                q.score = Math.round(SC.clamp(score + 52, 40, 99));
+                return q.score >= 90 ? { t: 'A 优', c: 'ok' } : q.score >= 78 ? { t: 'B 良', c: 'info' } : q.score >= 65 ? { t: 'C 关注', c: 'warn' } : { t: 'D 整改', c: 'bad' };
+            }
+            function renderDq() {
+                document.querySelector('#dq-table tbody').innerHTML = quality.map(function (q, i) {
+                    const g = dqGrade(q);
+                    return '<tr><td><b>' + SC.esc(q.sys) + '</b></td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(q.items) + '</span> 项</td>' +
+                        '<td>' + q.full.toFixed(1) + '%</td>' +
+                        '<td>' + q.timely.toFixed(1) + '%</td>' +
+                        '<td>' + q.bad.toFixed(2) + '%</td>' +
+                        '<td><canvas data-dq="' + i + '" style="display:block;width:120px;height:34px"></canvas></td>' +
+                        '<td><span class="sc-tag ' + g.c + '">' + g.t + ' ' + q.score + '</span></td>' +
+                        '<td><button class="sc-btn sm ghost" data-dqa="' + i + '">稽核明细</button></td></tr>';
+                }).join('');
+                quality.forEach(function (q, i) {
+                    const cv = document.querySelector('[data-dq="' + i + '"]');
+                    const arr = [];
+                    for (let k = 0; k < 12; k++) arr.push(Number(SC.clamp(q.full + rf(-2.4, 1.2) - (k > 9 ? q.bad / 2 : 0), 88, 100).toFixed(1)));
+                    SC.chart.spark(cv, { labels: arr.map((_, k) => k + 'h'), series: [{ name: '完整率', data: arr, color: q.score >= 78 ? '#27ae60' : '#e74c3c' }] });
+                    cv.parentNode.title = '近 12 小时完整率：' + arr.join(' / ') + '%';
+                });
+                document.querySelectorAll('[data-dqa]').forEach(function (btn) {
+                    btn.addEventListener('click', function () { openDqDetail(quality[Number(btn.dataset.dqa)]); });
+                });
+            }
+            function openDqDetail(q) {
+                const issues = [
+                    ['空值率 ' + (100 - q.full).toFixed(1) + '%', '主要集中于夜间 02:00-04:00 采集窗口，对应设备休眠策略'],
+                    ['迟到数据 ' + (100 - q.timely).toFixed(1) + '%', '平均迟到 42s，超出实时计评口径 30s 阈值'],
+                    ['跳变与越限 ' + q.bad.toFixed(2) + '%', '连续 3 点以上单调跳变，已自动标记为可疑并隔离入库'],
+                    ['重复上报 ' + (q.bad * 0.4).toFixed(2) + '%', '同一 sequence 在 5s 窗口内重复，已去重']
+                ];
+                SC.modal.open({
+                    title: '数据质量稽核 · ' + q.sys, size: 'md',
+                    body: '<div class="sc-kv">' + kvItem('接入项', q.items + ' 项') + kvItem('综合评级', dqGrade(q).t + '（' + q.score + '）') +
+                        kvItem('完整率', q.full.toFixed(1) + '%') + kvItem('及时率', q.timely.toFixed(1) + '%') + '</div>' +
+                        '<div class="sc-section-title">问题清单与归因</div>' +
+                        issues.map(function (it) { return '<div class="attn-item"><span class="ax"><b>' + it[0] + '</b><br><span class="sc-hint">' + it[1] + '</span></span></div>'; }).join('') +
+                        '<div class="sc-section-title">修复建议</div>' +
+                        '<div class="sc-note">对该源系统开启「断点续传 + 本地缓存重传」，并将迟到数据阈值放宽至 60s；同时下发重新标定任务，预计可使评级提升 6-9 分。</div>',
+                    footer: [
+                        {
+                            text: '下发整改任务', kind: 'primary', onClick: function () {
+                                q.bad = Number(Math.max(0.02, q.bad * 0.5).toFixed(2));
+                                q.full = Number(Math.min(99.9, q.full + 0.6).toFixed(1));
+                                q.timely = Number(Math.min(99.9, q.timely + 1.2).toFixed(1));
+                                renderDq();
+                                log('ok', q.sys + ' 数据质量整改任务已下发');
+                                SC.toast('整改任务已下发，评级已刷新', { type: 'success' });
+                                SC.modal.closeTop();
+                            }
+                        },
+                        {
+                            text: '导出问题明细', kind: 'ghost', onClick: function () {
+                                SC.csv.download('数据质量_' + q.sys + '_' + SC.today() + '.csv',
+                                    [['问题项', '占比', '归因']].concat(issues.map(it => [it[0], it[1], ''])).concat([['评级', q.score, dqGrade(q).t]]));
+                            }
+                        },
+                        { text: '关闭' }
+                    ]
+                });
+            }
+
+            /* ---------- 运行日志 ---------- */
+            function paintOpslog() {
+                const merged = mon.events.slice(0, 40).concat(opslog.slice(0, 60))
+                    .sort((a, b) => b.t - a.t).slice(0, 90);
+                const host = document.getElementById('mon-log');
+                if (!host) return;
+                host.innerHTML = merged.map(function (e) {
+                    return '<div class="li"><span class="t">' + SC.stamp(e.t).slice(5, 16) + '</span>' +
+                        '<span class="lv ' + e.lv + '">' + ({ info: 'INFO', warn: 'WARN', alarm: 'ALARM', ok: 'OK' }[e.lv] || 'INFO') + '</span>' +
+                        '<span class="tx">' + SC.esc(e.tx) + '</span></div>';
+                }).join('') || '<div class="li"><span class="tx">暂无日志</span></div>';
+            }
+            function monEvent(lv, tx) {
+                mon.events.unshift({ t: Date.now(), lv: lv, tx: tx });
+                if (mon.events.length > 120) mon.events.length = 120;
+            }
+
+            /* =====================================================================
+               10. 数据分析
+               ===================================================================== */
+            const charts = {};
+            function setChart(key, factory, el, cfg) {
+                if (!el) return null;
+                if (charts[key]) charts[key].update(cfg);
+                else charts[key] = factory(el, cfg);
+                return charts[key];
+            }
+            const FAULT_TYPES = ['通信中断', '电源异常', '模拟量漂移', '存储写满', '固件异常', '视频丢帧', '时钟漂移', '接口雷击损坏'];
+            const faultData = {
+                kinds: FAULT_TYPES.map(f => ri(2, 26)),
+                days: Array.from({ length: 30 }, (_, i) => (i + 1) + '日'),
+                occur: Array.from({ length: 30 }, () => ri(0, 7))
+            };
+            faultData.fixed = faultData.occur.map(v => SC.clamp(v + ri(-1, 3), 0, 9));
+
+            function renderAnState() {
+                const tks = Object.keys(TYPES);
+                setChart('typeBar', SC.chart.bar, document.getElementById('c-type-bar'), {
+                    labels: tks.map(k => TYPES[k].label.replace('设备', '')), unit: '%', yMax: 100,
+                    series: [
+                        { name: '在线率', color: '#26c6da', data: tks.map(k => Number(statsOf(devices.filter(d => d.type === k)).rate.toFixed(1))) },
+                        {
+                            name: '健康均分', color: '#95a5a6', data: tks.map(k => {
+                                const a = devices.filter(d => d.type === k);
+                                return Number((a.reduce((s, d) => s + d.health, 0) / (a.length || 1)).toFixed(1));
+                            })
+                        }
+                    ]
+                });
+                const keys = Object.keys(STATUS);
+                const SCOLORS = ['#27ae60', '#3498db', '#95a5a6', '#e74c3c', '#f39c12'];
+                setChart('statusPie', SC.chart.pie, document.getElementById('c-status-pie'), {
+                    labels: keys, donut: true, centerBottom: '建档设备',
+                    data: keys.map(k => devices.filter(d => d.status === k).length), colors: SCOLORS
+                });
+                SC.chart.legend(document.getElementById('l-status-pie'), keys.map(function (k, i) {
+                    return { name: k, color: SCOLORS[i], value: devices.filter(d => d.status === k).length + ' 台' };
+                }));
+                const zoneAgg = ZONES.map(function (z) {
+                    const a = devices.filter(d => d.zone === z);
+                    return { z: z, n: a.length, rate: statsOf(a).rate, health: a.reduce((s, d) => s + d.health, 0) / (a.length || 1) };
+                });
+                setChart('zoneBar', SC.chart.bar, document.getElementById('c-zone-bar'), {
+                    labels: zoneAgg.map(r => r.z), unit: '',
+                    series: [
+                        { name: '设备数量', color: '#26c6da', data: zoneAgg.map(r => r.n) },
+                        { name: '平均健康分', color: '#f39c12', data: zoneAgg.map(r => Math.round(r.health)) }
+                    ]
+                });
+            }
+            function renderAnFault() {
+                const totalFault = devices.filter(d => d.status === '故障').length;
+                const offline = devices.filter(d => d.status === '离线').length;
+                const occurSum = faultData.occur.reduce((a, b) => a + b, 0);
+                const mtbf = Math.round(devices.length * 30 * 24 / Math.max(1, occurSum));
+                const mttr = devices.reduce((a, d) => a + d.mttr, 0) / devices.length;
+                const fixRate = faultData.fixed.reduce((a, b) => a + b, 0) / Math.max(1, occurSum) * 100;
+                document.getElementById('fault-kv').innerHTML =
+                    kvItem('30 天故障次数', occurSum + ' 次') + kvItem('MTBF 平均无故障时间', SC.num(mtbf) + ' h') +
+                    kvItem('MTTR 平均修复时长', mttr.toFixed(1) + ' h') + kvItem('修复闭环率', fixRate.toFixed(1) + '%') +
+                    kvItem('当前故障台数', totalFault + ' 台') + kvItem('通信离线台数', offline + ' 台') +
+                    kvItem('故障率', (occurSum / (devices.length || 1) * 100).toFixed(1) + '% / 月') +
+                    kvItem('平均到场时长', (mttr * 0.36).toFixed(1) + ' h');
+                setChart('faultBar', SC.chart.bar, document.getElementById('c-fault-bar'), {
+                    labels: FAULT_TYPES.map(f => f.length > 5 ? f.slice(0, 5) : f), unit: ' 次',
+                    series: [{ name: '近 30 天发生次数', color: '#e74c3c', data: faultData.kinds }]
+                });
+                setChart('faultLine', SC.chart.line, document.getElementById('c-fault-line'), {
+                    labels: faultData.days, xEvery: 5, unit: ' 次', zeroBased: true,
+                    series: [
+                        { name: '新增故障', color: '#e74c3c', data: faultData.occur },
+                        { name: '完成修复', color: '#27ae60', data: faultData.fixed }
+                    ]
+                });
+                SC.chart.legend(document.getElementById('l-fault-line'), [
+                    { name: '新增故障', color: '#e74c3c' }, { name: '完成修复', color: '#27ae60' }
+                ], function (i, on) {
+                    charts.faultLine.update({
+                        series: [
+                            { name: '新增故障', color: '#e74c3c', data: faultData.occur, visible: i !== 0 || on },
+                            { name: '完成修复', color: '#27ae60', data: faultData.fixed, visible: i !== 1 || on }
+                        ]
+                    });
+                });
+                const risk = devices.slice().sort((a, b) => a.health - b.health).slice(0, 12);
+                document.querySelector('#risk-table tbody').innerHTML = risk.map(function (d) {
+                    const life = lifeDays(d);
+                    const g = healthGrade(d.health);
+                    return '<tr data-id="' + d.id + '"><td><b>' + d.id + '</b> ' + SC.esc(d.name) + '</td>' +
+                        '<td>' + typeShort(d.type) + '</td>' +
+                        '<td><span class="sc-cell-num">' + d.health + '</span> <span class="sc-tag ' + g.tag + '">' + g.text + '</span></td>' +
+                        '<td>' + d.offline + ' 次</td><td>' + d.loss.toFixed(2) + '%</td>' +
+                        '<td>' + d.mttr.toFixed(1) + ' h</td>' +
+                        '<td>' + (life >= 999 ? '稳定' : life <= 0 ? '已失效' : life + ' 天') + '</td>' +
+                        '<td>' + (life < 30 ? '<span class="sc-tag bad">高</span>' : life < 90 ? '<span class="sc-tag warn">中</span>' : '<span class="sc-tag ok">低</span>') + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-risk="' + d.id + '">处置</button></td></tr>';
+                }).join('');
+                document.querySelectorAll('[data-risk]').forEach(function (btn) {
+                    btn.addEventListener('click', function () { openDetail(btn.dataset.risk); });
+                });
+            }
+            function collectDays(n) {
+                const out = [];
+                for (let i = n - 1; i >= 0; i--) {
+                    const d = new Date(Date.now() - i * 86400000);
+                    const wk = d.getDay();
+                    const base = 118;
+                    out.push({
+                        label: n > 30 ? (d.getMonth() + 1) + '/' + d.getDate() : (d.getMonth() + 1) + '-' + SC.pad2(d.getDate()),
+                        volume: Number((base * (wk === 0 || wk === 6 ? 0.76 : 1) + rf(-14, 22)).toFixed(1)),
+                        calls: Math.round(base * 42 * (wk === 0 || wk === 6 ? 0.8 : 1) + ri(-900, 1400))
+                    });
+                }
+                return out;
+            }
+            const colCache = {};
+            function renderAnCollect(days) {
+                const n = days || renderAnCollect.last || 7;
+                renderAnCollect.last = n;
+                const data = colCache[n] || (colCache[n] = collectDays(n));
+                setChart('collect', SC.chart.line, document.getElementById('c-collect'), {
+                    labels: data.map(d => d.label), unit: ' GB', zeroBased: true,
+                    xEvery: n > 30 ? 10 : n > 7 ? 3 : 1,
+                    series: [
+                        { name: '日新增数据量', color: '#26c6da', data: data.map(d => d.volume) },
+                        { name: '有效数据量（清洗后）', color: '#27ae60', data: data.map(d => Number((d.volume * 0.93).toFixed(1))), fill: false, dash: [6, 4] }
+                    ]
+                });
+                SC.chart.legend(document.getElementById('l-collect'), [
+                    { name: '日新增数据量', color: '#26c6da', value: SC.num(data.reduce((a, d) => a + d.volume, 0), 0) + ' GB' },
+                    { name: '有效数据量', color: '#27ae60', value: SC.num(data.reduce((a, d) => a + d.volume * 0.93, 0), 0) + ' GB' }
+                ]);
+                const DOMAINS = [['城市照明', 26], ['交通信号', 22], ['排水防汄', 18], ['环境治理', 16], ['停车服务', 11], ['城管执法', 7]];
+                const DCOLORS = ['#26c6da', '#27ae60', '#f39c12', '#9b59b6', '#00b4d8', '#e67e22'];
+                setChart('domainPie', SC.chart.pie, document.getElementById('c-domain-pie'), {
+                    labels: DOMAINS.map(d => d[0]), data: DOMAINS.map(d => d[1]), donut: true,
+                    centerTop: SC.num(data.reduce((a, d) => a + d.volume, 0), 0) + 'GB', centerBottom: '区间累计',
+                    colors: DCOLORS
+                });
+                SC.chart.legend(document.getElementById('l-domain-pie'), DOMAINS.map(function (d, i) {
+                    return { name: d[0], color: DCOLORS[i], value: d[1] + '%' };
+                }));
+                document.getElementById('col-kv').innerHTML =
+                    kvItem('存储单价', '0.42 元/GB·天') + kvItem('区间数据成本', SC.money(data.length * 118 * 0.42, 0) + ' 元') +
+                    kvItem('热数据占比', '31%（近 7 天）') + kvItem('归档压缩率', '6.8 : 1') +
+                    kvItem('共享调用量', SC.num(data.reduce((a, d) => a + d.calls, 0)) + ' 次') +
+                    kvItem('平均查询响应', ri(60, 120) + ' ms');
+                setChart('shareBar', SC.chart.bar, document.getElementById('c-share-bar'), {
+                    labels: data.slice(-7).map(d => d.label), unit: ' 万次',
+                    series: [{ name: '共享交换调用', color: '#00b4d8', data: data.slice(-7).map(d => Number((d.calls / 10000).toFixed(1))) }]
+                });
+            }
+            function renderAnLife() {
+                const buckets = [['0-1 年', 0, 365], ['1-2 年', 365, 730], ['2-3 年', 730, 1095], ['3-4 年', 1095, 1460], ['4 年以上', 1460, 99999]];
+                const rows = buckets.map(function (b) {
+                    const a = devices.filter(d => d.uptimeDays >= b[1] && d.uptimeDays < b[2]);
+                    return { name: b[0], n: a.length, health: a.reduce((s, d) => s + d.health, 0) / (a.length || 1) };
+                });
+                const totalDays = devices.reduce((a, d) => a + d.uptimeDays, 0);
+                document.getElementById('life-kv').innerHTML =
+                    kvItem('平均役龄', (totalDays / devices.length / 365).toFixed(1) + ' 年') +
+                    kvItem('超期服役', devices.filter(d => d.uptimeDays > 1460).length + ' 台') +
+                    kvItem('待报废评估', devices.filter(d => d.health < 55).length + ' 台') +
+                    kvItem('年度汰换预算', SC.money(devices.filter(d => d.health < 62).length * 0.86, 1) + ' 万元') +
+                    kvItem('预测 12 月内故障', attnDevices().filter(d => lifeDays(d) < 360).length + ' 台') +
+                    kvItem('备件齐套率', '92.4%');
+                setChart('lifeBar', SC.chart.bar, document.getElementById('c-life-bar'), {
+                    labels: rows.map(r => r.name), unit: '',
+                    series: [
+                        { name: '设备数量', color: '#26c6da', data: rows.map(r => r.n) },
+                        { name: '平均健康分', color: '#e67e22', data: rows.map(r => Math.round(r.health)) }
+                    ]
+                });
+                const plan = [];
+                const quarters = ['1 季度', '2 季度', '3 季度', '4 季度'];
+                Object.keys(TYPES).forEach(function (tk, i) {
+                    const cand = devices.filter(d => d.type === tk && (d.health < 68 || d.uptimeDays > 1200));
+                    if (!cand.length) return;
+                    plan.push({
+                        batch: '2026-' + quarters[i % 4], type: TYPES[tk].label, n: cand.length,
+                        budget: Number((cand.length * (UNIT_PRICE[tk] || 0.6)).toFixed(1)),
+                        reason: cand.filter(d => d.uptimeDays > 1200).length + ' 台超期服役 / ' +
+                            cand.filter(d => d.health < 68).length + ' 台健康分低于 68'
+                    });
+                });
+                document.querySelector('#plan-table tbody').innerHTML = plan.map(function (p) {
+                    return '<tr><td><b>' + p.batch + '</b></td><td>' + p.type + '</td><td>' + p.n + ' 台</td>' +
+                        '<td><span class="sc-cell-num">' + p.budget.toFixed(1) + '</span></td><td>' + p.reason + '</td></tr>';
+                }).join('') || '<tr class="sc-empty-row"><td colspan="5">暂无汰换需求</td></tr>';
+                renderAnLife.data = plan;
+            }
+            function openReport() {
+                const s = statsOf(devices);
+                const avg = devices.reduce((a, d) => a + d.health, 0) / devices.length;
+                const attn = attnDevices();
+                const rows = [
+                    ['统计时点', SC.stamp(new Date())],
+                    ['建档设备（抽检）', s.total + ' 台'],
+                    ['在线率', s.rate.toFixed(1) + '%'],
+                    ['平均健康分', avg.toFixed(1) + '（' + healthGrade(avg).text + '）'],
+                    ['预警设备', attn.length + ' 台'],
+                    ['近 30 天故障', faultData.occur.reduce((a, b) => a + b, 0) + ' 次'],
+                    ['MTTR', (devices.reduce((a, d) => a + d.mttr, 0) / devices.length).toFixed(1) + ' h'],
+                    ['今日采集', document.getElementById('kpi-data').textContent + ' 万条'],
+                    ['待升级固件', devices.filter(d => TYPES[d.type] && d.fw !== TYPES[d.type].fwLatest).length + ' 台'],
+                    ['结论', s.rate > 95 && attn.length < 12 ? '总体平稳，维持现有巡检节奏' : '在线率或健康度偏离考核基线，建议优先处置预警清单前 10 台']
+                ];
+                SC.modal.open({
+                    title: '📄 设备与数据运行分析（' + SC.today() + '）', size: 'md',
+                    body: '<div class="sc-kv">' + rows.slice(1, 5).map(r => kvItem(r[0], r[1])).join('') + '</div>' +
+                        '<div class="sc-section-title">指标明细</div>' +
+                        rows.map(function (r) {
+                            return '<div class="conn-step"><span>' + r[0] + '</span><b>' + SC.esc(String(r[1])) + '</b></div>';
+                        }).join(''),
+                    footer: [
+                        {
+                            text: '⬇ 导出 CSV', kind: 'ghost', onClick: function () {
+                                SC.csv.download('设备运行分析_' + SC.today() + '.csv', [['指标', '取值']].concat(rows));
+                                SC.toast('分析报告已导出', { type: 'success' });
+                            }
+                        },
+                        { text: '关闭', kind: 'primary' }
+                    ]
+                });
+            }
+            function switchScope(scope) {
+                ['state', 'fault', 'collect', 'life'].forEach(function (k) {
+                    document.getElementById('an-' + k).hidden = k !== scope;
+                });
+                if (scope === 'state') renderAnState();
+                if (scope === 'fault') renderAnFault();
+                if (scope === 'collect') renderAnCollect();
+                if (scope === 'life') renderAnLife();
+            }
+
+            /* =====================================================================
+               11. 系统集成：接口 / 同步 / 订阅 / 第三方
+               ===================================================================== */
+            function sampleDevices(n) {
+                return devices.slice(0, n).map(d => ({ id: d.id, name: d.name, status: d.status, health: d.health, signal: d.signal }));
+            }
+            const apis = [
+                {
+                    id: 'API-01', name: '设备实时状态查询', method: 'GET', path: '/v1/devices/status', caller: '城市运行中枢', calls: 186420, success: 99.72, avg: 86, state: '启用', secure: true,
+                    params: { zone: '高新片区', status: '在线', page: 1, size: 20 },
+                    build: function (q) { return { code: 0, msg: 'success', trace: traceId(), data: { total: devices.length, zone: q.zone, page: q.page || 1, list: sampleDevices(q.size > 10 ? 6 : 3) } }; }
+                },
+                {
+                    id: 'API-02', name: '设备指令下发', method: 'POST', path: '/v1/devices/command', caller: '照明调度子系统', calls: 24810, success: 98.41, avg: 212, state: '启用', secure: true,
+                    params: { deviceId: 'DEV-0007', command: 'REBOOT', priority: 'HIGH' },
+                    build: function (q) { return { code: 0, msg: 'queued', trace: traceId(), data: { taskId: 'CMD-' + ri(100000, 999999), deviceId: q.deviceId, estimateSeconds: ri(3, 40), gateway: pick(gateways).id } }; }
+                },
+                {
+                    id: 'API-03', name: '时序数据批量写入', method: 'POST', path: '/v1/telemetry/batch', caller: '片区边缘网关', calls: 1284060, success: 99.94, avg: 46, state: '启用', secure: false,
+                    params: { batch: [{ deviceId: 'DEV-0012', metric: 'temperature', value: 26.4, ts: SC.stamp(new Date()) }] },
+                    build: function (q) { return { code: 0, msg: 'accepted', trace: traceId(), data: { received: q.batch.length, stored: q.batch.length, duplicated: 0, latencyMs: ri(20, 80) } }; }
+                },
+                {
+                    id: 'API-04', name: '告警事件订阅推送', method: 'POST', path: '/v1/alarm/subscribe', caller: '应急指挥中心', calls: 8620, success: 97.12, avg: 158, state: '启用', secure: true,
+                    params: { topics: ['device.offline', 'pump.high_level', 'wrist.loc_cross', 'gas.leak', 'bin.full'], callback: 'https://123.31.1.10:8443/alarm/cb' },
+                    build: function (q) { return { code: 0, msg: 'subscribed', trace: traceId(), data: { subscriptionId: 'SUB-' + ri(1000, 9999), topics: q.topics, expireAt: SC.stamp(Date.now() + 86400000 * 7) } }; }
+                },
+                {
+                    id: 'API-05', name: '设备台账批量导出', method: 'GET', path: '/v1/devices/export', caller: '大数据平合', calls: 3420, success: 95.26, avg: 1420, state: '限流', secure: true,
+                    params: { format: 'csv', fields: 'id,name,zone,health' },
+                    build: function (q) { return { code: 0, msg: 'ok', trace: traceId(), data: { rows: devices.length, format: q.format, downloadUrl: 'https://data.city.gov/tmp/' + SC.today().replace(/-/g, '') + '.csv' } }; }
+                },
+                {
+                    id: 'API-06', name: '网关健康检查', method: 'GET', path: '/v1/gateways/health', caller: '运维监控大屏', calls: 432600, success: 99.99, avg: 22, state: '启用', secure: false,
+                    params: {},
+                    build: function () { return { code: 0, msg: 'ok', trace: traceId(), data: { gateways: gateways.map(g => ({ id: g.id, conn: g.conn, latencyMs: g.lat, loss: g.loss, status: gwStatus(g).t })), healthy: gateways.filter(g => gwStatus(g).t === '正常').length } }; }
+                },
+                {
+                    id: 'API-07', name: '视频预置位调用', method: 'PUT', path: '/v1/video/preset', caller: '城管执法平台', calls: 62840, success: 96.84, avg: 336, state: '启用', secure: true,
+                    params: { cameraId: 'DEV-0042', presetIndex: 3 },
+                    build: function (q) { return { code: 0, msg: 'ok', trace: traceId(), data: { cameraId: q.cameraId, preset: q.presetIndex, snapshotUrl: '/snap/' + q.cameraId + '_' + Date.now() + '.jpg' } }; }
+                },
+                {
+                    id: 'API-08', name: '历史数据回溯查询', method: 'GET', path: '/v1/telemetry/history', caller: '排水调度系统', calls: 15930, success: 99.31, avg: 620, state: '停用', secure: true,
+                    params: { deviceId: 'DEV-0021', metric: 'level', from: SC.today() + 'T00:00', to: SC.today() + 'T23:59' },
+                    build: function (q) { return { code: 0, msg: 'ok', trace: traceId(), data: { metric: q.metric, points: 288, series: Array.from({ length: 6 }, (_, i) => Number(rf(0.3, 2.4).toFixed(2))) } }; }
+                },
+                {
+                    id: 'API-09', name: '水位液位批量查询', method: 'GET', path: '/v1/facility/level', caller: '排水调度系统', calls: 47820, success: 99.58, avg: 74, state: '启用', secure: false,
+                    params: { kinds: ['低洼积水水位计', '雷达液位计', '超声波液位计', '智能井盖'], zone: '滨江片区', threshold: 0.3 },
+                    build: function (q) { return { code: 0, msg: 'ok', trace: traceId(), data: { scanned: 612, over: ri(2, 9), unit: 'm', sample: q.kinds, list: Array.from({ length: 4 }, () => ({ deviceId: 'DEV-' + String(ri(1, devices.length)).padStart(4, '0'), level: Number((rf(0.05, 0.85) * (Number(q.threshold) || 0.3) * 3).toFixed(3)) })) } }; }
+                },
+                {
+                    id: 'API-10', name: '轨迹越界告警回调', method: 'POST', path: '/v1/track/geofence', caller: '环卫清运调度中心', calls: 96420, success: 98.86, avg: 38, state: '启用', secure: true,
+                    params: { deviceId: 'DEV-0013', kind: '环卫收运车终端', fenceId: 'FENCE-07', action: 'ALARM' },
+                    build: function (q) { return { code: 0, msg: 'dispatched', trace: traceId(), data: { alarmId: 'ALT-' + ri(100000, 999999), pipeline: 'MQTT → Flink → 告警中心', fenceId: q.fenceId, deviceId: q.deviceId, speedKmh: ri(0, 46), delayMs: ri(120, 860) } }; }
+                },
+                {
+                    id: 'API-11', name: '垃圾称重与满溢上报', method: 'POST', path: '/v1/waste/weight', caller: '分类回收运营平台', calls: 28460, success: 99.12, avg: 96, state: '启用', secure: false,
+                    params: { deviceId: 'DEV-0027', gross: 1286.4, tare: 620.0, binLevel: 82 },
+                    build: function (q) { return { code: 0, msg: 'accepted', trace: traceId(), data: { net: Number((q.gross - q.tare).toFixed(1)), station: pick(ZONES), needPickup: q.binLevel > 80, ticketId: 'WO-' + ri(10000, 99999) } }; }
+                }
+            ];
+            function traceId() { return Math.random().toString(36).slice(2, 10).toUpperCase(); }
+            const apiLogs = [];
+
+            function renderApis() {
+                document.querySelector('#api-table tbody').innerHTML = apis.map(function (a) {
+                    const st = a.state === '启用' ? 'ok' : a.state === '限流' ? 'warn' : 'off';
+                    return '<tr data-id="' + a.id + '"><td><b>' + a.id + '</b> ' + SC.esc(a.name) + '</td>' +
+                        '<td><span class="http-pill ' + (a.method === 'GET' ? '' : a.method === 'POST' ? 'warn' : a.method === 'PUT' ? 'bad' : '') + '">' + a.method + '</span></td>' +
+                        '<td><code>' + a.path + '</code></td><td>' + SC.esc(a.caller) + '</td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(a.calls) + '</span></td>' +
+                        '<td><span class="sc-tag ' + (a.success > 99 ? 'ok' : a.success > 97 ? 'warn' : 'bad') + '">' + a.success.toFixed(2) + '%</span></td>' +
+                        '<td>' + a.avg + ' ms</td>' +
+                        '<td><span class="sc-tag ' + st + '">' + a.state + '</span></td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="dbg">调试</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="toggle">' + (a.state === '停用' ? '启用' : '停用') + '</button></td></tr>';
+                }).join('');
+                document.getElementById('dbg-api').innerHTML = apis.map(a => '<option value="' + a.id + '">' + a.method + ' ' + a.path + '（' + SC.esc(a.name) + '）</option>').join('');
+                loadApiParams();
+            }
+            function loadApiParams() {
+                const a = apis.filter(x => x.id === document.getElementById('dbg-api').value)[0] || apis[0];
+                document.getElementById('dbg-params').value = JSON.stringify(a.params, null, 2);
+            }
+            /** JSON 语法着色（逐 token 转义，避免 XSS） */
+            const TOK = /"(?:\\.|[^"\\])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
+            function hlJson(raw) {
+                let out = '', last = 0;
+                String(raw).replace(TOK, function (m, off) {
+                    out += SC.esc(String(raw).slice(last, off));
+                    if (m.charAt(0) === '"') out += /:\s*$/.test(m) ? '<span class="k">' + SC.esc(m) + '</span>' : '<span class="s">' + SC.esc(m) + '</span>';
+                    else if (/^(true|false|null)$/i.test(m)) out += '<span class="k">' + m + '</span>';
+                    else out += '<span class="n">' + m + '</span>';
+                    last = off + m.length;
+                    return m;
+                });
+                return out + SC.esc(String(raw).slice(last));
+            }
+            function callApi(api, body, auth) {
+                return new Promise(function (resolve) {
+                    const cost = Math.round(api.avg * (0.5 + Math.random() * 1.4));
+                    setTimeout(function () {
+                        let res;
+                        const roll = Math.random();
+                        if (api.secure && !auth) {
+                            res = { status: 401, text: JSON.stringify({ code: 401, msg: 'missing token', trace: traceId() }, null, 2) };
+                        } else if (api.state === '停用') {
+                            res = { status: 503, text: JSON.stringify({ code: 503, msg: 'service disabled: ' + api.path, trace: traceId() }, null, 2) };
+                        } else if (api.state === '限流' && roll < 0.4) {
+                            res = { status: 429, text: JSON.stringify({ code: 429, msg: 'rate limit exceeded', retryAfterMs: 1000, trace: traceId() }, null, 2) };
+                        } else if (roll < 0.05) {
+                            res = { status: 504, text: JSON.stringify({ code: 504, msg: 'upstream timeout (' + api.avg + 'ms)', trace: traceId() }, null, 2) };
+                        } else if (roll < 0.08) {
+                            res = { status: 500, text: JSON.stringify({ code: 10500, msg: 'internal error: db connection reset', trace: traceId() }, null, 2) };
+                        } else {
+                            res = { status: 200, text: JSON.stringify(api.build(body), null, 2) };
+                        }
+                        res.cost = cost;
+                        res.bytes = res.text.length;
+                        res.trace = (res.text.match(/"trace": "(\w+)"/) || [])[1] || '-';
+                        resolve(res);
+                    }, Math.min(cost, 1400));
+                });
+            }
+            function runDebug() {
+                const api = apis.filter(x => x.id === document.getElementById('dbg-api').value)[0];
+                const btn = document.getElementById('dbg-run');
+                const respEl = document.getElementById('dbg-resp');
+                let body;
+                try {
+                    body = JSON.parse(document.getElementById('dbg-params').value || '{}');
+                } catch (e) {
+                    SC.toast('请求参数不是合法 JSON：' + e.message, { type: 'error' });
+                    return;
+                }
+                btn.disabled = true;
+                btn.textContent = '⏳ 请求中';
+                respEl.textContent = '--> ' + api.method + ' ' + api.path + '\n' + JSON.stringify(body);
+                const auth = document.getElementById('dbg-auth').classList.contains('on');
+                callApi(api, body, auth).then(function (res) {
+                    btn.disabled = false;
+                    btn.textContent = '▶ 发送请求';
+                    respEl.innerHTML = hlJson(res.text);
+                    const ok = res.status === 200;
+                    api.calls += 1;
+                    api.success = Number(((api.success * 0.998) + (ok ? 0.002 : -0.004)).toFixed(2));
+                    api.avg = Math.round(api.avg * 0.9 + res.cost * 0.1);
+                    document.getElementById('dbg-stat').innerHTML =
+                        kvItem('HTTP 状态', '<span class="http-pill ' + (ok ? '' : res.status >= 500 ? 'bad' : 'warn') + '">' + res.status + '</span>') +
+                        kvItem('耗时', res.cost + ' ms') + kvItem('响应大小', (res.bytes / 1024).toFixed(2) + ' KB') +
+                        kvItem('traceId', res.trace) + kvItem('网关节点', pick(gateways).id) + kvItem('鉴权', auth ? 'Bearer Token' : '无');
+                    apiLogs.unshift({ t: Date.now(), lv: ok ? 'ok' : 'warn', tx: api.method + ' ' + api.path + ' → ' + res.status + '（' + res.cost + 'ms，' + (res.bytes / 1024).toFixed(2) + 'KB）' });
+                    if (apiLogs.length > 60) apiLogs.length = 60;
+                    document.getElementById('dbg-log').innerHTML = apiLogs.map(function (e) {
+                        return '<div class="li"><span class="t">' + SC.stamp(e.t).slice(11, 19) + '</span><span class="lv ' + e.lv + '">' +
+                            (e.lv === 'ok' ? '200' : 'ERR') + '</span><span class="tx">' + SC.esc(e.tx) + '</span></div>';
+                    }).join('');
+                    SC.toast('调用完成：HTTP ' + res.status + '，耗时 ' + res.cost + 'ms', { type: ok ? 'success' : 'warn' });
+                    renderApis();
+                });
+            }
+            function openAddApi() {
+                SC.modal.form({
+                    title: '注册对外接口', submitText: '注册',
+                    fields: [
+                        { name: 'name', label: '接口名称', required: true, col: 2, placeholder: '例：地下管网水位查询' },
+                        { name: 'method', label: '请求方法', type: 'select', options: ['GET', 'POST', 'PUT', 'DELETE'], col: 1, required: true },
+                        { name: 'path', label: '接口路径', col: 1, required: true, value: '/v1/', validate: v => /^\/v\d+\/[\w\/\-{}]+$/.test(v) ? null : '路径需以 /v1/ 开头且不含空格' },
+                        { name: 'caller', label: '主调用方', col: 1, required: true },
+                        { name: 'sla', label: 'SLA 目标耗时', type: 'number', min: 20, max: 5000, step: 10, value: 200, unit: 'ms', col: 1 },
+                        { name: 'secure', label: '需鉴权', type: 'switch', value: true, col: 1 },
+                        { name: 'rate', label: '限流阈值', type: 'number', min: 10, max: 100000, value: 1000, unit: 'QPS', col: 1 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    apis.push({
+                        id: 'API-' + String(apis.length + 1).padStart(2, '0'), name: v.name, method: v.method, path: v.path,
+                        caller: v.caller, calls: 0, success: 100, avg: v.sla, state: '启用', secure: v.secure, params: {},
+                        build: function () { return { code: 0, msg: 'ok', trace: traceId(), data: { note: '新建接口尚未接入真实数据源', rateLimit: v.rate } }; }
+                    });
+                    renderApis();
+                    log('ok', '接口 ' + v.method + ' ' + v.path + ' 已注册（限流 ' + v.rate + ' QPS）');
+                    SC.toast('接口已注册并列入网关路由表', { type: 'success' });
+                });
+            }
+
+            /* ---------- 同步任务 ---------- */
+            const syncs = [
+                { id: 'S-01', name: '设备台账同步', src: '物联平台 → 数据中心', cycle: '每 15 分钟', last: Date.now() - 420000, rows: 128460, cost: 8.4, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-02', name: '告警事件下发', src: '数据中心 → 应急指挥', cycle: '实时推送', last: Date.now() - 60000, rows: 3640, cost: 0.6, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-03', name: '视频目录同步', src: '视联网平台 → 共享交换', cycle: '每小时', last: Date.now() - 1860000, rows: 4820, cost: 46.2, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-04', name: '能耗数据上报', src: '照明系统 → 能耗平台', cycle: '每日 02:00', last: Date.now() - 7200000, rows: 96400, cost: 122.8, state: '失败', enabled: true, pct: 100 },
+                { id: 'S-05', name: '地理信息图层', src: 'GIS 平台 → 设施工库', cycle: '每日 04:00', last: Date.now() - 3600000, rows: 284, cost: 312.4, state: '成功', enabled: false, pct: 100 },
+                { id: 'S-06', name: '基础设施编码对码', src: '城管系统 → 主数据', cycle: '每 30 分钟', last: Date.now() - 900000, rows: 18640, cost: 12.6, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-07', name: '环卫车辆轨迹同步', src: '车载终端 → 轨迹库', cycle: '每 5 分钟', last: Date.now() - 240000, rows: 962400, cost: 21.6, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-08', name: 'CEMS 排放数据上报', src: '焚烧炉监测站 → 环保平台', cycle: '每 2 小时', last: Date.now() - 5400000, rows: 18420, cost: 64.2, state: '成功', enabled: true, pct: 100 },
+                { id: 'S-09', name: '抓拍结构化入库', src: '边缘AI盒子 → 视图库', cycle: '准实时（30 秒）', last: Date.now() - 90000, rows: 274680, cost: 88.4, state: '运行中', enabled: true, pct: 62 }
+            ];
+            function renderSyncs() {
+                document.querySelector('#sync-table tbody').innerHTML = syncs.map(function (s) {
+                    const st = s.state === '运行中' ? 'info' : s.state === '成功' ? 'ok' : s.state === '失败' ? 'bad' : 'off';
+                    return '<tr data-id="' + s.id + '"><td><b>' + s.id + '</b> ' + SC.esc(s.name) + '</td>' +
+                        '<td>' + SC.esc(s.src) + '</td><td>' + s.cycle + '</td>' +
+                        '<td>' + (s.enabled ? agoText(s.last) : '<span class="sc-tag off">已暂停</span>') + '</td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(s.rows) + '</span></td>' +
+                        '<td>' + s.cost.toFixed(1) + ' s</td>' +
+                        '<td style="min-width:130px"><div class="sc-progress" style="height:8px"><i style="width:' + s.pct + '%"></i></div>' +
+                        '<span class="sc-tag ' + st + '" style="margin-top:5px">' + s.state + '</span></td>' +
+                        '<td><button class="sc-btn sm ghost" data-sync="' + s.id + '">立即执行</button> ' +
+                        '<label class="sc-switch' + (s.enabled ? ' on' : '') + '" data-sw="' + s.id + '" style="font-size:.8em"><i></i><span>' +
+                        (s.enabled ? '启用' : '停用') + '</span></label></td></tr>';
+                }).join('');
+                document.querySelectorAll('[data-sync]').forEach(function (btn) {
+                    btn.onclick = function () { runSync(syncs.filter(s => s.id === btn.dataset.sync)[0]); };
+                });
+                document.querySelectorAll('[data-sw]').forEach(function (sw) {
+                    sw.onclick = function () {
+                        const s = syncs.filter(x => x.id === sw.dataset.sw)[0];
+                        s.enabled = !s.enabled;
+                        renderSyncs();
+                        log(s.enabled ? 'ok' : 'warn', s.name + ' 定时任务已' + (s.enabled ? '启用' : '暂停'));
+                    };
+                });
+            }
+            function runSync(task, silent) {
+                if (task.state === '运行中') return Promise.resolve(false);
+                task.state = '运行中';
+                task.pct = 0;
+                renderSyncs();
+                return new Promise(function (resolve) {
+                    let pct = 0;
+                    const timer = setInterval(function () {
+                        pct = Math.min(100, pct + ri(8, 26));
+                        task.pct = pct;
+                        const row = document.querySelector('#sync-table [data-id="' + task.id + '"] .sc-progress > i');
+                        if (row) row.style.width = pct + '%';
+                        if (pct >= 100) {
+                            clearInterval(timer);
+                            const fail = task.id === 'S-04' && Math.random() < 0.6 ? true : Math.random() < 0.08;
+                            task.state = fail ? '失败' : '成功';
+                            task.last = Date.now();
+                            task.cost = Number((task.cost * 0.7 + rf(0.4, 60) * 0.3).toFixed(1));
+                            if (!fail) task.rows += ri(120, 4800);
+                            renderSyncs();
+                            log(fail ? 'alarm' : 'ok', task.name + (fail ? ' 执行失败：目标端返回 409 元数据冲突，已保留上次快照' : ' 完成，同步 ' + SC.num(ri(120, 4800)) + ' 行，耗时 ' + task.cost + 's'));
+                            if (!silent) SC.toast(task.name + (fail ? ' 执行失败' : ' 同步完成'), { type: fail ? 'error' : 'success' });
+                            resolve(!fail);
+                        }
+                    }, 200);
+                });
+            }
+            function runAllSync() {
+                const list = syncs.filter(s => s.enabled && s.state !== '运行中');
+                if (!list.length) { SC.toast('没有可执行的启用任务', { type: 'warn' }); return; }
+                SC.toast('已排队 ' + list.length + ' 个同步任务', { type: 'info' });
+                let chain = Promise.resolve();
+                list.forEach(function (s) { chain = chain.then(() => runSync(s, true)).then(() => new Promise(r => setTimeout(r, 260))); });
+                chain.then(function () { SC.toast('批量同步执行完毕', { type: 'success' }); });
+            }
+
+            /* ---------- 数据共享订阅 ---------- */
+            const subs = [
+                { id: 'SUB-01', who: '区应急指挥中心', scope: '排水液位 / 泵站状态 / 汛情预警', way: 'API 拉取', used: 62, total: 100, state: '已通过', expire: '2026-12-31' },
+                { id: 'SUB-02', who: '市交通运行监测', scope: '信号机状态 / 卡口流量', way: '消息推送', used: 88, total: 100, state: '已通过', expire: '2026-11-30' },
+                { id: 'SUB-03', who: '街道网格化管理', scope: '城管执法事件 / 视频预置位', way: 'API 拉取', used: 12, total: 50, state: '待审批', expire: '-' },
+                { id: 'SUB-04', who: '环保分局', scope: '空气监测 / 噪声监测', way: '定时库表交换', used: 45, total: 60, state: '已通过', expire: '2027-03-31' },
+                { id: 'SUB-05', who: '能源集团', scope: '路灯回路能耗', way: 'API 拉取', used: 99, total: 100, state: '已通过', expire: '2026-10-31' },
+                { id: 'SUB-06', who: '第三方运营公司', scope: '停车收费明细', way: 'API 拉取', used: 0, total: 20, state: '已驳回', expire: '-' },
+                { id: 'SUB-07', who: '环卫清运调度中心', scope: '环卫车轨迹 / 果壳箱满溢 / 回收站称重', way: '消息推送', used: 31, total: 80, state: '已通过', expire: '2027-06-30' },
+                { id: 'SUB-08', who: '城镇燃气安全平台', scope: '可燃气体 / 管网压力 / 消防栓水压', way: 'API 拉取', used: 6, total: 30, state: '待审批', expire: '-' }
+            ];
+            function renderSubs() {
+                document.querySelector('#sub-table tbody').innerHTML = subs.map(function (s) {
+                    const st = s.state === '已通过' ? 'ok' : s.state === '待审批' ? 'warn' : s.state === '已驳回' ? 'off' : 'bad';
+                    const over = s.used / s.total > 0.9;
+                    return '<tr data-id="' + s.id + '"><td><b>' + s.id + '</b> ' + SC.esc(s.who) + '</td>' +
+                        '<td>' + SC.esc(s.scope) + '</td><td>' + s.way + '</td>' +
+                        '<td style="min-width:150px"><div class="sc-progress" style="height:8px"><i style="width:' + Math.min(100, s.used / s.total * 100) + '%;' +
+                        (over ? 'background:linear-gradient(90deg,#e67e22,#e74c3c)' : '') + '"></i></div>' +
+                        '<span class="sc-hint">' + s.used + ' / ' + s.total + ' 万次・月</span></td>' +
+                        '<td><span class="sc-tag ' + st + '">' + s.state + '</span><div class="sc-hint">有效期至 ' + s.expire + '</div></td>' +
+                        '<td>' + (s.state === '待审批'
+                            ? '<button class="sc-btn sm ghost" data-sub-ok="' + s.id + '">通过</button> <button class="sc-btn sm ghost" data-sub-no="' + s.id + '">驳回</button>'
+                            : '<button class="sc-btn sm ghost" data-sub-renew="' + s.id + '">续期/提额</button>') + '</td></tr>';
+                }).join('');
+                document.querySelectorAll('[data-sub-ok]').forEach(function (b) {
+                    b.onclick = function () { approveSub(b.dataset.subOk, true); };
+                });
+                document.querySelectorAll('[data-sub-no]').forEach(function (b) {
+                    b.onclick = function () { approveSub(b.dataset.subNo, false); };
+                });
+                document.querySelectorAll('[data-sub-renew]').forEach(function (b) {
+                    b.onclick = function () { renewSub(b.dataset.subRenew); };
+                });
+            }
+            function approveSub(id, pass) {
+                const s = subs.filter(x => x.id === id)[0];
+                SC.modal.form({
+                    title: (pass ? '审批通过 · ' : '驳回申请 · ') + s.who, size: 'sm', submitText: pass ? '签发授权' : '确认驳回',
+                    fields: [
+                        { name: 'scope', label: '核准数据范围', type: 'static', html: '<div class="sc-note">' + SC.esc(s.scope) + '<br>调用方式：' + s.way + '</div>', col: 2 },
+                        { name: 'quota', label: '月度配额', type: 'number', min: 1, max: 1000, value: s.total, unit: '万次', col: 1, required: pass },
+                        { name: 'expire', label: '授权到期日', type: 'date', value: '2027-12-31', col: 1, required: pass },
+                        { name: 'remark', label: pass ? '签发备注' : '驳回理由', type: 'textarea', col: 2, required: !pass, placeholder: pass ? '例：仅开放只读，禁止二次转授' : '例：收费明细属敏感数据，需市级主管部门会签' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    s.state = pass ? '已通过' : '已驳回';
+                    if (pass) { s.total = v.quota; s.expire = v.expire; }
+                    renderSubs();
+                    log(pass ? 'ok' : 'warn', '共享订阅 ' + s.id + '（' + s.who + '）' + (pass ? '已审批通过，配额 ' + s.total + ' 万次' : '已驳回：' + v.remark));
+                    SC.toast('订阅 ' + s.id + (pass ? ' 已签发授权凭证' : ' 已驳回'), { type: 'success' });
+                });
+            }
+            function renewSub(id) {
+                const s = subs.filter(x => x.id === id)[0];
+                const over = s.used / s.total > 0.9;
+                SC.modal.confirm({
+                    title: '续期与提额',
+                    html: '将 ' + SC.esc(s.who) + ' 的授权延长 12 个月' + (over ? '，并将配额从 ' + s.total + ' 提升至 ' + s.total * 2 + ' 万次（当前使用率 ' + Math.round(s.used / s.total * 100) + '%）' : '。'),
+                    okText: '执行'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    if (over) { s.used = s.total; s.total *= 2; }
+                    s.expire = '2027-' + s.expire.slice(5, 7) + '-' + s.expire.slice(8, 10);
+                    s.state = '已通过';
+                    renderSubs();
+                    log('ok', s.id + ' 续期完成，配额 ' + s.total + ' 万次');
+                    SC.toast('续期完成', { type: 'success' });
+                });
+            }
+
+            /* ---------- 第三方连接 ---------- */
+            const conns = [
+                { name: '省政务数据共享交换平合', url: 'https://share.prov.gov.cn/api', auth: 'OAuth2', key: 'pk_live_8f2c91ae', secret: 'sk_2b7f4e0d8a19', state: '已连接', lat: 128 },
+                { name: '气象部门 API', url: 'https://met-api.cma.cn/v2', auth: 'API Key', key: 'met_9d41c2', secret: '────', state: '已连接', lat: 76 },
+                { name: '供电局用采系统', url: 'http://10.20.31.44:8082/esb', auth: '双向证书', key: 'CN=city-gateway', secret: '────', state: '异常', lat: 0 },
+                { name: '互联网地图服务', url: 'https://restapi.amap.com/v3', auth: 'API Key', key: 'amap_5c2f71', secret: '────', state: '未授权', lat: 0 }
+            ];
+            function renderConns() {
+                document.getElementById('conn-grid').innerHTML = conns.map(function (c, i) {
+                    const st = c.state === '已连接' ? 'ok' : c.state === '异常' ? 'bad' : 'off';
+                    return '<div class="conn-card" data-i="' + i + '">' +
+                        '<div class="ch"><span>🔌 ' + SC.esc(c.name) + '</span><span class="sc-tag ' + st + '">' + c.state + '</span></div>' +
+                        '<div class="sc-hint" style="word-break:break-all">' + SC.esc(c.url) + '</div>' +
+                        '<div class="sc-kv" style="margin-top:10px;gap:8px">' +
+                        '<div class="sc-kv-item"><div class="k">认证方式</div><div class="v" style="font-size:.95em">' + c.auth + '</div></div>' +
+                        '<div class="sc-kv-item"><div class="k">平均时延</div><div class="v" style="font-size:.95em">' + (c.state === '已连接' ? c.lat + ' ms' : '—') + '</div></div>' +
+                        '</div>' +
+                        '<div class="cred" style="margin-top:10px">' + SC.esc(c.key) + ' · <span data-secret>' + SC.esc(c.secret) + '</span></div>' +
+                        '<div class="steps" style="margin-top:8px"></div>' +
+                        '<div class="sc-inline" style="margin-top:10px">' +
+                        '<button class="sc-btn sm" data-test="' + i + '">📡 测试连通性</button>' +
+                        '<button class="sc-btn sm ghost" data-eye="' + i + '">👁 显示凭据</button></div></div>';
+                }).join('');
+                document.querySelectorAll('[data-test]').forEach(function (b) {
+                    b.onclick = function () { testConn(Number(b.dataset.test), b); };
+                });
+                document.querySelectorAll('[data-eye]').forEach(function (b) {
+                    b.onclick = function () {
+                        const card = b.closest('.conn-card');
+                        const el = card.querySelector('[data-secret]');
+                        const show = el.textContent === '────';
+                        el.textContent = show ? conns[Number(b.dataset.eye)].secret : '────';
+                        b.textContent = show ? '🙈 隐藏凭据' : '👁 显示凭据';
+                        if (show) log('warn', conns[Number(b.dataset.eye)].name + ' 凭据明文展示，已计入安全审计');
+                    };
+                });
+            }
+            function testConn(i, btn) {
+                const c = conns[i];
+                const card = btn.closest('.conn-card');
+                const host = card.querySelector('.steps');
+                const steps = [['DNS 解析', () => true], ['TLS 握手', () => c.url.indexOf('https') === 0 || c.auth === '双向证书'], ['身份认证', () => c.state !== '未授权'], ['心跳探测', () => c.state !== '异常']];
+                let idx = 0;
+                host.innerHTML = '';
+                btn.disabled = true;
+                (function next() {
+                    if (idx >= steps.length) {
+                        c.state = '已连接';
+                        c.lat = ri(60, 180);
+                        btn.disabled = false;
+                        btn.textContent = '📡 测试连通性';
+                        renderConns();
+                        log('ok', c.name + ' 连通性测试通过，平均时延 ' + c.lat + 'ms');
+                        SC.toast(c.name + ' 链路正常', { type: 'success' });
+                        return;
+                    }
+                    const name = steps[idx][0];
+                    const el = SC.el('<div class="conn-step"><span>' + name + '</span><b>探测中…</b></div>');
+                    host.appendChild(el);
+                    setTimeout(function () {
+                        const ok = steps[idx][1]();
+                        el.className = 'conn-step ' + (ok ? 'ok' : 'bad');
+                        el.innerHTML = '<span>' + name + '</span><b>' + (ok ? '通过 ' + ri(3, 120) + 'ms' : (name === 'TLS 握手' ? '证书不受信' : name === '身份认证' ? '403 无权限' : '超时')) + '</b>';
+                        idx++;
+                        if (!ok) {
+                            c.state = name === '身份认证' ? '未授权' : '异常';
+                            btn.disabled = false;
+                            btn.textContent = '📡 重新测试';
+                            log('alarm', c.name + ' 连通性测试失败于「' + name + '」');
+                            SC.toast(c.name + ' 测试失败：' + name, { type: 'error' });
+                            setTimeout(() => renderConns(), 1400);
+                            return;
+                        }
+                        next();
+                    }, 420);
+                })();
+            }
+
+            /* =====================================================================
+               12. 台账表格
+               ===================================================================== */
+            function agoText(ms) {
+                const m = Math.round((Date.now() - ms) / 60000);
+                if (m < 1) return '刚刚';
+                if (m < 60) return m + ' 分钟前';
+                const h = Math.floor(m / 60);
+                if (h < 24) return h + ' 小时前';
+                return Math.floor(h / 24) + ' 天前';
+            }
+            function typeShort(tk) { return TYPES[tk].label.replace('设备', ''); }
+            function renderDevs() {
+                document.querySelector('#dev-table tbody').innerHTML = devices.map(function (d) {
+                    const g = healthGrade(d.health);
+                    const behind = d.fw !== TYPES[d.type].fwLatest;
+                    const offline = d.status === '离线' || d.status === '故障';
+                    return '<tr data-id="' + d.id + '">' +
+                        '<td><b>' + d.id + '</b></td>' +
+                        '<td>' + SC.esc(d.name) + '<div class="sc-hint">' + SC.esc(d.model) + ' · ' + SC.esc(d.vendor) + '</div></td>' +
+                        '<td>' + typeShort(d.type) + '</td>' +
+                        '<td>' + SC.esc(d.zone) + '</td>' +
+                        '<td>' + SC.esc(d.protocol) + '</td>' +
+                        '<td>' + d.fw + (behind ? ' <span class="sc-tag warn">待升级</span>' : '') + '</td>' +
+                        '<td><span class="sc-cell-num">' + d.signal + '</span>%</td>' +
+                        '<td><span class="sc-cell-num">' + d.health + '</span> <span class="sc-tag ' + g.tag + '">' + g.text + '</span></td>' +
+                        '<td><span class="sc-tag ' + STATUS[d.status] + '">' + d.status + '</span></td>' +
+                        '<td>' + agoText(d.lastSeen) + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="view">详情</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="cmd"' + (offline ? ' disabled title="设备不可达"' : '') + '>指令</button></td>' +
+                        '</tr>';
+                }).join('');
+                if (devCtrl) devCtrl.reload();
+            }
+            function updateSelHint() {
+                const ids = devCtrl && devCtrl.getSelectedIds ? devCtrl.getSelectedIds() : [];
+                document.getElementById('sel-hint').textContent = ids.length
+                    ? '已选 ' + ids.length + ' 台设备：' + ids.slice(0, 6).join('、') + (ids.length > 6 ? '…' : '')
+                    : '未选择设备（表头复选框可全选本页）';
+            }
+            function selDevices() {
+                const ids = devCtrl && devCtrl.getSelectedIds ? devCtrl.getSelectedIds() : [];
+                return ids.map(byId).filter(Boolean);
+            }
+            /** 没勾选时默认作用于当前筛选结果，避免批量按钮“点了没反应” */
+            function targetDevices(tip) {
+                const sel = selDevices();
+                if (sel.length) return sel;
+                const vis = (devCtrl && devCtrl.visibleRows ? devCtrl.visibleRows : []).map(r => byId(r.id)).filter(Boolean);
+                if (!vis.length) {
+                    SC.toast('当前筛选结果为空，请先调整筛选条件', { type: 'warn' });
+                    return [];
+                }
+                SC.toast(tip + '：未勾选设备，已作用于当前筛选的 ' + vis.length + ' 台', { type: 'info' });
+                return vis;
+            }
+
+            /* =====================================================================
+               13. 批量任务（重启 / OTA / 转检修）
+               ===================================================================== */
+            const PHASES = ['下发', '下载', '安装', '校验'];
+            let job = null;
+
+            function startJob(cfg) {
+                if (job && !job.finished) {
+                    SC.toast('已有批量任务在执行，请等待完成', { type: 'warn' });
+                    return;
+                }
+                job = {
+                    title: cfg.title,
+                    phases: cfg.phases || PHASES,
+                    failRate: cfg.failRate === undefined ? 0.06 : cfg.failRate,
+                    items: cfg.items.map(function (d) {
+                        return { id: d.id, name: d.name, pct: 0, state: '排队', phase: '待下发' };
+                    }),
+                    ok: 0, fail: 0, finished: false, timer: null, onApply: cfg.onApply, onFail: cfg.onFail
+                };
+                const panel = document.getElementById('job-panel');
+                panel.hidden = false;
+                document.getElementById('job-title').textContent = cfg.title;
+                document.getElementById('job-retry').hidden = true;
+                renderJob();
+                log('info', cfg.title + '启动，共 ' + job.items.length + ' 台设备');
+                job.timer = setInterval(jobStep, 260);
+            }
+            function jobStep() {
+                if (!job) return;
+                const pending = job.items.filter(i => i.state === '排队');
+                const active = job.items.filter(i => i.state === '执行中');
+                // 并发度 5：先推进在执行项，再从队列里拉新的
+                active.forEach(function (i) {
+                    i.pct = Math.min(100, i.pct + ri(7, 24));
+                    const p = Math.min(job.phases.length - 1, Math.floor(i.pct / (100 / job.phases.length)));
+                    i.phase = job.phases[p];
+                    if (i.pct >= 100) {
+                        const bad = rnd() < job.failRate;
+                        i.state = bad ? '失败' : '成功';
+                        i.phase = bad ? '失败（超时无响应）' : '完成';
+                        bad ? job.fail++ : job.ok++;
+                        const d = byId(i.id);
+                        if (d) {
+                            if (bad && job.onFail) job.onFail(d, i);
+                            else if (job.onApply) job.onApply(d);
+                        }
+                    }
+                });
+                const slots = Math.max(0, 5 - active.length);
+                pending.slice(0, slots).forEach(function (i) { i.state = '执行中'; i.phase = job.phases[0]; });
+
+                const left = job.items.filter(i => i.state === '排队' || i.state === '执行中').length;
+                if (!left) finishJob();
+                renderJob();
+            }
+            function finishJob() {
+                clearInterval(job.timer);
+                job.finished = true;
+                saveDevices();
+                renderDevs();
+                renderKpi();
+                renderTypeGrid();
+                renderChips();
+                applyFilter();
+                document.getElementById('job-retry').hidden = job.fail === 0;
+                log(job.fail ? 'warn' : 'ok', job.title + '完成：成功 ' + job.ok + ' 台，失败 ' + job.fail + ' 台');
+                SC.toast(job.title + '完成（成功 ' + job.ok + ' / 失败 ' + job.fail + '）', { type: job.fail ? 'warn' : 'success', duration: 4000 });
+            }
+            function renderJob() {
+                const done = job.ok + job.fail;
+                const pct = job.items.length ? Math.round(done / job.items.length * 100) : 0;
+                document.getElementById('job-bar').style.width = pct + '%';
+                document.getElementById('job-stat').innerHTML =
+                    '进度 <b>' + done + '/' + job.items.length + '</b>（' + pct + '%） · 成功 <b style="color:#27ae60">' + job.ok +
+                    '</b> · 失败 <b style="color:#e74c3c">' + job.fail + '</b>' + (job.finished ? ' · 任务已结束' : ' · 并发上限 5，队列自动调度');
+                document.getElementById('job-list').innerHTML = job.items.map(function (i) {
+                    const color = i.state === '成功' ? '#27ae60' : i.state === '失败' ? '#e74c3c' : '#3498db';
+                    return '<div class="ji"><span>' + i.id + ' <span class="sc-hint">' + SC.esc(i.name) + '</span></span>' +
+                        '<span style="color:' + color + '">' + SC.esc(i.phase) + ' ' + (i.state === '执行中' ? i.pct + '%' : '') + '</span></div>';
+                }).join('');
+            }
+            function retryFailed() {
+                const ids = job.items.filter(i => i.state === '失败').map(i => i.id);
+                if (!ids.length) return;
+                startJob({
+                    title: job.title + '（失败重试）',
+                    items: ids.map(byId).filter(Boolean),
+                    failRate: job.failRate * 0.5,
+                    onApply: job.onApply
+                });
+            }
+
+            /* =====================================================================
+               14. 单设备指令 / 详情 / 表单
+               ===================================================================== */
+            const CMDS = {
+                sensor: ['远程校准', '立即上报', '采集频率调整', '自检'],
+                camera: ['抓拍', '预置位调用', '重启', '码率调整'],
+                ctrl: ['回路测试', '切换自动模式', '重启', '固件自检'],
+                gateway: ['链路重连', '配置下发', '重启', '清空缓存'],
+                mobile: ['轨迹上报频率调整', '电子围栏下发', '远程断油电提醒', '终端重启'],
+                site: ['称重去皮校准', '满溢抽检', '开锁投料口', 'CEMS 标定']
+            };
+            function kvItem(k, v) { return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
+            function openCmd(d) {
+                if (d.status === '离线' || d.status === '故障') {
+                    SC.toast(d.id + ' 当前不可达，指令已写入待发队列', { type: 'warn' });
+                    log('warn', d.id + ' 指令入队（设备不可达）');
+                    return;
+                }
+                SC.modal.form({
+                    title: '下发指令 · ' + d.id + ' ' + d.name,
+                    size: 'sm',
+                    submitText: '下发',
+                    fields: [
+                        { name: 'cmd', label: '指令', type: 'select', options: CMDS[d.type], col: 1, required: true },
+                        { name: 'timeout', label: '超时时间', type: 'number', value: 30, min: 5, max: 300, unit: '秒', col: 1 },
+                        { name: 'reason', label: '操作事由', type: 'textarea', placeholder: '例：夜间误报排查，需重新校准量程', col: 2 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    log('info', '向 ' + d.id + ' 下发指令「' + v.cmd + '」');
+                    const cost = ri(4, 26);
+                    const ok = rnd() > 0.12;
+                    SC.toast('指令已下发，' + cost + 's 后' + (ok ? '执行成功' : '失败：设备返回 NACK'), { type: ok ? 'success' : 'error', duration: 3600 });
+                    log(ok ? 'ok' : 'alarm', d.id + ' 指令「' + v.cmd + '」' + (ok ? '执行成功，耗时 ' + cost + 's' : '执行失败（超时无应答）'));
+                    if (!ok) { d.offline++; d.health = calcHealth(d); saveDevices(); renderDevs(); }
+                });
+            }
+            function openDetail(id) {
+                const d = byId(id);
+                if (!d) return;
+                const T = TYPES[d.type];
+                const g = healthGrade(d.health);
+                const life = lifeDays(d);
+                const slope = healthSlope(d);
+                const parts = [
+                    { n: '主板/电源模块', v: Math.min(99, d.health + 6) },
+                    { n: '通信模组', v: Math.min(99, d.health + (d.signal > 70 ? 8 : -9)) },
+                    { n: PART_LABEL[d.type] || '风扇/机箱', v: Math.min(99, d.health - Math.round(d.uptimeDays / 260)) },
+                    { n: '存储介质', v: Math.min(99, d.health + Math.round(d.loss * -1.5) + 4) }
+                ];
+                const body =
+                    '<div class="sc-kv">' +
+                    kvItem('设备型号', SC.esc(d.model)) + kvItem('厂商', SC.esc(d.vendor)) +
+                    kvItem('通信协议', SC.esc(d.protocol)) + kvItem('供电方式', SC.esc(d.power)) +
+                    kvItem('安装区域', SC.esc(d.zone)) + kvItem('启用日期', d.install + '（役龄 ' + Math.round(d.uptimeDays / 30) + ' 月）') +
+                    kvItem('序列号', d.serial) + kvItem('当前固件', d.fw + (d.fw === T.fwLatest ? '（最新）' : ' / 目标 ' + T.fwLatest)) +
+                    '</div>' +
+                    '<div class="sc-section-title">实时指标</div>' +
+                    '<div class="sc-kv">' +
+                    kvItem('运行状态', '<span class="sc-tag ' + STATUS[d.status] + '">' + d.status + '</span>') +
+                    kvItem('信号强度', d.signal + '%') +
+                    kvItem('机内温度', d.temp + ' ℃') +
+                    kvItem('电池/能耗', d.power === '电池' ? d.battery + '%' : '市电直供') +
+                    kvItem('丢包率', d.loss.toFixed(2) + '%') +
+                    kvItem('离线频次', d.offline + ' 次 / 近 30 天') +
+                    kvItem('采集频率', d.msgRate + ' msg/s') +
+                    kvItem('最近上报', agoText(d.lastSeen)) +
+                    '</div>' +
+                    '<div class="sc-section-title">物模型与测点（' + thingModel(d).length + ' 个测点，标识与数据中台采集口径对齐）</div>' +
+                    modelTable(d) +
+                    '<div class="sc-hint" style="margin:10px 0 4px">上报报文样例</div>' +
+                    '<div class="sc-code">' + SC.esc(modelPayload(d)) + '</div>' +
+                    '<div class="sc-split" style="margin-top:20px">' +
+                    '<div><div class="sc-panel-title"><h3 style="font-size:1em">健康分走势（近 8 周）</h3></div>' +
+                    '<div class="sc-chart sm"><canvas data-c="hist"></canvas></div></div>' +
+                    '<div><div class="sc-panel-title"><h3 style="font-size:1em">健康度与寿命预测</h3></div>' +
+                    '<div class="sc-chart sm"><canvas data-c="gauge"></canvas></div></div>' +
+                    '</div>' +
+                    '<div class="sc-section-title">健康分构成（扣分项）</div>' +
+                    '<div id="dt-factors"></div>' +
+                    '<div class="sc-section-title">部件劣化与更换建议</div>' +
+                    parts.map(function (p) {
+                        const gg = healthGrade(p.v);
+                        return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">' +
+                            '<span style="flex:0 0 130px;font-size:.88em">' + p.n + '</span>' +
+                            '<span class="sc-bar-mini" style="flex:1;margin:0"><i style="width:' + p.v + '%;background:' + (p.v > 80 ? '#27ae60' : p.v > 60 ? '#f39c12' : '#e74c3c') + '"></i></span>' +
+                            '<span class="sc-tag ' + gg.tag + '">' + p.v + '</span></div>';
+                    }).join('') +
+                    '<div class="sc-note' + (life < 60 ? ' warn' : '') + '" style="margin-top:14px">' +
+                    '劣化速率 <b>' + slope.toFixed(2) + ' 分/周</b>，按线性外推预计 <b>' +
+                    (life >= 999 ? '18 个月内无劣化风险' : life <= 0 ? '已跌破预警线' : life + ' 天后') + '</b>到达预警阈值（55 分）。' +
+                    (life < 90 ? '建议纳入下一轮预防性检修计划。' : '维持现有巡检周期即可。') +
+                    '</div>' +
+                    '<div class="sc-section-title">维护与事件记录</div>' +
+                    '<div class="sc-timeline" id="dt-events"></div>';
+                const m = SC.modal.open({
+                    title: d.id + ' · ' + d.name,
+                    size: 'lg',
+                    body: body,
+                    footer: [
+                        { text: '⟳ 下发指令', kind: 'ghost', onClick: () => openCmd(d) },
+                        { text: '🛠 登记维护', kind: 'ghost', onClick: () => openMaint(d) },
+                        { text: '🛰 数据中台采集档案', kind: 'ghost', onClick: () => { location.href = 'data-platform.html'; } },
+                        { text: '删除设备', kind: 'danger', onClick: () => removeDevice(d) },
+                        { text: '关闭', kind: 'primary' }
+                    ]
+                });
+                SC.chart.line(m.body.querySelector('[data-c=hist]'), {
+                    labels: d.healthHistory.map((_, i) => 'W' + (i + 1)),
+                    series: [{ name: '健康分', data: d.healthHistory, color: '#26c6da' }],
+                    yMin: 0, yMax: 100, thresholds: [{ value: 55, label: '预警线 55', color: '#e67e22' }], unit: ' 分'
+                });
+                SC.chart.gauge(m.body.querySelector('[data-c=gauge]'), {
+                    value: d.health, min: 0, max: 100, unit: ' 分', label: '综合健康度（' + g.text + '）',
+                    segments: [{ to: 55, color: '#e74c3c' }, { to: 70, color: '#f39c12' }, { to: 85, color: '#f1c40f' }, { to: 100, color: '#27ae60' }]
+                });
+                const factors = healthFactors(d);
+                m.body.querySelector('#dt-factors').innerHTML =
+                    '<div class="sc-kv">' + factors.map(f => kvItem(f.n, (f.v < 0 ? '' : '+') + f.v.toFixed(1) + ' 分')).join('') + '</div>';
+                m.body.querySelector('#dt-events').innerHTML = deviceEvents(d).map(function (e) {
+                    return '<div class="sc-tl-item ' + (e.cls || '') + '"><div class="h">' + SC.esc(e.h) + '</div><div class="m">' + SC.esc(e.m) + '</div></div>';
+                }).join('');
+            }
+            /** 健康分扣分项拆解，用于详情展示 */
+            function healthFactors(d) {
+                const f = [{ n: '基础分', v: 100 }];
+                if (d.status === '故障') f.push({ n: '故障在案', v: -34 });
+                else if (d.status === '离线') f.push({ n: '当前离线', v: -20 });
+                else if (d.status === '检修') f.push({ n: '检修锁定', v: -12 });
+                else if (d.status === '休眠') f.push({ n: '休眠策略', v: -4 });
+                else f.push({ n: '在线正常', v: 0 });
+                if (d.loss > 2) f.push({ n: '丢包 ' + d.loss.toFixed(1) + '%', v: -(d.loss - 2) * 3.2 });
+                if (d.temp > 70) f.push({ n: '温度 ' + d.temp + '℃', v: -(d.temp - 70) * 0.9 });
+                if (d.signal < 60) f.push({ n: '信号弱 ' + d.signal + '%', v: -(60 - d.signal) * 0.35 });
+                if (d.offline) f.push({ n: '离线 ' + d.offline + ' 次', v: -d.offline * 1.6 });
+                if (d.faultCount) f.push({ n: '历史故障 ' + d.faultCount + ' 次', v: -d.faultCount * 1.2 });
+                const behind = fwBehind(d.fw, TYPES[d.type].fwLatest);
+                if (behind) f.push({ n: '固件落后', v: -behind * 2.2 });
+                if (d.uptimeDays > 900) f.push({ n: '连续运行 ' + d.uptimeDays + ' 天', v: -(d.uptimeDays - 900) / 60 });
+                return f;
+            }
+            function deviceEvents(d) {
+                const ev = (d.notes || []).slice(0, 4).map(function (n) {
+                    return { h: n.txt, m: n.who + ' · ' + n.t, cls: 'done' };
+                });
+                ev.push({ h: '上报心跳 ' + d.msgRate + ' msg/s，丢包率 ' + d.loss.toFixed(2) + '%', m: agoText(d.lastSeen), cls: 'done' });
+                ev.push({ h: '固件校验通过（' + d.fw + '）', m: d.install + ' 入网初始化', cls: '' });
+                ev.push({ h: '待办：下周巡检 ' + (INSPECT_ITEM[d.type] || '量程校准'), m: '计划中', cls: 'todo' });
+                return ev;
+            }
+            function openMaint(d) {
+                SC.modal.form({
+                    title: '登记维护 · ' + d.id,
+                    submitText: '保存记录',
+                    fields: [
+                        { name: 'kind', label: '维护类型', type: 'select', options: ['现场检修', '更换部件', '清洁校准', '线路整改', '重新入网'], col: 1, required: true },
+                        { name: 'who', label: '处理人', col: 1, value: '运维班组 A', required: true },
+                        { name: 'cost', label: '工耗（小时）', type: 'number', min: 0.5, max: 72, step: 0.5, value: 1.5, col: 1 },
+                        { name: 'reset', label: '维护后恢复在线', type: 'switch', onText: '是', col: 1 },
+                        { name: 'txt', label: '处理结论', type: 'textarea', col: 2, required: true, placeholder: '例：更换 4-20mA 输入板卡，重新标定零点与满度，联动测试通过' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    d.notes.unshift({ t: SC.stamp(new Date()), who: v.who + '·' + v.kind, txt: v.txt });
+                    if (d.notes.length > 12) d.notes.length = 12;
+                    d.offline = Math.max(0, d.offline - 1);
+                    d.loss = Number((d.loss * 0.4).toFixed(2));
+                    d.temp = Math.min(d.temp, 62);
+                    if (v.reset) { d.status = '在线'; d.lastSeen = Date.now(); }
+                    d.fw = TYPES[d.type].fwLatest;
+                    d.faultCount = Math.max(0, d.faultCount - (v.kind === '更换部件' ? 1 : 0));
+                    d.health = calcHealth(d);
+                    d.healthHistory = d.healthHistory.concat([d.health]).slice(-8);
+                    saveDevices();
+                    renderDevs(); renderKpi(); renderTypeGrid(); renderChips(); applyFilter();
+                    log('ok', d.id + ' 维护登记完成（' + v.kind + '，' + v.cost + 'h），健康分恢复至 ' + d.health);
+                    SC.toast('维护记录已写入，健康分更新为 ' + d.health, { type: 'success' });
+                });
+            }
+            function removeDevice(d) {
+                SC.modal.confirm({
+                    title: '删除设备', danger: true, okText: '确认退网',
+                    html: '<div>将从台账中移除 <b>' + d.id + ' ' + SC.esc(d.name) + '</b>，并停止其接入通道。<br>' +
+                        '<span class="sc-hint">生产环境中需同步清理地址映射、告警订阅与历史数据索引。</span></div>'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    devices = devices.filter(x => x.id !== d.id);
+                    saveDevices();
+                    renderDevs(); renderKpi(); renderTypeGrid(); renderChips(); applyFilter();
+                    SC.modal.closeTop();
+                    log('warn', d.id + ' 已退网删除');
+                    SC.toast('设备 ' + d.id + ' 已退网', { type: 'success' });
+                });
+            }
+            function openAddDevice() {
+                const types = Object.keys(TYPES).map(k => ({ value: k, label: TYPES[k].label }));
+                SC.modal.form({
+                    title: '设备入网登记',
+                    submitText: '入网',
+                    fields: [
+                        { name: 'name', label: '设备名称', required: true, placeholder: '例：滨江路段管网流量计', col: 2 },
+                        { name: 'type', label: '设备类型', type: 'select', options: types, col: 1, required: true },
+                        { name: 'zone', label: '安装区域', type: 'select', options: ZONES, col: 1, required: true },
+                        {
+                            name: 'protocol', label: '接入协议', type: 'select',
+                            options: Object.keys(TYPES).reduce((a, k) => a.concat(TYPES[k].protocols), []).filter((v, i, a) => a.indexOf(v) === i), col: 1, required: true
+                        },
+                        {
+                            name: 'power', label: '供电方式', type: 'select',
+                            options: Object.keys(TYPES).reduce((a, k) => a.concat(TYPES[k].power), []).filter((v, i, a) => a.indexOf(v) === i), col: 1, required: true
+                        },
+                        { name: 'vendor', label: '厂商', col: 1, value: '华感科技', required: true },
+                        { name: 'msgRate', label: '上报频率', type: 'number', min: 1, max: 30, value: 2, unit: 'msg/s', col: 1 },
+                        { name: 'install', label: '启用日期', type: 'date', value: SC.today(), col: 1, required: true },
+                        { name: 'autoTest', label: '入网后自动联调', type: 'switch', value: true, onText: '执行自检', col: 1 },
+                        { name: 'note', label: '备注', type: 'textarea', col: 2, placeholder: '安装点位、杆号、回路编号等' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    let maxSeq = 0;
+                    devices.forEach(d => { const n = Number(d.id.split('-')[1]); if (n > maxSeq) maxSeq = n; });
+                    const T = TYPES[v.type];
+                    const d = {
+                        id: 'DEV-' + String(maxSeq + 1).padStart(4, '0'),
+                        name: v.name, type: v.type, model: T.models[0], protocol: v.protocol, zone: v.zone,
+                        vendor: v.vendor, power: v.power, serial: 'SN' + ri(10000000, 99999999),
+                        fw: T.fwLatest, status: '在线', signal: ri(72, 98), battery: 100, temp: ri(28, 46),
+                        loss: 0, offline: 0, faultCount: 0, mttr: 1, uptimeDays: 0,
+                        install: v.install, msgRate: v.msgRate, lastSeen: Date.now(), healthHistory: [], notes: []
+                    };
+                    if (v.note) d.notes.push({ t: SC.stamp(new Date()), who: '入网登记', txt: v.note });
+                    d.health = calcHealth(d);
+                    d.healthHistory = [d.health, d.health, d.health, d.health, d.health, d.health, d.health, d.health];
+                    devices.unshift(d);
+                    saveDevices();
+                    renderDevs(); renderKpi(); renderTypeGrid(); renderChips(); applyFilter();
+                    log('ok', d.id + ' 入网登记成功（' + v.protocol + ' / ' + v.zone + '）' + (v.autoTest ? '，已自动执行入网自检' : ''));
+                    SC.toast(d.id + ' 已入网' + (v.autoTest ? '，自检项全部通过' : ''), { type: 'success' });
+                });
+            }
+
+            /* =====================================================================
+               15. 实时仿真
+               ===================================================================== */
+            mon.writeRate = mon.real[mon.real.length - 1].v.reduce((a, b) => a + b, 0) * 3600 / 10000;
+            const hourly = [];
+            for (let i = 7; i >= 0; i--) {
+                const d = new Date(Date.now() - i * 3600000);
+                hourly.push({ label: SC.pad2(d.getHours()) + ':00', value: Number((mon.writeRate * (0.78 + Math.random() * 0.44)).toFixed(1)) });
+            }
+            function updateGauges() {
+                setChart('gLat', SC.chart.gauge, document.getElementById('g-latency'), {
+                    value: mon.latency, min: 0, max: 400, unit: ' ms', decimals: 0, label: '端到端时延',
+                    segments: [{ to: 150, color: '#27ae60' }, { to: 250, color: '#f39c12' }, { to: 400, color: '#e74c3c' }]
+                });
+                setChart('gLoss', SC.chart.gauge, document.getElementById('g-loss'), {
+                    value: mon.loss, min: 0, max: 3, unit: '%', decimals: 2, label: '链路丢包率',
+                    segments: [{ to: 0.8, color: '#27ae60' }, { to: 1.5, color: '#f39c12' }, { to: 3, color: '#e74c3c' }]
+                });
+                setChart('gStore', SC.chart.gauge, document.getElementById('g-store'), {
+                    value: mon.store, min: 0, max: 100, unit: '%', decimals: 1, label: '时序库容量水位',
+                    segments: [{ to: 70, color: '#27ae60' }, { to: 85, color: '#f39c12' }, { to: 100, color: '#e74c3c' }]
+                });
+            }
+            function renderStore() {
+                document.getElementById('store-kv').innerHTML =
+                    kvItem('写入速率', mon.writeRate.toFixed(1) + ' 万条/h') +
+                    kvItem('热库占用', SC.num(mon.store * 4.82, 0) + ' GB') +
+                    kvItem('冷库占用', '1,286 TB') +
+                    kvItem('压缩率', '6.8 : 1') +
+                    kvItem('保留策略', '热 30 天 / 冷 3 年') +
+                    kvItem('今日归档', SC.num(ri(180, 260)) + ' 万条');
+                setChart('storeBar', SC.chart.bar, document.getElementById('store-chart'), {
+                    labels: hourly.map(h => h.label), unit: ' 万条',
+                    series: [{ name: '小时入库量', color: '#27ae60', data: hourly.map(h => h.value) }]
+                });
+            }
+            /** 设备侧扰动：心跳、链路、偶发离线与自动恢复 */
+            function mutateDevices() {
+                let statusChanged = false;
+                for (let k = 0; k < 7; k++) {
+                    const d = devices[ri(0, devices.length - 1)];
+                    if (!d) continue;
+                    if (d.status === '在线') {
+                        d.signal = Math.round(SC.clamp(d.signal + ri(-4, 4), 30, 99));
+                        d.temp = Math.round(SC.clamp(d.temp + ri(-3, 3), 18, 92));
+                        d.loss = Number(SC.clamp(d.loss + rf(-0.3, 0.35), 0, 9).toFixed(2));
+                        d.lastSeen = Date.now();
+                        if (Math.random() < 0.05) {
+                            d.status = '离线'; d.offline++; statusChanged = true;
+                            d.health = calcHealth(d);
+                            monEvent('alarm', d.id + ' 心跳超时（>' + ri(3, 9) + ' 个周期），已切换为离线态并挂起告警去抖');
+                        }
+                    } else if (d.status === '离线' && Math.random() < 0.22) {
+                        d.status = '在线'; d.lastSeen = Date.now(); statusChanged = true;
+                        d.health = calcHealth(d);
+                        monEvent('ok', d.id + ' 自动重连成功，补传离线期间缓存 ' + ri(12, 480) + ' 条数据');
+                    } else if (d.status === '休眠' && Math.random() < 0.12) {
+                        d.status = '在线'; d.lastSeen = Date.now(); statusChanged = true;
+                        d.health = calcHealth(d);
+                    }
+                }
+                gateways.forEach(function (g) {
+                    g.conn = Math.max(200, g.conn + ri(-24, 26));
+                    g.lat = Math.round(SC.clamp(g.lat + ri(-9, 9), 30, 400));
+                    g.loss = Number(SC.clamp(g.loss + rf(-0.08, 0.09), 0, 4).toFixed(2));
+                });
+                if (statusChanged) { saveDevices(); renderDevs(); renderChips(); renderTypeGrid(); }
+                renderKpi();
+                if (statusChanged) applyFilter();
+            }
+            let tickCount = 0;
+            function monTick() {
+                tickCount++;
+                mon.real.push({ t: Date.now(), v: realSample() });
+                if (mon.real.length > 60) mon.real.shift();
+                const total = mon.real[mon.real.length - 1].v.reduce((a, b) => a + b, 0);
+                mon.writeRate = total * 3600 / 10000;
+                mon.latency = Math.round(SC.sim.walk(mon.latency, { min: 52, max: 340, volatility: 13 }));
+                mon.loss = Number(SC.clamp(SC.sim.walk(mon.loss, { min: 0, max: 2.8, volatility: 0.11 }), 0, 3).toFixed(2));
+                mon.store = Number(SC.clamp(mon.store + 0.008 + Math.random() * 0.02, 5, 99).toFixed(2));
+                if (Math.random() < 0.5) hourly[hourly.length - 1].value = Number((mon.writeRate * (0.94 + Math.random() * 0.12)).toFixed(1));
+                if (tickCount % 3600 === 0) { hourly.shift(); hourly.push({ label: SC.pad2(new Date().getHours()) + ':00', value: mon.writeRate }); }
+
+                if (mon.range === 'real') renderTpChart();
+                renderPipe(true);
+                updateGauges();
+                if (document.getElementById('data-monitor-module').classList.contains('active')) renderStore();
+                if (tickCount % 5 === 0) renderGw();
+                if (Math.random() < 0.22) {
+                    const pool = [
+                        ['info', 'MQTT Broker 主备切换完成，抖动 ' + ri(40, 320) + 'ms，无消息丢失'],
+                        ['info', '时序库分片 ' + pick(['metrics_03', 'metrics_07', 'video_meta']) + ' 写入延迟 ' + ri(120, 900) + 'ms，在阈值内'],
+                        ['warn', '片区网关 ' + pick(gateways).id + ' 上行带宽占用 ' + ri(76, 94) + '%，已启用采样降级'],
+                        ['warn', '数据清洗丢弃 ' + ri(12, 180) + ' 条越界值（空气质量 PM2.5 突变）'],
+                        ['ok', '订阅 ' + pick(subs).id + ' 推送回执正常，积压队列 0'],
+                        ['alarm', 'GB28181 会话 ' + ri(1000, 9999) + ' 注册失败，已重试 ' + ri(1, 3) + ' 次']
+                    ];
+                    const e = pick(pool);
+                    monEvent(e[0], e[1]);
+                    if (e[0] === 'alarm') SC.toast(e[1], { type: 'warn', title: '链路异常', duration: 3600 });
+                }
+                if (tickCount % 3 === 0) mutateDevices();
+                if (tickCount % 20 === 0) paintOpslog();
+                document.getElementById('gauge-time').textContent = '采样于 ' + SC.stamp(new Date());
+            }
+
+            /* =====================================================================
+               16. 初始化与事件绑定
+               ===================================================================== */
+            renderKpi();
+            renderTypeGrid();
+            renderChips();
+            renderDevs();
+            devCtrl = SC.table.enhance(document.getElementById('dev-table'), {
+                pageSize: 10, search: '#dev-search', export: '设备台账', selectable: true, keyAttr: 'id',
+                onRender: updateSelHint
+            });
+            applyFilter();
+
+            document.getElementById('dev-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('[data-act]');
+                if (!btn || btn.tagName !== 'BUTTON') return;
+                const id = btn.closest('tr').dataset.id;
+                const d = byId(id);
+                if (!d) return;
+                if (btn.dataset.act === 'view') openDetail(d.id);
+                if (btn.dataset.act === 'cmd') openCmd(d);
+            });
+
+            document.getElementById('btn-add-device').addEventListener('click', openAddDevice);
+            document.getElementById('btn-attn').addEventListener('click', openAttn);
+            document.getElementById('btn-batch-clear').addEventListener('click', function () {
+                devCtrl.clearSelected();
+                updateSelHint();
+            });
+            document.getElementById('btn-batch-reboot').addEventListener('click', function () {
+                const list = targetDevices('远程重启').filter(d => d.status !== '检修');
+                if (!list.length) return;
+                SC.modal.confirm({
+                    title: '批量重启确认', danger: true, okText: '下发重启',
+                    html: '即将重启 <b>' + list.length + '</b> 台设备，期间该设备停止上报约 30-90 秒。<br>' +
+                        '<span class="sc-hint">控制类设备（信号机、泵站柜）建议避开早晚高峰，本次已自动过滤检修态设备。</span>'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    startJob({
+                        title: '批量远程重启', items: list, failRate: 0.05,
+                        phases: ['下发', '重启中', '上线握手', '参数回拉'],
+                        onApply: function (d) { d.lastSeen = Date.now(); d.status = '在线'; d.signal = Math.max(d.signal, 62); d.health = calcHealth(d); },
+                        onFail: function (d) { d.offline++; d.status = '离线'; d.health = calcHealth(d); }
+                    });
+                    devCtrl.clearSelected();
+                });
+            });
+            document.getElementById('btn-batch-inspect').addEventListener('click', function () {
+                const list = targetDevices('转检修');
+                if (!list.length) return;
+                startJob({
+                    title: '批量锁定检修态', items: list, failRate: 0.02,
+                    phases: ['工单生成', '策略下发', '状态回写'],
+                    onApply: function (d) { d.status = '检修'; d.health = calcHealth(d); }
+                });
+                devCtrl.clearSelected();
+            });
+            document.getElementById('btn-batch-ota').addEventListener('click', function () {
+                const list = targetDevices('固件 OTA');
+                if (!list.length) return;
+                const candidates = list.filter(d => d.fw !== TYPES[d.type].fwLatest);
+                if (!candidates.length) { SC.toast('所选设备固件均为最新版本', { type: 'warn' }); return; }
+                SC.modal.form({
+                    title: '固件 OTA 升级任务（' + candidates.length + ' 台待升级）',
+                    submitText: '创建任务',
+                    fields: [
+                        { name: 'batch', label: '任务名称', col: 1, required: true, value: 'OTA-' + SC.today().replace(/-/g, '') + '-01' },
+                        {
+                            name: 'canary', label: '灰度比例', type: 'range', min: 10, max: 100, step: 10, value: 30, unit: '%', col: 1,
+                            hint: '先对部分设备下发，验证无异常后再全量推送'
+                        },
+                        { name: 'window', label: '执行窗口', type: 'select', options: ['立即执行', '凌晨 01:00-04:00', '维护日'], col: 1, required: true },
+                        { name: 'rollback', label: '失败自动回滚', type: 'switch', value: true, col: 1 },
+                        { name: 'keepParam', label: '保留业务参数', type: 'switch', value: true, col: 1 },
+                        { name: 'notify', label: '通知方式', type: 'checkgroup', options: ['短信', '站内消息', '邮件', '企业微信'], value: ['站内消息'], col: 2 },
+                        { name: 'remark', label: '升级说明', type: 'textarea', col: 2, placeholder: '例：修复弱网下重连风暴导致的队列堆积' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const shuffled = candidates.slice().sort(() => Math.random() - 0.5);
+                    const take = Math.max(1, Math.round(shuffled.length * v.canary / 100));
+                    const now = shuffled.slice(0, take);
+                    const later = shuffled.slice(take);
+                    startJob({
+                        title: '固件 OTA（' + v.batch + '，灰度 ' + v.canary + '%）',
+                        items: now, failRate: 0.1,
+                        phases: ['下发', '下载', '安装', '校验'],
+                        onApply: function (d) { d.fw = TYPES[d.type].fwLatest; d.health = calcHealth(d); },
+                        onFail: function (d) { d.offline++; if (v.rollback) d.notes.unshift({ t: SC.stamp(new Date()), who: 'OTA 任务', txt: d.id + ' 升级失败，已回滚至 ' + d.fw }); }
+                    });
+                    if (later.length) {
+                        log('info', 'OTA 全量计划：剩余 ' + later.length + ' 台将在灰度验证通过后于' + v.window + '自动推送');
+                        SC.toast('灰度 ' + now.length + ' 台已下发，剩余 ' + later.length + ' 台列入全量计划', { type: 'info', duration: 4200 });
+                    }
+                    devCtrl.clearSelected();
+                });
+            });
+            document.getElementById('job-retry').addEventListener('click', retryFailed);
+            document.getElementById('job-close').addEventListener('click', function () {
+                if (job && !job.finished) {
+                    SC.toast('任务执行中，完成后可关闭', { type: 'warn' });
+                    return;
+                }
+                document.getElementById('job-panel').hidden = true;
+            });
+
+            /* ---------- 监控模块 ---------- */
+            renderPipe(false);
+            renderGw();
+            renderDq();
+            renderTpChart();
+            updateGauges();
+            renderStore();
+            paintOpslog();
+            document.querySelectorAll('#tp-range button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelectorAll('#tp-range button').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    mon.range = b.dataset.range;
+                    renderTpChart();
+                });
+            });
+            document.getElementById('btn-mon-log-export').addEventListener('click', function () {
+                SC.csv.download('链路运行日志_' + SC.today() + '.csv', [['时间', '级别', '内容']]
+                    .concat(opslog.map(e => [SC.stamp(e.t), e.lv, e.tx])));
+                SC.toast('已导出 ' + opslog.length + ' 条运行与操作日志', { type: 'success' });
+            });
+            liveMon = SC.live({ interval: 1000, onTick: monTick, button: document.getElementById('mon-live-btn') });
+
+            /* ---------- 分析模块 ---------- */
+            renderAnState();
+            document.querySelectorAll('#an-scope button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelectorAll('#an-scope button').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    switchScope(b.dataset.scope);
+                });
+            });
+            document.querySelectorAll('#col-range button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelectorAll('#col-range button').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    renderAnCollect(Number(b.dataset.days));
+                });
+            });
+            document.getElementById('btn-report').addEventListener('click', openReport);
+            document.getElementById('btn-plan-export').addEventListener('click', function () {
+                const plan = renderAnLife.data || [];
+                if (!plan.length) { SC.toast('暂无汰换计划', { type: 'warn' }); return; }
+                SC.csv.download('设备汰换计划_' + SC.today() + '.csv', [['批次', '类型', '数量', '预算(万元)', '依据']]
+                    .concat(plan.map(p => [p.batch, p.type, p.n, p.budget, p.reason])));
+                SC.toast('汰换计划已导出（' + plan.length + ' 个批次）', { type: 'success' });
+            });
+
+            /* ---------- 集成模块 ---------- */
+            renderApis();
+            renderSyncs();
+            renderSubs();
+            renderConns();
+            document.getElementById('dbg-api').addEventListener('change', loadApiParams);
+            document.getElementById('dbg-run').addEventListener('click', runDebug);
+            document.getElementById('dbg-auth').addEventListener('click', function () { this.classList.toggle('on'); });
+            document.getElementById('btn-add-api').addEventListener('click', openAddApi);
+            document.getElementById('btn-sync-all').addEventListener('click', runAllSync);
+            document.getElementById('api-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('[data-act]');
+                if (!btn || btn.tagName !== 'BUTTON') return;
+                const id = btn.closest('tr').dataset.id;
+                const a = apis.filter(x => x.id === id)[0];
+                if (!a) return;
+                if (btn.dataset.act === 'dbg') {
+                    document.getElementById('dbg-api').value = a.id;
+                    loadApiParams();
+                    document.getElementById('dbg-run').scrollIntoView({ block: 'center' });
+                    SC.toast('已载入 ' + a.id + '，点击「发送请求」发起调用', { type: 'info' });
+                }
+                if (btn.dataset.act === 'toggle') {
+                    a.state = a.state === '停用' ? '启用' : '停用';
+                    renderApis();
+                    log(a.state === '停用' ? 'warn' : 'ok', '接口 ' + a.path + ' 已' + a.state);
+                    SC.toast(a.path + ' 已' + a.state, { type: a.state === '停用' ? 'warn' : 'success' });
+                }
+            });
+
+            /* ---------- 模块切换时重绘图表（隐藏容器宽度为 0） ---------- */
+            document.querySelectorAll('.module-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    setTimeout(function () {
+                        const m = btn.dataset.module;
+                        if (m === 'data-monitor') { renderTpChart(); updateGauges(); renderStore(); renderDq(); renderPipe(false); }
+                        if (m === 'data-analysis') switchScope(document.querySelector('#an-scope button.active').dataset.scope);
+                    }, 30);
+                });
+            });
+
+            if (catalogAdded) {
+                log('info', '设备目录口径升级至 v' + EQ_CAT_VER + '：保留原台账，自动补齐 ' + catalogAdded + ' 台新增类别设备（环卫、燃气、液位、视频抓拍、作业终端等）');
+                SC.toast('设备目录已升级，新增 ' + catalogAdded + ' 台类别补齐设备', { type: 'info', duration: 4200 });
+            }
+            log('ok', '设备与数据管理模块已加载：建档 ' + devices.length + ' 台抽检设备 / ' + Object.keys(TYPES).length + ' 类目录，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
+            SC.toast('设备台账已就绪，共 ' + devices.length + ' 台建档设备', { type: 'success' });
+        })();
+    </script>
+
 </body>
 
 </html>

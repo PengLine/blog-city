@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initModuleNavigation();
     initTabNavigation();
     initPageTransition();
+    // 数字滚动动画此前只在首页手动触发，这里统一交给所有页面
+    initAnimatedNumbers();
 });
 
 function initModuleNavigation() {
@@ -70,104 +72,42 @@ function initPageTransition() {
 function animateNumbers() {
     const statValues = document.querySelectorAll('.stat-value, .metric-value');
     statValues.forEach(value => {
+        if (value.dataset.animated === '1') return;
         const textContent = value.textContent.trim();
-        if (textContent === '智能' || textContent.includes('%') || textContent.includes('m') || textContent.includes('分钟')) {
-            return;
-        }
-        
-        const target = parseInt(textContent.replace(/,/g, ''));
-        if (isNaN(target)) return;
-        
+        // 拆出「前缀 + 数值 + 后缀」，避免 4.8 被取整成 4、10TB 被削成 10
+        const matched = textContent.match(/^([^\d]*)(\d[\d,]*(?:\.\d+)?)(.*)$/);
+        if (!matched) return;
+
+        const prefix = matched[1];
+        const decimals = matched[2].includes('.') ? matched[2].split('.')[1].length : 0;
+        const suffix = matched[3];
+        const target = parseFloat(matched[2].replace(/,/g, ''));
+        if (!isFinite(target)) return;
+
+        value.dataset.animated = '1';
         let current = 0;
         const increment = target / 50;
         const timer = setInterval(() => {
             current += increment;
             if (current >= target) {
-                value.textContent = formatNumber(target);
+                value.textContent = prefix + formatNumber(target, decimals) + suffix;
                 clearInterval(timer);
             } else {
-                value.textContent = formatNumber(Math.floor(current));
+                value.textContent = prefix + formatNumber(current, decimals) + suffix;
             }
         }, 30);
     });
 }
 
-function formatNumber(num) {
-    return num.toLocaleString();
+function formatNumber(num, decimals = 0) {
+    return Number(num).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    });
 }
 
 function initAnimatedNumbers() {
     setTimeout(animateNumbers, 500);
-}
-
-function initChart(canvasId, type, data, options = {}) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return null;
-    
-    const ctx = canvas.getContext('2d');
-    
-    const defaultOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    color: '#8892b0',
-                    padding: 20
-                }
-            }
-        }
-    };
-    
-    return new Chart(ctx, {
-        type: type,
-        data: data,
-        options: { ...defaultOptions, ...options }
-    });
-}
-
-function createBarChartData(labels, datasets) {
-    return {
-        labels: labels,
-        datasets: datasets.map(ds => ({
-            ...ds,
-            backgroundColor: ds.backgroundColor || 'rgba(52, 152, 219, 0.8)',
-            borderColor: ds.borderColor || 'rgba(52, 152, 219, 1)',
-            borderWidth: 1
-        }))
-    };
-}
-
-function createPieChartData(labels, data, colors) {
-    return {
-        labels: labels,
-        datasets: [{
-            data: data,
-            backgroundColor: colors || [
-                'rgba(231, 76, 60, 0.8)',
-                'rgba(52, 152, 219, 0.8)',
-                'rgba(243, 156, 18, 0.8)',
-                'rgba(39, 174, 96, 0.8)',
-                'rgba(155, 89, 182, 0.8)'
-            ],
-            borderWidth: 0
-        }]
-    };
-}
-
-function createLineChartData(labels, datasets) {
-    return {
-        labels: labels,
-        datasets: datasets.map(ds => ({
-            ...ds,
-            backgroundColor: ds.backgroundColor || 'rgba(0, 212, 255, 0.1)',
-            borderColor: ds.borderColor || 'rgba(0, 212, 255, 1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-        }))
-    };
 }
 
 function toggleFullscreen() {
