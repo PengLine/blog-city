@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>设备+数据 - 智慧城市管理平台</title>
+    <title>设备管理 - 智慧城市管理平台</title>
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/ui-kit.css">
     <style>
@@ -376,6 +376,270 @@
             height: 130px;
         }
 
+        /* ---------- 心跳与数据流 ---------- */
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .mini-card {
+            background: white;
+            border-radius: 11px;
+            padding: 13px 16px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            border-left: 3px solid #26c6da;
+        }
+
+        .mini-card .mk {
+            font-size: 0.76em;
+            color: #7f8c8d;
+        }
+
+        .mini-card .mv {
+            font-size: 1.42em;
+            font-weight: bold;
+            color: #2c3e50;
+            font-variant-numeric: tabular-nums;
+            margin: 3px 0 2px;
+        }
+
+        .mini-card .ms {
+            font-size: 0.73em;
+            color: #95a5a6;
+        }
+
+        .mini-card.ok {
+            border-left-color: #27ae60;
+        }
+
+        .mini-card.ok .mv {
+            color: #27ae60;
+        }
+
+        .mini-card.warn {
+            border-left-color: #e67e22;
+        }
+
+        .mini-card.warn .mv {
+            color: #e67e22;
+        }
+
+        .mini-card.bad {
+            border-left-color: #e74c3c;
+        }
+
+        .mini-card.bad .mv {
+            color: #e74c3c;
+        }
+
+        /* 心跳点阵：一格 = 一个心跳周期 */
+        .beat-strip {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+        }
+
+        .beat-strip i {
+            display: block;
+            width: 6px;
+            height: 15px;
+            border-radius: 2px;
+            background: #e3e8ee;
+        }
+
+        .beat-strip i.on {
+            background: #27ae60;
+        }
+
+        .beat-strip i.late {
+            background: #f39c12;
+        }
+
+        .beat-strip i.miss {
+            background: #e74c3c;
+        }
+
+        .beat-strip i.sleep {
+            background: #b0bec5;
+        }
+
+        .hb-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            font-size: 0.76em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        .hb-legend i {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            border-radius: 3px;
+            margin-right: 5px;
+            vertical-align: -1px;
+        }
+
+        .url-chip {
+            display: block;
+            max-width: 100%;
+            padding: 4px 9px;
+            border-radius: 7px;
+            background: #f2f5f8;
+            border: 1px solid #e1e6eb;
+            font-family: Consolas, monospace;
+            font-size: 0.76em;
+            color: #34495e;
+            word-break: break-all;
+            text-align: left;
+        }
+
+        /* 报文实时窗口 */
+        .tail {
+            height: 262px;
+            overflow: auto;
+            background: #10202d;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-family: Consolas, monospace;
+            font-size: 0.76em;
+            line-height: 1.7;
+            color: #cfd8e3;
+        }
+
+        .tail .row {
+            display: flex;
+            gap: 9px;
+            white-space: nowrap;
+        }
+
+        .tail .row .t {
+            color: #7fa8c9;
+            flex: 0 0 auto;
+        }
+
+        .tail .row .dev {
+            color: #4dd0e1;
+            flex: 0 0 auto;
+        }
+
+        .tail .row .tp {
+            color: #ffd54f;
+            flex: 0 0 auto;
+        }
+
+        .tail .row .py {
+            color: #aebccb;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tail .row.err {
+            color: #ef9a9a;
+        }
+
+        .tail .row.err .py {
+            color: #ef9a9a;
+        }
+
+        /* 取流播放器 */
+        .player {
+            background: #0d1b26;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #1d3140;
+        }
+
+        .player canvas {
+            display: block;
+            width: 100%;
+            height: 230px;
+        }
+
+        .player .bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            padding: 9px 12px;
+            background: #12242f;
+            color: #cfd8e3;
+            font-size: 0.78em;
+            align-items: center;
+        }
+
+        .player .bar b {
+            color: #4dd0e1;
+            font-weight: 600;
+        }
+
+        .player .bar .rec {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #ff8a80;
+        }
+
+        .player .bar .rec i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff5252;
+            animation: recblink 1.1s infinite;
+        }
+
+        @keyframes recblink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.25;
+            }
+        }
+
+        .bf-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 8px;
+            font-size: 0.86em;
+        }
+
+        .bf-item .bg {
+            flex: 1;
+        }
+
+        .fn-tag {
+            display: inline-block;
+            padding: 1px 7px;
+            margin: 1px 3px 1px 0;
+            border-radius: 999px;
+            font-size: .78em;
+            font-weight: 600;
+            color: var(--c, #34495e);
+            background: #f3f6fa;
+            border: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .sc-chip .fn-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 5px;
+            background: var(--c, #34495e);
+        }
+
         @media (max-width: 768px) {
             .dbg-grid {
                 grid-template-columns: 1fr;
@@ -394,8 +658,8 @@
     <div class="container">
         <header>
             <div>
-                <h1>🔧 设备+数据管理</h1>
-                <p>物联设备全生命周期管理 · 数据链路监控 · 健康预测 · 系统集成</p>
+                <h1>🔧 设备管理</h1>
+                <p>物联设备全生命周期管理 · 心跳与数据流获取监控 · 健康预测 · 系统集成</p>
             </div>
             <a href="index.html" class="nav-btn">🔙 返回主页面</a>
         </header>
@@ -425,6 +689,18 @@
                 <div class="device-label">今日采集条数（万条）</div>
                 <div class="device-sub" id="kpi-data-sub">存储占用 0 GB</div>
             </div>
+            <div class="device-card">
+                <div class="device-icon">💓</div>
+                <div class="device-value" id="kpi-beat">0%</div>
+                <div class="device-label">心跳准点率</div>
+                <div class="device-sub" id="kpi-beat-sub">超时 0 · 停摆 0</div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">🌊</div>
+                <div class="device-value" id="kpi-stream">0</div>
+                <div class="device-label">在推数据流（条）</div>
+                <div class="device-sub" id="kpi-stream-sub">视频 0 · 补传积压 0</div>
+            </div>
         </div>
 
         <p class="sc-hint" style="margin:12px 2px 0">口径说明：全市末端感知设备在册 <b>978,542</b> 台 / <b>23</b> 类（按杭州市域体量估算，
@@ -432,17 +708,19 @@
             按设备分类权重抽取样本逐台建档，批量作业与健康预测均在样本范围内可演练。</p>
 
         <div class="module-nav">
-            <button class="module-btn active" data-module="device-management">🔧 设备管理</button>
-            <button class="module-btn" data-module="data-monitor">📊 数据监控</button>
+            <button class="module-btn active" data-module="device-management">📋 设备台账</button>
+            <button class="module-btn" data-module="heartbeat">💓 心跳在线</button>
+            <button class="module-btn" data-module="stream">🌊 数据流</button>
+            <button class="module-btn" data-module="data-monitor">📡 链路监控</button>
             <button class="module-btn" data-module="data-analysis">📈 数据分析</button>
             <button class="module-btn" data-module="system-integration">🔗 系统集成</button>
         </div>
 
         <div id="device-management-module" class="module-content active">
             <div class="content-header">
-                <h3>🔧 设备管理</h3>
+                <h3>📋 设备台账与批量作业</h3>
                 <div class="sc-inline">
-                    <input class="search-input" id="dev-search" placeholder="搜索编号 / 名称 / 型号 / 区域…">
+                    <input class="search-input" id="dev-search" placeholder="搜索编号 / 名称 / 型号 / 区域 / 业务功能…">
                     <button class="sc-btn" id="btn-attn">🩺 健康预警清单</button>
                     <button class="sc-btn primary" id="btn-add-device">＋ 设备入网</button>
                 </div>
@@ -467,10 +745,16 @@
 
             <div class="sc-chips" id="dev-status-chips"></div>
 
+            <div class="sc-chips" id="dev-quick-chips" style="margin-bottom:12px"></div>
+
+            <div class="sc-chips" id="dev-func-chips" style="margin-bottom:12px"></div>
+
             <div class="sc-inline" style="margin-bottom:14px">
                 <span class="sc-hint">批量操作：</span>
                 <button class="sc-btn sm" id="btn-batch-reboot">⟳ 远程重启</button>
                 <button class="sc-btn sm" id="btn-batch-ota">⬆ 固件 OTA</button>
+                <button class="sc-btn sm" id="btn-batch-probe">📡 心跳探测</button>
+                <button class="sc-btn sm" id="btn-batch-sub">🌊 订阅数据流</button>
                 <button class="sc-btn sm" id="btn-batch-inspect">🛠 转检修</button>
                 <button class="sc-btn sm ghost" id="btn-batch-clear">清除选择</button>
                 <span class="sc-hint" id="sel-hint">未选择设备</span>
@@ -483,13 +767,16 @@
                             <th>设备编号</th>
                             <th>设备名称</th>
                             <th>类型</th>
+                            <th>业务功能</th>
                             <th>安装区域</th>
                             <th>协议</th>
                             <th>固件</th>
                             <th>信号</th>
                             <th>健康分</th>
                             <th>状态</th>
-                            <th data-no-sort>最近上报</th>
+                            <th>心跳</th>
+                            <th data-no-sort>最近心跳</th>
+                            <th data-no-sort>数据流</th>
                             <th data-no-sort>操作</th>
                         </tr>
                     </thead>
@@ -503,9 +790,233 @@
             </div>
         </div>
 
+        <div id="heartbeat-module" class="module-content">
+            <div class="content-header">
+                <h3>💓 心跳与在线</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="hb-search" placeholder="搜索编号 / 名称 / 片区…">
+                    <button class="sc-btn" id="btn-hb-rule">⚙ 心跳告警规则</button>
+                    <button class="sc-btn" id="btn-hb-probe">📡 单台心跳探测</button>
+                    <button class="sc-btn primary" id="btn-hb-wake">⚡ 批量唤醒掉线设备</button>
+                </div>
+            </div>
+
+            <div class="mini-grid" id="hb-kpi"></div>
+
+            <div class="sc-panel" style="margin-bottom:20px">
+                <div class="sc-panel-title">
+                    <h3>24 小时心跳达标墙</h3>
+                    <span class="sc-hint" id="hb-rule-tip">超时判定：连续丢失 3 个心跳周期</span>
+                </div>
+                <div class="sc-heat" id="hb-wall"></div>
+                <div class="sc-heat-axis" id="hb-wall-axis"></div>
+                <div class="hb-legend">
+                    <span><i style="background:#27ae60"></i>准点率 ≥ 95%</span>
+                    <span><i style="background:#f39c12"></i>80-95%（间歇丢拍）</span>
+                    <span><i style="background:#e74c3c"></i>&lt; 80%（频繁掉线）</span>
+                    <span><i style="background:#90a4ae"></i>设备处于休眠策略窗口</span>
+                    <span class="sc-hint">行=设备类型，列=整点小时；格子越深表示该小时心跳准点率越高。</span>
+                </div>
+            </div>
+
+            <div class="sc-split">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>心跳超时倍数分布</h3>
+                        <span class="sc-hint">距上次心跳 ÷ 标称周期</span>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-hb-gap"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>掉线与自动恢复（近 24 小时）</h3>
+                    </div>
+                    <div class="sc-chart">
+                        <canvas id="c-hb-line"></canvas>
+                    </div>
+                    <div id="l-hb-line"></div>
+                </div>
+            </div>
+
+            <div class="sc-section-title">心跳异常设备清单</div>
+            <div class="data-table-container">
+                <table class="data-table" id="hb-table">
+                    <thead>
+                        <tr>
+                            <th>设备</th>
+                            <th>类型</th>
+                            <th>接入协议</th>
+                            <th>心跳周期</th>
+                            <th>心跳态</th>
+                            <th>24h 准点率</th>
+                            <th>连续丢失</th>
+                            <th>重连次数</th>
+                            <th>待补传</th>
+                            <th data-no-sort>最近心跳</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-split" style="margin-top:20px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>心跳事件流</h3>
+                        <button class="sc-btn sm ghost" id="btn-hb-log-export">⬇ 导出事件</button>
+                    </div>
+                    <div class="sc-log" id="hb-log"></div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>断点缓存续传（补传队列）</h3>
+                        <div class="sc-inline">
+                            <button class="sc-btn sm" id="btn-bf-run">▶ 立即续传</button>
+                            <button class="sc-btn sm ghost" id="btn-bf-clear">清空已完成</button>
+                        </div>
+                    </div>
+                    <div class="sc-kv" id="bf-kv"></div>
+                    <div id="bf-list" style="margin-top:12px"></div>
+                </div>
+            </div>
+
+            <div class="sc-note" style="margin-top:18px">
+                低功耗广域网设备（NB-IoT / LoRaWAN）按运营商保活窗口设 5-15 分钟心跳，4G 与 MQTT 设备为 30-120 秒；
+                Modbus / PLC 属被轮询侧，以采集轮询周期等效心跳。心跳超时不直接判定故障，先经<strong>去抖窗口</strong>与
+                <strong>三次退避重连</strong>（30s / 120s / 600s），仍不可达才转离线并挂起告警，避免瞬时网络抖动刷屏。
+            </div>
+        </div>
+
+        <div id="stream-module" class="module-content">
+            <div class="content-header">
+                <h3>🌊 数据流获取与监控</h3>
+                <div class="sc-inline">
+                    <div class="sc-seg" id="st-kind">
+                        <button class="active" data-kind="all">全部</button>
+                        <button data-kind="video">视频流</button>
+                        <button data-kind="metric">指标流</button>
+                        <button data-kind="track">轨迹流</button>
+                        <button data-kind="event">事件流</button>
+                    </div>
+                    <button class="sc-btn" id="btn-st-sub">📶 批量订阅 / 退订</button>
+                    <button class="sc-btn primary" id="btn-st-pull">⇩ 拉取报文样本</button>
+                </div>
+            </div>
+
+            <div class="mini-grid" id="st-kpi"></div>
+
+            <div class="sc-split">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>取流会话</h3>
+                        <span class="sc-hint" id="st-sel-hint">在下方目录点「预览」选择一路视频流</span>
+                    </div>
+                    <div class="player">
+                        <canvas id="player-canvas"></canvas>
+                        <div class="bar" id="player-bar">
+                            <span class="rec" id="p-rec" hidden><i></i>REC</span>
+                            <span>会话 <b id="p-sid">—</b></span>
+                            <span>分辨率 <b id="p-res">—</b></span>
+                            <span>码率 <b id="p-br">—</b></span>
+                            <span>帧率 <b id="p-fps">—</b></span>
+                            <span>丢帧 <b id="p-loss">—</b></span>
+                            <span>时延 <b id="p-lat">—</b></span>
+                            <span id="p-clock">—</span>
+                        </div>
+                    </div>
+                    <div class="sc-inline" style="margin-top:12px">
+                        <div class="sc-seg" id="st-proto">
+                            <button class="active" data-p="gb">GB28181</button>
+                            <button data-p="rtsp">RTSP</button>
+                            <button data-p="hls">HLS 切片</button>
+                        </div>
+                        <button class="sc-btn sm" id="btn-st-start">▶ 起流</button>
+                        <button class="sc-btn sm" id="btn-st-snap">📸 抓拍</button>
+                        <button class="sc-btn sm ghost" id="btn-st-stop">⏹ 停流</button>
+                        <button class="sc-btn sm ghost" id="btn-st-copy">🔗 复制地址</button>
+                    </div>
+                    <div class="url-chip" id="st-url" style="margin-top:10px">未选择流</div>
+                    <div id="st-build" hidden style="margin-top:10px"></div>
+                    <div class="sc-kv" id="player-kv" style="margin-top:12px"></div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>实时码率与帧率</h3>
+                        <span class="sc-hint" id="st-time">--</span>
+                    </div>
+                    <div class="sc-chart lg">
+                        <canvas id="c-st-flow"></canvas>
+                    </div>
+                    <div id="l-st-flow"></div>
+                    <div class="gauge-row" style="margin-top:14px">
+                        <div class="sc-chart"><canvas id="g-st-buf"></canvas></div>
+                        <div class="sc-chart"><canvas id="g-st-loss"></canvas></div>
+                        <div class="sc-chart"><canvas id="g-st-lat"></canvas></div>
+                    </div>
+                    <div class="sc-section-title">按流类别吞吐</div>
+                    <div class="sc-chart sm">
+                        <canvas id="c-st-kind"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sc-section-title">数据流目录（每台在管设备一条上行流）</div>
+            <div class="data-table-container">
+                <table class="data-table" id="stream-table">
+                    <thead>
+                        <tr>
+                            <th>流 / 设备</th>
+                            <th>类别</th>
+                            <th>接入协议</th>
+                            <th>主题或地址</th>
+                            <th>速率</th>
+                            <th>抖动</th>
+                            <th>丢帧率</th>
+                            <th>缓冲</th>
+                            <th>订阅</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-split" style="margin-top:20px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>报文实时窗口（原始上报）</h3>
+                        <div class="sc-inline">
+                            <span class="sc-hint" id="tail-stat">—</span>
+                            <button class="sc-btn sm ghost" id="btn-tail-pause">⏸ 暂停</button>
+                            <button class="sc-btn sm ghost" id="btn-tail-clear">清空</button>
+                            <button class="sc-btn sm ghost" id="btn-tail-export">⬇ 导出</button>
+                        </div>
+                    </div>
+                    <div class="tail" id="tail"></div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>订阅与接入配额</h3>
+                    </div>
+                    <div class="sc-kv" id="sub-kv"></div>
+                    <div class="sc-chart sm" style="margin-top:14px">
+                        <canvas id="c-st-topic"></canvas>
+                    </div>
+                    <div class="sc-note" style="margin-top:14px">
+                        视频流默认按需拉流（不常驻转码），指标与轨迹流常驻推送；QoS1 主题由 Broker 持久化会话，
+                        断连后按订阅关系自动重投，避免补传与实时流双写造成重复计数。
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="data-monitor-module" class="module-content">
             <div class="content-header">
-                <h3>📊 数据监控</h3>
+                <h3>📡 链路监控</h3>
                 <div class="sc-inline">
                     <span class="sc-live"><span class="sc-live-dot"></span><span data-live-label>实时</span>
                         <button class="sc-btn sm ghost" id="mon-live-btn">⏸ 暂停</button>
@@ -919,8 +1430,9 @@
             };
             /** 各类设备的上报速率区间（msg/s），用于今日采集量与峰值吞吐估算 */
             const MSG_RATE = { sensor: [1, 6], camera: [2, 18], ctrl: [1, 3], gateway: [3, 20], mobile: [1, 9], site: [1, 5] };
-            /** 设备目录口径版本：类型字典或权重调整时递增，浏览器已有台账按此版本号做增量补齐 */
-            const EQ_CAT_VER = 2;
+            /** 设备目录口径版本：类型字典、权重、运行字段（心跳/流）或业务功能清单结构调整时递增，
+                浏览器已有台账按此版本号做增量补齐，新增运行字段则逐台补算不覆盖既有记录 */
+            const EQ_CAT_VER = 4;
             /** 冷启动建档基数（台） */
             const DEVICE_BASE = 120;
             /** 设备汰换单台预算（万元/台） */
@@ -929,6 +1441,76 @@
             const PART_LABEL = { sensor: '敏感探头', camera: '镜头/云台', ctrl: '继电器/执行机', gateway: '风扇/机箱', mobile: '定位模组/电池', site: '称重单元/探头' };
             /** 各类设备的标准巡检项 */
             const INSPECT_ITEM = { sensor: '量程校准', camera: '镜头清洁', ctrl: '回路绝缘检查', gateway: '机房除尘与链路巡检', mobile: '车载支架与天线检查', site: '清掏与探头标定' };
+
+            /* =====================================================================
+               1a-2. 业务功能口径
+               类型分组回答「设备归谁维护」，业务功能回答「设备为城市办哪件事」：
+               台账、详情与筛选同时提供这两个维度，功能口径与 device-catalog.js
+               的 23 类「业务口径」列逐条对齐，改口径以共享目录为准。
+               ===================================================================== */
+            const FUNC = {
+                snap: { label: '人车抓拍', c: '#2980b9', desc: '人员、机动车与商家门店抓拍，产出对象类型、置信度与图片对象地址' },
+                verify: { label: '采集比对', c: '#8e44ad', desc: '现场信息采集与人证比对，产出比对得分与核验结果，证件号只存哈希' },
+                locate: { label: '定位轨迹', c: '#16a085', desc: '车辆与作业人员定位上报，支撑越界告警、SOS 与轨迹回放' },
+                water: { label: '水位液位', c: '#2c3e50', desc: '低洼积水、管网、井盖与泵站前池液位监测，超阈值触发内涝预警' },
+                press: { label: '压力监测', c: '#c0392b', desc: '栓口水压与管网压力检测，用于渗漏判定与爆管分析' },
+                gas: { label: '气体检测', c: '#d35400', desc: '可燃气体、烟雾与异味浓度检测，输出泄漏等级与异味等级' },
+                emis: { label: '排放检测', c: '#27ae60', desc: '焚烧炉烟气二氧化硫、氮氧化物、颗粒物折算与达标核算' },
+                waste: { label: '垃圾收运', c: '#f39c12', desc: '果壳箱满溢、环卫车收运任务与运输船载重航线上报' },
+                weigh: { label: '称重计量', c: '#7f8c8d', desc: '回收站分类称重与中转站地磅计量，产出站点数据与净重' },
+                light: { label: '照明控制', c: '#e67e22', desc: '路灯单灯开关与调光控制，回传功率、电能与灯具故障' },
+                patrol: { label: '巡查记录', c: '#34495e', desc: '巡更到岗打点、巡查轨迹与现场照片留痕记录' },
+                ctrl: { label: '设施控制', c: '#9b59b6', desc: '信号机、道闸、泵站、阀门与风机等远程控制及指令应答' },
+                edge: { label: '汇聚转发', c: '#1abc9c', desc: '终端接入汇聚、协议转换与边缘推理转发' },
+                env: { label: '环境监测', c: '#4b6584', desc: '温湿度、空气质量、噪声与光照等环境指标监测' }
+            };
+            /** 单台设备的业务功能；未建档的新品名退化到所属类型的默认功能 */
+            const ITEM_FUNC = {
+                /* 摄像头：人、商家、车辆抓拍 */
+                '治安球机': ['snap'], '卡口相机': ['snap'], '路网枪机': ['snap'], '全景相机': ['snap'],
+                '城管取证相机': ['snap'], '人脸抓拍枪机': ['snap'], '半球摄像机': ['snap'], '商家门店抓拍机': ['snap'],
+                /* 认证一体机：信息采集、信息比对 */
+                '人证核验一体机': ['verify'],
+                /* 手环 / GPS：车辆、人员定位 */
+                '智能作业手环': ['locate'], '执法车辆定位终端': ['locate'],
+                /* 液位水位：低洼水位计、雷达、超声波、井盖 */
+                '水位计': ['water'], '低洼积水水位计': ['water'], '雷达液位计': ['water'], '超声波液位计': ['water'],
+                '智能井盖': ['water'], '管网流量计': ['water'],
+                /* 消防栓：水压监测；燃气：压力检测 + 气体检测 */
+                '智能消防栓水压计': ['press'], '管网压力变送器': ['press'], '可燃气体探测器': ['gas', 'press'],
+                /* 焚烧炉：气体检测 + 排放检测 */
+                '焚烧炉烟气监测站': ['gas', 'emis'], '焚烧炉助燃风机控制柜': ['ctrl', 'emis'],
+                /* 环卫：果壳箱垃圾、环卫车收运运输、运输船运输 */
+                '智能果壳箱': ['waste'], '环卫收运车终端': ['waste', 'locate'], '运输船智能终端': ['waste', 'locate'],
+                /* 回收站：站点数据、称重 */
+                '分类回收站称重机': ['weigh'], '垃圾中转站地磅': ['weigh'],
+                /* 路灯：控制与调光 */
+                '路灯单灯控制器': ['light'], '照明回路控制器': ['light'],
+                /* 巡更仪：记录 */
+                '电子巡更仪': ['patrol'],
+                /* 其余在册设备 */
+                '车载视频终端': ['snap', 'locate'], '视频AI边缘盒子': ['edge', 'snap'],
+                '公厕异味监测仪': ['gas', 'env'], '烟感探测器': ['gas'],
+                '温度传感器': ['env'], '空气质量监测仪': ['env'], '噪声监测仪': ['env'], '光照传感器': ['env'],
+                '交通信号机': ['ctrl'], '停车场道闸': ['ctrl'], '泵站控制柜': ['ctrl', 'water'],
+                '管网阀门执行器': ['ctrl', 'press'], '风机变频柜': ['ctrl'],
+                '边缘计算网关': ['edge'], '片区汇聚网关': ['edge'], '协议转换网关': ['edge'], '物联NB-IoT汇聚网关': ['edge']
+            };
+            const TYPE_FUNC = { sensor: ['env'], camera: ['snap'], ctrl: ['ctrl'], gateway: ['edge'], mobile: ['locate'], site: ['waste'] };
+            /** 业务功能是名称派生量，不落库存字段，避免旧存档出现口径漂移；
+               入网登记的自定义名称先按关键字命中目录名称，再退化到所属类型的默认功能 */
+            function deviceFuncs(d) {
+                if (ITEM_FUNC[d.name]) return ITEM_FUNC[d.name];
+                const hit = Object.keys(ITEM_FUNC).filter(function (k) { return d.name.indexOf(k) >= 0; })[0];
+                return hit ? ITEM_FUNC[hit] : (TYPE_FUNC[d.type] || ['env']);
+            }
+            function funcTags(d, max) {
+                const fs = deviceFuncs(d);
+                const html = fs.slice(0, max || 99).map(function (f) {
+                    return '<span class="fn-tag" style="--c:' + FUNC[f].c + '">' + FUNC[f].label + '</span>';
+                }).join(' ');
+                return fs.length > (max || 99) ? html + '<span class="sc-hint">+' + (fs.length - (max || 99)) + '</span>' : html;
+            }
 
             /* =====================================================================
                1b. 物模型（测点目录）
@@ -1029,6 +1611,150 @@
             };
 
             /* =====================================================================
+               1c. 心跳与数据流
+               心跳周期按接入协议取保活基线（NB-IoT / LoRa 等低功耗广域网以分钟计，
+               4G 与 MQTT 以秒计，Modbus / PLC 属被轮询侧，用采集轮询周期代替主动心跳）
+               ===================================================================== */
+            const PROTOCOL_HB = {
+                'MQTT': 60, 'LoRaWAN': 900, 'NB-IoT': 600, 'Modbus RTU': 300, 'Modbus TCP': 60,
+                'GB28181': 120, 'RTSP': 60, 'HTTP': 120, 'CoAP': 300, '4G Cat.1': 30,
+                'BLE 网关': 60, 'PLC-S7': 120, '地磅仪表': 300, 'AIS/北斗': 60
+            };
+            const HB_STATE = { '准点': 'ok', '抖动': 'warn', '超时': 'bad', '停摆': 'off' };
+            const STREAM_KIND = {
+                video: { label: '视频流', icon: '🎥', unit: 'kbps' },
+                metric: { label: '指标流', icon: '📡', unit: 'msg/s' },
+                track: { label: '轨迹流', icon: '🛰️', unit: 'pos/s' },
+                event: { label: '事件流', icon: '🔔', unit: 'evt/min' }
+            };
+            const STREAM_STATE = { '推流中': 'ok', '拉流中': 'info', '空闲': 'off', '异常': 'bad', '已停': 'off' };
+
+            /** 设备的流类别：视频/轨迹/事件/指标（视频与 AI 盒子走视联网，车载穿戴走轨迹） */
+            function streamKindOf(d) {
+                if (d.type === 'camera' || d.name === '车载视频终端' || d.name === '视频AI边缘盒子') return 'video';
+                if (d.type === 'mobile') return 'track';
+                if (d.name === '人证核验一体机' || d.name === '分类回收站称重机') return 'event';
+                return 'metric';
+            }
+            /** 视频流的取流地址：GB28181 目录编码 / RTSP 单播 / HLS 切片，三种取流方式对应同一台相机 */
+            function streamUrls(d, s) {
+                const h = strHash(d.id + '|url');
+                const ch = String(1000 + (h % 8999));
+                return {
+                    gb: 'gb28181://340200000013200' + ch + ':' + d.id + '?channel=' + ch,
+                    rtsp: 'rtsp://10.30.' + (h % 60) + '.' + (h % 240) + ':554/Streaming/Channels/' + ch + '01',
+                    hls: 'https://video.city.gov/hls/' + d.id + '/index.m3u8'
+                };
+            }
+            /** 按设备档案生成数据流会话（不含实时抖动，抖动由仿真 tick 叠加） */
+            function buildStream(d) {
+                const h = strHash(d.id + '|st');
+                const kind = streamKindOf(d);
+                const RES = ['1280×720', '1920×1080', '2560×1440', '3840×2160'];
+                const BR = [2048, 4096, 6144, 8192];
+                const s = {
+                    id: 'STR-' + String(h % 9000 + 1000), kind: kind, state: '空闲',
+                    br: 0, fps: 0, sr: d.msgRate, loss: 0, jitter: 6 + h % 48, buf: 14 + h % 46,
+                    lat: 42 + h % 210, subs: h % 4, recon: d.recon || 0, qos: 1 + h % 2,
+                    since: Date.now() - (h % 7200) * 1000, codec: '', res: '', proto: '', frames: 0, snaps: 0
+                };
+                if (kind === 'video') {
+                    const ri4 = h % 4;
+                    s.res = RES[ri4]; s.br = BR[ri4] + h % 900; s.fps = [15, 25, 30, 25][ri4];
+                    s.codec = h % 3 === 0 ? 'H.264' : 'H.265';
+                    s.proto = d.protocol === 'RTSP' ? 'RTSP' : 'GB28181';
+                    s.qos = 0;
+                    const u = streamUrls(d, s);
+                    s.url = u.gb; s.urls = u;
+                    s.preset = ['预置位 1（全景）', '预置位 2（出入口）', '预置位 3（车道）'][h % 3];
+                } else if (kind === 'track') {
+                    s.proto = d.protocol;
+                    s.url = 'mqtt://broker.iot.city/v1/up/' + d.zone + '/' + d.id + '/track';
+                    s.sr = Number((1 / (d.protocol === 'AIS/北斗' ? 10 : 5)).toFixed(2));
+                    s.br = 12 + h % 40;
+                } else if (kind === 'event') {
+                    s.proto = 'HTTP';
+                    s.url = 'https://api.city.gov/v1/report/' + d.id;
+                    s.sr = Math.max(1, Math.round(d.msgRate * 6));
+                    s.br = 34 + h % 90;
+                } else {
+                    s.proto = d.protocol === 'Modbus RTU' || d.protocol === 'Modbus TCP' ? 'Modbus 轮询' : d.protocol;
+                    s.url = 'mqtt://broker.iot.city/v1/up/' + d.zone + '/' + d.id + '/telemetry';
+                    s.br = 8 + h % 26;
+                }
+                if (d.status === '在线') s.state = kind === 'video' ? '空闲' : '推流中';
+                else if (d.status === '休眠') s.state = kind === 'video' ? '空闲' : '推流中';
+                else s.state = d.status === '故障' ? '异常' : '已停';
+                s.loss = Number(((h % 60) / 100 * (d.status === '在线' || d.status === '休眠' ? 1 : 5)).toFixed(2));
+                return s;
+            }
+            /** 心跳与流的运行字段：新建档设备与旧存档设备共用同一套生成规则（按设备编号散列，保证刷新一致） */
+            function initRuntime(d) {
+                const h = strHash(d.id + '|hb');
+                d.hbPeriod = PROTOCOL_HB[d.protocol] || 120;
+                if (d.type === 'ctrl') d.hbPeriod = Math.min(d.hbPeriod, 60);
+                d.hbDrift = Math.round(d.hbPeriod * (0.04 + (h % 12) / 100));
+                d.lastBeat = d.lastBeat || d.lastSeen || Date.now();
+                d.miss = 0;
+                d.missTotal = d.offline * 3 + (h % 6);
+                d.recon = d.offline + (h % 4);
+                d.buf = (d.status === '离线' || d.status === '故障') ? d.msgRate * d.hbPeriod * (1 + h % 4) : 0;
+                d.beatHist = Array.from({ length: 24 }, function (_, i) {
+                    const hv = strHash(d.id + 'h' + i);
+                    let v = 78 + hv % 22;
+                    if (d.health < 70) v -= (70 - d.health) * 0.8;
+                    if (d.power === '电池') v -= hv % 7;
+                    if ((d.status === '离线' || d.status === '故障') && i >= 20) v = hv % 38;
+                    if (d.status === '休眠') v = 62 + hv % 22;
+                    return Math.round(SC.clamp(v, 3, 100));
+                });
+                d.stream = buildStream(d);
+                d.subscribed = d.stream.kind === 'video' ? h % 3 === 0 : true;
+                return d;
+            }
+            /** 距上次心跳已经过了多少个标称周期 */
+            function beatRatio(d) {
+                return (Date.now() - (d.lastBeat || d.lastSeen)) / (d.hbPeriod * 1000);
+            }
+            function hbState(d) {
+                if (d.status === '离线' || d.status === '故障' || d.status === '检修') return '停摆';
+                const r = beatRatio(d);
+                const sleepFactor = d.status === '休眠' ? 8 : 1;
+                if (r > hbRule.periods * sleepFactor) return '超时';
+                if (r > 1.4 * sleepFactor || (d.miss || 0) > 0) return '抖动';
+                return '准点';
+            }
+            /** 心跳达标率（24 小时均值）与最近一小时达标率 */
+            function beatScore(d) {
+                const arr = d.beatHist || [];
+                return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+            }
+            function fmtAgo(ms) {
+                const s = Math.max(0, Math.round(ms / 1000));
+                if (s < 60) return s + ' 秒';
+                const m = Math.floor(s / 60);
+                if (m < 60) return m + ' 分 ' + (s % 60) + ' 秒';
+                return Math.floor(m / 60) + ' 小时 ' + (m % 60) + ' 分';
+            }
+            function streamLabel(d) {
+                const k = STREAM_KIND[d.stream ? d.stream.kind : 'metric'];
+                return k.icon + ' ' + k.label;
+            }
+            /** 设备当前速率（msg/s 或 kbps），离线/故障设备为 0 */
+            function streamRate(d) {
+                if (!d.stream) return 0;
+                return (d.status === '离线' || d.status === '故障' || d.status === '检修') ? 0 : d.stream.sr;
+            }
+            /** 最近 24 小时心跳达标条：一格 = 一个整点小时 */
+            function beatStrip(d) {
+                return (d.beatHist || []).map(function (v, i) {
+                    const cls = d.status === '休眠' ? 'sleep' : v >= 95 ? 'on' : v >= 80 ? 'late' : 'miss';
+                    return '<i class="' + cls + '" title="' + SC.pad2(i) + ':00 准点率 ' + v + '%"></i>';
+                }).join('');
+            }
+
+
+            /* =====================================================================
                2. 数据模型
                ===================================================================== */
             function buildDevices() {
@@ -1079,7 +1805,7 @@
                 };
                 d.health = calcHealth(d);
                 d.healthHistory = buildHistory(d);
-                return d;
+                return initRuntime(d);
             }
             function weightedStatus(tk) {
                 const r = rnd();
@@ -1150,16 +1876,28 @@
             /* 台账持久化策略：设备明细整表存档（保留用户的处置记录），
                但类型目录只做「增量补齐」——口径升级时保留既有设备，为目录中缺失的设备名称各补 1 台 */
             let devices = SC.store.get('equipment', 'devices', null) || [];
-            let catalogAdded = 0;
+            let catalogAdded = 0, runtimeMigrated = 0;
             if (!devices.length) {
+                /* 冷启动按权重随机建档，仍可能漏掉目录里的个别品类，这里补齐保证清单每类至少一台抽检建档 */
                 devices = buildDevices();
+                catalogAdded = mergeCatalog(devices, '抽检建档覆盖设备目录清单').length;
             } else if (SC.store.get('equipment', 'catVer', 0) !== EQ_CAT_VER) {
                 catalogAdded = mergeCatalog(devices).length;
             }
+            /* 旧存档只补运行字段（心跳周期、24h 达标率、数据流会话），不动用户已有处置记录 */
+            devices.forEach(function (d) {
+                if (!d.stream || !d.beatHist || !d.hbPeriod) { initRuntime(d); runtimeMigrated++; }
+            });
             SC.store.set('equipment', 'catVer', EQ_CAT_VER);
             SC.store.set('equipment', 'devices', devices);
+            /** 心跳告警规则：超时判定按「连续丢失 N 个周期」，去抖窗口用于抑制瞬时抖动误报 */
+            let hbRule = SC.store.get('equipment', 'hbRule', null) || {
+                periods: 3, debounce: 2, level: 'warn', autoMaint: false, wakeRetry: 3, backfillRate: 12
+            };
+            /** 断点补传队列：设备重连后把离线期间缓存的报文回灌时序库 */
+            let backfill = SC.store.get('equipment', 'backfill', []);
             /** 目录增量合并：返回新补齐的设备数组，使用独立随机流以免扰动全局序列 */
-            function mergeCatalog(list) {
+            function mergeCatalog(list, reason) {
                 const keep = seed, added = [];
                 seed = 20260915;
                 let maxSeq = 0;
@@ -1175,7 +1913,7 @@
                         has[tk + '|' + name] = 1;
                         maxSeq++;
                         const d = makeDevice(tk, name, maxSeq);
-                        d.notes.push({ t: SC.stamp(new Date()), who: '目录同步', txt: '设备目录口径升级自动建档：' + TYPES[tk].label + '「' + name + '」' });
+                        d.notes.push({ t: SC.stamp(new Date()), who: '目录同步', txt: (reason || '设备目录口径升级') + '自动建档：' + TYPES[tk].label + '「' + name + '」' });
                         added.push(d);
                     });
                 });
@@ -1192,7 +1930,7 @@
                 paintOpslog();
             }
 
-            const state = { type: 'all', status: 'all' };
+            const state = { type: 'all', status: 'all', quick: 'all', func: 'all' };
             let devCtrl = null;
 
             /* =====================================================================
@@ -1221,6 +1959,13 @@
                 document.getElementById('kpi-data').textContent = SC.num(msgToday, 1);
                 document.getElementById('kpi-data-sub').textContent = '存储占用 ' + SC.num(msgToday * 0.42, 1) + ' GB · 峰值 ' +
                     SC.num(devices.reduce((a, d) => a + d.msgRate, 0), 0) + ' msg/s';
+                const hb = hbSummary();
+                document.getElementById('kpi-beat').textContent = hb.onTime.toFixed(1) + '%';
+                document.getElementById('kpi-beat').style.color = hb.onTime >= 95 ? '#26c6da' : '#e67e22';
+                document.getElementById('kpi-beat-sub').textContent = '准点 ' + hb.beat + ' · 超时 ' + hb.timeout + ' · 停摆 ' + hb.stalled;
+                const sw = streamSummary();
+                document.getElementById('kpi-stream').textContent = SC.num(sw.live);
+                document.getElementById('kpi-stream-sub').textContent = '视频在拉 ' + sw.vLive + ' · 掉线缓存 ' + SC.num(sw.buf) + ' 条';
             }
             function renderTypeGrid() {
                 const host = document.getElementById('type-grid');
@@ -1245,6 +1990,16 @@
                     });
                 });
             }
+            /** 台账快捷视图：把心跳、补传、订阅等运行态做成一键筛选 */
+            const QUICK = [
+                ['all', '全部视图', function () { return true; }],
+                ['beat', '心跳异常', function (d) { const s = hbState(d); return s === '超时' || s === '停摆'; }],
+                ['buf', '待补传缓存', function (d) { return (d.buf || 0) > 0; }],
+                ['nosub', '未订阅数据流', function (d) { return d.subscribed === false; }],
+                ['video', '视频流设备', function (d) { return !!d.stream && d.stream.kind === 'video'; }],
+                ['pull', '视频在拉流', function (d) { return !!d.stream && d.stream.state === '拉流中'; }],
+                ['fw', '固件待升级', function (d) { return d.fw !== TYPES[d.type].fwLatest; }]
+            ];
             function renderChips() {
                 const host = document.getElementById('dev-status-chips');
                 const counts = { all: devices.length };
@@ -1262,13 +2017,49 @@
                         applyFilter();
                     });
                 });
+                const qhost = document.getElementById('dev-quick-chips');
+                qhost.innerHTML = QUICK.map(function (q) {
+                    const n = devices.filter(q[2]).length;
+                    return '<button class="sc-chip' + (state.quick === q[0] ? ' active' : '') + '" data-quick="' + q[0] + '">'
+                        + q[1] + ' <b>' + n + '</b></button>';
+                }).join('');
+                qhost.querySelectorAll('.sc-chip').forEach(function (chip) {
+                    chip.addEventListener('click', function () {
+                        state.quick = chip.dataset.quick;
+                        renderChips();
+                        applyFilter();
+                        const n = devCtrl && devCtrl.visibleRows ? devCtrl.visibleRows.length : 0;
+                        SC.toast('快捷视图「' + (QUICK.filter(q => q[0] === chip.dataset.quick)[0] || [])[1] + '」：' + n + ' 台命中', { type: 'info' });
+                    });
+                });
+                /* 业务功能维度与类型分组正交：类型回答「归谁维护」，功能回答「办哪件事」 */
+                const fhost = document.getElementById('dev-func-chips');
+                const live = Object.keys(FUNC).filter(function (f) {
+                    return devices.some(d => deviceFuncs(d).indexOf(f) >= 0);
+                });
+                fhost.innerHTML = '<button class="sc-chip' + (state.func === 'all' ? ' active' : '') + '" data-func="all">全部功能 <b>' + devices.length + '</b></button>' +
+                    live.map(function (f) {
+                        const n = devices.filter(d => deviceFuncs(d).indexOf(f) >= 0).length;
+                        return '<button class="sc-chip' + (state.func === f ? ' active' : '') + '" data-func="' + f + '" title="' + SC.esc(FUNC[f].desc) + '">' +
+                            '<span class="fn-dot" style="--c:' + FUNC[f].c + '"></span>' + FUNC[f].label + ' <b>' + n + '</b></button>';
+                    }).join('');
+                fhost.querySelectorAll('.sc-chip').forEach(function (chip) {
+                    chip.addEventListener('click', function () {
+                        state.func = chip.dataset.func;
+                        renderChips();
+                        applyFilter();
+                    });
+                });
             }
             function applyFilter() {
                 if (!devCtrl) return;
+                const quick = (QUICK.filter(q => q[0] === state.quick)[0] || QUICK[0])[2];
                 devCtrl.setFilter(function (row) {
                     const d = byId(row.id);
                     if (!d) return false;
-                    return (state.type === 'all' || d.type === state.type) && (state.status === 'all' || d.status === state.status);
+                    return (state.type === 'all' || d.type === state.type) &&
+                        (state.status === 'all' || d.status === state.status) &&
+                        (state.func === 'all' || deviceFuncs(d).indexOf(state.func) >= 0) && quick(d);
                 });
             }
             /* =====================================================================
@@ -1305,8 +2096,8 @@
                     footer: [
                         {
                             text: '⬇ 导出清单', kind: 'ghost', onClick: function () {
-                                SC.csv.download('健康预警_' + SC.today() + '.csv', [['设备编号', '名称', '类型', '区域', '健康分', '等级', '丢包率%', '离线次数', '预计剩余天数', '建议动作']]
-                                    .concat(list.map(d => [d.id, d.name, TYPES[d.type].label, d.zone, d.health, healthGrade(d.health).text, d.loss, d.offline, lifeDays(d), advice(d)])));
+                                SC.csv.download('健康预警_' + SC.today() + '.csv', [['设备编号', '名称', '类型', '业务功能', '区域', '健康分', '等级', '丢包率%', '离线次数', '预计剩余天数', '建议动作']]
+                                    .concat(list.map(d => [d.id, d.name, TYPES[d.type].label, deviceFuncs(d).map(f => FUNC[f].label).join('、'), d.zone, d.health, healthGrade(d.health).text, d.loss, d.offline, lifeDays(d), advice(d)])));
                                 SC.toast('已导出 ' + list.length + ' 条预警记录', { type: 'success' });
                             }
                         },
@@ -1823,7 +2614,7 @@
                     ['结论', s.rate > 95 && attn.length < 12 ? '总体平稳，维持现有巡检节奏' : '在线率或健康度偏离考核基线，建议优先处置预警清单前 10 台']
                 ];
                 SC.modal.open({
-                    title: '📄 设备与数据运行分析（' + SC.today() + '）', size: 'md',
+                    title: '📄 设备运行分析（' + SC.today() + '）', size: 'md',
                     body: '<div class="sc-kv">' + rows.slice(1, 5).map(r => kvItem(r[0], r[1])).join('') + '</div>' +
                         '<div class="sc-section-title">指标明细</div>' +
                         rows.map(function (r) {
@@ -2279,19 +3070,29 @@
                     const g = healthGrade(d.health);
                     const behind = d.fw !== TYPES[d.type].fwLatest;
                     const offline = d.status === '离线' || d.status === '故障';
+                    const hs = hbState(d), r = beatRatio(d);
+                    const s = d.stream || (d.stream = buildStream(d));
+                    const rateTxt = s.kind === 'video'
+                        ? (s.state === '拉流中' ? s.br + ' kbps' : '按需未拉流')
+                        : streamRate(d) + ' ' + STREAM_KIND[s.kind].unit;
                     return '<tr data-id="' + d.id + '">' +
                         '<td><b>' + d.id + '</b></td>' +
                         '<td>' + SC.esc(d.name) + '<div class="sc-hint">' + SC.esc(d.model) + ' · ' + SC.esc(d.vendor) + '</div></td>' +
                         '<td>' + typeShort(d.type) + '</td>' +
+                        '<td>' + funcTags(d, 2) + '</td>' +
                         '<td>' + SC.esc(d.zone) + '</td>' +
                         '<td>' + SC.esc(d.protocol) + '</td>' +
                         '<td>' + d.fw + (behind ? ' <span class="sc-tag warn">待升级</span>' : '') + '</td>' +
                         '<td><span class="sc-cell-num">' + d.signal + '</span>%</td>' +
                         '<td><span class="sc-cell-num">' + d.health + '</span> <span class="sc-tag ' + g.tag + '">' + g.text + '</span></td>' +
                         '<td><span class="sc-tag ' + STATUS[d.status] + '">' + d.status + '</span></td>' +
-                        '<td>' + agoText(d.lastSeen) + '</td>' +
+                        '<td><span class="sc-tag ' + HB_STATE[hs] + '">' + hs + '</span> <span class="sc-hint">' + d.hbPeriod + 's</span></td>' +
+                        '<td>' + agoText(d.lastBeat) + '<div class="sc-hint">' + (r > 1.2 ? r.toFixed(1) + '× 周期' : '保活正常') + '</div></td>' +
+                        '<td>' + streamLabel(d) + '<div class="sc-hint">' + SC.esc(rateTxt) + ' · ' + s.state +
+                        (d.subscribed === false ? ' · 未订阅' : '') + '</div></td>' +
                         '<td><button class="sc-btn sm ghost" data-act="view">详情</button> ' +
-                        '<button class="sc-btn sm ghost" data-act="cmd"' + (offline ? ' disabled title="设备不可达"' : '') + '>指令</button></td>' +
+                        '<button class="sc-btn sm ghost" data-act="cmd"' + (offline ? ' disabled title="设备不可达"' : '') + '>指令</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="flow"' + (s.kind === 'video' ? '' : ' title="指标/轨迹流常驻推送"') + '>流</button></td>' +
                         '</tr>';
                 }).join('');
                 if (devCtrl) devCtrl.reload();
@@ -2384,6 +3185,7 @@
                 renderTypeGrid();
                 renderChips();
                 applyFilter();
+                renderHbKpi(); renderHbWall(); renderHbTable(); renderStKpi(); renderStTable();
                 document.getElementById('job-retry').hidden = job.fail === 0;
                 log(job.fail ? 'warn' : 'ok', job.title + '完成：成功 ' + job.ok + ' 台，失败 ' + job.fail + ' 台');
                 SC.toast(job.title + '完成（成功 ' + job.ok + ' / 失败 ' + job.fail + '）', { type: job.fail ? 'warn' : 'success', duration: 4000 });
@@ -2456,6 +3258,7 @@
                 const g = healthGrade(d.health);
                 const life = lifeDays(d);
                 const slope = healthSlope(d);
+                const s = d.stream || (d.stream = buildStream(d));
                 const parts = [
                     { n: '主板/电源模块', v: Math.min(99, d.health + 6) },
                     { n: '通信模组', v: Math.min(99, d.health + (d.signal > 70 ? 8 : -9)) },
@@ -2468,6 +3271,8 @@
                     kvItem('通信协议', SC.esc(d.protocol)) + kvItem('供电方式', SC.esc(d.power)) +
                     kvItem('安装区域', SC.esc(d.zone)) + kvItem('启用日期', d.install + '（役龄 ' + Math.round(d.uptimeDays / 30) + ' 月）') +
                     kvItem('序列号', d.serial) + kvItem('当前固件', d.fw + (d.fw === T.fwLatest ? '（最新）' : ' / 目标 ' + T.fwLatest)) +
+                    '<div class="sc-kv-item" style="grid-column:1/-1"><div class="k">业务功能</div><div class="v">' + funcTags(d) +
+                    '<div class="sc-hint">' + deviceFuncs(d).map(function (f) { return FUNC[f].desc; }).join('；') + '</div></div></div>' +
                     '</div>' +
                     '<div class="sc-section-title">实时指标</div>' +
                     '<div class="sc-kv">' +
@@ -2480,6 +3285,33 @@
                     kvItem('采集频率', d.msgRate + ' msg/s') +
                     kvItem('最近上报', agoText(d.lastSeen)) +
                     '</div>' +
+                    '<div class="sc-section-title">心跳与保活</div>' +
+                    '<div class="sc-kv">' +
+                    kvItem('心跳周期', d.hbPeriod + ' s（协议保活基线，漂移 ±' + d.hbDrift + ' s）') +
+                    kvItem('心跳态', '<span class="sc-tag ' + HB_STATE[hbState(d)] + '">' + hbState(d) + '</span>') +
+                    kvItem('最近心跳', agoText(d.lastBeat) + ' 前') +
+                    kvItem('超时倍数', beatRatio(d).toFixed(2) + ' × 周期') +
+                    kvItem('连续丢拍', (d.miss || 0) + ' 周期（累计 ' + (d.missTotal || 0) + ' 次）') +
+                    kvItem('重连次数', (d.recon || 0) + ' 次（退避 30s / 120s / 600s）') +
+                    kvItem('24h 准点率', beatScore(d).toFixed(1) + '%') +
+                    kvItem('断点缓存', SC.num(d.buf || 0) + ' 条待补传') +
+                    '</div>' +
+                    '<div class="beat-strip" style="margin-top:10px">' + beatStrip(d) + '</div>' +
+                    '<div class="sc-hint" style="margin-top:6px">每格代表一个整点小时的心跳准点率（绿 ≥95% / 橙 80-95% / 红 &lt;80% / 灰 休眠窗口）。</div>' +
+                    '<div class="sc-section-title">数据流</div>' +
+                    '<div class="sc-kv">' +
+                    kvItem('会话 / 类别', s.id + ' · ' + STREAM_KIND[s.kind].icon + ' ' + STREAM_KIND[s.kind].label) +
+                    kvItem('会话状态', '<span class="sc-tag ' + STREAM_STATE[s.state] + '">' + s.state + '</span>') +
+                    kvItem('接入协议', SC.esc(s.proto || d.protocol)) +
+                    kvItem('当前速率', s.kind === 'video'
+                        ? (s.state === '拉流中' ? Math.round(s.br) + ' kbps / ' + s.fps + 'fps' : '按需拉流，未起流')
+                        : streamRate(d) + ' ' + STREAM_KIND[s.kind].unit) +
+                    kvItem('抖动 / 丢帧', s.jitter.toFixed(0) + ' ms / ' + s.loss.toFixed(2) + '%') +
+                    kvItem('端到端时延', Math.round(s.lat) + ' ms') +
+                    kvItem('订阅关系', (d.subscribed === false ? '<span class="sc-tag off">未订阅（不入库）</span>' : (s.subs || 0) + ' 个下游')) +
+                    kvItem('QoS / 会话', 'QoS' + s.qos + '（' + (s.qos ? '持久会话，断连重投' : '清洁会话，不补投') + '）') +
+                    '</div>' +
+                    '<div class="url-chip" style="margin-top:10px">' + SC.esc(s.url) + '</div>' +
                     '<div class="sc-section-title">物模型与测点（' + thingModel(d).length + ' 个测点，标识与数据中台采集口径对齐）</div>' +
                     modelTable(d) +
                     '<div class="sc-hint" style="margin:10px 0 4px">上报报文样例</div>' +
@@ -2513,6 +3345,11 @@
                     body: body,
                     footer: [
                         { text: '⟳ 下发指令', kind: 'ghost', onClick: () => openCmd(d) },
+                        { text: '💓 心跳探测', kind: 'ghost', onClick: () => openProbe(d) },
+                        {
+                            text: s.kind === 'video' ? (s.state === '拉流中' ? '⏹ 停流' : '🎥 取流预览') : '🌊 数据流监控',
+                            kind: 'ghost', onClick: () => gotoStream(d)
+                        },
                         { text: '🛠 登记维护', kind: 'ghost', onClick: () => openMaint(d) },
                         { text: '🛰 数据中台采集档案', kind: 'ghost', onClick: () => { location.href = 'data-platform.html'; } },
                         { text: '删除设备', kind: 'danger', onClick: () => removeDevice(d) },
@@ -2557,7 +3394,10 @@
                 const ev = (d.notes || []).slice(0, 4).map(function (n) {
                     return { h: n.txt, m: n.who + ' · ' + n.t, cls: 'done' };
                 });
-                ev.push({ h: '上报心跳 ' + d.msgRate + ' msg/s，丢包率 ' + d.loss.toFixed(2) + '%', m: agoText(d.lastSeen), cls: 'done' });
+                ev.push({ h: '心跳保活周期 ' + d.hbPeriod + 's，' + agoText(d.lastBeat) + '前收到最近一次心跳（判定：' + hbState(d) + '）', m: '接入网关保活探测', cls: hbState(d) === '准点' ? 'done' : 'todo' });
+                if (d.buf > 0) ev.push({ h: '离线期间本地缓存 ' + SC.num(d.buf) + ' 条上报待补传，重连后按时间序回灌', m: '断点续传队列', cls: 'todo' });
+                if (d.stream) ev.push({ h: '数据流 ' + d.stream.id + '（' + STREAM_KIND[d.stream.kind].label + '）状态：' + d.stream.state + '，订阅方 ' + (d.stream.subs || 0) + ' 个', m: agoText(d.stream.since) + '前建立会话', cls: 'done' });
+                ev.push({ h: '上报报文 ' + d.msgRate + ' msg/s，链路丢包率 ' + d.loss.toFixed(2) + '%', m: agoText(d.lastSeen) + '前', cls: 'done' });
                 ev.push({ h: '固件校验通过（' + d.fw + '）', m: d.install + ' 入网初始化', cls: '' });
                 ev.push({ h: '待办：下周巡检 ' + (INSPECT_ITEM[d.type] || '量程校准'), m: '计划中', cls: 'todo' });
                 return ev;
@@ -2645,12 +3485,1000 @@
                     if (v.note) d.notes.push({ t: SC.stamp(new Date()), who: '入网登记', txt: v.note });
                     d.health = calcHealth(d);
                     d.healthHistory = [d.health, d.health, d.health, d.health, d.health, d.health, d.health, d.health];
+                    initRuntime(d);
+                    d.lastBeat = Date.now();
+                    d.beatHist = d.beatHist.map(() => 100);
+                    d.subscribed = true;
+                    if (d.stream.kind !== 'video') d.stream.state = '推流中';
                     devices.unshift(d);
                     saveDevices();
                     renderDevs(); renderKpi(); renderTypeGrid(); renderChips(); applyFilter();
+                    renderHbTable(); renderHbWall(); renderHbKpi(); renderStTable(); renderStKpi();
                     log('ok', d.id + ' 入网登记成功（' + v.protocol + ' / ' + v.zone + '）' + (v.autoTest ? '，已自动执行入网自检' : ''));
                     SC.toast(d.id + ' 已入网' + (v.autoTest ? '，自检项全部通过' : ''), { type: 'success' });
                 });
+            }
+
+            /* =====================================================================
+               14b. 心跳与在线监控
+               ===================================================================== */
+            const hbEvents = [];
+            let hbCtrl = null, hbTrend = null, bfTimer = null;
+
+            function hbSummary() {
+                let beat = 0, jitter = 0, timeout = 0, stalled = 0, buf = 0, recon = 0, miss = 0;
+                devices.forEach(function (d) {
+                    const s = hbState(d);
+                    if (s === '准点' || s === '抖动') beat++;
+                    else if (s === '超时') timeout++;
+                    else stalled++;
+                    buf += d.buf || 0;
+                    recon += d.recon || 0;
+                    miss += d.missTotal || 0;
+                    jitter += d.hbDrift || 0;
+                });
+                const total = devices.length || 1;
+                const live = devices.filter(d => d.status === '在线' || d.status === '休眠');
+                const drift = live.map(d => beatRatio(d) * d.hbPeriod * 1000).sort((a, b) => a - b);
+                return {
+                    total: total, beat: beat, timeout: timeout, stalled: stalled, buf: buf,
+                    recon: recon, miss: miss, onTime: beat / total * 100,
+                    avgPeriod: live.length ? live.reduce((a, d) => a + d.hbPeriod, 0) / live.length : 0,
+                    avgJitter: live.length ? jitter / live.length : 0,
+                    p95: drift.length ? Math.round(drift[Math.floor(drift.length * 0.95)] / 1000) : 0
+                };
+            }
+            function streamSummary() {
+                let live = 0, video = 0, vLive = 0, br = 0, buf = 0, subs = 0, err = 0, unSub = 0;
+                const jitter = [], loss = [], lat = [], bufs = [];
+                devices.forEach(function (d) {
+                    const s = d.stream;
+                    if (!s) return;
+                    if (s.state === '推流中' || s.state === '拉流中') {
+                        live++;
+                        br += s.kind === 'video' ? s.br : s.sr * 260 * 8 / 1000;
+                    }
+                    if (s.state === '异常') err++;
+                    if (s.kind === 'video') { video++; if (s.state === '拉流中') vLive++; }
+                    if (d.subscribed === false) unSub++; else subs++;
+                    jitter.push(s.jitter); loss.push(s.loss); lat.push(s.lat); bufs.push(s.buf);
+                    buf += d.buf || 0;
+                });
+                const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+                const sorted = lat.slice().sort((a, b) => a - b);
+                return {
+                    live: live, video: video, vLive: vLive, br: br, buf: buf, subs: subs,
+                    unSub: unSub, err: err, jitter: avg(jitter), loss: avg(loss), lat: avg(lat),
+                    bufAvg: avg(bufs),
+                    p95: sorted.length ? sorted[Math.floor(sorted.length * 0.95)] : 0
+                };
+            }
+            function miniCard(k, v, s, cls) {
+                return '<div class="mini-card ' + (cls || '') + '"><div class="mk">' + k + '</div>' +
+                    '<div class="mv">' + v + '</div><div class="ms">' + s + '</div></div>';
+            }
+            function renderHbKpi() {
+                const h = hbSummary();
+                const host = document.getElementById('hb-kpi');
+                if (!host) return;
+                host.innerHTML =
+                    miniCard('心跳准点率', h.onTime.toFixed(1) + '%', '准点 ' + h.beat + ' / 建档 ' + h.total, h.onTime >= 95 ? 'ok' : 'warn') +
+                    miniCard('心跳超时', h.timeout + ' 台', '连续丢失 > ' + hbRule.periods + ' 个周期', h.timeout ? 'bad' : 'ok') +
+                    miniCard('心跳停摆', h.stalled + ' 台', '离线 / 故障 / 检修锁定', h.stalled > 12 ? 'warn' : '') +
+                    miniCard('平均心跳周期', h.avgPeriod.toFixed(0) + ' s', '协议保活基线加权', '') +
+                    miniCard('心跳间隔 P95', h.p95 + ' s', '含退避重连等待', h.p95 > 300 ? 'warn' : 'ok') +
+                    miniCard('累计丢拍', h.miss + ' 次', '近 30 天全部设备', '') +
+                    miniCard('重连成功率', ((h.recon ? (h.recon - h.timeout) / h.recon : 1) * 100).toFixed(1) + '%', '退避 30s / 120s / 600s', '') +
+                    miniCard('断点缓存积压', SC.num(h.buf) + ' 条', '待重连后回灌时序库', h.buf > 20000 ? 'warn' : '');
+            }
+            function heatColor(rate) {
+                if (rate >= 95) return 'rgba(39,174,96,' + (0.42 + (rate - 95) / 5 * 0.55).toFixed(2) + ')';
+                if (rate >= 80) return 'rgba(243,156,18,' + (0.45 + (rate - 80) / 15 * 0.5).toFixed(2) + ')';
+                return 'rgba(231,76,60,' + (0.35 + rate / 80 * 0.58).toFixed(2) + ')';
+            }
+            function renderHbWall() {
+                const host = document.getElementById('hb-wall');
+                if (!host) return;
+                host.innerHTML = Object.keys(TYPES).map(function (tk) {
+                    const arr = devices.filter(d => d.type === tk);
+                    const cells = Array.from({ length: 24 }, function (_, h) {
+                        if (!arr.length) return '<div class="cell" style="background:#eef2f6"></div>';
+                        const vals = arr.map(d => (d.beatHist && d.beatHist[h] !== undefined) ? d.beatHist[h] : 100);
+                        const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+                        const sleeping = arr.filter(d => d.status === '休眠').length / arr.length;
+                        const bad = arr.filter(d => hbState(d) === '超时').length;
+                        const bg = sleeping > 0.5 ? '#90a4ae' : heatColor(avg);
+                        return '<div class="cell" style="background:' + bg + '" title="' + SC.esc(
+                            TYPES[tk].label + ' · ' + SC.pad2(h) + ':00 准点率 ' + avg.toFixed(1) + '%（' + arr.length +
+                            ' 台在册，当前超时 ' + bad + ' 台' + (sleeping > 0.5 ? '，多数处于休眠窗口' : '') + '）') + '"></div>';
+                    }).join('');
+                    return '<div class="rh">' + TYPES[tk].label.replace('设备', '') + '</div>' + cells;
+                }).join('');
+                document.getElementById('hb-wall-axis').innerHTML = '<div></div>' +
+                    Array.from({ length: 24 }, (_, h) => '<div>' + SC.pad2(h) + '</div>').join('');
+            }
+            function hbTrendInit() {
+                const out = [];
+                const nowH = new Date().getHours();
+                for (let i = 23; i >= 0; i--) {
+                    const h = strHash('hbtrend' + ((nowH - i + 24) % 24) + devices.length);
+                    const night = ((nowH - i + 24) % 24) < 6 || ((nowH - i + 24) % 24) > 21;
+                    const off = Math.max(0, Math.round(devices.length * (night ? 0.012 : 0.03) * (0.4 + (h % 180) / 100)));
+                    out.push({ label: SC.pad2((nowH - i + 24) % 24) + ':00', off: off, back: Math.max(0, off - Math.round((h % 40) / 14)) });
+                }
+                return out;
+            }
+            function renderHbCharts() {
+                const buckets = [['≤1×', 0, 1], ['1-3×', 1, 3], ['3-10×', 3, 10], ['10-60×', 10, 60], ['停摆/严重超时', 60, 1e9]];
+                const counts = buckets.map(function (b) {
+                    return devices.filter(function (d) {
+                        const r = hbState(d) === '停摆' ? 1e9 : beatRatio(d);
+                        return r > b[1] && r <= b[2];
+                    }).length;
+                });
+                setChart('hbGap', SC.chart.bar, document.getElementById('c-hb-gap'), {
+                    labels: buckets.map(b => b[0]), unit: ' 台', zeroBased: true,
+                    series: [{ name: '设备数', color: '#26c6da', data: counts }]
+                });
+                const tr = hbTrend || (hbTrend = hbTrendInit());
+                setChart('hbLine', SC.chart.line, document.getElementById('c-hb-line'), {
+                    labels: tr.map(t => t.label), xEvery: 4, unit: ' 次', zeroBased: true,
+                    series: [
+                        { name: '心跳超时', color: '#e74c3c', data: tr.map(t => t.off) },
+                        { name: '自动重连成功', color: '#27ae60', data: tr.map(t => t.back) }
+                    ]
+                });
+                const sum = tr.reduce((a, t) => a + t.off, 0);
+                SC.chart.legend(document.getElementById('l-hb-line'), [
+                    { name: '心跳超时', color: '#e74c3c', value: sum + ' 次' },
+                    { name: '自动重连成功', color: '#27ae60', value: tr.reduce((a, t) => a + t.back, 0) + ' 次' }
+                ], function (i, on) {
+                    charts.hbLine.update({
+                        series: [
+                            { name: '心跳超时', color: '#e74c3c', data: tr.map(t => t.off), visible: i !== 0 || on },
+                            { name: '自动重连成功', color: '#27ae60', data: tr.map(t => t.back), visible: i !== 1 || on }
+                        ]
+                    });
+                });
+            }
+            function hbRows() {
+                const order = { '超时': 0, '停摆': 1, '抖动': 2 };
+                return devices.filter(d => hbState(d) !== '准点')
+                    .sort((a, b) => (order[hbState(a)] - order[hbState(b)]))
+                    .sort((a, b) => (hbState(a) === hbState(b) ? beatRatio(b) - beatRatio(a) : 0));
+            }
+            function renderHbTable() {
+                const tbody = document.querySelector('#hb-table tbody');
+                if (!tbody) return;
+                const rows = hbRows();
+                tbody.innerHTML = rows.length ? rows.map(function (d) {
+                    const s = hbState(d), r = beatRatio(d), score = beatScore(d);
+                    return '<tr data-id="' + d.id + '"><td><b>' + d.id + '</b> ' + SC.esc(d.name) +
+                        '<div class="sc-hint">' + SC.esc(d.zone) + ' · ' + SC.esc(d.protocol) + '</div></td>' +
+                        '<td>' + typeShort(d.type) + '</td>' +
+                        '<td>' + SC.esc(d.protocol) + '</td>' +
+                        '<td><span class="sc-cell-num">' + d.hbPeriod + '</span> s</td>' +
+                        '<td><span class="sc-tag ' + HB_STATE[s] + '">' + s + '</span></td>' +
+                        '<td><span class="sc-cell-num">' + score.toFixed(1) + '</span>%' +
+                        '<div class="sc-bar-mini" style="margin-top:4px"><i style="width:' + score.toFixed(0) + '%;background:' +
+                        (score > 92 ? '#27ae60' : score > 80 ? '#f39c12' : '#e74c3c') + '"></i></div></td>' +
+                        '<td><span class="sc-cell-num">' + (d.miss || 0) + '</span> 周期</td>' +
+                        '<td><span class="sc-cell-num">' + (d.recon || 0) + '</span> 次</td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(d.buf || 0) + '</span> 条</td>' +
+                        '<td>' + agoText(d.lastBeat) + '<div class="sc-hint">' +
+                        (s === '停摆' ? '已超 ' + Math.min(9999, Math.round(r)) + ' 个周期' : r.toFixed(1) + '× 周期') + '</div></td>' +
+                        '<td><button class="sc-btn sm ghost" data-hb="probe">探测</button> ' +
+                        '<button class="sc-btn sm ghost" data-hb="wake">唤醒</button> ' +
+                        '<button class="sc-btn sm ghost" data-hb="view">详情</button></td></tr>';
+                }).join('') : '<tr class="sc-empty-row"><td colspan="11">全部在管设备心跳准点，当前无超时记录 🎉</td></tr>';
+                if (hbCtrl) hbCtrl.reload();
+            }
+            function renderHbLog() {
+                const host = document.getElementById('hb-log');
+                if (!host) return;
+                host.innerHTML = hbEvents.slice(0, 60).map(function (e) {
+                    return '<div class="li"><span class="t">' + SC.stamp(e.t).slice(5, 19) + '</span>' +
+                        '<span class="lv ' + e.lv + '">' + ({ info: 'INFO', warn: 'WARN', alarm: 'ALARM', ok: 'OK' }[e.lv] || 'INFO') + '</span>' +
+                        '<span class="tx">' + SC.esc(e.tx) + '</span></div>';
+                }).join('') || '<div class="li"><span class="tx">暂无心跳事件：所有设备均在保活窗口内上报</span></div>';
+            }
+            function hbEvent(lv, tx) {
+                hbEvents.unshift({ t: Date.now(), lv: lv, tx: tx });
+                if (hbEvents.length > 160) hbEvents.length = 160;
+                const tr = hbTrend || (hbTrend = hbTrendInit());
+                if (lv === 'alarm' || lv === 'warn') tr[tr.length - 1].off++;
+                if (lv === 'ok') tr[tr.length - 1].back++;
+                if (document.getElementById('heartbeat-module').classList.contains('active')) renderHbLog();
+            }
+            /* ---------- 断点缓存续传（补传） ---------- */
+            function enqueueBackfill(d) {
+                const total = d.buf || 0;
+                if (total < 60) return;
+                if (backfill.some(b => b.id === d.id && b.state !== '已完成')) return;
+                backfill.unshift({ id: d.id, name: d.name, total: total, done: 0, state: '待续传' });
+                if (backfill.length > 12) backfill.length = 12;
+                SC.store.set('equipment', 'backfill', backfill.slice(0, 6));
+            }
+            function renderBackfill() {
+                const host = document.getElementById('bf-list');
+                if (!host) return;
+                const done = backfill.filter(b => b.state === '已完成').length;
+                const pending = backfill.filter(b => b.state !== '已完成');
+                const totalRows = pending.reduce((a, b) => a + (b.total - b.done), 0);
+                document.getElementById('bf-kv').innerHTML =
+                    kvItem('补传任务', backfill.length + ' 个（待处理 ' + pending.length + '）') +
+                    kvItem('待回灌行数', SC.num(totalRows) + ' 条') +
+                    kvItem('续传速率', hbRule.backfillRate + ' 万条/分钟') +
+                    kvItem('去重策略', '按 (dev_id, ts) 幂等键丢弃重复') +
+                    kvItem('已完成', done + ' 个任务');
+                host.innerHTML = backfill.length ? backfill.map(function (b, i) {
+                    const pct = b.total ? Math.round(b.done / b.total * 100) : 100;
+                    return '<div class="bf-item"><span style="flex:0 0 auto"><b>' + b.id + '</b></span>' +
+                        '<span class="bg"><div class="sc-progress" style="height:8px"><i style="width:' + pct + '%;' +
+                        (b.state === '已完成' ? 'background:#27ae60' : '') + '"></i></div>' +
+                        '<span class="sc-hint">' + SC.esc(b.name) + ' · ' + SC.num(b.done) + ' / ' + SC.num(b.total) + ' 条</span></span>' +
+                        '<span class="sc-tag ' + (b.state === '已完成' ? 'ok' : b.state === '续传中' ? 'info' : 'warn') + '">' + b.state + '</span>' +
+                        '<button class="sc-btn sm ghost" data-bf="' + i + '">' + (b.state === '已完成' ? '移除' : '立即续传') + '</button></div>';
+                }).join('') : '<div class="sc-note">暂无补传任务。设备掉线期间本地缓存的上报会在重连后按时间序回灌，幂等键去重后不影响统计口径。</div>';
+                host.querySelectorAll('[data-bf]').forEach(function (btn) {
+                    btn.onclick = function () {
+                        const b = backfill[Number(btn.dataset.bf)];
+                        if (!b) return;
+                        if (b.state === '已完成') { backfill.splice(Number(btn.dataset.bf), 1); }
+                        else { b.state = '续传中'; startBackfill(); }
+                        renderBackfill();
+                        SC.store.set('equipment', 'backfill', backfill.slice(0, 6));
+                    };
+                });
+            }
+            function startBackfill() {
+                if (bfTimer) return;
+                bfTimer = setInterval(function () {
+                    let active = false;
+                    backfill.forEach(function (b) {
+                        if (b.state === '已完成') return;
+                        b.state = '续传中';
+                        b.done = Math.min(b.total, b.done + Math.round(b.total * 0.16) + hbRule.backfillRate * 40);
+                        if (b.done >= b.total) {
+                            b.state = '已完成';
+                            const d = byId(b.id);
+                            if (d) { d.buf = 0; hbEvent('ok', d.id + ' 断点数据补传完成，' + SC.num(b.total) + ' 条已回灌时序库'); }
+                            log('ok', b.id + ' 补传完成（' + SC.num(b.total) + ' 条）');
+                        } else active = true;
+                    });
+                    renderBackfill();
+                    const sum = hbSummary();
+                    document.getElementById('kpi-stream-sub') &&
+                        (document.getElementById('kpi-stream-sub').textContent = '视频在拉 ' + streamSummary().vLive + ' · 掉线缓存 ' + SC.num(sum.buf) + ' 条');
+                    if (!active) { clearInterval(bfTimer); bfTimer = null; }
+                }, 700);
+            }
+            /* ---------- 心跳探测 ---------- */
+            function probeSteps(d) {
+                const alive = d.status === '在线' || d.status === '休眠';
+                const weak = d.signal < 55;
+                const lat = alive ? ri(18, 180) + (weak ? 120 : 0) : 0;
+                return [
+                    ['寻址解析', alive, alive ? ri(2, 42) + 'ms' : '无 ARP/DNS 应答'],
+                    ['会话保活', alive, alive ? '会话 ' + d.stream.id + ' 在线' : '会话已回收'],
+                    ['注册鉴权', alive, alive ? '凭据校验通过' : '注册报文超时'],
+                    ['心跳往返', alive, alive ? '往返 ' + lat + 'ms（周期 ' + d.hbPeriod + 's）' : '连续丢失 ' + Math.min(99, Math.round(beatRatio(d))) + ' 个周期'],
+                    ['订阅恢复', alive && d.subscribed !== false, d.subscribed === false ? '该设备未订阅数据流' : alive ? 'QoS' + d.stream.qos + ' 订阅已恢复' : '跳过'],
+                    ['缓存核对', alive, d.buf > 0 ? '本地待补传 ' + SC.num(d.buf) + ' 条' : '无积压']
+                ];
+            }
+            function runSteps(host, steps, onFail, onDone) {
+                let idx = 0;
+                host.innerHTML = '';
+                (function next() {
+                    if (idx >= steps.length) { if (onDone) onDone(); return; }
+                    const name = steps[idx][0];
+                    const row = SC.el('<div class="conn-step"><span>' + name + '</span><b>探测中…</b></div>');
+                    host.appendChild(row);
+                    setTimeout(function () {
+                        const ok = steps[idx][1];
+                        row.className = 'conn-step ' + (ok ? 'ok' : 'bad');
+                        row.innerHTML = '<span>' + name + '</span><b>' + (ok ? '通过 ' : '失败 ') + SC.esc(steps[idx][2]) + '</b>';
+                        if (!ok) { if (onFail) onFail(name); return; }
+                        idx++;
+                        next();
+                    }, 380);
+                })();
+            }
+            function openProbe(d) {
+                const body = '<div class="sc-kv">' +
+                    kvItem('设备', d.id + ' · ' + SC.esc(d.name)) +
+                    kvItem('接入协议', SC.esc(d.protocol)) +
+                    kvItem('心跳周期', d.hbPeriod + ' 秒（漂移 ±' + d.hbDrift + 's）') +
+                    kvItem('最近心跳', agoText(d.lastBeat) + ' 前') +
+                    kvItem('当前心跳态', '<span class="sc-tag ' + HB_STATE[hbState(d)] + '">' + hbState(d) + '</span>') +
+                    kvItem('待补传缓存', SC.num(d.buf || 0) + ' 条') +
+                    '</div><div class="sc-section-title">逐跳探测</div><div id="pr-steps"></div>' +
+                    '<div class="sc-hint" id="pr-tip" style="margin-top:10px">探测只读，不改写设备状态；若心跳往返通过则刷新最近心跳时间。</div>';
+                const m = SC.modal.open({
+                    title: '📡 心跳探测 · ' + d.id, size: 'md', body: body,
+                    footer: [{ text: '关闭', kind: 'primary' }]
+                });
+                const host = m.body.querySelector('#pr-steps');
+                runSteps(host, probeSteps(d), function (name) {
+                    m.body.querySelector('#pr-tip').innerHTML = '<span style="color:#e74c3c">「' + name + '」未通过：设备不可达，建议先执行唤醒或派单现场检修。</span>';
+                    hbEvent('warn', d.id + ' 心跳探测失败于「' + name + '」');
+                }, function () {
+                    d.lastBeat = Date.now();
+                    d.miss = 0;
+                    saveDevices();
+                    renderHbTable(); renderHbKpi(); renderDevs();
+                    m.body.querySelector('#pr-tip').innerHTML = '<span style="color:#27ae60">六跳全部通过，已刷新最近心跳时间并解除丢拍计数。</span>';
+                    hbEvent('ok', d.id + ' 心跳探测通过，往返时延正常，已刷新保活时间');
+                    SC.toast(d.id + ' 心跳探测通过', { type: 'success' });
+                });
+            }
+            /* ---------- 唤醒与规则 ---------- */
+            function wakeDevices(list) {
+                if (!list.length) { SC.toast('没有需要唤醒的设备', { type: 'warn' }); return; }
+                SC.modal.confirm({
+                    title: '批量唤醒（心跳重连）', okText: '下发唤醒',
+                    html: '将向 <b>' + list.length + '</b> 台掉线设备下发寻呼与重连指令。<br>' +
+                        '<span class="sc-hint">电池类设备需等待下一个唤醒窗口；' + hbRule.wakeRetry + ' 次退避重连仍失败的将保持离线并计入丢拍。</span>'
+                }).then(function (ok) {
+                    if (!ok) return;
+                    startJob({
+                        title: '批量唤醒与链路重建', items: list, failRate: 0.18,
+                        phases: ['寻呼', '重连', '会话重建', '缓存标记'],
+                        onApply: function (d) {
+                            d.status = '在线'; d.lastBeat = Date.now(); d.lastSeen = Date.now();
+                            d.miss = 0; d.recon++; d.health = calcHealth(d);
+                            if (d.stream) { d.stream.state = d.stream.kind === 'video' ? '空闲' : '推流中'; d.stream.since = Date.now(); }
+                            enqueueBackfill(d);
+                        },
+                        onFail: function (d) { d.offline++; d.miss = (d.miss || 0) + hbRule.periods; d.health = calcHealth(d); }
+                    });
+                    hbEvent('info', '批量唤醒任务启动，目标 ' + list.length + ' 台掉线设备');
+                });
+            }
+            function openHbRule() {
+                SC.modal.form({
+                    title: '心跳与掉线告警规则', submitText: '保存并下发到接入网关',
+                    fields: [
+                        { name: 'periods', label: '超时判定（连续丢失周期数）', type: 'number', min: 1, max: 10, step: 1, value: hbRule.periods, col: 1, required: true, hint: 'NB-IoT 设备建议 3-5 个周期，避免电池唤醒窗口误判' },
+                        { name: 'debounce', label: '告警去抖窗口', type: 'number', min: 0, max: 10, step: 1, value: hbRule.debounce, unit: '周期', col: 1, required: true },
+                        { name: 'wakeRetry', label: '自动重连次数', type: 'number', min: 1, max: 6, value: hbRule.wakeRetry, unit: '次', col: 1, required: true },
+                        { name: 'backfillRate', label: '断点续传速率', type: 'number', min: 1, max: 60, value: hbRule.backfillRate, unit: '万条/分钟', col: 1, required: true },
+                        {
+                            name: 'level', label: '告警级别', type: 'select', col: 1, value: hbRule.level,
+                            options: [{ value: 'info', label: '提示（仅记录）' }, { value: 'warn', label: '告警（通知班组）' }, { value: 'alarm', label: '紧急（进指挥中枢）' }]
+                        },
+                        { name: 'autoMaint', label: '超时设备自动转检修', type: 'switch', onText: '自动转检修', value: hbRule.autoMaint, col: 1 },
+                        { name: 'sleepIgnore', label: '休眠策略不计超时', type: 'switch', value: true, col: 1 },
+                        { name: 'topics', label: '通知渠道', type: 'checkgroup', col: 2, options: ['短信', '站内消息', '企业微信', '工单系统', '大屏弹窗'], value: ['站内消息', '工单系统'] }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    hbRule.periods = v.periods; hbRule.debounce = v.debounce;
+                    hbRule.wakeRetry = v.wakeRetry; hbRule.backfillRate = v.backfillRate;
+                    hbRule.level = v.level; hbRule.autoMaint = v.autoMaint;
+                    SC.store.set('equipment', 'hbRule', hbRule);
+                    document.getElementById('hb-rule-tip').textContent =
+                        '超时判定：连续丢失 ' + hbRule.periods + ' 个周期 · 去抖 ' + hbRule.debounce + ' 周期 · 重连 ' + hbRule.wakeRetry + ' 次';
+                    renderHbKpi(); renderHbTable(); renderHbCharts(); applyFilter(); renderDevs();
+                    log('ok', '心跳告警规则已更新：超时 ' + hbRule.periods + ' 周期 / 去抖 ' + hbRule.debounce + ' 周期 / 级别 ' + v.level + '，已下发至 ' + gateways.length + ' 个接入网关');
+                    SC.toast('规则已保存并下发到 ' + gateways.length + ' 个接入网关', { type: 'success' });
+                });
+            }
+
+            /* =====================================================================
+               14c. 数据流获取与监控
+               ===================================================================== */
+            const st = {
+                kind: 'all', sel: null, proto: 'gb', tailOn: true, building: false,
+                flow: [], tail: [], pulled: 0, frames: 0, snaps: [], tick: 0, snapHold: 0, snapMsg: ''
+            };
+            let stCtrl = null;
+            for (let i = 59; i >= 0; i--) {
+                st.flow.push({ t: Date.now() - i * 1000, v: Math.round(24000 + Math.random() * 5200), sel: 0 });
+            }
+            const PROTO_LABEL = { gb: 'GB28181 联网平台', rtsp: 'RTSP 单播', hls: 'HLS 切片' };
+            function shortUrl(u) {
+                const s = String(u).replace(/^(mqtt|https|rtsp|gb28181):\/\//, '').replace(/^broker\.iot\.city/, 'mqtts://broker');
+                return s.length > 46 ? s.slice(0, 44) + '…' : s;
+            }
+            function videoDevices() {
+                return devices.filter(d => d.stream && d.stream.kind === 'video');
+            }
+            function renderStKpi() {
+                const s = streamSummary();
+                const host = document.getElementById('st-kpi');
+                if (!host) return;
+                host.innerHTML =
+                    miniCard('在推流会话', SC.num(s.live) + ' 条', '推流 ' + (s.live - s.vLive) + ' · 拉流 ' + s.vLive, 'ok') +
+                    miniCard('视频流总码率', SC.num(s.br / 1024, 2) + ' Mbps', '在管视频设备 ' + s.video + ' 路', '') +
+                    miniCard('按需拉流中', s.vLive + ' 路', '未拉流不占用转码算力', s.vLive > 12 ? 'warn' : '') +
+                    miniCard('平均抖动', s.jitter.toFixed(0) + ' ms', 'RTP 到达间隔抖动', s.jitter > 60 ? 'warn' : 'ok') +
+                    miniCard('平均丢帧率', s.loss.toFixed(2) + '%', '超 2% 触发降级', s.loss > 1.2 ? 'bad' : 'ok') +
+                    miniCard('接入 P95 时延', s.p95 + ' ms', '设备侧 → 时序库', s.p95 > 200 ? 'warn' : '') +
+                    miniCard('订阅设备', SC.num(s.subs) + ' 台', '未订阅 ' + s.unSub + ' 台（不入库）', '') +
+                    miniCard('异常流', s.err + ' 条', '会话中断 / 注册失败', s.err ? 'bad' : 'ok');
+            }
+            /** 目录列表：按流类别过滤，视频流优先展示（未起流也需要预览/起流入口） */
+            function streamList() {
+                const list = devices.filter(d => d.stream && (st.kind === 'all' || d.stream.kind === st.kind));
+                return list.sort(function (a, b) {
+                    const w = function (d) { return d.stream.state === '拉流中' ? 0 : d.stream.state === '异常' ? 1 : d.stream.state === '推流中' ? 2 : 3; };
+                    return w(a) - w(b) || (a.stream.kind === 'video' ? 0 : 1) - (b.stream.kind === 'video' ? 0 : 1) || a.id.localeCompare(b.id);
+                });
+            }
+            function renderStTable() {
+                const tbody = document.querySelector('#stream-table tbody');
+                if (!tbody) return;
+                const list = streamList();
+                tbody.innerHTML = list.map(function (d) {
+                    const s = d.stream, sc = STREAM_KIND[s.kind];
+                    const rate = s.state === '推流中' || s.state === '拉流中'
+                        ? (s.kind === 'video' ? SC.num(s.br) + ' kbps' : s.sr + ' ' + sc.unit)
+                        : '—';
+                    return '<tr data-id="' + d.id + '"><td><b>' + s.id + '</b> <span class="sc-hint">' + d.id + '</span>' +
+                        '<div class="sc-hint">' + SC.esc(d.name) + '</div></td>' +
+                        '<td>' + sc.icon + ' ' + sc.label + '</td>' +
+                        '<td>' + SC.esc(s.proto || d.protocol) + '</td>' +
+                        '<td><span class="sc-hint" style="font-family:Consolas,monospace" title="' + SC.esc(s.url) + '">' + SC.esc(shortUrl(s.url)) + '</span></td>' +
+                        '<td><span class="sc-cell-num">' + rate + '</span></td>' +
+                        '<td><span class="sc-cell-num">' + s.jitter.toFixed(0) + '</span> ms</td>' +
+                        '<td><span class="sc-cell-num">' + s.loss.toFixed(2) + '</span>%' +
+                        (s.loss > 2 ? ' <span class="sc-tag bad">降级</span>' : '') + '</td>' +
+                        '<td style="min-width:96px"><div class="sc-progress" style="height:8px"><i style="width:' + Math.min(100, s.buf).toFixed(0) + '%;' +
+                        (s.buf > 78 ? 'background:linear-gradient(90deg,#e67e22,#e74c3c)' : '') + '"></i></div>' +
+                        '<span class="sc-hint">缓冲 ' + s.buf.toFixed(0) + '%</span></td>' +
+                        '<td>' + (d.subscribed === false ? '<span class="sc-tag off">未订阅</span>' : '<span class="sc-tag ok">' + s.subs + ' 方</span>') + '</td>' +
+                        '<td><span class="sc-tag ' + STREAM_STATE[s.state] + '">' + s.state + '</span></td>' +
+                        '<td>' + (s.kind === 'video'
+                            ? '<button class="sc-btn sm ghost" data-st="preview">预览</button> ' +
+                            '<button class="sc-btn sm ghost" data-st="' + (s.state === '拉流中' ? 'stop' : 'pull') + '">' + (s.state === '拉流中' ? '停流' : '起流') + '</button> '
+                            : '<button class="sc-btn sm ghost" data-st="sample">取样</button> ') +
+                        '<button class="sc-btn sm ghost" data-st="diag">诊断</button></td></tr>';
+                }).join('');
+                if (stCtrl) stCtrl.reload();
+            }
+            function renderStCharts() {
+                const s = streamSummary();
+                setChart('stFlow', SC.chart.line, document.getElementById('c-st-flow'), {
+                    labels: st.flow.map(r => SC.stamp(r.t).slice(14)), xEvery: 12, unit: ' kbps',
+                    series: [
+                        { name: '全部视频流码率', color: '#f39c12', data: st.flow.map(r => r.v) },
+                        { name: '当前会话码率', color: '#26c6da', data: st.flow.map(r => r.sel) }
+                    ],
+                    thresholds: [{ value: 6000, label: '单路上限 6Mbps', color: '#e74c3c' }]
+                });
+                SC.chart.legend(document.getElementById('l-st-flow'), [
+                    { name: '全部视频流码率', color: '#f39c12', value: SC.num(s.br, 0) + ' kbps' },
+                    { name: '当前会话码率', color: '#26c6da', value: (st.sel && byId(st.sel)) ? SC.num(byId(st.sel).stream.br) + ' kbps' : '未选择' }
+                ]);
+                const kinds = Object.keys(STREAM_KIND);
+                setChart('stKind', SC.chart.bar, document.getElementById('c-st-kind'), {
+                    labels: kinds.map(k => STREAM_KIND[k].label), unit: ' 条', zeroBased: true,
+                    series: [
+                        { name: '在推/在拉', color: '#26c6da', data: kinds.map(k => devices.filter(d => d.stream && d.stream.kind === k && (d.stream.state === '推流中' || d.stream.state === '拉流中')).length) },
+                        { name: '空闲/已停', color: '#b0bec5', data: kinds.map(k => devices.filter(d => d.stream && d.stream.kind === k && (d.stream.state === '空闲' || d.stream.state === '已停')).length) },
+                        { name: '异常', color: '#e74c3c', data: kinds.map(k => devices.filter(d => d.stream && d.stream.kind === k && d.stream.state === '异常').length) }
+                    ]
+                });
+                const protos = kinds.length ? Object.keys(devices.reduce(function (a, d) { if (d.stream && d.stream.proto) a[d.stream.proto] = 1; return a; }, {})) : [];
+                setChart('stTopic', SC.chart.bar, document.getElementById('c-st-topic'), {
+                    labels: protos.map(p => p.length > 9 ? p.slice(0, 9) : p), unit: ' 条', zeroBased: true,
+                    series: [{ name: '接入协议流数', color: '#9b59b6', data: protos.map(p => devices.filter(d => d.stream && d.stream.proto === p).length) }]
+                });
+                const totalMsg = devices.reduce((a, d) => a + streamRate(d), 0);
+                setChart('stBuf', SC.chart.gauge, document.getElementById('g-st-buf'), {
+                    value: s.bufAvg, min: 0, max: 100, unit: '%', decimals: 0, label: '平均缓冲水位',
+                    segments: [{ to: 55, color: '#27ae60' }, { to: 80, color: '#f39c12' }, { to: 100, color: '#e74c3c' }]
+                });
+                setChart('stLoss', SC.chart.gauge, document.getElementById('g-st-loss'), {
+                    value: s.loss, min: 0, max: 8, unit: '%', decimals: 2, label: '平均丢帧率',
+                    segments: [{ to: 1.2, color: '#27ae60' }, { to: 2, color: '#f39c12' }, { to: 8, color: '#e74c3c' }]
+                });
+                setChart('stLat', SC.chart.gauge, document.getElementById('g-st-lat'), {
+                    value: s.p95, min: 0, max: 500, unit: ' ms', decimals: 0, label: '流时延 P95',
+                    segments: [{ to: 180, color: '#27ae60' }, { to: 320, color: '#f39c12' }, { to: 500, color: '#e74c3c' }]
+                });
+                document.getElementById('sub-kv').innerHTML =
+                    kvItem('活动订阅关系', SC.num(devices.reduce((a, d) => a + (d.subscribed === false ? 0 : (d.stream ? d.stream.subs || 0 : 0)), 0)) + ' 组') +
+                    kvItem('Broker 会话', SC.num(devices.filter(d => d.status === '在线').length) + ' 个持久会话') +
+                    kvItem('实时吞吐', SC.num(totalMsg, 1) + ' msg/s（配额 ' + SC.num(Math.round(devices.length * 9)) + '）') +
+                    kvItem('QoS1 主题占比', '68%（告警与事件类）') +
+                    kvItem('主题命名规范', '/v1/up/{片区}/{设备}/{测点组}') +
+                    kvItem('当日原始报文', SC.num(st.pulled + devices.length * 420) + ' 条抽检样本入库');
+                document.getElementById('st-time').textContent = '采样于 ' + SC.stamp(new Date());
+            }
+            function paintTail() {
+                const host = document.getElementById('tail');
+                if (!host) return;
+                document.getElementById('tail-stat').textContent =
+                    st.tail.length + ' 行缓存 · 已拉取 ' + st.pulled + ' 条 · ' + (st.tailOn ? '滚动中' : '已暂停');
+                if (!st.tailOn) return;
+                host.innerHTML = st.tail.map(function (r) {
+                    return '<div class="row' + (r.err ? ' err' : '') + '"><span class="t">' + SC.stamp(r.t).slice(11) + '</span>' +
+                        '<span class="dev">' + r.dev + '</span><span class="tp">' + SC.esc(r.topic) + '</span>' +
+                        '<span class="py">' + SC.esc(r.text) + '</span></div>';
+                }).join('');
+            }
+            /** 生成一条原始上报：视频流给 RTP 元数据，其它给物模型 JSON */
+            function tailSample(d, force) {
+                const s = d.stream || (d.stream = buildStream(d));
+                const offline = d.status === '离线' || d.status === '故障';
+                let text;
+                if (s.kind === 'video') {
+                    text = '{"seq":' + (880000 + (st.frames % 12000)) + ',"ts":' + (Date.now() % 100000) * 9 +
+                        ',"codec":"' + s.codec + '","res":"' + s.res + '","kbps":' + Math.round(s.br) +
+                        ',"gop":' + (s.fps * 2) + ',"drop":' + Math.round(s.loss * 3) + '}';
+                } else if (offline) {
+                    text = '{"dev_id":"' + d.id + '","err":"no_heartbeat","last":' + d.lastBeat + '}';
+                } else {
+                    text = modelPayload(d);
+                }
+                const topic = s.kind === 'video' ? (s.proto === 'RTSP' ? 'rtsp/live' : 'gb28181/rtp') :
+                    (s.url.split('/').slice(2).join('/')).replace(/^[^/]*\//, '');
+                st.tail.unshift({
+                    t: Date.now(), dev: d.id, topic: topic,
+                    text: text.length > 180 ? text.slice(0, 178) + '…' : text,
+                    err: offline, bytes: text.length + 46
+                });
+                if (st.tail.length > 140) st.tail.length = 140;
+                st.pulled++;
+                if (force || st.tailOn) paintTail();
+            }
+            /** 抽样范围：数据流模块取当前页目录，其它模块沿用台账勾选或筛选结果 */
+            function pullTargets() {
+                if (stCtrl && document.getElementById('stream-module').classList.contains('active')) {
+                    const rows = (stCtrl.pageRows || stCtrl.visibleRows || []).map(r => byId(r.id)).filter(Boolean);
+                    if (rows.length) return rows;
+                }
+                return targetDevices('拉取报文样本');
+            }
+            function pullSamples() {
+                const list = pullTargets().filter(d => d.status !== '检修');
+                if (!list.length) return;
+                const take = list.slice(0, 8);
+                take.forEach(d => tailSample(d, true));
+                const rows = take.map(function (d) {
+                    const s = d.stream;
+                    return '<div class="attn-item"><span class="sc-tag ' + STREAM_STATE[s.state] + '">' + STREAM_KIND[s.kind].label + '</span>' +
+                        '<span class="ax"><b>' + d.id + '</b> ' + SC.esc(d.name) +
+                        '<br><span class="sc-hint" style="font-family:Consolas,monospace;word-break:break-all">' + SC.esc(s.url) + '</span>' +
+                        '<div class="sc-code" style="margin-top:6px">' + SC.esc(s.kind === 'video' ? JSON.stringify({ channel: d.id, codec: s.codec, res: s.res, fps: s.fps, kbps: Math.round(s.br) }) : modelPayload(d)) + '</div></span></div>';
+                }).join('');
+                SC.modal.open({
+                    title: '⇩ 原始上报报文抽样（' + take.length + ' 台）', size: 'lg',
+                    body: '<div class="sc-note">抽样取自接入侧最近一帧原文，未做清洗；测点标识与物模型一一对应，可直接比对数据中台采集口径。</div>' +
+                        '<div class="attn-list">' + rows + '</div>',
+                    footer: [
+                        {
+                            text: '⬇ 导出抽样', kind: 'ghost', onClick: function () {
+                                SC.csv.download('报文抽样_' + SC.today() + '.csv', [['设备', '名称', '流类别', '主题地址', '报文']]
+                                    .concat(take.map(d => [d.id, d.name, STREAM_KIND[d.stream.kind].label, d.stream.url, d.stream.kind === 'video' ? 'RTP ' + d.stream.br + 'kbps' : modelPayload(d)])));
+                            }
+                        },
+                        { text: '关闭' }
+                    ]
+                });
+                hbEvent('info', '手动拉取 ' + take.length + ' 台设备最近上报原文，用于链路对码');
+            }
+            /* ---------- 取流会话 ---------- */
+            function selectStream(d) {
+                st.sel = d.id;
+                const s = d.stream;
+                document.getElementById('st-sel-hint').textContent = d.id + ' · ' + d.name;
+                document.getElementById('st-url').textContent = stUrl(d);
+                paintPlayerKv();
+                updatePlayerBar();
+                renderStCharts();
+            }
+            function stUrl(d) {
+                const s = d.stream;
+                if (s.kind !== 'video') return s.url;
+                const u = s.urls || streamUrls(d, s);
+                return st.proto === 'rtsp' ? u.rtsp : st.proto === 'hls' ? u.hls : u.gb;
+            }
+            /** 跳到场景模块（复用 common.js 的模块切换） */
+            function switchModule(name) {
+                const btn = document.querySelector('.module-btn[data-module="' + name + '"]');
+                if (btn) btn.click();
+            }
+            /** 从台账或详情弹窗定位到该设备的数据流会话，视频流直接起流 */
+            function gotoStream(d) {
+                if (!d.stream) return;
+                switchModule('stream');
+                st.kind = 'all';
+                document.querySelectorAll('#st-kind button').forEach(b => b.classList.toggle('active', b.dataset.kind === 'all'));
+                renderStTable();
+                selectStream(d);
+                if (d.stream.kind === 'video' && d.stream.state !== '拉流中') {
+                    pullStream(d);
+                } else {
+                    SC.toast(d.id + ' 会话 ' + d.stream.id + ' · ' + STREAM_KIND[d.stream.kind].label + ' ' + d.stream.state, { type: 'info' });
+                }
+            }
+            function paintPlayerKv() {
+                const d = st.sel ? byId(st.sel) : null;
+                const host = document.getElementById('player-kv');
+                if (!host) return;
+                if (!d) {
+                    host.innerHTML = kvItem('会话状态', '未选择取流目标') + kvItem('建议', '在目录中点「预览」选择一路视频流');
+                    return;
+                }
+                const s = d.stream;
+                host.innerHTML =
+                    kvItem('设备 / 流', d.id + ' · ' + s.id) +
+                    kvItem('接入方式', SC.esc(s.proto) + ' / ' + (s.codec || 'JSON')) +
+                    kvItem('预置位', SC.esc(s.preset || '—')) +
+                    kvItem('会话起始', SC.stamp(s.since)) +
+                    kvItem('累计帧', SC.num(s.frames || 0)) +
+                    kvItem('抓拍', (s.snaps || 0) + ' 张') +
+                    kvItem('重连次数', (s.recon || 0) + ' 次') +
+                    kvItem('订阅方', (s.subs || 0) + ' 个下游') +
+                    (st.snaps.filter(x => x.id === d.id).length
+                        ? '<div class="sc-hint" style="margin-top:8px;grid-column:1/-1">抓拍对象：' + st.snaps.filter(x => x.id === d.id).slice(0, 3)
+                        .map(x => '<span class="cred">' + SC.esc(x.obj) + '（' + x.size + 'KB）</span>').join(' · ') + '</div>'
+                        : '');
+            }
+            function updatePlayerBar() {
+                const d = st.sel ? byId(st.sel) : null;
+                const s = d && d.stream;
+                const pulling = s && s.state === '拉流中';
+                document.getElementById('p-rec').hidden = !pulling;
+                document.getElementById('p-sid').textContent = s ? s.id : '—';
+                document.getElementById('p-res').textContent = s ? (s.res || '—') : '—';
+                document.getElementById('p-br').textContent = s ? (pulling ? Math.round(s.br) + ' kbps' : '未拉流') : '—';
+                document.getElementById('p-fps').textContent = s ? (pulling ? s.fps + ' fps' : '0 fps') : '—';
+                document.getElementById('p-loss').textContent = s ? s.loss.toFixed(2) + '%' : '—';
+                document.getElementById('p-lat').textContent = s ? Math.round(s.lat) + ' ms' : '—';
+                const clock = document.getElementById('p-clock');
+                if (st.snapHold && Date.now() - st.snapHold < 5000) clock.textContent = st.snapMsg;
+                else if (!s) clock.textContent = '—';
+                else if (s.kind !== 'video') clock.textContent = STREAM_KIND[s.kind].label + '常驻推送';
+                else clock.textContent = pulling ? '已取流 ' + fmtAgo(Date.now() - s.since) + ' · ' + SC.num(s.frames || 0) + ' 帧' : '会话未建立（按需拉流）';
+            }
+            function pullStream(d) {
+                if (!d || !d.stream || d.stream.kind !== 'video') { SC.toast('指标与轨迹流常驻推送，无需起流', { type: 'info' }); return; }
+                if (d.stream.state === '拉流中') { SC.toast('该路会话已建立', { type: 'info' }); selectStream(d); return; }
+                if (d.status === '离线' || d.status === '故障') {
+                    SC.toast(d.id + ' 不可达，起流失败：' + (d.status === '故障' ? '设备故障在案' : '心跳停摆'), { type: 'error' });
+                    hbEvent('alarm', d.id + ' 起流失败（设备不可达），会话保持空闲');
+                    return;
+                }
+                selectStream(d);
+                st.building = true;
+                const build = document.getElementById('st-build');
+                build.hidden = false;
+                document.getElementById('p-clock').textContent = '会话建立中…';
+                const steps = [
+                    ['目录注册', true, '通道 ' + (d.stream.urls ? d.stream.urls.gb.split(':')[1].slice(2) : d.id) + ' 已注册'],
+                    ['INVITE 协商', true, 'SDP：' + (d.stream.codec || 'H.265') + '/' + d.stream.res + '@' + d.stream.fps],
+                    ['媒体通道', d.status === '在线', d.status === '在线' ? 'RTP/UDP 端口 ' + ri(20000, 39999) : '信令可达但媒体通道超时'],
+                    ['关键帧解码', true, 'I 帧到达，GOP ' + d.stream.fps * 2],
+                    ['转码分发', true, '已切片为 ' + PROTO_LABEL[st.proto] + ' 输出']
+                ];
+                runSteps(build, steps, function (name) {
+                    st.building = false;
+                    d.stream.state = '异常';
+                    build.hidden = true;
+                    renderStTable(); renderStCharts(); renderStKpi();
+                    SC.toast('起流失败于「' + name + '」', { type: 'error' });
+                    hbEvent('alarm', d.id + ' 起流失败于「' + name + '」');
+                }, function () {
+                    st.building = false;
+                    d.stream.state = '拉流中';
+                    d.stream.since = Date.now();
+                    d.stream.frames = 0;
+                    build.hidden = true;
+                    saveDevices();
+                    renderStTable(); renderStCharts(); renderStKpi(); updatePlayerBar(); paintPlayerKv(); renderDevs();
+                    SC.toast(d.id + ' 取流成功：' + d.stream.res + ' / ' + d.stream.fps + 'fps / ' + Math.round(d.stream.br) + 'kbps', { type: 'success', duration: 3600 });
+                    log('ok', d.id + ' 起流成功（' + PROTO_LABEL[st.proto] + '），会话 ' + d.stream.id);
+                    tailSample(d, true);
+                });
+            }
+            function stopStream(d) {
+                if (!d || !d.stream) return;
+                if (d.stream.state === '空闲') { SC.toast('该路流本就未拉取', { type: 'info' }); return; }
+                d.stream.state = d.stream.kind === 'video' ? '空闲' : '已停';
+                d.stream.frames = 0;
+                if (st.sel === d.id) { document.getElementById('p-clock').textContent = '会话已关闭'; }
+                saveDevices();
+                renderStTable(); renderStCharts(); renderStKpi(); updatePlayerBar(); paintPlayerKv();
+                log('info', d.id + ' 已停流，释放转码与带宽资源（会话 ' + d.stream.id + '）');
+                SC.toast(d.id + ' 已停流，下游自动收到 stream_end', { type: 'success' });
+            }
+            function snapStream(d) {
+                if (!d || !d.stream) return;
+                if (d.stream.state !== '拉流中') { SC.toast('请先起流再抓拍', { type: 'warn' }); return; }
+                d.stream.snaps = (d.stream.snaps || 0) + 1;
+                const size = Math.round(180 + Math.random() * 420);
+                const obj = 'oss://snap/' + d.id + '_' + Date.now() + '.jpg';
+                st.snaps.unshift({ t: Date.now(), id: d.id, obj: obj, size: size });
+                if (st.snaps.length > 8) st.snaps.length = 8;
+                tailSample(d, true);
+                st.snapHold = Date.now();
+                st.snapMsg = '抓拍 ' + SC.stamp(new Date()).slice(11) + ' · ' + size + 'KB';
+                document.getElementById('p-clock').textContent = st.snapMsg;
+                SC.toast('抓拍完成：' + d.stream.res + ' JPEG ' + size + 'KB → ' + obj, { type: 'success', duration: 3400 });
+                log('ok', d.id + ' 抓拍 1 张（' + size + 'KB），对象 ' + obj + ' 已写入视图库');
+                paintPlayerKv();
+            }
+            function diagStream(d) {
+                const s = d.stream;
+                const body = '<div class="sc-kv">' +
+                    kvItem('流 / 设备', s.id + ' · ' + d.id) +
+                    kvItem('类别', STREAM_KIND[s.kind].icon + ' ' + STREAM_KIND[s.kind].label) +
+                    kvItem('接入协议', SC.esc(s.proto || d.protocol)) +
+                    kvItem('速率', (s.kind === 'video' ? Math.round(s.br) + ' kbps' : s.sr + ' ' + STREAM_KIND[s.kind].unit)) +
+                    kvItem('抖动 / 丢帧', s.jitter.toFixed(0) + ' ms / ' + s.loss.toFixed(2) + '%') +
+                    kvItem('缓冲水位', s.buf.toFixed(0) + '%') +
+                    kvItem('端到端时延', Math.round(s.lat) + ' ms') +
+                    kvItem('重连次数', (s.recon || 0) + ' 次') +
+                    '</div>' +
+                    '<div class="sc-section-title">近 30 秒抖动与丢帧</div>' +
+                    '<div class="sc-chart sm"><canvas data-c="sj"></canvas></div>' +
+                    '<div class="sc-section-title">链路探测</div><div id="dg-steps"></div>' +
+                    '<div class="sc-note' + (s.loss > 2 ? ' warn' : '') + '" style="margin-top:14px">' +
+                    (s.loss > 2 ? '丢帧率超阈值：建议把子码流降至 720p、GOP 提至 50，或改用 TCP 承载 HLS；持续劣化请检查片区网关上行带宽与天线驻波比。'
+                        : '流媒体链路健康。若需长期轮巡，可把该路改为「常驻拉流」并加入下游订阅；按需拉流会在校验通过后 30 秒回收会话。') +
+                    '</div>';
+                const m = SC.modal.open({
+                    title: '🧭 流诊断 · ' + d.id + '（' + STREAM_KIND[s.kind].label + '）', size: 'md', body: body,
+                    footer: [
+                        {
+                            text: s.state === '拉流中' ? '停流' : (s.kind === 'video' ? '起流' : '拉取样'), kind: 'primary', onClick: function () {
+                                if (s.state === '拉流中') stopStream(d);
+                                else if (s.kind === 'video') { m.close(); pullStream(d); }
+                                else tailSample(d, true);
+                            }
+                        },
+                        {
+                            text: '复制地址', kind: 'ghost', onClick: function () { copyText(stUrl(d)); }
+                        },
+                        { text: '关闭' }
+                    ]
+                });
+                const jit = [], ls = [];
+                for (let i = 0; i < 30; i++) { jit.push(Math.round(SC.clamp(s.jitter + rf(-14, 22), 2, 260))); ls.push(Number(SC.clamp(s.loss + rf(-0.6, 0.9), 0, 12).toFixed(2))); }
+                SC.chart.line(m.body.querySelector('[data-c=sj]'), {
+                    labels: jit.map((_, i) => (30 - i) + 's'), xEvery: 6, smooth: false,
+                    series: [
+                        { name: '抖动 ms', color: '#f39c12', data: jit },
+                        { name: '丢帧 %', color: '#e74c3c', data: ls, dash: [6, 4] }
+                    ]
+                });
+                runSteps(m.body.querySelector('#dg-steps'), [
+                    ['网关路由', d.status !== '离线', d.status === '离线' ? '设备不在任何网关在线列表' : '归属 ' + pick(gateways).id],
+                    ['主题权限', d.subscribed !== false, d.subscribed === false ? '该设备未订阅，Broker 拒绝转发' : 'ACL 通过'],
+                    ['媒体端口', s.kind !== 'video' || s.state !== '空闲', s.kind === 'video' && s.state === '空闲' ? '未起流，端口未映射' : '端口映射正常'],
+                    ['时序写入', d.status !== '故障', d.status === '故障' ? '设备自诊断码异常' : '写入 QPS 正常']
+                ], null, null);
+            }
+            function copyText(text) {
+                const done = function () { SC.toast('取流地址已复制到剪贴板', { type: 'success' }); };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+                } else fallbackCopy(text, done);
+            }
+            function fallbackCopy(text, done) {
+                const ta = SC.el('<textarea style="position:fixed;left:-9999px"></textarea>');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); done(); } catch (e) { SC.toast('复制失败，请手动选取地址', { type: 'warn' }); }
+                ta.remove();
+            }
+            function batchSubscribe() {
+                const list = targetDevices('订阅变更');
+                if (list.length) batchSubscribeFor(list);
+            }
+            function batchSubscribeFor(list) {
+                if (!list.length) return;
+                SC.modal.form({
+                    title: '批量订阅 / 退订数据流（' + list.length + ' 台）', submitText: '下发订阅变更',
+                    fields: [
+                        { name: 'mode', label: '动作', type: 'select', options: ['订阅（入库）', '退订（停止入库）'], col: 1, required: true },
+                        { name: 'qos', label: 'QoS 等级', type: 'select', options: ['0（最多一次）', '1（至少一次）', '2（恰好一次）'], value: '1（至少一次）', col: 1 },
+                        { name: 'topics', label: '主题组', type: 'checkgroup', col: 2, options: ['telemetry 测点', 'status 状态', 'alarm 告警', 'track 轨迹', 'video_meta 视频元数据', 'snap 抓拍对象'], value: ['telemetry', 'status'] },
+                        { name: 'retain', label: '保留最后一条（retain）', type: 'switch', value: true, col: 1 },
+                        { name: 'persist', label: '持久会话', type: 'switch', value: true, col: 1 },
+                        { name: 'reason', label: '变更事由', type: 'textarea', col: 2, required: true, placeholder: '例：视频元数据仅共享给城管平台，其余主题退订以降低存储成本' }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const on = v.mode.indexOf('订阅') === 0;
+                    const qos = Number(v.qos.charAt(0));
+                    list.forEach(function (d) {
+                        d.subscribed = on;
+                        if (d.stream) {
+                            d.stream.qos = qos;
+                            d.stream.subs = Math.max(0, (d.stream.subs || 0) + (on ? 1 : -1));
+                            if (on && d.status === '在线' && d.stream.kind !== 'video') d.stream.state = '推流中';
+                            if (!on && d.stream.state === '推流中') d.stream.state = '已停';
+                        }
+                    });
+                    saveDevices();
+                    renderStTable(); renderStKpi(); renderStCharts(); renderDevs(); applyFilter(); renderChips();
+                    log(on ? 'ok' : 'warn', '批量' + (on ? '订阅' : '退订') + ' ' + list.length + ' 台设备数据流，主题组：' + v.topics.join('/') + '（QoS' + qos + (v.retain ? '，retain' : '') + (v.persist ? '，持久会话' : '') + '）');
+                    SC.toast('已对 ' + list.length + ' 台设备' + (on ? '建立订阅' : '停止入库'), { type: 'success' });
+                    devCtrl.clearSelected();
+                });
+            }
+            /* ---------- 取流播放器画面 ---------- */
+            function drawIdleScene(ctx, w, h, d, msg) {
+                ctx.fillStyle = '#0d1b26';
+                ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                ctx.lineWidth = 1;
+                for (let y = 0; y < h; y += 4) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+                ctx.fillStyle = '#4dd0e1';
+                ctx.font = '600 14px "Microsoft YaHei",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(msg, w / 2, h / 2 - 6);
+                ctx.fillStyle = '#7f8c9b';
+                ctx.font = '11px Consolas,monospace';
+                ctx.fillText(d ? (d.id + ' · ' + d.name + ' · ' + (d.stream ? d.stream.res || 'JSON' : '—')) : '未选择取流目标', w / 2, h / 2 + 18);
+                ctx.textAlign = 'left';
+            }
+            function drawPlayer() {
+                const cv = document.getElementById('player-canvas');
+                if (!cv || !document.getElementById('stream-module').classList.contains('active')) return;
+                const d = st.sel ? byId(st.sel) : null;
+                const s = d && d.stream;
+                const dpr = window.devicePixelRatio || 1;
+                const w = cv.clientWidth || 480, h = cv.clientHeight || 230;
+                if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+                const ctx = cv.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, w, h);
+                if (!s || s.kind !== 'video') { drawIdleScene(ctx, w, h, d, s && s.kind ? '该设备无视频画面' : '会话未建立'); return; }
+                if (s.state !== '拉流中') {
+                    drawIdleScene(ctx, w, h, d, st.building ? '会话建立中…' : '按需拉流未开启 · 点「起流」');
+                    return;
+                }
+                st.tick++;
+                /* 夜间街面场景：透视路面 + 移动目标 + AI 识别框，纯前端模拟解码画面 */
+                const sky = ctx.createLinearGradient(0, 0, 0, h);
+                sky.addColorStop(0, '#16303f');
+                sky.addColorStop(0.55, '#1d3d4d');
+                sky.addColorStop(1, '#0e1a22');
+                ctx.fillStyle = sky;
+                ctx.fillRect(0, 0, w, h);
+                const horizon = h * 0.42;
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                for (let i = 0; i < 7; i++) {
+                    const bx = (i * 97 + st.tick * 0.4) % (w + 60) - 30;
+                    ctx.fillRect(bx, horizon - 46 - (i % 3) * 18, 26, 46 + (i % 3) * 18);
+                }
+                ctx.fillStyle = '#10202a';
+                ctx.beginPath();
+                ctx.moveTo(w * 0.12, h);
+                ctx.lineTo(w * 0.42, horizon);
+                ctx.lineTo(w * 0.58, horizon);
+                ctx.lineTo(w * 0.88, h);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                ctx.setLineDash([9, 11]);
+                ctx.lineDashOffset = -(st.tick * 6) % 20;
+                ctx.beginPath();
+                ctx.moveTo(w * 0.5, horizon);
+                ctx.lineTo(w * 0.5, h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                const targets = [[0.2, '轿车', 0.97], [0.55, '电动三轮', 0.9], [0.74, '行人', 0.86]];
+                targets.forEach(function (t, i) {
+                    const p = ((st.tick * (1.4 + i * 0.5) + i * 120) % (w + 120)) - 60;
+                    const ty = horizon + 14 + i * 22;
+                    const tw = 58 - i * 8, thh = 30 - i * 4;
+                    ctx.fillStyle = i === 2 ? 'rgba(255,214,120,.75)' : 'rgba(210,225,235,.8)';
+                    ctx.fillRect(p, ty, tw, thh);
+                    ctx.strokeStyle = '#4dd0e1';
+                    ctx.lineWidth = 1.6;
+                    ctx.strokeRect(p - 4, ty - 6, tw + 8, thh + 12);
+                    ctx.fillStyle = '#4dd0e1';
+                    ctx.font = '10px Consolas,monospace';
+                    ctx.fillText(t[1] + ' ' + t[2], p - 4, ty - 10);
+                });
+                if (s.loss > 2 && st.tick % 9 === 0) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.14)';
+                    ctx.fillRect(0, (st.tick * 23) % h, w, 7);
+                    ctx.fillRect(0, (st.tick * 41) % h, w, 4);
+                }
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.fillRect(0, 0, w, 20);
+                ctx.fillRect(0, h - 20, w, 20);
+                ctx.fillStyle = '#e0f2f1';
+                ctx.font = '11px Consolas,monospace';
+                ctx.fillText(d.id + '  ' + s.res + '  ' + s.codec + '  ' + Math.round(s.br) + 'kbps', 8, 14);
+                ctx.textAlign = 'right';
+                ctx.fillText(SC.stamp(new Date()) + (s.snaps ? '  SNAP×' + s.snaps : ''), w - 8, 14);
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#90a4ae';
+                ctx.fillText('缓冲 ' + s.buf.toFixed(0) + '%  丢帧 ' + s.loss.toFixed(2) + '%  时延 ' + Math.round(s.lat) + 'ms', 8, h - 7);
+                ctx.textAlign = 'right';
+                ctx.fillText('帧 ' + SC.num(s.frames || 0), w - 8, h - 7);
+                ctx.textAlign = 'left';
+            }
+            /* ---------- 心跳与流的仿真推进 ---------- */
+            function hbStreamTick() {
+                let dirty = false;
+                devices.forEach(function (d) {
+                    const s = d.stream;
+                    if (d.status === '在线') {
+                        if (Math.random() < 0.34) {
+                            d.lastBeat = Date.now() - ri(0, Math.round(d.hbPeriod * 0.5)) * 1000;
+                            d.miss = 0;
+                        } else if (Math.random() < 0.06) {
+                            d.miss = (d.miss || 0) + 1;
+                            d.missTotal++;
+                            d.hbDrift = Math.min(120, d.hbDrift + 2);
+                            if (d.miss > hbRule.debounce) {
+                                hbEvent('warn', d.id + ' 丢拍 ' + d.miss + ' 次（周期 ' + d.hbPeriod + 's，信号 ' + d.signal + '%）' +
+                                    (d.miss >= hbRule.periods ? '，已判定超时' : '，去抖窗口内暂不告警'));
+                            }
+                            if (d.miss >= hbRule.periods) {
+                                if (hbRule.autoMaint) {
+                                    d.status = '检修';
+                                    d.health = calcHealth(d);
+                                    hbEvent('alarm', d.id + ' 心跳超时 ' + d.miss + ' 个周期，按规则自动转检修并生成工单');
+                                } else {
+                                    hbEvent('alarm', d.id + ' 心跳超时（' + d.miss + ' 个周期 × ' + d.hbPeriod + 's），已挂起告警去抖');
+                                }
+                            }
+                        }
+                    } else if (d.status === '休眠') {
+                        if (Math.random() < 0.04) d.lastBeat = Date.now();
+                    } else {
+                        d.buf = Math.min(900000, (d.buf || 0) + Math.round(d.msgRate * d.hbPeriod * 0.35));
+                        dirty = true;
+                    }
+                    if (s) {
+                        if (s.state === '拉流中') {
+                            s.frames += s.fps;
+                            s.br = Math.round(SC.clamp(s.br + ri(-160, 170), s.br * 0.72, s.br * 1.24));
+                            s.lat = Math.round(SC.clamp(s.lat + ri(-14, 15), 24, 460));
+                        }
+                        if (s.state === '推流中' || s.state === '拉流中') {
+                            s.jitter = Math.round(SC.clamp(s.jitter + ri(-7, 8), 3, 240));
+                            s.loss = Number(SC.clamp(s.loss + rf(-0.22, 0.24), 0, 14).toFixed(2));
+                            s.buf = Number(SC.clamp(s.buf + (s.loss > 2 ? 1.8 : -0.7) + rf(-1.4, 1.6), 4, 99).toFixed(1));
+                            if (s.loss > 6 && s.state === '拉流中') {
+                                s.state = '异常';
+                                s.recon++;
+                                hbEvent('alarm', s.id + ' 丢帧率 ' + s.loss.toFixed(2) + '% 超限，媒体会话中断并触发重连');
+                            }
+                        }
+                    }
+                });
+                if (Math.random() < 0.1) {
+                    const d = pick(devices.filter(x => x.status === '在线' && x.stream && x.stream.state === '异常')) || null;
+                    if (d) {
+                        d.stream.state = d.stream.kind === 'video' ? '空闲' : '推流中';
+                        d.stream.loss = Number(rf(0.1, 1.2).toFixed(2));
+                        if (d.stream.kind === 'video') d.stream.recon++;
+                        hbEvent('ok', d.stream.id + ' 重连成功（退避第 ' + ri(1, hbRule.wakeRetry) + ' 次），' +
+                            (d.stream.kind === 'video' ? '视频会话回收为按需待拉流' : STREAM_KIND[d.stream.kind].label + '恢复推送'));
+                    }
+                }
+                /* 每次随机让若干设备的当前小时准点率小幅漂移，达标墙随之变化 */
+                if (Math.random() < 0.5) {
+                    for (let k = 0; k < 5; k++) {
+                        const d = devices[ri(0, devices.length - 1)];
+                        if (!d || !d.beatHist) continue;
+                        const base = hbState(d) === '准点' ? rf(-1.4, 1.2) : rf(-6, 2);
+                        d.beatHist[23] = Math.round(SC.clamp(d.beatHist[23] + base, 2, 100));
+                    }
+                }
+                if (dirty) { /* 缓存积压随 tick 增长，补传完成时清零 */ }
+                /* 视频总码率曲线 */
+                const sum = streamSummary();
+                st.flow.push({ t: Date.now(), v: Math.max(200, sum.br), sel: st.sel && (byId(st.sel) || {}).stream ? (byId(st.sel).stream.state === '拉流中' ? byId(st.sel).stream.br : 0) : 0 });
+                if (st.flow.length > 60) st.flow.shift();
+                if (Math.random() < 0.5) {
+                    const pool = devices.filter(x => x.status === '在线' && x.subscribed !== false);
+                    if (pool.length) tailSample(pool[ri(0, pool.length - 1)]);
+                }
             }
 
             /* =====================================================================
@@ -2703,15 +4531,29 @@
                         if (Math.random() < 0.05) {
                             d.status = '离线'; d.offline++; statusChanged = true;
                             d.health = calcHealth(d);
+                            d.miss = hbRule.periods;
+                            if (d.stream) {
+                                if (d.stream.kind === 'video') d.stream.state = '空闲';
+                                else if (d.stream.state !== '已停') { d.stream.state = '异常'; d.stream.recon++; }
+                            }
+                            hbEvent('alarm', d.id + ' 连续丢失 ' + hbRule.periods + ' 个心跳周期（' + d.hbPeriod + 's/次），判定掉线并转入断点缓存');
                             monEvent('alarm', d.id + ' 心跳超时（>' + ri(3, 9) + ' 个周期），已切换为离线态并挂起告警去抖');
                         }
                     } else if (d.status === '离线' && Math.random() < 0.22) {
                         d.status = '在线'; d.lastSeen = Date.now(); statusChanged = true;
                         d.health = calcHealth(d);
-                        monEvent('ok', d.id + ' 自动重连成功，补传离线期间缓存 ' + ri(12, 480) + ' 条数据');
+                        const cached = d.buf || ri(12, 480);
+                        d.lastBeat = Date.now(); d.miss = 0; d.recon = (d.recon || 0) + 1;
+                        if (d.stream) { d.stream.state = d.stream.kind === 'video' ? '空闲' : '推流中'; d.stream.since = Date.now(); }
+                        hbEvent('ok', d.id + ' 退避重连成功，心跳恢复（缓存 ' + SC.num(cached) + ' 条待回灌）');
+                        enqueueBackfill({ id: d.id, name: d.name, buf: cached });
+                        monEvent('ok', d.id + ' 自动重连成功，补传离线期间缓存 ' + SC.num(cached) + ' 条数据');
                     } else if (d.status === '休眠' && Math.random() < 0.12) {
                         d.status = '在线'; d.lastSeen = Date.now(); statusChanged = true;
                         d.health = calcHealth(d);
+                        d.lastBeat = Date.now(); d.miss = 0;
+                        if (d.stream && d.stream.kind !== 'video') d.stream.state = '推流中';
+                        hbEvent('ok', d.id + ' 唤醒窗口到达，设备上线并补报一个心跳');
                     }
                 }
                 gateways.forEach(function (g) {
@@ -2756,6 +4598,21 @@
                 }
                 if (tickCount % 3 === 0) mutateDevices();
                 if (tickCount % 20 === 0) paintOpslog();
+
+                /* 心跳与数据流推进：只重绘当前可见模块，隐藏时仅更新数据 */
+                hbStreamTick();
+                if (document.getElementById('heartbeat-module').classList.contains('active')) {
+                    renderHbKpi();
+                    if (tickCount % 2 === 0) { renderHbWall(); renderHbCharts(); }
+                    if (tickCount % 4 === 0) renderHbTable();
+                }
+                if (document.getElementById('stream-module').classList.contains('active')) {
+                    renderStKpi();
+                    if (tickCount % 2 === 0) renderStCharts();
+                    if (tickCount % 4 === 0) renderStTable();
+                    updatePlayerBar();
+                    drawPlayer();
+                }
                 document.getElementById('gauge-time').textContent = '采样于 ' + SC.stamp(new Date());
             }
 
@@ -2780,6 +4637,7 @@
                 if (!d) return;
                 if (btn.dataset.act === 'view') openDetail(d.id);
                 if (btn.dataset.act === 'cmd') openCmd(d);
+                if (btn.dataset.act === 'flow') gotoStream(d);
             });
 
             document.getElementById('btn-add-device').addEventListener('click', openAddDevice);
@@ -2865,6 +4723,183 @@
                 document.getElementById('job-panel').hidden = true;
             });
 
+            /* ---------- 心跳与在线模块 ---------- */
+            hbCtrl = SC.table.enhance(document.getElementById('hb-table'), {
+                pageSize: 10, search: '#hb-search', export: '心跳异常设备'
+            });
+            document.getElementById('hb-rule-tip').textContent =
+                '超时判定：连续丢失 ' + hbRule.periods + ' 个周期 · 去抖 ' + hbRule.debounce + ' 周期 · 重连 ' + hbRule.wakeRetry +
+                ' 次 · 级别 ' + hbRule.level + (hbRule.autoMaint ? ' · 超时自动转检修' : '');
+            backfill.forEach(function (b) { if (b.state === '续传中') b.state = '待续传'; });
+            devices.filter(d => (d.buf || 0) > 60).slice(0, 6).forEach(d => enqueueBackfill(d));
+            renderHbKpi(); renderHbWall(); renderHbCharts(); renderHbTable(); renderBackfill();
+            if (runtimeMigrated) {
+                hbEvent('info', '运行档案升级：' + runtimeMigrated + ' 台已建档设备补齐心跳周期、达标墙与数据流会话');
+            }
+            hbEvent('info', '心跳监控就绪：' + devices.length + ' 台在册，协议保活基线 30s（4G）~ 900s（LoRaWAN）');
+
+            document.getElementById('btn-hb-rule').addEventListener('click', openHbRule);
+            document.getElementById('btn-hb-probe').addEventListener('click', function () {
+                const sel = selDevices();
+                const d = sel[0] || hbRows()[0] || devices[0];
+                if (!d) return;
+                if (!sel.length) SC.toast('未勾选设备，已选择超时最严重的一台：' + d.id, { type: 'info' });
+                openProbe(d);
+            });
+            document.getElementById('btn-hb-wake').addEventListener('click', function () {
+                const sel = selDevices();
+                const list = sel.length
+                    ? sel.filter(d => d.status === '离线' || d.status === '故障' || d.status === '检修' || hbState(d) === '超时')
+                    : devices.filter(d => d.status === '离线' || d.status === '故障' || hbState(d) === '超时');
+                if (!list.length) { SC.toast('当前没有掉线或心跳超时的设备需要唤醒', { type: 'success' }); return; }
+                wakeDevices(list);
+            });
+            document.getElementById('hb-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('[data-hb]');
+                if (!btn || btn.tagName !== 'BUTTON') return;
+                const d = byId(btn.closest('tr').dataset.id);
+                if (!d) return;
+                if (btn.dataset.hb === 'probe') openProbe(d);
+                if (btn.dataset.hb === 'wake') wakeDevices([d]);
+                if (btn.dataset.hb === 'view') openDetail(d.id);
+            });
+            document.getElementById('btn-hb-log-export').addEventListener('click', function () {
+                if (!hbEvents.length) { SC.toast('暂无心跳事件可导出', { type: 'info' }); return; }
+                SC.csv.download('心跳事件_' + SC.today() + '.csv', [['时间', '级别', '内容']]
+                    .concat(hbEvents.map(e => [SC.stamp(e.t), e.lv, e.tx])));
+                SC.toast('已导出 ' + hbEvents.length + ' 条心跳事件', { type: 'success' });
+            });
+            document.getElementById('btn-bf-run').addEventListener('click', function () {
+                if (!backfill.length) { SC.toast('补传队列为空，设备缓存将在重连后自动回灌', { type: 'info' }); return; }
+                backfill.forEach(b => { if (b.state === '待续传') b.state = '续传中'; });
+                startBackfill();
+                renderBackfill();
+                log('info', '手动触发断点续传，队列 ' + backfill.length + ' 个任务，速率 ' + hbRule.backfillRate + ' 万条/分钟');
+            });
+            document.getElementById('btn-bf-clear').addEventListener('click', function () {
+                const n = backfill.filter(b => b.state === '已完成').length;
+                backfill = backfill.filter(b => b.state !== '已完成');
+                SC.store.set('equipment', 'backfill', backfill.slice(0, 6));
+                renderBackfill();
+                SC.toast(n ? '已清除 ' + n + ' 个已完成补传任务' : '没有已完成的补传任务', { type: n ? 'success' : 'info' });
+            });
+
+            /* ---------- 数据流模块 ---------- */
+            stCtrl = SC.table.enhance(document.getElementById('stream-table'), {
+                pageSize: 10, search: false, export: '数据流目录'
+            });
+            renderStKpi(); renderStTable(); paintPlayerKv(); updatePlayerBar();
+            devices.filter(d => d.status === '在线').slice(0, 14).forEach(d => tailSample(d));
+            const firstCam = videoDevices().filter(d => d.status === '在线')[0] || videoDevices()[0];
+            if (firstCam) selectStream(firstCam); else renderStCharts();
+            drawPlayer();
+            document.getElementById('st-sel-hint').textContent = firstCam
+                ? firstCam.id + ' · ' + firstCam.name + '（默认选择，可在目录换一路）'
+                : '在下方目录点「预览」选择一路视频流';
+
+            document.querySelectorAll('#st-kind button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelectorAll('#st-kind button').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    st.kind = b.dataset.kind;
+                    renderStTable();
+                });
+            });
+            document.querySelectorAll('#st-proto button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelectorAll('#st-proto button').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    st.proto = b.dataset.p;
+                    const d = st.sel ? byId(st.sel) : null;
+                    document.getElementById('st-url').textContent = d ? stUrl(d) : '未选择流';
+                    if (d && d.stream.state === '拉流中') {
+                        d.stream.recon++;
+                        log('info', d.id + ' 会话 ' + d.stream.id + ' 切换取流方式为 ' + b.textContent.trim() + '，重新协商 SDP');
+                        SC.toast('已切换到 ' + b.textContent.trim() + ' 取流地址', { type: 'info' });
+                    }
+                });
+            });
+            document.getElementById('stream-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('[data-st]');
+                if (!btn || btn.tagName !== 'BUTTON') return;
+                const d = byId(btn.closest('tr').dataset.id);
+                if (!d) return;
+                const act = btn.dataset.st;
+                if (act === 'preview') {
+                    selectStream(d); drawPlayer();
+                    SC.toast('已选择 ' + d.id + '，点「起流」建立会话', { type: 'info' });
+                }
+                if (act === 'pull') pullStream(d);
+                if (act === 'stop') stopStream(d);
+                if (act === 'sample') tailSample(d, true);
+                if (act === 'diag') diagStream(d);
+            });
+            document.getElementById('btn-st-start').addEventListener('click', function () {
+                const d = st.sel ? byId(st.sel) : (videoDevices().filter(x => x.status === '在线')[0] || null);
+                if (!d) { SC.toast('请先在目录中选择一路视频流', { type: 'warn' }); return; }
+                if (d.stream.kind !== 'video') { SC.toast(d.id + ' 是' + STREAM_KIND[d.stream.kind].label + '，常驻推送无需起流', { type: 'info' }); return; }
+                pullStream(d);
+            });
+            document.getElementById('btn-st-stop').addEventListener('click', function () {
+                const d = st.sel ? byId(st.sel) : null;
+                if (!d) { SC.toast('未选择取流会话', { type: 'warn' }); return; }
+                stopStream(d);
+            });
+            document.getElementById('btn-st-snap').addEventListener('click', function () {
+                const d = st.sel ? byId(st.sel) : null;
+                if (!d) { SC.toast('未选择取流会话', { type: 'warn' }); return; }
+                snapStream(d);
+                updatePlayerBar();
+            });
+            document.getElementById('btn-st-copy').addEventListener('click', function () {
+                const d = st.sel ? byId(st.sel) : null;
+                if (!d) { SC.toast('未选择流', { type: 'warn' }); return; }
+                copyText(stUrl(d));
+            });
+            document.getElementById('btn-st-sub').addEventListener('click', function () {
+                const list = selDevices().length ? selDevices() : streamList().slice(0, 12);
+                if (!list.length) { SC.toast('没有可订阅的设备', { type: 'warn' }); return; }
+                SC.toast('订阅变更将作用于 ' + list.length + ' 台设备', { type: 'info' });
+                batchSubscribeFor(list);
+            });
+            document.getElementById('btn-st-pull').addEventListener('click', pullSamples);
+            document.getElementById('btn-tail-pause').addEventListener('click', function () {
+                st.tailOn = !st.tailOn;
+                this.textContent = st.tailOn ? '⏸ 暂停' : '▶ 继续';
+                paintTail();
+            });
+            document.getElementById('btn-tail-clear').addEventListener('click', function () {
+                st.tail = [];
+                paintTail();
+                document.getElementById('tail').innerHTML = '<div class="row"><span class="py">窗口已清空，等待下一帧上报…</span></div>';
+            });
+            document.getElementById('btn-tail-export').addEventListener('click', function () {
+                if (!st.tail.length) { SC.toast('窗口内没有报文样本', { type: 'info' }); return; }
+                SC.csv.download('报文样本_' + SC.today() + '.csv', [['时间', '设备', '主题', '报文体', '字节']]
+                    .concat(st.tail.map(r => [SC.stamp(r.t), r.dev, r.topic, r.text, r.bytes])));
+                SC.toast('已导出 ' + st.tail.length + ' 条原始报文', { type: 'success' });
+            });
+
+            /* ---------- 台账新增按钮：心跳探测与订阅 ---------- */
+            document.getElementById('btn-batch-probe').addEventListener('click', function () {
+                const list = targetDevices('心跳探测');
+                if (!list.length) return;
+                const take = list.slice(0, 40);
+                if (take.length < list.length) SC.toast('探测并发受限，本轮只执行前 40 台', { type: 'info' });
+                startJob({
+                    title: '批量心跳探测（' + take.length + ' 台）', items: take, failRate: 0.14,
+                    phases: ['寻址', '保活', '鉴权', '缓存核对'],
+                    onApply: function (d) { d.lastBeat = Date.now(); d.miss = 0; },
+                    onFail: function (d) { d.miss = (d.miss || 0) + 1; d.missTotal++; d.recon++; hbEvent('warn', d.id + ' 批量探测无应答，累计丢拍 ' + d.missTotal + ' 次'); }
+                });
+                devCtrl.clearSelected();
+            });
+            document.getElementById('btn-batch-sub').addEventListener('click', function () {
+                const list = targetDevices('订阅变更');
+                if (list.length) batchSubscribeFor(list);
+                devCtrl.clearSelected();
+            });
+
             /* ---------- 监控模块 ---------- */
             renderPipe(false);
             renderGw();
@@ -2948,6 +4983,8 @@
                 btn.addEventListener('click', function () {
                     setTimeout(function () {
                         const m = btn.dataset.module;
+                        if (m === 'heartbeat') { renderHbKpi(); renderHbWall(); renderHbCharts(); renderHbTable(); renderHbLog(); renderBackfill(); }
+                        if (m === 'stream') { renderStKpi(); renderStTable(); renderStCharts(); paintTail(); paintPlayerKv(); updatePlayerBar(); drawPlayer(); }
                         if (m === 'data-monitor') { renderTpChart(); updateGauges(); renderStore(); renderDq(); renderPipe(false); }
                         if (m === 'data-analysis') switchScope(document.querySelector('#an-scope button.active').dataset.scope);
                     }, 30);
@@ -2958,7 +4995,7 @@
                 log('info', '设备目录口径升级至 v' + EQ_CAT_VER + '：保留原台账，自动补齐 ' + catalogAdded + ' 台新增类别设备（环卫、燃气、液位、视频抓拍、作业终端等）');
                 SC.toast('设备目录已升级，新增 ' + catalogAdded + ' 台类别补齐设备', { type: 'info', duration: 4200 });
             }
-            log('ok', '设备与数据管理模块已加载：建档 ' + devices.length + ' 台抽检设备 / ' + Object.keys(TYPES).length + ' 类目录，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
+            log('ok', '设备管理模块已加载：建档 ' + devices.length + ' 台抽检设备 / ' + Object.keys(TYPES).length + ' 类目录，接入吞吐 ' + SC.num(mon.writeRate, 1) + ' 万条/h');
             SC.toast('设备台账已就绪，共 ' + devices.length + ' 台建档设备', { type: 'success' });
         })();
     </script>
