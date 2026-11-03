@@ -329,10 +329,207 @@
             min-width: 620px;
         }
 
+        /* ---------- 全景一张图 ---------- */
+        .pano-wrap {
+            height: 520px;
+        }
+
+        .module-btn .pm-badge {
+            display: none;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 9px;
+            padding: 0 6px;
+            margin-left: 5px;
+            font-size: 0.78em;
+            font-weight: bold;
+        }
+
+        .module-btn .pm-badge.show {
+            display: inline-block;
+            animation: pm-blink 1.4s infinite;
+        }
+
+        @keyframes pm-blink {
+            50% {
+                opacity: 0.42;
+            }
+        }
+
+        /* 地图异常提示小框 */
+        .pm-pop {
+            display: none;
+            position: absolute;
+            z-index: 4;
+            width: 254px;
+            background: rgba(8, 24, 38, 0.95);
+            border: 1px solid rgba(130, 195, 225, 0.32);
+            border-left: 3px solid #7f8c8d;
+            border-radius: 9px;
+            padding: 10px 12px;
+            color: #eaf4fa;
+            font-size: 0.79em;
+            line-height: 1.62;
+            box-shadow: 0 9px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .pm-pop.show {
+            display: block;
+        }
+
+        .pm-pop.bad {
+            border-left-color: #e74c3c;
+        }
+
+        .pm-pop.warn {
+            border-left-color: #f39c12;
+        }
+
+        .pm-pop.ok {
+            border-left-color: #2ecc71;
+        }
+
+        .pm-pop .pm-pop-head {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .pm-pop .pm-pop-head b {
+            color: #fff;
+            font-size: 1.06em;
+        }
+
+        .pm-pop .pm-why {
+            color: #ff8a80;
+            margin: 2px 0 6px;
+        }
+
+        .pm-pop .r {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pm-pop .r .k {
+            color: #94b6ca;
+            flex: 0 0 76px;
+            white-space: nowrap;
+        }
+
+        .pm-pop .r .v {
+            flex: 1;
+            min-width: 0;
+            color: #e6f2f9;
+        }
+
+        .pm-pop .acts {
+            display: flex;
+            gap: 6px;
+            margin-top: 9px;
+            flex-wrap: wrap;
+        }
+
+        .pm-pop .x {
+            position: absolute;
+            right: 6px;
+            top: 4px;
+            color: #9fbdd0;
+            cursor: pointer;
+            padding: 2px 5px;
+        }
+
+        /* 异常清单 */
+        .pm-list {
+            max-height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .pm-item {
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .pm-item:hover {
+            background: #f2f7fb;
+        }
+
+        .pm-item.sel {
+            background: #eafaf1;
+            border-color: #bfe6cf;
+        }
+
+        .pm-item .dot {
+            flex: 0 0 9px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-top: 6px;
+        }
+
+        .pm-item.bad {
+            border-left-color: #e74c3c;
+            background: #fdf2f1;
+        }
+
+        .pm-item.bad .dot {
+            background: #e74c3c;
+            animation: pm-blink 1.2s infinite;
+        }
+
+        .pm-item.warn {
+            border-left-color: #f39c12;
+        }
+
+        .pm-item.warn .dot {
+            background: #f39c12;
+        }
+
+        .pm-item .bd {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pm-item .tx {
+            display: block;
+            font-size: 0.85em;
+            color: #5d6d7e;
+        }
+
+        .pm-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px 15px;
+            margin-top: 12px;
+            font-size: 0.82em;
+            color: #5b6b7b;
+        }
+
+        .pm-legend i {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
         @media (max-width: 480px) {
             .map-tools {
                 position: static;
                 margin-top: 10px;
+            }
+
+            .pm-pop {
+                width: 190px;
             }
         }
     </style>
@@ -385,7 +582,8 @@
         </div>
 
         <div class="module-nav">
-            <button class="module-btn active" data-module="online-supervision">👁️‍🗨️ 在线监管</button>
+            <button class="module-btn active" data-module="panorama">🗺️ 全景一张图<span class="pm-badge" id="pm-badge"></span></button>
+            <button class="module-btn" data-module="online-supervision">👁️‍🗨️ 在线监管</button>
             <button class="module-btn" data-module="operation-planning">🗺️ 作业规划</button>
             <button class="module-btn" data-module="task-execution">🚛 执行监管</button>
             <button class="module-btn" data-module="scheduling-management">📅 排班管理</button>
@@ -395,8 +593,61 @@
             <button class="module-btn" data-module="application-maintenance">🔧 系统运维</button>
         </div>
 
+        <!-- ============ 全景一张图 ============ -->
+        <div id="panorama-module" class="module-content active">
+            <div class="content-header">
+                <h3>🗺️ 环卫设施全景一张图</h3>
+                <div class="content-actions">
+                    <select class="sc-input" id="pm-di" style="width:auto"></select>
+                    <select class="sc-input" id="pm-type" style="width:auto"></select>
+                    <button class="sc-btn sm ghost" id="pm-bad-only">🚨 只看异常</button>
+                    <button class="sc-btn sm" id="pm-locate">📍 定位异常</button>
+                </div>
+            </div>
+
+            <div class="sc-split">
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>📍 设施定位与实时状态</h3>
+                        <span class="sc-hint" id="pm-tip">红点为异常或未闭环告警，点击点位或清单项查看小框提示</span>
+                    </div>
+                    <div class="map-wrap pano-wrap">
+                        <canvas id="pano-map"></canvas>
+                        <div class="map-hud" id="pano-hud"></div>
+                        <div class="map-tools" id="pm-layers">
+                            <label><input type="checkbox" data-ly="veh" checked> 🚛 作业车辆</label>
+                            <label><input type="checkbox" data-ly="bin" checked> 🗑️ 智能收集点</label>
+                            <label><input type="checkbox" data-ly="ship" checked> ⛴️ 环卫船</label>
+                            <label><input type="checkbox" data-ly="plant" checked> 🏭 处置厂</label>
+                            <label><input type="checkbox" data-ly="kit" checked> 🍽️ 餐厨企业</label>
+                            <label><input type="checkbox" data-ly="rcy" checked> ♻️ 回收站</label>
+                            <label><input type="checkbox" data-ly="crew"> 👷 作业人员</label>
+                            <label><input type="checkbox" data-ly="alarm" checked> 🚨 未闭环告警</label>
+                            <label><input type="checkbox" data-ly="route" checked> 〰️ 作业路线</label>
+                        </div>
+                        <div class="pm-pop" id="pano-pop"></div>
+                    </div>
+                    <div class="sc-kv" id="pm-kv" style="margin-top:16px"></div>
+                    <div class="pm-legend" id="pano-legend"></div>
+                </div>
+                <div class="sc-panel" style="margin-bottom:0">
+                    <div class="sc-panel-title">
+                        <h3>🚨 异常与告警清单</h3>
+                        <span class="sc-hint" id="pm-list-count">--</span>
+                    </div>
+                    <div class="pm-list" id="pano-list"></div>
+                    <div class="sc-note" style="margin:14px 0 0">
+                        图示为<b>示范片区在管样本</b>定位（6 个片区），非全市底图。<br>
+                        全市口径（数据中台在册）：智能果壳箱 BIN 62,400 台 · 环卫作业车终端 SVW 286 台 ·
+                        运输船智能终端 SHP 36 艘 · 回收站称重一体机 RCY 4,860 台 · 焚烧炉 CEMS 监测站 INC 96 站。
+                        点位坐标为演示用归一化坐标，接入真实 GIS 后由设备上报经纬度反算。
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ============ 在线监管 ============ -->
-        <div id="online-supervision-module" class="module-content active">
+        <div id="online-supervision-module" class="module-content">
             <div class="module-tabs">
                 <button class="tab-btn active" data-tab="vehicles">🚛 车辆监管</button>
                 <button class="tab-btn" data-tab="garbage-bins">🗑️ 收集点监管</button>
@@ -2959,6 +3210,446 @@
                 drawMap();
                 if (UI.playT >= 100) { UI.playing = false; $('btn-play').textContent = '▶ 回放'; }
             }
+            /* ======================= 全景一张图 ======================= */
+            /* FNV-1a 散列：在不消耗演示数据随机序列（_seed 全程不复位）的前提下，
+               为焚烧厂 / 作业人员 / 告警等没有坐标字段的实体生成稳定定位。 */
+            function fnv(s) {
+                let h = 2166136261;
+                for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+                return h / 4294967296;
+            }
+            function anchorOf(id, di, spread) {
+                const c = CENTERS[SC.clamp(di, 0, 5)];
+                return {
+                    x: SC.clamp(c[0] + (fnv(id + '|x') - 0.5) * spread, 0.03, 0.97),
+                    y: SC.clamp(c[1] + (fnv(id + '|y') - 0.5) * spread * 0.82, 0.06, 0.94)
+                };
+            }
+            function nearestDi(x, y) {
+                let best = 0, bd = 1e9;
+                CENTERS.forEach(function (c, i) {
+                    const d = Math.pow(c[0] - x, 2) + Math.pow(c[1] - y, 2);
+                    if (d < bd) { bd = d; best = i; }
+                });
+                return best;
+            }
+            function agoText(min) {
+                return min >= 1440 ? '昨日' : min < 60 ? min + ' 分钟前' : Math.floor(min / 60) + ' 小时前';
+            }
+            const PM_LY = { veh: true, bin: true, ship: true, plant: true, kit: true, rcy: true, crew: false, alarm: true, route: true };
+            const PM_TYPE = {
+                veh: '🚛 作业车辆', bin: '🗑️ 智能收集点', ship: '⛴️ 环卫船', plant: '🏭 处置厂',
+                kit: '🍽️ 餐厨企业', rcy: '♻️ 回收站', crew: '👷 作业人员', alarm: '🚨 告警点位'
+            };
+            let PM_SEL = '', PM_ALL = [], PM_HITS = [], PM_BAD_ONLY = false;
+            const PM_COL = { ok: '#2ecc71', idle: '#5dade2', warn: '#f39c12', bad: '#e74c3c', off: '#7f8c8d' };
+            function pmColor(g) { return PM_COL[g] || '#95a5a6'; }
+
+            /** 告警定位：先在台账里找同名实体，找不到就落到所属片区锚点 */
+            function alarmAt(a) {
+                const v = DB.veh.filter(x => a.place.indexOf(x.plate) > -1)[0];
+                if (v) return { x: v.x, y: v.y, di: DIST.indexOf(v.dist) };
+                const b = DB.bins.filter(x => a.place.indexOf(x.code) > -1)[0];
+                if (b) return { x: b.x, y: b.y, di: b.di };
+                const p = DB.plants.filter(x => a.place.indexOf(x.name) > -1)[0];
+                if (p) { const q = plantPos(p); return { x: q.x, y: q.y, di: q.di }; }
+                const k = DB.kit.filter(x => a.place.indexOf(x.name) > -1)[0];
+                if (k) return { x: k.x, y: k.y0, di: DIST.indexOf(k.dist) };
+                let di = -1;
+                DIST.some(function (d, i) { if (a.place.indexOf(d) > -1) { di = i; return true; } });
+                if (di < 0) di = nearestDi(fnv(a.id), fnv(a.id + 'q'));
+                const q = anchorOf(a.id + '|a', di, 0.2);
+                q.di = di;
+                return q;
+            }
+            function plantPos(p) {
+                const di = Math.max(0, DIST.indexOf(p.dist));
+                const q = anchorOf(p.id + '|p', di, 0.26);
+                return { x: q.x, y: q.y, di: di };
+            }
+
+            /** 全部实体的地图视图（定位 + 状态 + 异常原因），供地图与清单共用 */
+            function panoItems() {
+                const out = [];
+                DB.veh.forEach(function (v) {
+                    const over = v.load >= P.loadLimit;
+                    out.push({
+                        key: 'veh:' + v.id, type: 'veh', id: v.id, act: 'veh', di: DIST.indexOf(v.dist),
+                        name: v.plate, sub: v.type + ' · ' + v.driver, x: v.x, y: v.y, status: v.status,
+                        grade: v.status === '离线' ? 'bad' : over ? 'bad' : v.status === '维修中' ? 'warn'
+                            : v.status === '作业中' ? 'ok' : 'idle',
+                        why: v.status === '离线' ? '车载终端（SVW）心跳丢失，图上为最后上报位置'
+                            : over ? '车厢装载 ' + v.load + '% 已达红线 ' + P.loadLimit + '%，须返场卸料' : '',
+                        rows: [['所属车队', v.team], ['载重', v.load + '%（' + (v.cap * v.load / 100).toFixed(1) + ' / ' + v.cap + ' t）'],
+                        ['时速', v.speed + ' km/h'], ['行驶', v.km.toFixed(1) + ' km'], ['位置', v.dist + '片区 ' + v.road]]
+                    });
+                });
+                DB.bins.forEach(function (b) {
+                    const st = binStatus(b);
+                    out.push({
+                        key: 'bin:' + b.id, type: 'bin', id: b.id, act: 'bin', di: b.di,
+                        name: b.code, sub: b.kind + ' · ' + b.addr, x: b.x, y: b.y, status: st,
+                        grade: st === '满溢' || st === '离线' ? 'bad' : st === '待清运' ? 'warn' : 'ok',
+                        why: st === '满溢' ? '填充 ' + Math.round(b.fill) + '% 超阈值 ' + P.overflow + '%，待清运'
+                            : st === '离线' ? 'NB-IoT 心跳丢失，填充度停止上报（电池 ' + b.bat + '%）' : '',
+                        rows: [['填充度', Math.round(b.fill) + '%（' + b.vol + ' m³）'], ['类别', b.kind],
+                        ['最近清运转录', agoText(b.ago)], ['信号 / 电池', b.sig + '/5 · ' + b.bat + '%'], ['所属路线', b.route || '未绑定']]
+                    });
+                });
+                DB.ships.forEach(function (s) {
+                    out.push({
+                        key: 'ship:' + s.id, type: 'ship', id: s.id, act: 'ship', di: nearestDi(s.x, s.y),
+                        name: s.code, sub: s.type + ' · ' + s.water, x: s.x, y: s.y, status: s.status,
+                        grade: s.hold >= 96 ? 'bad' : s.status === '检修' ? 'warn' : s.status === '作业中' ? 'ok' : 'idle',
+                        why: s.hold >= 96 ? '货舱载重 ' + s.hold + '% 接近满载，须进港卸料' : '',
+                        rows: [['航速', s.speed + ' 节'], ['累计收运', s.tons + ' t'], ['舱载', s.hold + '%'],
+                        ['吃水 / 船员', s.draft + ' m · ' + s.crew + ' 人'], ['水域', s.water]]
+                    });
+                });
+                DB.plants.forEach(function (p) {
+                    const br = p.lines.filter(function (l) { return l.pm > 20 || l.so2 > 80 || l.nox > 250 || l.temp < 850; });
+                    const q = plantPos(p);
+                    const worst = br[0];
+                    out.push({
+                        key: 'plant:' + p.id, type: 'plant', id: p.id + '-0', act: 'plant', di: q.di,
+                        name: p.name, sub: p.dist + '片区 · ' + p.lines.length + ' 条炉线', x: q.x, y: q.y, status: p.env,
+                        grade: (p.env === '超标预警' || br.length) ? 'bad' : p.status === '检修降负荷' ? 'warn' : 'ok',
+                        why: br.length ? worst.name + ' 烟气超标（PM ' + worst.pm + ' / SO₂ ' + worst.so2 + ' / NOₓ ' + worst.nox + '）'
+                            : p.status === '检修降负荷' ? '检修降负荷运行，进场量受限' : '',
+                        rows: [['今日进场', SC.num(p.todayIn) + ' t'], ['上网电量', p.kwh + ' MWh'],
+                        ['发酵坑位', p.pit + '%'], ['炉渣', p.res + '%'], ['运行工况', p.status], ['排放考核', p.env]]
+                    });
+                });
+                DB.kit.forEach(function (k) {
+                    out.push({
+                        key: 'kit:' + k.id, type: 'kit', id: k.id, act: 'kitd', di: DIST.indexOf(k.dist),
+                        name: k.name, sub: k.biz + ' · ' + k.dist + '片区', x: k.x, y: k.y0, status: k.ok,
+                        grade: k.ok === '违规' ? 'bad' : k.ok === '预警' ? 'warn' : 'ok',
+                        why: k.ok === '违规' ? '产废量偏差 ' + (k.dev > 0 ? '+' : '') + k.dev + '%，疑似混投或私自外运'
+                            : k.ok === '预警' ? '产废量偏差 ' + (k.dev > 0 ? '+' : '') + k.dev + '%，纳入巡查' : '',
+                        rows: [['签约桶数', k.contract + ' 只'], ['日产餐厨', k.y + ' t'], ['收运频次', k.freq],
+                        ['量样偏差', (k.dev > 0 ? '+' : '') + k.dev + '%'], ['未结工单', k.tickets + ' 张']]
+                    });
+                });
+                DB.rcy.forEach(function (s) {
+                    out.push({
+                        key: 'rcy:' + s.id, type: 'rcy', id: s.id, act: 'rcy', di: s.di,
+                        name: s.name, sub: s.dev + ' · ' + s.dist + '片区', x: s.x, y: s.y, status: s.state,
+                        grade: (s.state === '离线' || s.state === '异常') ? 'bad' : s.state === '待标定' ? 'warn' : 'ok',
+                        why: s.state === '离线' ? '称重一体机（RCY）掉线，今日无计量上报'
+                            : s.state === '异常' ? '称重数据跳变，疑似地磅受力异常'
+                                : s.state === '待标定' ? '检定超期 ' + s.cal + ' 天，计量数据待第三方标定' : '',
+                        rows: [['今日回收', s.today + ' kg'], ['资源化率', s.recy + '%'], ['订单数', s.orders + ' 单'],
+                        ['固件 / 负责人', s.fw + ' · ' + s.keeper], ['上次检定', s.cal + ' 天前'], ['驳运车辆', s.veh]]
+                    });
+                });
+                DB.crew.forEach(function (u) {
+                    const di = Math.max(0, TEAM.indexOf(u.team));
+                    const q = anchorOf(u.id + '|u', di, 0.22);
+                    out.push({
+                        key: 'crew:' + u.id, type: 'crew', id: u.id, act: '', di: di,
+                        name: u.name, sub: u.post + ' · ' + u.team, x: q.x, y: q.y, status: u.status,
+                        grade: u.over ? 'bad' : u.status === '在岗' ? 'ok' : 'off',
+                        why: u.over ? '本月工时 ' + u.hours.toFixed(1) + ' h 超 174 h 红线' : '',
+                        rows: [['工号', u.no], ['岗位', u.post], ['本月工时', u.hours.toFixed(1) + ' h'], ['在岗状态', u.status]]
+                    });
+                });
+                DB.alarms.forEach(function (a) {
+                    if (a.status === '已闭环' || a.status === '误报') return;
+                    const q = alarmAt(a);
+                    out.push({
+                        key: 'alarm:' + a.id, type: 'alarm', id: a.id, act: 'a-view', di: q.di,
+                        name: a.kind, sub: a.no + ' · ' + a.place, x: q.x, y: q.y, status: a.level,
+                        grade: (a.level === '紧急' || a.level === '重要') ? 'bad' : 'warn',
+                        why: a.kind + '（' + a.level + '）' + agoText(a.at) + ' 触发，' + a.status + '，责任人 ' + a.owner,
+                        rows: [['告警编号', a.no], ['来源', a.src], ['触发', agoText(a.at)],
+                        ['确认时限', a.sla + ' 分（余 ' + alarmLeft(a) + ' 分）'], ['处置状态', a.status], ['责任班组', a.owner]]
+                    });
+                });
+                return out;
+            }
+            function panoVisible() {
+                PM_ALL = panoItems();
+                const di = $('pm-di') ? $('pm-di').value : 'all';
+                const ty = $('pm-type') ? $('pm-type').value : 'all';
+                return PM_ALL.filter(function (it) {
+                    if (!PM_LY[it.type]) return false;
+                    if (ty !== 'all' && it.type !== ty) return false;
+                    if (di !== 'all' && String(it.di) !== di) return false;
+                    if (PM_BAD_ONLY && it.grade !== 'bad' && it.grade !== 'warn') return false;
+                    return true;
+                });
+            }
+
+            function pmHouse(ctx, px, py, s, col) {
+                ctx.fillStyle = col;
+                ctx.beginPath();
+                ctx.moveTo(px - s, py + s * 0.85); ctx.lineTo(px - s, py - s * 0.15);
+                ctx.lineTo(px, py - s); ctx.lineTo(px + s, py - s * 0.15);
+                ctx.lineTo(px + s, py + s * 0.85); ctx.closePath(); ctx.fill();
+            }
+            function pmMark(ctx, it, px, py, label) {
+                const col = pmColor(it.grade);
+                const sel = it.key === PM_SEL;
+                if (it.grade === 'bad' || it.grade === 'warn' || sel) {
+                    const rr = (it.grade === 'bad' ? 14 : 11) + Math.sin(Date.now() / 380) * 3;
+                    ctx.strokeStyle = sel ? 'rgba(255,255,255,.9)'
+                        : it.grade === 'bad' ? 'rgba(231,76,60,.55)' : 'rgba(243,156,18,.45)';
+                    ctx.lineWidth = 1.6;
+                    ctx.beginPath(); ctx.arc(px, py, rr, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
+                }
+                ctx.fillStyle = col;
+                ctx.strokeStyle = 'rgba(6,20,32,.7)';
+                if (it.type === 'veh') {
+                    ctx.beginPath(); ctx.arc(px, py, it.grade === 'bad' ? 6 : 5, 0, 7); ctx.fill(); ctx.stroke();
+                } else if (it.type === 'bin') {
+                    ctx.beginPath(); ctx.arc(px, py, it.grade === 'bad' ? 4.6 : 3, 0, 7); ctx.fill();
+                } else if (it.type === 'ship') {
+                    ctx.beginPath(); ctx.moveTo(px - 6, py - 2); ctx.lineTo(px + 6, py - 2);
+                    ctx.lineTo(px + 4, py + 3); ctx.lineTo(px - 4, py + 3); ctx.closePath(); ctx.fill(); ctx.stroke();
+                } else if (it.type === 'plant') {
+                    pmHouse(ctx, px, py, 7, col); ctx.strokeStyle = 'rgba(6,20,32,.7)'; ctx.stroke();
+                } else if (it.type === 'kit') {
+                    ctx.beginPath(); ctx.moveTo(px, py - 5); ctx.lineTo(px + 5, py + 4); ctx.lineTo(px - 5, py + 4);
+                    ctx.closePath(); ctx.fill();
+                } else if (it.type === 'rcy') {
+                    ctx.beginPath(); ctx.moveTo(px, py - 5); ctx.lineTo(px + 5, py); ctx.lineTo(px, py + 5);
+                    ctx.lineTo(px - 5, py); ctx.closePath(); ctx.fill(); ctx.stroke();
+                } else if (it.type === 'crew') {
+                    ctx.beginPath(); ctx.arc(px, py, 2.6, 0, 7); ctx.fill();
+                } else {
+                    ctx.beginPath(); ctx.arc(px, py, 7.5, 0, 7); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(px, py, 3.4, 0, 7); ctx.fill();
+                    ctx.strokeStyle = col; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py - 12); ctx.lineTo(px, py - 8.5); ctx.stroke(); ctx.lineWidth = 1;
+                }
+                if (sel) {
+                    ctx.strokeStyle = 'rgba(255,255,255,.55)';
+                    ctx.beginPath();
+                    ctx.moveTo(px - 17, py); ctx.lineTo(px - 9, py); ctx.moveTo(px + 9, py); ctx.lineTo(px + 17, py);
+                    ctx.moveTo(px, py - 17); ctx.lineTo(px, py - 10); ctx.moveTo(px, py + 10); ctx.lineTo(px, py + 17);
+                    ctx.stroke();
+                }
+                if (label && (it.key === PM_SEL || (it.type !== 'bin' && it.type !== 'crew'))) {
+                    ctx.fillStyle = sel ? '#fff' : 'rgba(232,243,250,.86)';
+                    ctx.font = (sel ? 'bold ' : '') + '10px "Microsoft YaHei"'; ctx.textAlign = 'left';
+                    ctx.fillText(it.name, px + 8, py - 6);
+                }
+            }
+
+            function drawPano() {
+                const cv = $('pano-map');
+                if (!cv) return;
+                const dpr = window.devicePixelRatio || 1;
+                const w = cv.clientWidth || 640, h = cv.clientHeight || 520;
+                if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+                    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+                }
+                const ctx = cv.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, w, h);
+                const items = panoVisible();
+
+                /* 底图：片区色块 + 路网 + 水域 */
+                const only = $('pm-di') ? $('pm-di').value : 'all';
+                CENTERS.forEach(function (c, i) {
+                    ctx.fillStyle = ['#123524', '#0f2c3a', '#123045', '#1a2b3c', '#233', '#132f2a'][i % 6];
+                    ctx.globalAlpha = only === 'all' || only === String(i) ? 0.62 : 0.18;
+                    ctx.beginPath(); ctx.arc(c[0] * w, c[1] * h, Math.min(w, h) * 0.2, 0, 7); ctx.fill();
+                    ctx.globalAlpha = only === 'all' || only === String(i) ? 1 : 0.45;
+                    ctx.fillStyle = 'rgba(232,243,250,.55)'; ctx.font = '11px "Microsoft YaHei"'; ctx.textAlign = 'center';
+                    ctx.fillText(DIST[i] + '片区', c[0] * w, c[1] * h - Math.min(w, h) * 0.17);
+                    ctx.globalAlpha = 1;
+                });
+                ctx.strokeStyle = 'rgba(146,182,208,.3)'; ctx.lineWidth = 1.5;
+                ROADS.forEach(function (rd) { poly(ctx, rd, w, h); ctx.stroke(); });
+                ctx.strokeStyle = 'rgba(52,152,219,.48)'; ctx.lineWidth = 11; ctx.lineCap = 'round';
+                poly(ctx, WATER, w, h); ctx.stroke(); ctx.lineWidth = 1.5; ctx.lineCap = 'butt';
+                if (PM_LY.route) {
+                    ctx.strokeStyle = 'rgba(46,204,113,.2)'; ctx.setLineDash([]);
+                    DB.routes.forEach(function (r) { poly(ctx, routePath(r), w, h); ctx.stroke(); });
+                }
+
+                /* 异常项先铺一层红晕，保证「有告警就是红色」一眼可见 */
+                items.forEach(function (it) {
+                    if (it.grade !== 'bad') return;
+                    const g = ctx.createRadialGradient(it.x * w, it.y * h, 1, it.x * w, it.y * h, 24);
+                    g.addColorStop(0, 'rgba(231,76,60,.34)'); g.addColorStop(1, 'rgba(231,76,60,0)');
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(it.x * w, it.y * h, 24, 0, 7); ctx.fill();
+                });
+
+                /* 点位：正常项在下，异常项最后绘制避免被压住 */
+                PM_HITS = [];
+                const order = items.slice().sort(function (a, b) {
+                    return (a.grade === 'bad' ? 1 : 0) - (b.grade === 'bad' ? 1 : 0);
+                });
+                const wide = w > 620;
+                let tags = 0;
+                order.forEach(function (it) {
+                    const px = it.x * w, py = it.y * h;
+                    const label = it.grade === 'bad' && tags < 14 ? true : false;
+                    if (label) tags++;
+                    pmMark(ctx, it, px, py, (wide && label) || it.key === PM_SEL);
+                    PM_HITS.push({ px: px, py: py, it: it });
+                });
+
+                /* HUD 与选中项小框同步（车辆会随仿真位移，弹框要跟着走） */
+                const bad = items.filter(it => it.grade === 'bad').length;
+                $('pano-hud').innerHTML = '在图实体 ' + items.length + ' 项 · 异常 <b style="color:#ff8a80">' + bad + '</b> 项'
+                    + '<br>在线车辆 ' + DB.veh.filter(v => v.status !== '离线').length + '/' + DB.veh.length
+                    + ' · 满溢 ' + DB.bins.filter(b => binStatus(b) === '满溢').length + ' 个'
+                    + '<br>未闭环告警 ' + DB.alarms.filter(a => a.status === '待确认' || a.status === '处理中').length + ' 起'
+                    + (only !== 'all' ? '（已筛选 ' + DIST[+only] + '片区）' : '');
+                const sel = PM_SEL ? items.filter(x => x.key === PM_SEL)[0] : null;
+                if (PM_SEL && !sel) {
+                    PM_SEL = '';
+                    panoPop(null);
+                    renderPanoList();
+                } else if (sel && $('pano-pop').classList.contains('show')) panoPop(sel);
+            }
+
+            /** 异常提示小框：紧贴点位弹出，越界自动翻边 */
+            function panoPop(it) {
+                const box = $('pano-pop');
+                if (!box) return;
+                if (!it) { box.className = 'pm-pop'; box.innerHTML = ''; return; }
+                const cv = $('pano-map'), rect = cv.getBoundingClientRect();
+                let acts = '';
+                if (it.act) acts += '<button class="sc-btn sm" data-act="' + it.act + '" data-v="' + it.id + '">详情</button>';
+                if (it.type === 'veh') acts += '<button class="sc-btn sm ghost" data-act="track" data-v="' + it.id + '">轨迹回放</button>';
+                if (it.type === 'bin') acts += (it.status === '离线'
+                    ? '<button class="sc-btn sm ghost" data-act="fix" data-v="' + it.id + '">派维修工</button>'
+                    : '<button class="sc-btn sm ghost" data-act="one" data-v="' + it.id + '">派车清运</button>');
+                if (it.type === 'alarm') acts += '<button class="sc-btn sm primary" data-act="a-ok" data-v="' + it.id + '">推进处置</button>';
+                box.className = 'pm-pop show ' + (it.grade === 'bad' ? 'bad' : it.grade === 'warn' ? 'warn' : 'ok');
+                box.innerHTML = '<span class="x" data-pop-close>✕</span>'
+                    + '<div class="pm-pop-head"><b>' + SC.esc(it.name) + '</b>' + stTag(it.status) + '</div>'
+                    + '<div class="r" style="color:#9fbdd0">' + SC.esc(it.sub) + '</div>'
+                    + (it.why ? '<div class="pm-why">⚠ ' + SC.esc(it.why) + '</div>' : '')
+                    + it.rows.map(r => '<div class="r"><span class="k">' + r[0] + '</span><span class="v">' + SC.esc(String(r[1])) + '</span></div>').join('')
+                    + (acts ? '<div class="acts">' + acts + '</div>' : '');
+                const px = it.x * rect.width, py = it.y * rect.height;
+                const bw = box.offsetWidth, bh = box.offsetHeight;
+                let left = px + 15, top = py - bh / 2;
+                if (left + bw > rect.width - 8) left = px - bw - 15;
+                if (left < 8) left = 8;
+                if (top < 8) top = 8;
+                if (top + bh > rect.height - 8) top = Math.max(8, rect.height - bh - 8);
+                box.style.left = left + 'px';
+                box.style.top = top + 'px';
+            }
+
+            function panoSelect(key) {
+                PM_SEL = key;
+                const it = PM_ALL.filter(x => x.key === key)[0];
+                drawPano();
+                panoPop(it || null);
+                renderPanoList();
+            }
+            /** 自动锁定一个最该处理的异常（紧急告警优先），进入本页即弹出提示小框 */
+            function panoFocusWorst(force) {
+                const bad = panoVisible().filter(it => it.grade === 'bad');
+                if (!bad.length) {
+                    if (force) { PM_SEL = ''; panoPop(null); drawPano(); renderPanoList(); }
+                    return null;
+                }
+                const hit = bad.filter(it => it.type === 'alarm' && it.status === '紧急')[0]
+                    || bad.filter(it => it.type === 'alarm')[0] || bad[0];
+                if (force) PM_SEL = hit.key;
+                drawPano();
+                panoPop(hit);
+                renderPanoList();
+                return hit;
+            }
+
+            function renderPanoList() {
+                const items = panoVisible();
+                const bad = items.filter(it => it.grade === 'bad');
+                const warn = items.filter(it => it.grade === 'warn');
+                const rank = { alarm: 0, bin: 1, veh: 2, plant: 3, rcy: 4, kit: 5, ship: 6, crew: 7 };
+                const rows = bad.concat(warn).sort(function (a, b) {
+                    return (rank[a.type] - rank[b.type]) || (a.name > b.name ? 1 : -1);
+                });
+                $('pm-list-count').textContent = '异常 ' + bad.length + ' · 预警 ' + warn.length + ' · 在图 ' + items.length + ' 项';
+                $('pano-list').innerHTML = rows.length ? rows.map(function (it) {
+                    return '<div class="pm-item ' + (it.grade === 'bad' ? 'bad' : 'warn') + (it.key === PM_SEL ? ' sel' : '')
+                        + '" data-pk="' + it.key + '" title="' + SC.esc(it.name + ' · ' + it.sub) + '">'
+                        + '<span class="dot"></span><div class="bd"><b>' + SC.esc(it.name) + '</b> '
+                        + stTag(it.status) + ' <span class="sc-hint">' + PM_TYPE[it.type] + '</span>'
+                        + '<span class="tx">' + SC.esc(it.why || it.sub) + '</span></div></div>';
+                }).join('') : '<div class="sc-hint" style="padding:14px">当前筛选范围内无异常与预警点位（满溢 / 离线 / 超标 / 违规 / 未闭环告警）。</div>';
+
+                $('pm-kv').innerHTML =
+                    kv('在图实体', items.length + ' 项 / 台账 ' + PM_ALL.length + ' 项') +
+                    kv('红色异常', bad.length + ' 处') +
+                    kv('黄色预警', warn.length + ' 处') +
+                    kv('满溢点位', DB.bins.filter(b => binStatus(b) === '满溢').length + ' 个') +
+                    kv('离线设备', DB.bins.filter(b => !b.online).length + DB.veh.filter(v => v.status === '离线').length + ' 台') +
+                    kv('未闭环告警', DB.alarms.filter(a => a.status === '待确认' || a.status === '处理中').length + ' 起');
+                $('pano-legend').innerHTML =
+                    [['ok', '正常 / 作业中'], ['idle', '空闲 · 待命'], ['warn', '预警 · 检修'], ['bad', '异常 / 告警（红色闪烁）'], ['off', '离线 · 不在岗']]
+                        .map(g => '<span><i style="background:' + pmColor(g[0]) + '"></i>' + g[1] + '</span>').join('')
+                    + '<span>●车辆 ◆回收站 ▲餐厨企业 ▮环卫船 ⌂处置厂 ·人员 ✛告警</span>';
+            }
+
+            /** 页签红点：不依赖本页是否可见，任何模块下都提示异常规模 */
+            function paintPanoBadge() {
+                const badge = $('pm-badge');
+                if (!badge) return;
+                const bad = panoItems().filter(it => it.grade === 'bad').length;
+                badge.textContent = bad > 99 ? '99+' : bad;
+                badge.className = 'pm-badge' + (bad ? ' show' : '');
+            }
+
+            function initPano() {
+                $('pm-di').innerHTML = '<option value="all">全部片区（示范片区在管）</option>'
+                    + DIST.map((d, i) => '<option value="' + i + '">' + d + '片区</option>').join('');
+                $('pm-type').innerHTML = '<option value="all">全部对象</option>'
+                    + Object.keys(PM_TYPE).map(k => '<option value="' + k + '">' + PM_TYPE[k] + '</option>').join('');
+                $('pm-di').addEventListener('change', function () { PM_SEL = ''; drawPano(); renderPanoList(); });
+                $('pm-type').addEventListener('change', function () { PM_SEL = ''; drawPano(); renderPanoList(); });
+                Array.prototype.forEach.call(document.querySelectorAll('#pm-layers input'), function (cb) {
+                    PM_LY[cb.dataset.ly] = cb.checked;
+                    cb.addEventListener('change', function () {
+                        PM_LY[cb.dataset.ly] = cb.checked;
+                        drawPano();
+                        renderPanoList();
+                    });
+                });
+                $('pm-bad-only').addEventListener('click', function () {
+                    PM_BAD_ONLY = !PM_BAD_ONLY;
+                    this.className = 'sc-btn sm ' + (PM_BAD_ONLY ? 'danger' : 'ghost');
+                    this.textContent = PM_BAD_ONLY ? '🚨 显示全部' : '🚨 只看异常';
+                    PM_SEL = ''; panoPop(null); drawPano(); renderPanoList();
+                });
+                $('pm-locate').addEventListener('click', function () {
+                    const hit = panoFocusWorst(true);
+                    if (!hit) SC.toast('当前筛选范围内无异常点位，全部设施运行正常', { type: 'success' });
+                    else SC.toast('已锁定 ' + PM_TYPE[hit.type] + '「' + hit.name + '」：' + (hit.why || hit.status),
+                        { type: 'warn', duration: 3200 });
+                });
+                const cv = $('pano-map');
+                cv.addEventListener('click', function (ev) {
+                    const rect = cv.getBoundingClientRect();
+                    const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
+                    let best = null, bd = 16;
+                    PM_HITS.forEach(function (hx) {
+                        const d = Math.sqrt(Math.pow(hx.px - x, 2) + Math.pow(hx.py - y, 2));
+                        if (d < bd) { bd = d; best = hx; }
+                    });
+                    if (!best) { PM_SEL = ''; panoPop(null); drawPano(); renderPanoList(); return; }
+                    panoSelect(best.it.key);
+                });
+                $('pano-pop').addEventListener('click', function (ev) {
+                    if (ev.target.closest('[data-pop-close]')) { PM_SEL = ''; panoPop(null); drawPano(); renderPanoList(); }
+                });
+                $('pano-list').addEventListener('click', function (ev) {
+                    const item = ev.target.closest('.pm-item');
+                    if (!item || ev.target.closest('[data-act]')) return;
+                    panoSelect(item.dataset.pk);
+                });
+            }
+
             /* ======================= 详情弹窗 ======================= */
             function detail(title, html, footer) {
                 const api = SC.modal.open({
@@ -3179,6 +3870,7 @@
             function refreshAll() {
                 refreshOnline(); refreshOps(); renderAna(); renderCal(); renderMt(); paintStore();
                 if (visible('trajectory-supervision')) drawMap();
+                if (visible('panorama')) { drawPano(); renderPanoList(); }
             }
 
             /* ======================= 实时仿真 ======================= */
@@ -3309,6 +4001,7 @@
             function tick() {
                 simulate();
                 paintMetrics();
+                paintPanoBadge();
                 const mod = currentModule();
                 if (mod === 'online-supervision') {
                     const tab = currentTab();
@@ -3330,6 +4023,9 @@
                 } else if (mod === 'trajectory-supervision') {
                     trackTick();
                     if (!UI.playing) drawMap();
+                } else if (mod === 'panorama') {
+                    drawPano();
+                    if (tickN % 3 === 0) renderPanoList();
                 } else if (mod === 'application-maintenance') {
                     if (tickN % 10 === 0) { renderMt(); paintStore(); }
                 }
@@ -4015,6 +4711,10 @@
                             else if (mod === 'trajectory-supervision') drawMap();
                             else if (mod === 'online-supervision') renderPlant();
                             else if (mod === 'application-maintenance') { renderParams(); paintStore(); renderMt(); }
+                            else if (mod === 'panorama') {
+                                drawPano(); renderPanoList();
+                                if (!PM_SEL) panoFocusWorst(true);
+                            }
                         }, 40);
                     });
                 });
@@ -4038,14 +4738,18 @@
                 window.addEventListener('resize', SC.debounce(function () {
                     drawGantt();
                     drawMap();
+                    if (visible('panorama')) drawPano();
                     if (visible('online-supervision')) renderPlant();
                     if (visible('statistical-analysis')) renderAna();
                     if (visible('alarm-center')) renderAlarm();
                 }, 260));
 
                 /* 9. 首屏渲染 */
+                initPano();
                 renderParams();
                 refreshAll();
+                paintPanoBadge();
+                panoFocusWorst(true);
                 pushLog('ok', '引擎', '已装载台账：' + DB.bins.length + ' 个收集点 · ' + DB.veh.length + ' 台车辆 · '
                     + DB.routes.length + ' 条路线 · ' + DB.tasks.length + ' 张任务单 · ' + DB.alarms.length + ' 条报警 · '
                     + DB.crew.length + ' 名作业人员');
