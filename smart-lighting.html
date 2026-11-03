@@ -369,6 +369,7 @@
                 <button class="sc-btn ghost sm" id="btn-all-off">🌑 全域熄灯</button>
                 <button class="sc-btn ghost sm" id="btn-eco">🍃 节能 30%</button>
                 <button class="sc-btn ghost sm" id="btn-reset">↺ 恢复默认</button>
+                <button class="sc-btn ghost sm" id="btn-dev-console">🎮 设备管理直连</button>
             </div>
         </div>
 
@@ -927,7 +928,8 @@
     <script src="assets/js/common.js"></script>
     <script src="assets/js/arch-link.js"></script>
     <script src="assets/js/device-catalog.js"></script>
-    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/device-access.js"></script>
+<script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script>
         /* ==================================================================
@@ -1293,7 +1295,19 @@
             /* ---------------- 分区渲染 ---------------- */
             const zoneListEl = document.getElementById('zone-list');
 
+            /** 设备管理直连入口：显示本页提交到共享队列的排队指令与最近回执 */
+            function paintDevConsole() {
+                const el = document.getElementById('btn-dev-console');
+                if (!el) return;
+                const mine = DevAccess.receipts('smart-lighting.html', 30);
+                const wait = mine.filter(function (j) { return j.state === '待执行'; }).length;
+                el.textContent = '🎮 设备管理直连' + (wait ? '（排队 ' + wait + '）' : '');
+                el.title = mine[0]
+                    ? '最近指令 ' + mine[0].id + ' · ' + mine[0].cmdLabel + ' → ' + mine[0].state + (mine[0].ack ? '：' + mine[0].ack : '')
+                    : '本页面的开关、调光与场景指令统一经设备管理页（equipment-data.html）下发单灯控制器';
+            }
             function renderZones() {
+                paintDevConsole();
                 zoneListEl.innerHTML = state.zones.map(function (z) {
                     const meta = metaOf(z.id);
                     const rated = meta.count * meta.watt / 1000;
@@ -1321,15 +1335,29 @@
                         paintPower();
                         drawScene();
                     });
-                    range.addEventListener('change', save);
+                    range.addEventListener('change', function () {
+                        save();
+                        zoneCmd(z, { on: z.brightness > 0, brightness_pct: z.brightness }, '分区调光至 ' + z.brightness + '%');
+                    });
                     item.querySelector('[data-toggle]').addEventListener('click', function () {
                         z.on = !z.on;
                         save();
                         renderZones();
                         paintPower();
                         drawScene();
-                        SC.toast(metaOf(id).name + (z.on ? ' 回路已送电' : ' 回路已断电'), { type: z.on ? 'success' : 'warn' });
+                        zoneCmd(z, { on: z.on, brightness_pct: z.on ? z.brightness : 0 }, (z.on ? '回路送电' : '回路断电'));
                     });
+                });
+            }
+
+            /** 单分区指令：提交设备管理页直连 LoRa 网关下发，回执到达后提示结果 */
+            function zoneCmd(z, params, reason) {
+                DevAccess.submit({
+                    dev: z.id, devName: metaOf(z.id).name + '（' + SC.num(metaOf(z.id).count) + ' 台）', kind: 'LTC', cmd: 'dim',
+                    params: params, reason: '智慧照明页' + reason, by: '照明值守席'
+                }, function (job, err) {
+                    SC.toast(job && job.state === '成功' ? reason + '回执正常（指令 ' + job.id + '）' : reason + '失败：' + err,
+                        { type: job && job.state === '成功' ? 'success' : 'error' });
                 });
             }
 
@@ -1631,10 +1659,21 @@
                         {
                             text: '下发调光', kind: 'primary', onClick: function () {
                                 const v = Number(host.querySelector('input[type=range]').value);
-                                lamp.brightness = v;
-                                SC.store.set('lighting', 'lamps', lamps);
-                                renderLamps();
-                                SC.toast('已向 ' + lamp.id + ' 下发 ' + v + '% 调光指令', { type: 'success' });
+                                /* 单灯指令同样经设备管理页直连 LoRa 网关下发，回执成功后才回写灯杆亮度 */
+                                SC.toast('调光指令已提交设备管理页，等待 ' + lamp.id + ' 回执…', { type: 'info' });
+                                DevAccess.submit({
+                                    dev: lamp.id, devName: '路灯单灯控制器 ' + addrText(lamp), kind: 'LTC', cmd: 'dim',
+                                    params: { on: v > 0, brightness_pct: v }, reason: '智慧照明页灯杆调光至 ' + v + '%', by: '照明值守席'
+                                }, function (job, err) {
+                                    if (job && job.state === '成功') {
+                                        lamp.brightness = v;
+                                        SC.store.set('lighting', 'lamps', lamps);
+                                        renderLamps();
+                                        SC.toast(lamp.id + ' 回执 dim_pct=' + v + '%，已回写灯杆状态', { type: 'success' });
+                                    } else {
+                                        SC.toast('调光失败：' + (err || '设备管理页未回执'), { type: 'error' });
+                                    }
+                                });
                             }
                         }
                     ]
@@ -2141,9 +2180,12 @@
                 SC.toast('已切换至' + (state.mode === 'auto' ? '天光自适应（按日出日落与地面照度自动判定）' : m.label), { type: 'success' });
             });
 
-            document.getElementById('btn-all-on').addEventListener('click', () => bulk('全域开灯', z => { z.on = true; z.brightness = 100; }));
-            document.getElementById('btn-all-off').addEventListener('click', () => bulk('全域熄灯', z => { z.on = false; }));
-            document.getElementById('btn-eco').addEventListener('click', () => bulk('节能策略', z => { z.on = true; z.brightness = 30; }));
+            document.getElementById('btn-all-on').addEventListener('click', () => bulk('全域开灯', z => { z.on = true; z.brightness = 100; }, { on: true, brightness_pct: 100 }));
+            document.getElementById('btn-all-off').addEventListener('click', () => bulk('全域熄灯', z => { z.on = false; }, { on: false, brightness_pct: 0 }));
+            document.getElementById('btn-eco').addEventListener('click', () => bulk('节能策略', z => { z.on = true; z.brightness = 30; }, { on: true, brightness_pct: 30 }));
+            document.getElementById('btn-dev-console').addEventListener('click', function () {
+                location.href = DevAccess.consoleHref({ module: 'control', kind: 'LTC', from: 'smart-lighting.html' });
+            });
             document.getElementById('btn-reset').addEventListener('click', function () {
                 state.mode = 'auto';
                 document.querySelectorAll('.mode-btns .control-btn').forEach(function (b) {
@@ -2158,18 +2200,34 @@
                 SC.toast('已恢复天光自适应控制', { type: 'success' });
             });
 
-            function bulk(label, fn) {
+            /** 照明侧不直连现场控制器：批量策略逐分区提交设备管理页执行，回执到齐后再回写本页运行态 */
+            function bulk(label, fn, params) {
                 /* 全域批量指令的受影响台数按照明资产在册量派生，与数据中台 LTC 类口径保持一致 */
                 const hit = ZONES.reduce((s, z) => s + z.count, 0);
-                SC.modal.confirm({ text: '确认对全部 ' + ZONES.length + ' 类照明资产（在册 ' + SC.num(hit) + ' 台单灯控制器）执行「' + label + '」？该操作会立即下发至现场控制器。' })
+                SC.modal.confirm({ text: '确认对全部 ' + ZONES.length + ' 类照明资产（在册 ' + SC.num(hit) + ' 台单灯控制器）执行「' + label + '」？' +
+                    '<br><span class="sc-hint">本页按分区各提交一条指令到设备管理页，由其经 LoRa 网关直连下发并回写回执。</span>' })
                     .then(function (ok) {
                         if (!ok) return;
-                        state.zones.forEach(fn);
-                        save();
-                        renderZones();
-                        paintPower();
-                        drawScene();
-                        SC.toast(label + '指令已下发（' + SC.num(hit) + ' 台设备）', { type: 'success' });
+                        let done = 0, fail = 0;
+                        ZONES.forEach(function (z) {
+                            DevAccess.submit({
+                                dev: z.id, devName: z.name + '（' + SC.num(z.count) + ' 台）', kind: 'LTC', cmd: 'dim',
+                                params: Object.assign({}, params), reason: '智慧照明页批量策略「' + label + '」', by: '照明值守席'
+                            }, function (job, err) {
+                                const zz = state.zones.filter(function (x) { return x.id === z.id; })[0];
+                                if (job && job.state === '成功' && zz) { fn(zz); done++; }
+                                else fail++;
+                                if (done + fail === ZONES.length) {
+                                    save();
+                                    renderZones();
+                                    paintPower();
+                                    drawScene();
+                                    SC.toast(label + '：设备管理页回执 成功 ' + done + ' / 失败 ' + fail + '（覆盖 ' + SC.num(hit) + ' 台）',
+                                        { type: fail ? 'warn' : 'success', duration: 4200 });
+                                }
+                            });
+                        });
+                        SC.toast('已提交 ' + ZONES.length + ' 条分区指令至设备管理页，等待回执…', { type: 'info' });
                     });
             }
 

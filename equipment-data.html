@@ -640,7 +640,110 @@
             background: var(--c, #34495e);
         }
 
+        .outlet-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .outlet-card {
+            border: 1px solid #e4e9f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            background: linear-gradient(180deg, #fbfdff, #f4f7fb);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .outlet-card .oh {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .outlet-card .ov {
+            font-size: 1.35em;
+            font-weight: 700;
+            color: #1f6fb2;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .outlet-card code {
+            font-size: .78em;
+            color: #56708c;
+            background: rgba(31, 111, 178, .07);
+            padding: 2px 6px;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        .outlet-card .ou {
+            font-size: .78em;
+            color: #7f8c9b;
+            line-height: 1.6;
+        }
+
+        .cmd-params {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .cmd-params .cp {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cmd-params .cp span {
+            font-size: .78em;
+            color: #7f8c9b;
+        }
+
+        .cmd-params .cp input,
+        .cmd-params .cp select {
+            padding: 5px 8px;
+            border: 1px solid #dfe6ee;
+            border-radius: 7px;
+            font-size: .86em;
+            background: #fff;
+        }
+
+        .ack-box {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f6f8fb;
+            border-left: 3px solid #b8c6d4;
+            font-size: .85em;
+            color: #46586c;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .ack-box.ok {
+            border-left-color: #27ae60;
+            background: #f2fbf5;
+        }
+
+        .ack-box.bad {
+            border-left-color: #e74c3c;
+            background: #fdf3f2;
+        }
+
         @media (max-width: 768px) {
+            .outlet-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cmd-params {
+                grid-template-columns: 1fr;
+            }
+
             .dbg-grid {
                 grid-template-columns: 1fr;
             }
@@ -711,6 +814,8 @@
             <button class="module-btn active" data-module="device-management">📋 设备台账</button>
             <button class="module-btn" data-module="heartbeat">💓 心跳在线</button>
             <button class="module-btn" data-module="stream">🌊 数据流</button>
+            <button class="module-btn" data-module="access">🔌 设备接入</button>
+            <button class="module-btn" data-module="control">🎮 远程控制</button>
             <button class="module-btn" data-module="data-monitor">📡 链路监控</button>
             <button class="module-btn" data-module="data-analysis">📈 数据分析</button>
             <button class="module-btn" data-module="system-integration">🔗 系统集成</button>
@@ -1010,6 +1115,155 @@
                         视频流默认按需拉流（不常驻转码），指标与轨迹流常驻推送；QoS1 主题由 Broker 持久化会话，
                         断连后按订阅关系自动重投，避免补传与实时流双写造成重复计数。
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="access-module" class="module-content">
+            <div class="content-header">
+                <h3>🔌 设备接入与供数出口</h3>
+                <div class="sc-inline">
+                    <input class="search-input" id="ac-search" placeholder="搜索编码 / 品类 / 接入方式…">
+                    <button class="sc-btn" id="btn-ac-trial">🧪 入网联调试采</button>
+                    <button class="sc-btn" id="btn-ac-export">⬇ 导出接入目录</button>
+                    <button class="sc-btn primary" id="btn-ac-publish">📤 发布接入快照</button>
+                </div>
+            </div>
+
+            <div class="sc-note">
+                本页是全市物联网设备唯一的<strong>接入与下发出口</strong>：品类注册、协议与主题绑定、入网联调、心跳与数据流监控都在此完成，
+                再把已经接入的数据以 <b>MQ / HTTP / Flink / 数据交换</b> 四条链路交给数据中台；数据中台与各场景页不再自持设备目录，
+                要控制设备统一提交到「🎮 远程控制」队列，由本页直连执行并回写回执。
+            </div>
+
+            <div class="mini-grid" id="ac-kpi" style="margin-top:16px"></div>
+
+            <div class="sc-panel" style="margin:18px 0 20px">
+                <div class="sc-panel-title">
+                    <h3>四条对外供数链路</h3>
+                    <span class="sc-hint" id="ac-outlet-tip">口径由本页接入快照发布，数据中台只读消费</span>
+                </div>
+                <div class="outlet-grid" id="ac-outlets"></div>
+            </div>
+
+            <div class="sc-section-title">品类接入清单（口径源：末端设备接入目录 · <span id="ac-kind-count">23</span> 类）</div>
+            <div class="data-table-container">
+                <table class="data-table" id="ac-table">
+                    <thead>
+                        <tr>
+                            <th>编码</th>
+                            <th>品类名称</th>
+                            <th>分类</th>
+                            <th>接入方式</th>
+                            <th>上报频率</th>
+                            <th>全市在册</th>
+                            <th>抽检建档</th>
+                            <th>心跳在线率</th>
+                            <th>昨日上报</th>
+                            <th data-no-sort>供数链路</th>
+                            <th>状态</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-split" style="margin-top:20px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>接入报文趋势（近 24 小时）</h3>
+                        <span class="sc-hint">四条链路堆叠，含断点缓存续传回灌</span>
+                    </div>
+                    <div class="sc-chart lg">
+                        <canvas id="c-ac-chart"></canvas>
+                    </div>
+                    <div id="l-ac-chart"></div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>接入事件与调试记录</h3>
+                        <button class="sc-btn sm ghost" id="btn-ac-log-clear">清空记录</button>
+                    </div>
+                    <div class="sc-log" id="ac-log"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="control-module" class="module-content">
+            <div class="content-header">
+                <h3>🎮 远程控制与指令留痕</h3>
+                <div class="sc-inline">
+                    <button class="sc-btn" id="btn-ct-audit">⬇ 导出指令审计</button>
+                    <button class="sc-btn primary" id="btn-ct-run">▶ 执行全部待办</button>
+                    <label class="sc-switch" id="ct-auto"><i></i><span>自动执行跨页指令</span></label>
+                </div>
+            </div>
+
+            <div class="sc-note">
+                各场景页（照明 / 排水 / 街面 / 市政 / 运维）不再直接改设备状态，而是把控制意图连同参数快照提交到本队列；
+                本页按品类协议翻译成物模型下行指令、直连设备执行、回写回执，并把全过程写入指令审计。
+                <span id="ct-src-tip"></span>
+            </div>
+
+            <div class="mini-grid" id="ct-kpi" style="margin-top:16px"></div>
+
+            <div class="sc-section-title">跨页指令队列</div>
+            <div class="data-table-container">
+                <table class="data-table" id="ct-queue">
+                    <thead>
+                        <tr>
+                            <th>指令号</th>
+                            <th>提交页</th>
+                            <th>目标设备</th>
+                            <th>品类</th>
+                            <th>指令</th>
+                            <th>参数快照</th>
+                            <th data-no-sort>事由</th>
+                            <th>状态</th>
+                            <th data-no-sort>回执</th>
+                            <th data-no-sort>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="sc-split" id="ct-workbench" style="margin-top:20px">
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>单台设备直连交互</h3>
+                        <span class="sc-hint">指令目录随品类联动</span>
+                    </div>
+                    <div class="sc-field">
+                        <label>目标设备</label>
+                        <select class="sc-input" id="ct-dev"></select>
+                    </div>
+                    <div class="sc-field">
+                        <label>下行指令</label>
+                        <select class="sc-input" id="ct-cmd"></select>
+                    </div>
+                    <div class="sc-field">
+                        <label>指令参数</label>
+                        <div class="cmd-params" id="ct-params"></div>
+                    </div>
+                    <div class="sc-field">
+                        <label>操作事由</label>
+                        <input class="sc-input" id="ct-reason" placeholder="例：夜间误报排查，重新下发启泵液位">
+                    </div>
+                    <div class="sc-inline">
+                        <button class="sc-btn primary" id="ct-send">📤 直连下发</button>
+                        <button class="sc-btn ghost" id="ct-pull">📡 读当前物模型</button>
+                    </div>
+                    <div class="ack-box" id="ct-ack">尚未下发指令：选择设备与指令后下发，回执将写入审计。</div>
+                </div>
+                <div>
+                    <div class="sc-panel-title">
+                        <h3>指令审计留痕</h3>
+                        <span class="sc-hint">谁 / 哪页 / 哪台 / 什么参数 / 结果</span>
+                    </div>
+                    <div class="sc-chips" id="ct-audit-chips"></div>
+                    <div class="sc-log" id="ct-auditlog"></div>
                 </div>
             </div>
         </div>
@@ -1366,6 +1620,8 @@
     <script src="assets/js/arch-link.js"></script>
     <script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
+    <script src="assets/js/device-catalog.js"></script>
+    <script src="assets/js/device-access.js"></script>
     <script>
         (function () {
             'use strict';
@@ -1389,7 +1645,7 @@
                 sensor: {
                     label: '传感器设备', icon: '📡', weight: 34,
                     items: ['温度传感器', '水位计', '空气质量监测仪', '噪声监测仪', '管网流量计', '烟感探测器', '智能井盖', '光照传感器',
-                        '雷达液位计', '超声波液位计', '低洼积水水位计', '智能消防栓水压计', '可燃气体探测器', '管网压力变送器'],
+                        '雷达液位计', '超声波液位计', '低洼积水水位计', '智能消防栓水压计', '可燃气体探测器', '管网压力变送器', '桥隧应变计'],
                     models: ['S-T200', 'S-W310', 'S-A400', 'S-N150', 'S-L820', 'S-P60'],
                     protocols: ['MQTT', 'LoRaWAN', 'Modbus RTU', 'NB-IoT'],
                     fwLatest: 'v3.4.2', vendors: ['华感科技', '辰测物联', '万集仪表'], power: ['电池', '市电']
@@ -1432,7 +1688,7 @@
             const MSG_RATE = { sensor: [1, 6], camera: [2, 18], ctrl: [1, 3], gateway: [3, 20], mobile: [1, 9], site: [1, 5] };
             /** 设备目录口径版本：类型字典、权重、运行字段（心跳/流）或业务功能清单结构调整时递增，
                 浏览器已有台账按此版本号做增量补齐，新增运行字段则逐台补算不覆盖既有记录 */
-            const EQ_CAT_VER = 4;
+            const EQ_CAT_VER = 5;
             /** 冷启动建档基数（台） */
             const DEVICE_BASE = 120;
             /** 设备汰换单台预算（万元/台） */
@@ -1462,6 +1718,7 @@
                 patrol: { label: '巡查记录', c: '#34495e', desc: '巡更到岗打点、巡查轨迹与现场照片留痕记录' },
                 ctrl: { label: '设施控制', c: '#9b59b6', desc: '信号机、道闸、泵站、阀门与风机等远程控制及指令应答' },
                 edge: { label: '汇聚转发', c: '#1abc9c', desc: '终端接入汇聚、协议转换与边缘推理转发' },
+                strain: { label: '结构形变', c: '#5d6d7e', desc: '桥梁隧道应变、挠度与索体温度监测，超阈值触发形变预警' },
                 env: { label: '环境监测', c: '#4b6584', desc: '温湿度、空气质量、噪声与光照等环境指标监测' }
             };
             /** 单台设备的业务功能；未建档的新品名退化到所属类型的默认功能 */
@@ -1488,6 +1745,8 @@
                 '路灯单灯控制器': ['light'], '照明回路控制器': ['light'],
                 /* 巡更仪：记录 */
                 '电子巡更仪': ['patrol'],
+                /* 桥隧应变计：结构安全形变监测 */
+                '桥隧应变计': ['strain'],
                 /* 其余在册设备 */
                 '车载视频终端': ['snap', 'locate'], '视频AI边缘盒子': ['edge', 'snap'],
                 '公厕异味监测仪': ['gas', 'env'], '烟感探测器': ['gas'],
@@ -1535,6 +1794,7 @@
                 '智能消防栓水压计': [['press_mpa', '栓口水压', 'DOUBLE', 'MPa', '1/min', '0.42'], ['flow_ls', '瞬时放水流量', 'DOUBLE', 'L/s', '1/min', '0.0'], ['shock_g', '碰撞加速度', 'DOUBLE', 'g', 'on_change', '0.3'], ['valve_stat', '阀门开关状态', 'STRING', '-', '1/h', 'closed'], ['leak_flag', '渗漏判定', 'BOOLEAN', '-', 'on_change', 'false']],
                 '可燃气体探测器': [['press_kpa', '管网压力', 'DOUBLE', 'kPa', '1/min', '2.84'], ['ch4_pct', '甲烷浓度', 'DOUBLE', '%LEL', '1/30s', '1.6'], ['co_ppm', '一氧化碳', 'DOUBLE', 'ppm', '1/30s', '3'], ['leak_lvl', '泄漏等级', 'STRING', '-', 'on_change', 'L1'], ['valve_sig', '附属阀门信号', 'STRING', '-', 'on_change', 'open']],
                 '管网压力变送器': [['press_kpa', '管压', 'DOUBLE', 'kPa', '1/min', '126.4'], ['press_min', '分钟最小压力', 'DOUBLE', 'kPa', '1/min', '118.2'], ['dp_10min', '十分钟压差', 'DOUBLE', 'kPa', '10min', '-2.4'], ['leak_flag', '渗漏判定', 'BOOLEAN', '-', 'on_change', 'false']],
+                '桥隧应变计': [['strain_ue', '微应变值', 'DOUBLE', 'με', '1/10min', '86.4'], ['deflect_mm', '挠度变形', 'DOUBLE', 'mm', '1/10min', '4.2'], ['cable_temp', '索体温度', 'DOUBLE', '℃', '1/10min', '21.8'], ['threshold_pct', '阈值占用比', 'DOUBLE', '%', '1/10min', '37.5'], ['ch_no', '光纤通道号', 'INT', '-', '1/10min', '3']],
                 /* ---- 监控：人 / 车 / 商家门店抓拍 ---- */
                 '治安球机': [['channel_id', 'GB28181 通道编号', 'STRING', '-', 'on_event', '340200000013200001'], ['ptz', '云台方位/俯仰角', 'ARRAY', '°', 'on_command', '[127,-8]'], ['obj_type', '抓拍对象类型', 'STRING', '-', 'on_event', 'person'], ['conf', '识别置信度', 'DOUBLE', '-', 'on_event', '0.93'], ['img_ref', '抓拍图对象地址', 'STRING', 'oss', 'on_event', 'oss://snap/a.jpg']],
                 '卡口相机': [['cross_id', '卡口编号', 'STRING', '-', 'on_event', 'K33010012'], ['plate_no', '车牌（分级掩码）', 'STRING', '-', 'on_event', '浙A·***23'], ['pass_time', '过车时刻', 'DATETIME', '-', 'on_event', ''], ['speed', '分道速度', 'DOUBLE', 'km/h', 'on_event', '47.6'], ['vio_code', '违法代码', 'STRING', '-', 'on_event', '']],
@@ -3216,39 +3476,36 @@
 
             /* =====================================================================
                14. 单设备指令 / 详情 / 表单
+               指令表与执行链路统一由 DevAccess（品类可控指令 + 跨页队列）提供，
+               本页不再自持一份 CMDS，避免与其他模块的下发口径分叉。
                ===================================================================== */
-            const CMDS = {
-                sensor: ['远程校准', '立即上报', '采集频率调整', '自检'],
-                camera: ['抓拍', '预置位调用', '重启', '码率调整'],
-                ctrl: ['回路测试', '切换自动模式', '重启', '固件自检'],
-                gateway: ['链路重连', '配置下发', '重启', '清空缓存'],
-                mobile: ['轨迹上报频率调整', '电子围栏下发', '远程断油电提醒', '终端重启'],
-                site: ['称重去皮校准', '满溢抽检', '开锁投料口', 'CEMS 标定']
-            };
             function kvItem(k, v) { return '<div class="sc-kv-item"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
+            /** 台账快捷下发：仍走远程控制工作台，保证执行、回执与审计只有一条路径 */
             function openCmd(d) {
                 if (d.status === '离线' || d.status === '故障') {
-                    SC.toast(d.id + ' 当前不可达，指令已写入待发队列', { type: 'warn' });
-                    log('warn', d.id + ' 指令入队（设备不可达）');
+                    const job = DevAccess.dispatch({
+                        dev: d.id, devName: d.name, kind: kindOf(d), cmd: 'probe',
+                        params: { times: 3 }, reason: '设备' + d.status + '，指令入队待退避重试', by: '设备管理台'
+                    });
+                    log('warn', d.id + ' 当前不可达，心跳探测指令 ' + job.id + ' 已写入待发队列');
+                    SC.toast(d.id + ' 不可达，指令已入队，恢复后可在远程控制页重放', { type: 'warn' });
                     return;
                 }
+                const codes = DevAccess.cmdList(kindOf(d));
                 SC.modal.form({
                     title: '下发指令 · ' + d.id + ' ' + d.name,
                     size: 'sm',
-                    submitText: '下发',
+                    submitText: '进入控制工作台',
                     fields: [
-                        { name: 'cmd', label: '指令', type: 'select', options: CMDS[d.type], col: 1, required: true },
-                        { name: 'timeout', label: '超时时间', type: 'number', value: 30, min: 5, max: 300, unit: '秒', col: 1 },
+                        {
+                            name: 'cmd', label: '指令（按品类 ' + (kindOf(d) || '通用') + ' 过滤）', type: 'select', col: 2, required: true,
+                            options: codes.map(function (c) { const m = DevAccess.cmdMeta(c); return { value: c, label: m.group + ' · ' + m.label }; })
+                        },
                         { name: 'reason', label: '操作事由', type: 'textarea', placeholder: '例：夜间误报排查，需重新校准量程', col: 2 }
                     ]
                 }).then(function (v) {
                     if (!v) return;
-                    log('info', '向 ' + d.id + ' 下发指令「' + v.cmd + '」');
-                    const cost = ri(4, 26);
-                    const ok = rnd() > 0.12;
-                    SC.toast('指令已下发，' + cost + 's 后' + (ok ? '执行成功' : '失败：设备返回 NACK'), { type: ok ? 'success' : 'error', duration: 3600 });
-                    log(ok ? 'ok' : 'alarm', d.id + ' 指令「' + v.cmd + '」' + (ok ? '执行成功，耗时 ' + cost + 's' : '执行失败（超时无应答）'));
-                    if (!ok) { d.offline++; d.health = calcHealth(d); saveDevices(); renderDevs(); }
+                    gotoControl(d, v.cmd, v.reason);
                 });
             }
             function openDetail(id) {
@@ -3345,6 +3602,7 @@
                     body: body,
                     footer: [
                         { text: '⟳ 下发指令', kind: 'ghost', onClick: () => openCmd(d) },
+                        { text: '🔌 品类接入档案', kind: 'ghost', onClick: () => { if (m.close) m.close(); openKind(kindOf(d) || 'CAM'); } },
                         { text: '💓 心跳探测', kind: 'ghost', onClick: () => openProbe(d) },
                         {
                             text: s.kind === 'video' ? (s.state === '拉流中' ? '⏹ 停流' : '🎥 取流预览') : '🌊 数据流监控',
@@ -4482,6 +4740,662 @@
             }
 
             /* =====================================================================
+               14d. 设备接入与供数出口
+               本页是全市物联网设备唯一的接入出口：品类注册、协议与主题绑定、入网联调
+               在此完成，再以 MQ / HTTP / Flink / 数据交换四条链路把已接入数据交给数据
+               中台只读消费；品类口径取自 DevCatalog.KINDS，本页不再复制一份目录。
+               ===================================================================== */
+            /** 抽检建档品名 → 全市 23 类目录编码就近对码；控制回路与边缘网关不属末端感知 */
+            const KIND_CODE = {
+                '水位计': 'WLV', '管网流量计': 'WLV', '管网压力变送器': 'WLV',
+                '低洼积水水位计': 'LVL', '雷达液位计': 'RLV', '超声波液位计': 'ULV', '智能井盖': 'MNH', '桥隧应变计': 'STR',
+                '智能消防栓水压计': 'HYD', '可燃气体探测器': 'GAS', '烟感探测器': 'GAS',
+                '温度传感器': 'MET', '空气质量监测仪': 'MET', '噪声监测仪': 'MET', '光照传感器': 'MET', '公厕异味监测仪': 'MET',
+                '治安球机': 'CAM', '全景相机': 'CAM', '城管取证相机': 'CAM', '车载视频终端': 'CAM',
+                '路网枪机': 'SPR', '人脸抓拍枪机': 'SPR', '半球摄像机': 'SPR', '商家门店抓拍机': 'SPR',
+                '卡口相机': 'DME', '人证核验一体机': 'AUT', '智能作业手环': 'WBC', '电子巡更仪': 'PAT',
+                '执法车辆定位终端': 'GPS', '环卫收运车终端': 'SVW', '运输船智能终端': 'SHP',
+                '智能果壳箱': 'BIN', '分类回收站称重机': 'RCY', '垃圾中转站地磅': 'RCY',
+                '焚烧炉烟气监测站': 'INC', '焚烧炉助燃风机控制柜': 'INC',
+                '路灯单灯控制器': 'LTC', '照明回路控制器': 'LTC', '停车场道闸': 'MKR'
+            };
+            /** 设备 → 目录编码：先精确匹配品名，再按关键字命中；控制与网关类返回空串 */
+            function kindOf(d) {
+                if (KIND_CODE[d.name]) return KIND_CODE[d.name];
+                const hit = Object.keys(KIND_CODE).filter(function (k) { return d.name.indexOf(k) >= 0; })[0];
+                return hit ? KIND_CODE[hit] : '';
+            }
+            function kindDevices(code) { return devices.filter(function (d) { return kindOf(d) === code; }); }
+            /** 目录「上报频率」文本 → 标称周期秒：昨日上报量由此折算，不再另造单台常量表 */
+            function freqSeconds(text) {
+                const t = String(text || '');
+                if (/事件触发/.test(t)) return 60;
+                if (/每单/.test(t)) return 300;
+                if (/实时/.test(t)) return 10;
+                const m = t.match(/(\d+(?:\.\d+)?)/);
+                const n = m ? Number(m[1]) : 5;
+                if (/分钟|min/i.test(t)) return n * 60;
+                if (/小时/.test(t)) return n * 3600;
+                if (/日|天/.test(t)) return n * 86400;
+                return n;
+            }
+            function bigNum(n) {
+                if (n >= 1e8) return (n / 1e8).toFixed(2) + ' 亿';
+                if (n >= 1e4) return (n / 1e4).toFixed(1) + ' 万';
+                return SC.num(Math.round(n));
+            }
+            /** 同一份接入数据在不同链路上的份额系数：MQ 为源头，Flink 派生，HTTP 与交换为旁路 */
+            const OUTLET_FACTOR = { mq: 1, http: 0.22, flink: 0.86, exchange: 0.06 };
+            const OUTLET_LAG = { mq: 'P95 120 ms', http: 'P95 460 ms', flink: '水位线 5 min', exchange: 'T+1 02:00' };
+            const OUTLET_CONS = {
+                mq: '消费方：数据中台 Flink 源表、告警中心',
+                http: '消费方：跨部门共享交换前置、厂商云回调',
+                flink: '消费方：实时宽表 dws_*_rt、越界与超阈值告警',
+                exchange: '消费方：ODS 贴源层、视频切片与称重单据归档'
+            };
+            const ac = { paused: SC.store.get('equipment', 'acPaused', {}) || {}, trial: {}, log: [], snapTs: 0 };
+            let acCtrl = null, ctCtrl = null;
+            function acEvent(lv, tx) {
+                ac.log.unshift({ t: Date.now(), lv: lv, tx: tx });
+                if (ac.log.length > 120) ac.log.length = 120;
+                renderAcLog();
+            }
+            /** 接入行：目录口径（全市在册、频率）+ 本页抽检实测（建档、在线率、心跳准点） */
+            function acRows() {
+                const K = (window.DevCatalog && window.DevCatalog.KINDS) || [];
+                return K.map(function (k) {
+                    const code = k[0], ds = kindDevices(code), period = freqSeconds(k[5]);
+                    const on = ds.filter(d => d.status === '在线').length;
+                    const punctual = ds.filter(d => hbState(d) === '准点').length;
+                    const perDay = Math.round(86400 / period);
+                    return {
+                        code: code, name: k[1], cat: k[2], access: k[3], freq: k[5],
+                        units: k[4], domain: k[6], biz: k[7],
+                        sampled: ds.length, onlineRate: ds.length ? on / ds.length * 100 : -1,
+                        punctualRate: ds.length ? punctual / ds.length * 100 : -1,
+                        period: period, perKindDay: k[4] * perDay, outlets: DevAccess.outletsOf(code),
+                        paused: !!ac.paused[code], trial: ac.trial[code] || null,
+                        topic: DevAccess.topicFor(code)
+                    };
+                });
+            }
+            function renderAcKpi() {
+                const rows = acRows();
+                const units = rows.reduce((a, r) => a + r.units, 0);
+                const cover = rows.filter(r => r.sampled > 0).length;
+                const sampled = devices.length;
+                const withSample = rows.filter(r => r.onlineRate >= 0);
+                const avgOn = withSample.length ? withSample.reduce((a, r) => a + r.onlineRate, 0) / withSample.length : 0;
+                const msgs = Math.round(rows.reduce((a, r) => a + r.perKindDay, 0));
+                const host = document.getElementById('ac-kpi');
+                if (!host) return;
+                host.innerHTML =
+                    miniCard('接入品类', cover + ' / ' + rows.length + ' 类', '本批抽检已覆盖目录品类', cover === rows.length ? 'ok' : 'warn') +
+                    miniCard('全市在册', bigNum(units) + ' 台', '口径源：末端设备接入目录', '') +
+                    miniCard('抽检建档', SC.num(sampled) + ' 台', '本页面直接维护的设备实例', '') +
+                    miniCard('平均在线率', avgOn.toFixed(1) + '%', '按抽检实测汇总，非全市估算', avgOn >= 92 ? 'ok' : 'warn') +
+                    miniCard('昨日上报', bigNum(msgs) + ' 条', '在册量 × 频率折算', '') +
+                    miniCard('供数链路', DevAccess.OUTLETS.length + ' 条', 'MQ / HTTP / Flink / 数据交换', '') +
+                    miniCard('暂停接入', rows.filter(r => r.paused).length + ' 类', '停用后中台侧同步降级', '') +
+                    miniCard('快照发布', ac.snapTs ? agoText(ac.snapTs) : '未发布', '供数据中台只读消费', ac.snapTs ? 'ok' : 'warn');
+            }
+            function renderOutlets() {
+                const host = document.getElementById('ac-outlets');
+                if (!host) return;
+                const rows = acRows();
+                host.innerHTML = DevAccess.OUTLETS.map(function (o) {
+                    const hit = rows.filter(r => r.outlets.indexOf(o.id) >= 0);
+                    const msgs = Math.round(hit.reduce((a, r) => a + r.perKindDay, 0) * (OUTLET_FACTOR[o.id] || 0.2));
+                    return '<div class="outlet-card">' +
+                        '<div class="oh">' + o.icon + ' ' + SC.esc(o.label) +
+                        '<span class="sc-tag ' + (o.id === 'exchange' ? 'info' : 'ok') + '">' + hit.length + ' 类</span></div>' +
+                        '<div class="ov">' + bigNum(msgs) + '<small style="font-size:.5em;color:#7f8c9b"> 条/日</small></div>' +
+                        '<div class="ou">' + SC.esc(o.seq) + '</div>' +
+                        '<code>' + SC.esc(o.endpoint) + '</code>' +
+                        '<div class="ou">主题 <code>' + SC.esc(o.topic) + '</code></div>' +
+                        '<div class="ou">时延 ' + OUTLET_LAG[o.id] + ' · ' + OUTLET_CONS[o.id] + '</div>' +
+                        '</div>';
+                }).join('');
+                const tip = document.getElementById('ac-outlet-tip');
+                if (tip) tip.textContent = '接入快照版本 v' + DevAccess.version + ' · 上次发布 ' + (ac.snapTs ? agoText(ac.snapTs) : '尚未发布');
+            }
+            function renderAcTable() {
+                const host = document.querySelector('#ac-table tbody');
+                if (!host) return;
+                host.innerHTML = acRows().map(function (r) {
+                    const outs = r.outlets.map(function (id) {
+                        return '<span class="fn-tag" style="--c:' + ({ mq: '#2980b9', http: '#16a085', flink: '#8e44ad', exchange: '#7f8c8d' })[id] + '">' +
+                            DevAccess.OUTLETS.filter(o => o.id === id)[0].label + '</span>';
+                    }).join(' ');
+                    return '<tr data-code="' + r.code + '">' +
+                        '<td><b>' + r.code + '</b></td>' +
+                        '<td>' + SC.esc(r.name) + '<div class="sc-hint">' + SC.esc(r.biz) + '</div></td>' +
+                        '<td>' + SC.esc(r.cat) + '</td>' +
+                        '<td>' + SC.esc(r.access) + '</td>' +
+                        '<td>' + SC.esc(r.freq) + '<div class="sc-hint">周期 ' + r.period + 's</div></td>' +
+                        '<td><span class="sc-cell-num">' + SC.num(r.units) + '</span></td>' +
+                        '<td><span class="sc-cell-num">' + (r.sampled || '—') + '</span></td>' +
+                        '<td>' + (r.onlineRate < 0 ? '<span class="sc-hint">未抽检</span>'
+                            : '<span class="sc-cell-num">' + r.onlineRate.toFixed(0) + '</span>% <span class="sc-tag ' + (r.onlineRate >= 90 ? 'ok' : r.onlineRate >= 75 ? 'warn' : 'bad') + '">' +
+                            (r.punctualRate < 0 ? '' : '准点 ' + r.punctualRate.toFixed(0) + '%') + '</span>') + '</td>' +
+                        '<td><span class="sc-cell-num">' + bigNum(r.perKindDay) + '</span></td>' +
+                        '<td>' + outs + '</td>' +
+                        '<td><span class="sc-tag ' + (r.paused ? 'off' : 'ok') + '">' + (r.paused ? '已暂停' : '接入中') + '</span>' +
+                        (r.trial ? '<div class="sc-hint">试采 ' + r.trial.n + ' 条 · ' + r.trial.res + '</div>' : '') + '</td>' +
+                        '<td><button class="sc-btn sm ghost" data-act="kind">档案</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="pause">' + (r.paused ? '恢复' : '暂停') + '</button> ' +
+                        '<button class="sc-btn sm ghost" data-act="trial">试采</button></td>' +
+                        '</tr>';
+                }).join('');
+                if (acCtrl) acCtrl.reload();
+                const kc = document.getElementById('ac-kind-count');
+                if (kc) kc.textContent = acRows().length;
+            }
+            /** 24 小时接入曲线：按链路份额与日内形状推导，保证刷新后曲线一致 */
+            function renderAcChart() {
+                const el = document.getElementById('c-ac-chart');
+                if (!el) return;
+                const rows = acRows().filter(r => !r.paused);
+                const totalDay = rows.reduce((a, r) => a + r.perKindDay, 0) / 24;
+                const labels = [], series = [];
+                DevAccess.OUTLETS.forEach(function (o) {
+                    labels.push(o.icon + ' ' + o.label);
+                    series.push({ name: o.label, color: ({ mq: '#2980b9', http: '#16a085', flink: '#8e44ad', exchange: '#95a5a6' })[o.id], data: [] });
+                });
+                const hour = new Date().getHours();
+                for (let h = 0; h < 24; h++) {
+                    const shape = 0.62 + 0.48 * Math.sin((h - 5) / 24 * 2 * Math.PI) + (h >= 7 && h <= 22 ? 0.12 : -0.08);
+                    DevAccess.OUTLETS.forEach(function (o, i) {
+                        const v = totalDay * shape * (OUTLET_FACTOR[o.id] || 0.2);
+                        series[i].data.push(Math.round(o.id === 'exchange' && h === 2 ? v * 5.4 : v));
+                    });
+                }
+                setChart('ac', SC.chart.line, el, {
+                    labels: SC.sim.hours(24), xEvery: 3, unit: ' 条',
+                    series: series.map(function (s) { return { name: s.name, color: s.color, data: s.data, visible: true }; })
+                });
+                SC.chart.legend(document.getElementById('l-ac-chart'), series.map(function (s, i) {
+                    return { name: s.name, color: s.color, value: bigNum(s.data[hour]) + ' 条/时' };
+                }), null);
+            }
+            function renderAcLog() {
+                const host = document.getElementById('ac-log');
+                if (!host) return;
+                host.innerHTML = ac.log.slice(0, 60).map(function (e) {
+                    return '<div class="li"><span class="t">' + SC.stamp(e.t).slice(5, 19) + '</span>' +
+                        '<span class="lv ' + e.lv + '">' + ({ info: 'INFO', warn: 'WARN', alarm: 'ALARM', ok: 'OK' }[e.lv] || 'INFO') + '</span>' +
+                        '<span class="tx">' + SC.esc(e.tx) + '</span></div>';
+                }).join('') || '<div class="li"><span class="tx">暂无接入事件：品类注册与联调结果会在此留痕</span></div>';
+            }
+            /** 发布接入快照：中台与场景页只读消费，不再各自复制目录 */
+            function publishAccess(silent) {
+                const rows = acRows();
+                const outletStat = DevAccess.OUTLETS.map(function (o) {
+                    const hit = rows.filter(r => r.outlets.indexOf(o.id) >= 0 && !r.paused);
+                    return {
+                        id: o.id, label: o.label, endpoint: o.endpoint, topic: o.topic, lag: OUTLET_LAG[o.id],
+                        kinds: hit.length, msgsDay: Math.round(hit.reduce((a, r) => a + r.perKindDay, 0) * (OUTLET_FACTOR[o.id] || 0.2))
+                    };
+                });
+                DevAccess.publish({
+                    kinds: rows.map(function (r) {
+                        return {
+                            code: r.code, name: r.name, cat: r.cat, access: r.access, freq: r.freq, units: r.units,
+                            domain: r.domain, biz: r.biz, outlets: r.outlets, topic: r.topic, onboard: r.sampled,
+                            trial: r.trial ? r.trial.n + ' 条 / ' + r.trial.res : null,
+                            online: r.onlineRate < 0 ? null : Number(r.onlineRate.toFixed(1)),
+                            punctual: r.punctualRate < 0 ? null : Number(r.punctualRate.toFixed(1)),
+                            perDay: r.perKindDay, paused: r.paused
+                        };
+                    }),
+                    outlets: outletStat,
+                    totalUnits: rows.reduce((a, r) => a + r.units, 0),
+                    sampled: devices.length,
+                    pendingCmd: DevAccess.pendingCount(),
+                    source: 'equipment-data.html'
+                });
+                ac.snapTs = Date.now();
+                renderAcKpi();
+                renderOutlets();
+                if (!silent) {
+                    acEvent('ok', '已发布接入快照：' + rows.length + ' 类 / ' + bigNum(rows.reduce((a, r) => a + r.perKindDay, 0)) +
+                        ' 条/日，四条链路 ' + outletStat.map(o => o.kinds + ' 类').join(' · ') + '；数据中台采集模块可只读消费');
+                    SC.toast('接入快照已发布，数据中台采集模块将直接读取', { type: 'success' });
+                }
+            }
+            function openKind(code) {
+                const r = acRows().filter(x => x.code === code)[0];
+                if (!r) return;
+                const ds = kindDevices(code);
+                const body = '<div class="sc-kv">' +
+                    kvItem('品类编码', r.code) + kvItem('分类', SC.esc(r.cat) + ' / ' + SC.esc(r.domain) + '域') +
+                    kvItem('接入方式', SC.esc(r.access)) + kvItem('上报频率', SC.esc(r.freq) + '（标称 ' + r.period + 's）') +
+                    kvItem('全市在册', SC.num(r.units) + ' 台') + kvItem('本批抽检建档', (r.sampled || 0) + ' 台') +
+                    kvItem('MQ 主题', SC.esc(r.topic)) + kvItem('供数链路', r.outlets.map(function (id) {
+                        return DevAccess.OUTLETS.filter(o => o.id === id)[0].label;
+                    }).join(' / ')) +
+                    kvItem('业务口径', SC.esc(r.biz)) + kvItem('接入状态', r.paused ? '已暂停采集' : '采集正常') +
+                    '</div>' +
+                    '<div class="sc-section-title">下行可控指令</div>' +
+                    '<div class="sc-inline">' + DevAccess.cmdList(code).map(function (c) {
+                        return '<span class="fn-tag" style="--c:#8e44ad">' + SC.esc(DevAccess.cmdMeta(c).label) + '</span>';
+                    }).join(' ') + '</div>' +
+                    '<div class="sc-section-title">抽检设备（' + ds.length + ' 台）</div>' +
+                    (ds.length ? '<table class="data-table"><thead><tr><th>编号</th><th>名称</th><th>片区</th><th>协议</th><th>状态</th><th>心跳</th></tr></thead><tbody>' +
+                        ds.slice(0, 12).map(function (d) {
+                            return '<tr><td><b>' + d.id + '</b></td><td>' + SC.esc(d.name) + '</td><td>' + SC.esc(d.zone) + '</td>' +
+                                '<td>' + SC.esc(d.protocol) + '</td><td>' + d.status + '</td><td>' + hbState(d) + '（' + d.hbPeriod + 's）</td></tr>';
+                        }).join('') + '</tbody></table>' : '<div class="sc-hint">本批抽检未覆盖该品类，台账按目录口径展示。</div>') +
+                    '<div class="sc-hint" style="margin-top:10px">报文样例（取首台抽检设备物模型拼装）：</div>' +
+                    (ds.length ? '<code style="display:block;margin-top:6px;word-break:break-all">' + SC.esc(modelPayload(ds[0])) + '</code>' : '');
+                const m = SC.modal.open({
+                    title: '🔌 接入档案 · ' + r.name + '（' + r.code + '）', size: 'lg', body: body,
+                    footer: [
+                        { text: r.paused ? '▶ 恢复采集' : '⏸ 暂停采集', kind: 'ghost', onClick: function () { togglePause(r.code); if (m.close) m.close(); } },
+                        { text: ds.length ? '🎮 下发到抽检设备' : '关闭', kind: ds.length ? 'primary' : 'ghost', onClick: function () { if (!ds.length) { if (m.close) m.close(); return; } fillCtDev(ds[0].id); if (m.close) m.close(); switchModule('control'); } }
+                    ]
+                });
+            }
+            function togglePause(code) {
+                const r = acRows().filter(x => x.code === code)[0];
+                if (!r) return;
+                ac.paused[code] = !ac.paused[code];
+                SC.store.set('equipment', 'acPaused', ac.paused);
+                const stop = ac.paused[code];
+                acEvent(stop ? 'warn' : 'ok', r.name + '（' + code + '）已' + (stop ? '暂停采集：MQ 主题停止消费、Flink 作业挂起，中台侧同步降级'
+                    : '恢复采集：按 ' + r.freq + ' 重新拉起，缺口由断点缓存续传回灌'));
+                if (stop) {
+                    kindDevices(code).forEach(function (d) { if (d.stream) enqueueBackfill(d); });
+                }
+                renderAcTable();
+                renderAcKpi();
+                renderOutlets();
+                publishAccess(true);
+            }
+            function openTrial(preCode) {
+                const rows = acRows();
+                SC.modal.form({
+                    title: '🧪 入网联调试采', submitText: '开始试采',
+                    fields: [
+                        {
+                            name: 'code', label: '试采品类', type: 'select', col: 2, required: true, value: preCode || rows[0].code,
+                            options: rows.map(function (r) { return { value: r.code, label: r.code + ' · ' + r.name + '（' + r.access + '）' }; })
+                        },
+                        { name: 'n', label: '抽样报文', type: 'number', value: 20, min: 5, max: 200, unit: '条', col: 1 },
+                        { name: 'auth', label: '校验设备鉴权', type: 'switch', value: true, onText: '校验三元组', col: 1 },
+                        { name: 'model', label: '校验物模型字段', type: 'switch', value: true, onText: '按测点目录', col: 1 },
+                        { name: 'outlet', label: '同时打通供数链路', type: 'switch', value: true, onText: '注册到 MQ / Flink', col: 1 }
+                    ]
+                }).then(function (v) {
+                    if (!v) return;
+                    const r = rows.filter(x => x.code === v.code)[0];
+                    const ds = kindDevices(v.code);
+                    const d0 = ds[0];
+                    const body = document.createElement('div');
+                    body.innerHTML = '<div class="sc-hint">品类 <b>' + r.code + ' · ' + SC.esc(r.name) + '</b>，接入方式 ' + SC.esc(r.access) +
+                        '，抽样 ' + v.n + ' 条报文，主题 ' + SC.esc(r.topic) + '</div><div id="trial-host" style="margin-top:10px"></div>';
+                    const m = SC.modal.open({ title: '联调试采进度', size: 'md', body: body, footer: [{ text: '关闭' }] });
+                    const steps = [
+                        ['品类与协议注册', true, r.access + ' · 标称 ' + r.period + 's'],
+                        ['设备鉴权', !!v.auth, v.auth ? '三元组通过 ' + Math.min(5, ds.length || 3) + ' 台' : '跳过鉴权（仅沙箱）'],
+                        ['物模型字段校验', !!v.model, v.model ? (d0 ? thingModel(d0).length + ' 个测点对齐 DEV_MODEL' : '按目录测点模板校验') : '跳过'],
+                        ['报文抽样解析', true, v.n + ' 条 / 缺字段 0 / 幂等键重复 0'],
+                        ['主题与链路打通', !!v.outlet, v.outlet ? r.outlets.map(o => DevAccess.OUTLETS.filter(x => x.id === o)[0].label).join(' / ') : '仅本地入库'],
+                        ['中台可见性回执', true, '快照已更新，采集模块可查询']
+                    ];
+                    runSteps(document.getElementById('trial-host'), steps, function () {
+                        ac.trial[v.code] = { n: v.n, res: '失败', at: Date.now() };
+                        acEvent('alarm', r.name + ' 联调试采失败，已保留现场报文待排查');
+                    }, function () {
+                        ac.trial[v.code] = { n: v.n, res: '通过', at: Date.now() };
+                        acEvent('ok', r.name + '（' + v.code + '）联调通过：抽样 ' + v.n + ' 条全部解析入库，供数链路 ' +
+                            r.outlets.join('/') + ' 已打通');
+                        publishAccess(true);
+                    });
+                    renderAcTable();
+                });
+            }
+            function exportAccess() {
+                const rows = acRows();
+                SC.csv.download('设备接入目录_' + SC.today() + '.csv',
+                    [['编码', '品类', '分类', '接入方式', '在册数量', '上报频率', '标称周期s', '昨日上报条数', '抽检建档', '在线率%', '心跳准点率%', '供数链路', 'MQ主题', '归属域', '业务口径', '状态']]
+                        .concat(rows.map(r => [r.code, r.name, r.cat, r.access, r.units, r.freq, r.period, r.perKindDay, r.sampled,
+                        r.onlineRate < 0 ? '' : r.onlineRate.toFixed(1), r.punctualRate < 0 ? '' : r.punctualRate.toFixed(1),
+                        r.outlets.join('|'), r.topic, r.domain, r.biz, r.paused ? '已暂停' : '接入中'])));
+                acEvent('ok', '导出接入目录 ' + rows.length + ' 类（口径与本页面发布给数据中台的快照一致）');
+                SC.toast('已导出 ' + rows.length + ' 类接入目录', { type: 'success' });
+            }
+
+            /* =====================================================================
+               14e. 远程控制与指令留痕
+               全站唯一的设备下发出口：场景页把控制意图提交到 sc:equipment:cmdq，
+               本页按品类协议直连执行、回写回执，并把全过程写入 sc:equipment:audit。
+               ===================================================================== */
+            const ct = { auto: true, filter: 'all', busy: false, hl: '' };
+            function renderCtKpi() {
+                const host = document.getElementById('ct-kpi');
+                if (!host) return;
+                const all = DevAccess.queue(true);
+                const wait = all.filter(j => j.state === '待执行');
+                const done = all.filter(j => j.state !== '待执行');
+                const ok = done.filter(j => j.state === '成功').length;
+                const cross = wait.filter(j => j.from !== 'equipment-data.html').length;
+                const crossAll = all.filter(j => j.from !== 'equipment-data.html').length;
+                const avg = done.length ? done.reduce((a, j) => a + (j.costMs || 0), 0) / done.length / 1000 : 0;
+                host.innerHTML =
+                    miniCard('待执行指令', wait.length + ' 条', cross ? '其中 ' + cross + ' 条来自其他模块' : (crossAll ? '历史 ' + crossAll + ' 条来自其他模块' : '本页面提交'), wait.length ? 'warn' : 'ok') +
+                    miniCard('已回执', done.length + ' 条', '成功 ' + ok + ' / 失败 ' + (done.length - ok), '') +
+                    miniCard('下发成功率', done.length ? (ok / done.length * 100).toFixed(1) + '%' : '—', '含 NACK 与超时', ok / (done.length || 1) >= 0.9 ? 'ok' : 'warn') +
+                    miniCard('平均回执耗时', avg.toFixed(1) + ' s', '协议往返 + 设备执行', avg > 30 ? 'warn' : '') +
+                    miniCard('审计留痕', DevAccess.audits(500).length + ' 条', '谁 / 哪页 / 什么参数 / 结果', '') +
+                    miniCard('自动执行', ct.auto ? '已开启' : '已暂停', '跨页指令到队即下发', ct.auto ? 'ok' : 'off');
+            }
+            function renderCtQueue() {
+                const host = document.querySelector('#ct-queue tbody');
+                if (!host) return;
+                const rows = DevAccess.queue(true).slice(0, 60);
+                host.innerHTML = rows.map(function (j) {
+                    const tag = { '待执行': 'warn', '成功': 'ok', '失败': 'bad', '已取消': 'off' }[j.state] || 'info';
+                    return '<tr data-id="' + j.id + '"' + (ct.hl === j.id ? ' style="background:#fff7e6"' : '') + '>' +
+                        '<td><b>' + j.id + '</b><div class="sc-hint">' + DevAccess.stamp(j.ts).slice(5) + '</div></td>' +
+                        '<td>' + SC.esc(j.from.replace('.html', '')) + '</td>' +
+                        '<td>' + SC.esc(j.dev || '—') + (j.devName ? '<div class="sc-hint">' + SC.esc(j.devName) + '</div>' : '') + '</td>' +
+                        '<td>' + SC.esc(j.kindName) + '<div class="sc-hint">' + SC.esc(j.kind || '未归类') + '</div></td>' +
+                        '<td>' + SC.esc(j.cmdLabel) + '<div class="sc-hint">' + SC.esc(j.cmd) + '</div></td>' +
+                        '<td><code style="font-size:.78em">' + SC.esc(JSON.stringify(j.params || {})) + '</code></td>' +
+                        '<td><span class="sc-hint">' + SC.esc(j.reason || '—') + '</span></td>' +
+                        '<td><span class="sc-tag ' + tag + '">' + j.state + '</span></td>' +
+                        '<td>' + SC.esc(j.ack || '—') + (j.costMs ? '<div class="sc-hint">耗时 ' + (j.costMs / 1000).toFixed(1) + 's</div>' : '') + '</td>' +
+                        '<td>' + (j.state === '待执行'
+                            ? '<button class="sc-btn sm ghost" data-act="run">执行</button> <button class="sc-btn sm ghost" data-act="drop">取消</button>'
+                            : '<button class="sc-btn sm ghost" data-act="dev">看设备</button>') + '</td>' +
+                        '</tr>';
+                }).join('') || '<tr><td colspan="10" class="sc-hint" style="text-align:center;padding:18px">队列为空：各场景页提交后会在此排队</td></tr>';
+                if (ctCtrl) ctCtrl.reload();
+                const tip = document.getElementById('ct-src-tip');
+                if (tip) {
+                    const by = {};
+                    DevAccess.queue(true).forEach(j => { by[j.from.replace('.html', '')] = (by[j.from.replace('.html', '')] || 0) + 1; });
+                    tip.textContent = Object.keys(by).length ? '近期提交方：' + Object.keys(by).map(k => k + ' ' + by[k] + ' 条').join(' / ') : '';
+                }
+            }
+            /** 指令落到设备后的真实状态变化：本页抽检建档设备才改档案，其余按品类协议经网关下发 */
+            function applyCmd(d, job, ok) {
+                if (!d || !ok) return;
+                const p = job.params || {};
+                const note = '远程控制下发「' + job.cmdLabel + '」' + JSON.stringify(p) + '（来源 ' + job.from.replace('.html', '') + '）';
+                if (!d.notes) d.notes = [];
+                d.notes.unshift({ t: SC.stamp(new Date()), who: '控制指令', txt: note });
+                if (job.cmd === 'reboot') { d.status = '在线'; d.lastBeat = Date.now(); d.lastSeen = Date.now(); d.miss = 0; d.recon = (d.recon || 0) + 1; if (d.stream && d.stream.kind === 'video') d.stream.state = '空闲'; }
+                else if (job.cmd === 'probe') { d.lastBeat = Date.now(); d.miss = 0; }
+                else if (job.cmd === 'ota') { d.fw = TYPES[d.type].fwLatest; }
+                else if (job.cmd === 'calibrate' || job.cmd === 'weigh') { d.health = Math.min(99, d.health + 2); d.loss = Number(Math.max(0, d.loss - 0.4).toFixed(2)); }
+                else if (job.cmd === 'dim' || job.cmd === 'scene') { if (d.stream) d.stream.subs = (d.stream.subs || 0); }
+                else if (job.cmd === 'snap' || job.cmd === 'ptz') { if (d.stream && d.stream.kind === 'video') { d.stream.state = '拉流中'; d.stream.br = Math.max(600, d.stream.br || 1200); } }
+                d.uptimeDays = d.uptimeDays || 1;
+                saveDevices();
+                renderDevs();
+            }
+            function runCtJob(job, cb) {
+                if (!job || job.state !== '待执行') { if (cb) cb(null, false); return; }
+                ct.busy = true;
+                const target = /^DEV-\d+/.test(job.dev || '') ? byId(job.dev) : null;
+                const cost = ri(3, 42);
+                const blocked = !!target && (target.status === '离线' || target.status === '故障');
+                const ok = blocked ? false : rnd() > 0.12;
+                setTimeout(function () {
+                    const fresh = DevAccess.find(job.id);
+                    if (!fresh || fresh.state !== '待执行') {
+                        ct.busy = false;
+                        if (cb) cb(fresh, false, 0);
+                        return;
+                    }
+                    const meta = DevAccess.cmdMeta(job.cmd);
+                    const ack = blocked ? (target.status + '，链路不可达，指令进入退避重试')
+                        : ok ? (meta.ack + '（' + JSON.stringify(job.params || {}) + '）')
+                            : '超时无应答（按 30s / 120s / 600s 退避重试）';
+                    if (ok) applyCmd(target, job, true);
+                    const settled = DevAccess.settle(job.id, {
+                        state: ok ? '成功' : '失败', ack: ack, ret: JSON.stringify(job.params || {}),
+                        costMs: cost * 1000, by: '设备管理台'
+                    });
+                    log(ok ? 'ok' : 'alarm', '指令 ' + job.id + '（' + job.from.replace('.html', '') + ' → ' + (job.dev || job.kindName) + ' · ' + job.cmdLabel + '）' +
+                        (ok ? '执行成功，回执 ' + ack : '执行失败：' + ack));
+                    if (!target && ok) acEvent('info', job.id + ' 未在本页抽检台账，按品类 ' + job.kindName + ' 的接入协议经边缘网关下发并回执');
+                    ct.busy = false;
+                    renderCtQueue();
+                    renderCtKpi();
+                    renderCtAudit();
+                    if (cb) cb(settled, ok, cost);
+                }, 420 + cost * 6);
+            }
+            function runCtAll() {
+                const wait = DevAccess.queue(false);
+                if (!wait.length) { SC.toast('队列中没有待执行指令', { type: 'info' }); return; }
+                let i = 0;
+                (function next() {
+                    if (i >= wait.length) { SC.toast('已执行 ' + wait.length + ' 条跨页指令，回执写入审计', { type: 'success' }); return; }
+                    runCtJob(wait[i], function () { i++; next(); });
+                })();
+            }
+            function renderCtAudit() {
+                const host = document.getElementById('ct-auditlog');
+                if (!host) return;
+                const chips = document.getElementById('ct-audit-chips');
+                const all = DevAccess.audits(400);
+                if (chips) {
+                    const kinds = ['all', '已受理', '成功', '失败', '已取消'];
+                    chips.innerHTML = kinds.map(function (k) {
+                        const n = k === 'all' ? all.length : all.filter(a => a.res === k).length;
+                        return '<button class="sc-chip' + (ct.filter === k ? ' active' : '') + '" data-res="' + k + '">' +
+                            (k === 'all' ? '全部留痕' : k) + ' <b>' + n + '</b></button>';
+                    }).join('');
+                    chips.querySelectorAll('.sc-chip').forEach(function (c) {
+                        c.addEventListener('click', function () { ct.filter = c.dataset.res; renderCtAudit(); });
+                    });
+                }
+                const list = all.filter(function (a) { return ct.filter === 'all' || a.res === ct.filter; });
+                const lv = { '成功': 'ok', '已受理': 'info', '失败': 'alarm', '已取消': 'warn' };
+                host.innerHTML = list.slice(0, 50).map(function (a) {
+                    return '<div class="li"><span class="t">' + String(a.t).slice(5, 19) + '</span>' +
+                        '<span class="lv ' + (lv[a.res] || 'info') + '">' + a.res + '</span>' +
+                        '<span class="tx">' + SC.esc(a.by + ' · ' + a.from.replace('.html', '') + ' → ' + (a.dev || '—') + ' · ' +
+                        DevAccess.cmdMeta(a.cmd).label + ' ' + JSON.stringify(a.params || {}) + (a.note ? '（' + a.note + '）' : '')) + '</span></div>';
+                }).join('') || '<div class="li"><span class="tx">暂无审计记录</span></div>';
+            }
+            function fillCtDev(pre) {
+                const sel = document.getElementById('ct-dev');
+                if (!sel) return;
+                sel.innerHTML = devices.map(function (d) {
+                    return '<option value="' + d.id + '">' + d.id + ' · ' + SC.esc(d.name) + '（' + SC.esc(d.zone) + ' / ' + (kindOf(d) || '未归类') + '）</option>';
+                }).join('');
+                if (pre && byId(pre)) sel.value = pre;
+                fillCtCmd();
+            }
+            function fillCtCmd() {
+                const d = byId(document.getElementById('ct-dev').value);
+                const sel = document.getElementById('ct-cmd');
+                if (!d || !sel) return;
+                const codes = DevAccess.cmdList(kindOf(d));
+                sel.innerHTML = codes.map(function (c) {
+                    const m = DevAccess.cmdMeta(c);
+                    return '<option value="' + c + '">' + SC.esc(m.group + ' · ' + m.label) + '</option>';
+                }).join('');
+                renderCmdParams();
+            }
+            function renderCmdParams() {
+                const code = document.getElementById('ct-cmd').value;
+                const host = document.getElementById('ct-params');
+                const ps = DevAccess.cmdMeta(code).params || [];
+                if (!ps.length) { host.innerHTML = '<span class="sc-hint">该指令无需参数</span>'; return; }
+                host.innerHTML = ps.map(function (p) {
+                    let input;
+                    if (p.t === 'bool') input = '<select data-p="' + p.k + '"><option value="1">是</option><option value="0">否</option></select>';
+                    else if (p.t === 'enum') input = '<select data-p="' + p.k + '">' + p.opts.map(o => '<option value="' + o + '">' + o + '</option>').join('') + '</select>';
+                    else if (p.t === 'str') input = '<input data-p="' + p.k + '" value="' + (p.d === '目标固件' ? TYPES[byId(document.getElementById('ct-dev').value).type].fwLatest : '') + '" placeholder="' + SC.esc(p.d) + '">';
+                    else input = '<input data-p="' + p.k + '" type="number"' + (p.min != null ? ' min="' + p.min + '"' : '') + (p.max != null ? ' max="' + p.max + '"' : '') +
+                        ' step="' + (p.t === 'num' ? '0.01' : '1') + '" value="' + (p.k === 'brightness_pct' ? '60' : p.k === 'unit' ? '1' : p.k === 'delay_s' ? '0' : p.k === 'times' ? '3' : p.k === 'period_s' ? '10' : '') + '" placeholder="' + SC.esc(p.d) + '">';
+                    return '<div class="cp"><span>' + SC.esc(p.d || p.k) + ' · ' + p.k + '</span>' + input + '</div>';
+                }).join('');
+            }
+            function ctSend() {
+                const d = byId(document.getElementById('ct-dev').value);
+                if (!d) { SC.toast('请先选择目标设备', { type: 'warn' }); return; }
+                const code = document.getElementById('ct-cmd').value;
+                const meta = DevAccess.cmdMeta(code);
+                const params = {};
+                (meta.params || []).forEach(function (p) {
+                    const el = document.querySelector('#ct-params [data-p="' + p.k + '"]');
+                    if (!el) return;
+                    params[p.k] = p.t === 'str' || p.t === 'enum' ? el.value : p.t === 'bool' ? el.value === '1' : Number(el.value);
+                });
+                const job = DevAccess.dispatch({
+                    from: 'equipment-data.html', dev: d.id, devName: d.name, kind: kindOf(d),
+                    cmd: code, params: params, reason: document.getElementById('ct-reason').value || '设备管理台直连下发',
+                    by: '设备管理台'
+                });
+                if (job.error) { SC.toast(job.error, { type: 'warn' }); return; }
+                const ack = document.getElementById('ct-ack');
+                ack.className = 'ack-box';
+                ack.textContent = '指令 ' + job.id + ' 已进入队列，等待设备应答…（协议 ' + d.protocol + ' · 品类 ' + (kindOf(d) || '未归类') + '）';
+                renderCtQueue();
+                renderCtKpi();
+                runCtJob(job, function (settled, ok, cost) {
+                    ack.className = 'ack-box ' + (ok ? 'ok' : 'bad');
+                    ack.textContent = (ok ? '✔ ' : '✖ ') + job.id + ' · ' + d.id + ' ' + d.name + ' · ' + meta.label +
+                        '\n参数 ' + JSON.stringify(params) + '\n回执 ' + (settled && settled.ack || '') + '\n耗时 ' + cost + 's，全过程已写入指令审计';
+                });
+            }
+            /** 台账与详情弹窗跳转到控制工作台并选中设备；带 cmd 时预填指令与事由 */
+            function gotoControl(d, cmd, reason) {
+                switchModule('control');
+                fillCtDev(d.id);
+                if (cmd) {
+                    const sel = document.getElementById('ct-cmd');
+                    if ([...sel.options].some(o => o.value === cmd)) {
+                        sel.value = cmd;
+                        renderCmdParams();
+                    }
+                }
+                if (reason) document.getElementById('ct-reason').value = reason;
+                ct.hl = '';
+                SC.toast('已选中 ' + d.id + '，参数确认后点击「下发并等待回执」执行', { type: 'info' });
+                const host = document.getElementById('ct-workbench');
+                if (host) host.scrollIntoView({ block: 'center' });
+            }
+            /** 由实时仿真循环驱动：自动执行开关打开时排队指令逐条下发 */
+            function ctTick() {
+                if (ct.auto && !ct.busy) {
+                    const wait = DevAccess.queue(false).filter(j => j.from !== 'equipment-data.html');
+                    if (wait.length) runCtJob(wait[wait.length - 1]);
+                }
+                if (document.getElementById('control-module').classList.contains('active')) { renderCtKpi(); renderCtQueue(); }
+            }
+            /** 深链入口：?module=control&dev=DEV-0007&cmdq=CMD-xxx */
+            function applyEntry() {
+                const p = DevAccess.params();
+                if (!p.dev && !p.cmdq && !p.module) return;
+                if (p.dev && /^DEV-/.test(p.dev) && byId(p.dev)) {
+                    if (p.module === 'access') { switchModule('access'); openKind(kindOf(byId(p.dev)) || 'CAM'); }
+                    else switchModule('control');
+                    fillCtDev(p.dev);
+                    log('info', '由 ' + (p.from || '外部页面') + ' 深链进入，已定位设备 ' + p.dev);
+                }
+                if (p.cmdq) {
+                    ct.hl = p.cmdq;
+                    switchModule('control');
+                    renderCtQueue();
+                    if (DevAccess.find(p.cmdq) && DevAccess.find(p.cmdq).state === '待执行') {
+                        SC.toast('来自 ' + (p.from || '外部页面') + ' 的指令 ' + p.cmdq + ' 待执行', { type: 'warn' });
+                    }
+                }
+                if (p.module) switchModule(p.module);
+                /* 仅带品类的深链（场景页「设备管理直连」）：接入侧开档案，控制侧定位该品类抽检设备 */
+                if (p.kind && DevAccess.byCode(p.kind) && !p.dev && !p.cmdq) {
+                    const kName = DevAccess.nameOf(p.kind);
+                    if (p.module === 'access') {
+                        switchModule('access');
+                        openKind(p.kind);
+                        log('info', '由 ' + (p.from || '外部页面') + ' 深链进入，已打开「' + kName + '」品类接入档案');
+                    } else {
+                        switchModule('control');
+                        const first = devices.filter(function (d) { return kindOf(d) === p.kind; })[0];
+                        if (first) {
+                            fillCtDev(first.id);
+                            log('info', '由 ' + (p.from || '外部页面') + ' 深链进入，控制工作台已定位「' + kName + '」抽检设备 ' + first.id);
+                            document.getElementById('ct-workbench').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            log('warn', '由 ' + (p.from || '外部页面') + ' 深链进入：「' + kName + '」暂无抽检建档设备，指令将按品类协议经边缘网关代执行');
+                        }
+                    }
+                }
+            }
+
+            /* ---------- 14d / 14e 初始化与事件绑定 ---------- */
+            acCtrl = SC.table.enhance(document.getElementById('ac-table'), {
+                pageSize: 12, search: '#ac-search', export: '设备接入目录', keyAttr: 'code'
+            });
+            ctCtrl = SC.table.enhance(document.getElementById('ct-queue'), { pageSize: 8, keyAttr: 'id' });
+            renderAcKpi();
+            renderOutlets();
+            renderAcTable();
+            renderAcLog();
+            renderCtKpi();
+            renderCtQueue();
+            renderCtAudit();
+            fillCtDev();
+            publishAccess(true);
+            acEvent('info', '接入模块加载：' + acRows().length + ' 类目录 / ' + devices.length + ' 台抽检建档，供数链路 MQ · HTTP · Flink · 数据交换');
+            document.getElementById('ac-table').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('[data-act]');
+                const tr = ev.target.closest('tr');
+                if (!btn || !tr || !tr.dataset.code) return;
+                if (btn.dataset.act === 'kind') openKind(tr.dataset.code);
+                if (btn.dataset.act === 'pause') togglePause(tr.dataset.code);
+                if (btn.dataset.act === 'trial') openTrial(tr.dataset.code);
+            });
+            document.getElementById('ct-queue').addEventListener('click', function (ev) {
+                const btn = ev.target.closest('[data-act]');
+                const tr = ev.target.closest('tr');
+                if (!btn || !tr || !tr.dataset.id) return;
+                const job = DevAccess.find(tr.dataset.id);
+                if (!job) return;
+                if (btn.dataset.act === 'run') runCtJob(job, function (s, ok) { SC.toast(job.id + (ok ? ' 执行成功' : ' 执行失败：' + (s && s.ack || '')), { type: ok ? 'success' : 'error' }); });
+                if (btn.dataset.act === 'drop') { DevAccess.drop(job.id, '人工取消'); renderCtQueue(); renderCtKpi(); renderCtAudit(); log('warn', '指令 ' + job.id + ' 已取消'); }
+                if (btn.dataset.act === 'dev' && /^DEV-/.test(job.dev || '') && byId(job.dev)) openDetail(job.dev);
+            });
+            document.getElementById('btn-ac-trial').addEventListener('click', function () { openTrial(); });
+            document.getElementById('btn-ac-export').addEventListener('click', exportAccess);
+            document.getElementById('btn-ac-publish').addEventListener('click', function () { publishAccess(false); });
+            document.getElementById('btn-ac-log-clear').addEventListener('click', function () { ac.log = []; renderAcLog(); });
+            document.getElementById('btn-ct-run').addEventListener('click', runCtAll);
+            document.getElementById('ct-send').addEventListener('click', ctSend);
+            document.getElementById('ct-dev').addEventListener('change', fillCtCmd);
+            document.getElementById('ct-cmd').addEventListener('change', renderCmdParams);
+            document.getElementById('ct-pull').addEventListener('click', function () {
+                const d = byId(document.getElementById('ct-dev').value);
+                if (!d) return;
+                const ack = document.getElementById('ct-ack');
+                ack.className = 'ack-box';
+                ack.textContent = '读取 ' + d.id + ' 物模型（' + thingModel(d).length + ' 个测点，协议 ' + d.protocol + '）：\n' + modelPayload(d);
+            });
+            document.getElementById('btn-ct-audit').addEventListener('click', function () {
+                const list = DevAccess.audits(500);
+                SC.csv.download('指令审计_' + SC.today() + '.csv',
+                    [['时间', '操作人', '来源页', '设备', '品类', '指令', '参数', '结果', '回执/事由']]
+                        .concat(list.map(a => [a.t, a.by, a.from, a.dev, a.kind, DevAccess.cmdMeta(a.cmd).label, JSON.stringify(a.params || {}), a.res, a.note])));
+                SC.toast('已导出 ' + list.length + ' 条指令审计', { type: 'success' });
+            });
+            document.getElementById('ct-auto').addEventListener('click', function () {
+                ct.auto = !ct.auto;
+                this.classList.toggle('on', ct.auto);
+                renderCtKpi();
+                log('info', '跨页指令自动执行已' + (ct.auto ? '开启' : '暂停'));
+            });
+            document.getElementById('ct-auto').classList.toggle('on', ct.auto);
+            setTimeout(applyEntry, 260);
+
+            /* =====================================================================
                15. 实时仿真
                ===================================================================== */
             mon.writeRate = mon.real[mon.real.length - 1].v.reduce((a, b) => a + b, 0) * 3600 / 10000;
@@ -4612,6 +5526,14 @@
                     if (tickCount % 4 === 0) renderStTable();
                     updatePlayerBar();
                     drawPlayer();
+                }
+                /* 设备接入快照与跨页指令队列推进 */
+                DevAccess.beat();
+                if (tickCount % 10 === 0) publishAccess(true);
+                ctTick();
+                if (document.getElementById('access-module').classList.contains('active') && tickCount % 6 === 0) {
+                    renderAcKpi();
+                    renderAcChart();
                 }
                 document.getElementById('gauge-time').textContent = '采样于 ' + SC.stamp(new Date());
             }
@@ -4985,6 +5907,8 @@
                         const m = btn.dataset.module;
                         if (m === 'heartbeat') { renderHbKpi(); renderHbWall(); renderHbCharts(); renderHbTable(); renderHbLog(); renderBackfill(); }
                         if (m === 'stream') { renderStKpi(); renderStTable(); renderStCharts(); paintTail(); paintPlayerKv(); updatePlayerBar(); drawPlayer(); }
+                        if (m === 'access') { renderAcKpi(); renderOutlets(); renderAcTable(); renderAcChart(); renderAcLog(); }
+                        if (m === 'control') { renderCtKpi(); renderCtQueue(); renderCtAudit(); }
                         if (m === 'data-monitor') { renderTpChart(); updateGauges(); renderStore(); renderDq(); renderPipe(false); }
                         if (m === 'data-analysis') switchScope(document.querySelector('#an-scope button.active').dataset.scope);
                     }, 30);

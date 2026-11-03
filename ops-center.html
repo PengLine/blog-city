@@ -524,7 +524,7 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                <div class="sc-hint" style="margin-top:10px">点击行查看设备档案与诊断历史；「诊断」执行远程自检，可下发自愈指令或生成维修工单。</div>
+                <div class="sc-hint" style="margin-top:10px">点击行查看设备档案与诊断历史；「诊断」执行远程自检，可生成维修工单。复位等下发类动作不在本页直连设备，统一提交设备管理页执行并回写回执。</div>
             </div>
 
             <div class="sc-panel" style="margin-top:18px">
@@ -684,6 +684,8 @@
     <script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/device-catalog.js"></script>
+    <script src="assets/js/device-access.js"></script>
     <script>
         /* ==========================================================================
            运维中心运行时：总览 / 服务健康 / 设备运维 / 告警中心 / 变更值班
@@ -912,35 +914,30 @@
 
             /* ==========================================================================
                4. 设备运维：类型台账 + 末端设备清单
-               口径与数据中台「末端设备接入清单」、设备数据页设备类型一致（共 23 类 / 978,542 台，按杭州市域体量估算）
+               名称 / 接入方式 / 在册数量取自共享目录口径源 assets/js/device-catalog.js
+               （与设备管理页接入快照、数据中台接入清单同源，共 23 类 / 978,542 台）；
+               本页只补运维侧独有的主色、接入方式族与抽检样本数
                列义：编码 / 名称 / 接入方式 / 在册数量 / 主色 / 接入方式族 / 抽检样本数
-               新类别必须追加到末尾：样本 id 与随机流均依赖行序，插入会打乱已有设备编号
+               新类别必须追加到 OC_ORDER 末尾：样本 id 与随机流均依赖行序，插入会打乱已有设备编号
                ========================================================================== */
-            const KIND_DEF = [
-                ['CAM', '视频监控球机', 'GB28181 直连', 62000, BLUE, '视频 AI 抓拍', 6],
-                ['MNH', '智能井盖探测器', 'NB-IoT', 92800, ACCENT, 'IoT 遥测', 6],
-                ['WLV', '管网水位计', 'NB-IoT', 9400, GREEN, 'IoT 遥测', 6],
-                ['LTC', '路灯单灯控制器', 'LoRa', 512600, AMBER, '控制下发', 6],
-                ['GPS', '车载定位终端', '4G Cat.1', 318, PURPLE, '车载与船载', 6],
-                ['MKR', '地磁车检器', 'Sub-1G', 86400, RED, 'IoT 遥测', 6],
-                ['STR', '桥隧应变计', '光纤光栅', 1860, '#00b4d8', 'IoT 遥测', 6],
-                ['MET', '区域气象站', '4G', 586, GRAY, 'IoT 遥测', 4],
-                ['SPR', '枪机半球抓拍一体机', 'ONVIF + 边缘 AI', 31500, '#5c7cfa', '视频 AI 抓拍', 4],
-                ['DME', '卡口电子警察', 'GB28181 + 识别服务', 12800, '#4c6ef5', '视频 AI 抓拍', 4],
-                ['AUT', '人证核验一体机', 'HTTP SDK 推送', 4260, '#f783ac', '人员与场所终端', 4],
-                ['WBC', '智能手环', 'BLE 网关 + MQTT', 26400, '#ff922b', '人员与场所终端', 4],
-                ['PAT', '电子巡更仪', '4G + NFC 打点', 18600, '#845ef7', '人员与场所终端', 4],
-                ['LVL', '低洼水位计', 'NB-IoT / CoAP', 8600, '#20c997', 'IoT 遥测', 4],
-                ['RLV', '雷达液位计', 'NB-IoT', 2480, '#38d9a9', 'IoT 遥测', 4],
-                ['ULV', '超声波液位计', 'MQTT / 4G', 1860, '#63e6be', 'IoT 遥测', 4],
-                ['HYD', '智能消防栓终端', 'NB-IoT', 28600, '#e03131', 'IoT 遥测', 4],
-                ['GAS', '燃气管网探测终端', 'Modbus 网关', 9800, '#c92a2a', 'IoT 遥测', 4],
-                ['INC', '焚烧炉 CEMS 监测站', 'Modbus TCP', 96, '#f59f00', 'IoT 遥测', 4],
-                ['BIN', '智能果壳箱', 'NB-IoT', 62400, '#74b816', 'IoT 遥测', 4],
-                ['RCY', '回收站称重一体机', 'HTTP + 地磅网关', 4860, '#94d82d', '人员与场所终端', 4],
-                ['SVW', '环卫作业车终端', '4G / 5G + MQ', 286, '#7048e8', '车载与船载', 4],
-                ['SHP', '运输船智能终端', 'AIS / 北斗终端', 36, '#4263eb', '车载与船载', 4]
-            ];
+            const OC_ORDER = ['CAM', 'MNH', 'WLV', 'LTC', 'GPS', 'MKR', 'STR', 'MET', 'SPR', 'DME',
+                'AUT', 'WBC', 'PAT', 'LVL', 'RLV', 'ULV', 'HYD', 'GAS', 'INC', 'BIN', 'RCY', 'SVW', 'SHP'];
+            const OC_KIND_META = {
+                CAM: [BLUE, '视频 AI 抓拍', 6], MNH: [ACCENT, 'IoT 遥测', 6], WLV: [GREEN, 'IoT 遥测', 6],
+                LTC: [AMBER, '控制下发', 6], GPS: [PURPLE, '车载与船载', 6], MKR: [RED, 'IoT 遥测', 6],
+                STR: ['#00b4d8', 'IoT 遥测', 6], MET: [GRAY, 'IoT 遥测', 4], SPR: ['#5c7cfa', '视频 AI 抓拍', 4],
+                DME: ['#4c6ef5', '视频 AI 抓拍', 4], AUT: ['#f783ac', '人员与场所终端', 4],
+                WBC: ['#ff922b', '人员与场所终端', 4], PAT: ['#845ef7', '人员与场所终端', 4],
+                LVL: ['#20c997', 'IoT 遥测', 4], RLV: ['#38d9a9', 'IoT 遥测', 4], ULV: ['#63e6be', 'IoT 遥测', 4],
+                HYD: ['#e03131', 'IoT 遥测', 4], GAS: ['#c92a2a', 'IoT 遥测', 4], INC: ['#f59f00', 'IoT 遥测', 4],
+                BIN: ['#74b816', 'IoT 遥测', 4], RCY: ['#94d82d', '人员与场所终端', 4],
+                SVW: ['#7048e8', '车载与船载', 4], SHP: ['#4263eb', '车载与船载', 4]
+            };
+            const KIND_DEF = OC_ORDER.map(function (code) {
+                const k = DevAccess.byCode(code);
+                const m = OC_KIND_META[code];
+                return [code, k[1], k[3], k[4], m[0], m[1], m[2]];
+            });
             /* 电池供电类型：决定抽检样本是否需要电量与低电预警 */
             const BAT_KIND = { MNH: 1, LTC: 1, MKR: 1, WLV: 1, WBC: 1, PAT: 1, LVL: 1, RLV: 1, ULV: 1, HYD: 1, BIN: 1 };
             const DEV_TOTAL = KIND_DEF.reduce(function (a, k) { return a + k[3]; }, 0);
@@ -1998,15 +1995,31 @@
                 renderDevice();
             }
 
+            /* 运维侧不再直连设备：复位等控制动作统一提交设备管理页执行，回写后再改本页样本态 */
             function devReset(id) {
                 const d = devById(id);
                 if (!d) return;
-                patchDev(id, { status: '在线', sig: Math.max(62, d.sig || 40) + 34, last: Date.now(), batt: Math.max(d.batt, 46) });
-                note('ok', '设备 ' + id + ' 远程复位成功，心跳已恢复（信号 ' + Math.min(99, (d.sig || 40) + 34) + '%）');
-                SC.toast('复位指令已下发，设备重新上线', { type: 'success' });
+                const job = DevAccess.submit({
+                    dev: id, devName: d.kind + ' ' + d.point, kind: d.pfx, cmd: 'reboot',
+                    params: { delay_s: 0 }, reason: '运维中心对 ' + id + ' 发起远程复位（' + d.status + '）', by: '运维值班席'
+                }, function (done, err) {
+                    if (done && done.state === '成功') {
+                        patchDev(id, { status: '在线', sig: Math.min(99, (d.sig || 40) + 34), last: Date.now(), batt: Math.max(d.batt, 46) });
+                        note('ok', '设备 ' + id + ' 经设备管理页复位成功（指令 ' + done.id + '，' + done.ack + '）');
+                        SC.toast('复位回执正常，设备重新上线', { type: 'success' });
+                    } else {
+                        note('alarm', '设备 ' + id + ' 复位未成功：' + (err || (done && done.ack) || '无回执') + '，已转现场检修');
+                        patchDev(id, { status: '离线' });
+                        SC.toast('设备管理页回执失败：' + (err || (done && done.ack) || '超时未回执'), { type: 'error' });
+                    }
+                    renderDevice();
+                    renderLive();
+                    renderOverview();
+                });
+                if (job.error) { SC.toast(job.error, { type: 'warn' }); return; }
+                note('info', '复位指令 ' + job.id + ' 已提交设备管理页直连下发，等待设备回执…');
+                SC.toast('指令已提交设备管理页执行', { type: 'info' });
                 renderDevice();
-                renderLive();
-                renderOverview();
             }
 
             function ticketFor(id) {
@@ -2144,10 +2157,16 @@
                     { text: '🔍 远程诊断', kind: 'primary', run: function () { devDiag(id); } },
                     { text: '♻ 远程复位', kind: 'danger', run: function () { devReset(id); } },
                     { text: '🧾 生成工单', kind: '', run: function () { ticketFor(id); } },
+                    {
+                        text: '🎮 设备管理直连交互', kind: '', href: DevAccess.consoleHref({
+                            module: 'control', kind: (devById(id) || {}).pfx, from: 'ops-center.html'
+                        })
+                    },
                     { text: '关闭', kind: 'ghost' }
                 ].forEach(function (cfg) {
                     const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
                     btn.addEventListener('click', function () {
+                        if (cfg.href) { location.href = cfg.href; return; }
                         if (!cfg.run) { api.close(); return; }
                         cfg.run();
                         /* 动作会弹自己的结果窗并刷新列表，关掉当前档案窗避免展示旧状态 */

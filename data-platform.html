@@ -435,9 +435,9 @@
             <div class="sc-panel" style="margin-top:18px">
                 <div class="sc-panel-title">
                     <h3>🔧 末端设备接入清单</h3>
-                    <span class="sc-hint">按设备类型约定在册数量与上报口径，点击行查看物模型与报文样例</span>
+                    <span class="sc-hint" id="dev-src-hint">只读消费设备管理页发布的接入快照：在册数量与上报口径同源，暂停采集、联调试采与指令下发请前往设备管理</span>
                     <div class="sc-inline">
-                        <button class="sc-btn sm" id="btn-dev-trial">▶ 批量试采</button>
+                        <button class="sc-btn sm" id="btn-dev-console">🔌 前往设备管理接入</button>
                         <button class="sc-btn ghost sm" id="btn-dev-export">⬇ 导出目录</button>
                     </div>
                 </div>
@@ -685,6 +685,8 @@
     <script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/device-catalog.js"></script>
+    <script src="assets/js/device-access.js"></script>
     <script>
         /* ==========================================================================
            数据中台运行时：总览 / 采集通道 / 清洗整编 / 存储治理 / 数据服务
@@ -718,10 +720,10 @@
                ========================================================================== */
             let ST = SC.store.get(NS, 'state', null);
             if (!ST || ST.ver !== DP_VER) {
-                ST = { ver: DP_VER, chans: [], off: {}, live: {}, devk: {}, rules: {}, jobs: {}, archived: [], grants: [], pushes: [], checks: 0 };
+                ST = { ver: DP_VER, chans: [], off: {}, live: {}, rules: {}, jobs: {}, archived: [], grants: [], pushes: [], checks: 0 };
             }
-            ['chans', 'off', 'live', 'devk', 'rules', 'jobs', 'archived', 'grants', 'pushes'].forEach(function (k) {
-                if (!ST[k]) ST[k] = (k === 'off' || k === 'live' || k === 'devk' || k === 'rules' || k === 'jobs') ? {} : [];
+            ['chans', 'off', 'live', 'rules', 'jobs', 'archived', 'grants', 'pushes'].forEach(function (k) {
+                if (!ST[k]) ST[k] = (k === 'off' || k === 'live' || k === 'rules' || k === 'jobs') ? {} : [];
             });
             function saveST() { SC.store.set(NS, 'state', ST); }
             /* 运行态覆写（试采 / 巡检结果），与基线种子合并，不污染原始数据 */
@@ -812,38 +814,28 @@
             }
 
             /* ==========================================================================
-               2b. 末端设备接入目录（与运维中心设备台账、设备数据页设备类型共用一套口径）
+               2b. 末端设备接入目录（只读消费设备管理页发布的接入快照）
+               --------------------------------------------------------------------------
+               品类、在册数量、接入方式与上报频率的唯一口径源是 assets/js/device-catalog.js
+               （DevCatalog.KINDS，23 类 / 978,542 台），接入状态由 equipment-data.html 的
+               「设备接入」模块经 DevAccess 发布；本页只补充中台侧的入湖落点两列，
+               不再自持设备清单，也不再执行暂停采集与入网联调。
                ========================================================================== */
             const DEV_VENDORS = ['海康威视', '大华股份', '浙江宇视', '华为物联', '三川智慧', '新天科技', '本地集成商', '先河环保'];
-            /* 编码 / 名称 / 分类 / 接入方式 / 在册数量 / 上报频率 / 关联通道 / 通道分摊比（兜底） / 业务口径 / 归属域
-               在册数量按杭州市域体量口径估算（13 个区县、约 1.68 万 km²、1240 万人）：视频感知三类合计 10.63 万、
-               路灯单灯控制器 51.26 万、智能果壳箱 6.24 万、液位水位四类 2.23 万、环卫作业车 286 台 / 运输船 36 艘，
-               全市 23 类在册合计 978,542 台；单台日均入湖条数见 DEV_PER */
-            const DEV_SEED = [
-                ['CAM', '视频监控球机', '视频感知', 'GB28181 直连', 62000, '事件触发', 'CH-15', 0.72, '人员、车辆与商家门店前秩序抓拍', '街面'],
-                ['SPR', '枪机半球抓拍一体机', '视频感知', 'ONVIF + 边缘 AI', 31500, '事件触发', 'CH-15', 0.28, '重点部位定点抓拍、商家经营行为识别', '街面'],
-                ['DME', '卡口电子警察', '视频感知', 'GB28181 + 识别服务', 12800, '1 秒', 'CH-16', 1, '过车与车牌识别、违法取证', '街面'],
-                ['AUT', '人证核验一体机', '公共服务终端', 'HTTP SDK 推送', 4260, '实时', 'CH-17', 1, '信息采集、人证比对与访客登记', '公共服务'],
-                ['WBC', '智能手环', '人员穿戴', 'BLE 网关 + MQTT', 26400, '5 秒', 'CH-18', 1, '作业人员定位、越界与 SOS 告警', '城管'],
-                ['PAT', '电子巡更仪', '人员作业', '4G + NFC 打点', 18600, '实时', 'CH-29', 1, '到岗记录与巡查轨迹', '城管'],
-                ['GPS', '车载定位终端', '移动载具', '4G Cat.1', 318, '5 秒', 'CH-03', 0.62, '执法车辆定位轨迹（MQ → Flink → 告警）', '街面'],
-                ['SVW', '环卫作业车终端', '移动载具', '4G / 5G + MQ', 286, '5 秒', 'CH-03', 0.38, '垃圾收运与运输轨迹、车载满溢状态', '环卫'],
-                ['SHP', '运输船智能终端', '移动载具', 'AIS / 北斗 + 载重', 36, '10 秒', 'CH-19', 1, '垃圾运输航线、载重与进出港上报', '环卫'],
-                ['LVL', '低洼水位计', '水务感知', 'NB-IoT / CoAP', 8600, '15 秒', 'CH-20', 1, '下立交与低洼处积水水位、内涝预警', '排水'],
-                ['WLV', '管网水位计', '水务感知', 'NB-IoT', 9400, '15 秒', 'CH-01', 1, '检查井与管网水位监测', '排水'],
-                ['RLV', '雷达液位计', '水务感知', 'NB-IoT', 2480, '5 分钟', 'CH-21', 1, '非接触式液位、泵站前池监测', '排水'],
-                ['ULV', '超声波液位计', '水务感知', 'MQTT / 4G', 1860, '5 分钟', 'CH-22', 1, '调蓄池与河道液位监测', '排水'],
-                ['MNH', '智能井盖探测器', '市政设施', 'NB-IoT', 92800, '10 分钟', 'CH-23', 1, '井盖位移倾覆与井内水位', '市政'],
-                ['HYD', '智能消防栓终端', '市政设施', 'NB-IoT', 28600, '15 分钟', 'CH-24', 1, '水压监测、放水与碰撞告警', '市政'],
-                ['GAS', '燃气管网探测终端', '市政设施', 'Modbus 网关', 9800, '1 分钟', 'CH-25', 1, '压力与可燃气体检测、防止泄漏', '市政'],
-                ['STR', '桥隧应变计', '结构安全', '光纤光栅', 1860, '10 分钟', 'CH-07', 1, '桥梁隧道结构形变监测', '市政'],
-                ['MET', '区域气象站', '环境监测', '4G', 586, '5 分钟', 'CH-09', 1, '雨量风速与气象预警联动', '排水'],
-                ['INC', '焚烧炉 CEMS 监测站', '环保设施', 'Modbus TCP', 96, '1 分钟', 'CH-26', 1, '烟气气体与排放检测、达标核算', '环卫'],
-                ['BIN', '智能果壳箱', '环卫设施', 'NB-IoT', 62400, '30 分钟', 'CH-27', 1, '满溢状态与开盖计数', '环卫'],
-                ['RCY', '回收站称重一体机', '环卫设施', 'HTTP + 地磅网关', 4860, '每单实时', 'CH-28', 1, '站点数据与分类称重计量', '环卫'],
-                ['LTC', '路灯单灯控制器', '照明控制', 'LoRa', 512600, '1 分钟', 'CH-02', 1, '单灯开关调光控制与故障回传', '照明'],
-                ['MKR', '地磁车检器', '交通感知', 'Sub-1G', 86400, '1 分钟', 'CH-05', 1, '泊位占用检测与周转统计', '停车']
-            ];
+            /* 中台侧独有口径：品类 → [入湖采集通道, 通道分摊比（未约定单台入湖量时的兜底）] */
+            const DP_DEV_LAKE = {
+                CAM: ['CH-15', 0.72], SPR: ['CH-15', 0.28], DME: ['CH-16', 1], AUT: ['CH-17', 1],
+                WBC: ['CH-18', 1], PAT: ['CH-29', 1], GPS: ['CH-03', 0.62], SVW: ['CH-03', 0.38],
+                SHP: ['CH-19', 1], LVL: ['CH-20', 1], WLV: ['CH-01', 1], RLV: ['CH-21', 1],
+                ULV: ['CH-22', 1], MNH: ['CH-23', 1], HYD: ['CH-24', 1], GAS: ['CH-25', 1],
+                STR: ['CH-07', 1], MET: ['CH-09', 1], INC: ['CH-26', 1], BIN: ['CH-27', 1],
+                RCY: ['CH-28', 1], LTC: ['CH-02', 1], MKR: ['CH-05', 1]
+            };
+            /* 由目录口径派生：[编码, 名称, 分类, 接入方式, 在册数量, 上报频率, 通道, 分摊比, 业务口径, 归属域] */
+            const DEV_SEED = DevCatalog.KINDS.map(function (k) {
+                const lake = DP_DEV_LAKE[k[0]] || ['CH-01', 1];
+                return [k[0], k[1], k[2], k[3], k[4], k[5], lake[0], lake[1], k[7], k[6]];
+            });
 
             /* 单台日均入湖条数（入湖口径）：高频遥测在边缘网关按分钟级聚合、事件型只计有效抓拍，
                故一般小于原始上报次数；采集通道的日入湖行数即由此推导，保证「在册数量 × 频率」与流量自洽 */
@@ -979,8 +971,17 @@
             });
             const DEVK_TAG = { '正常': 'ok', '缺报偏多': 'warn', '暂停接入': 'off' };
 
-            /** 设备目录运行态：基线种子叠加本地存档里的暂停 / 试采结果，不污染种子 */
+            /** 设备管理页发布的接入快照：接入状态、抽检建档与试采结论以它为准，本页只读 */
+            function accessSnapshot() {
+                const snap = DevAccess.snapshot();
+                const map = {};
+                if (snap && snap.kinds) snap.kinds.forEach(function (k) { map[k.code] = k; });
+                return { ts: snap ? snap.ts : 0, page: snap ? snap.page : '', byCode: map };
+            }
+
+            /** 设备目录运行态：目录口径 + 本页入湖落点，叠加设备管理页快照的接入实测 */
             function devKindList() {
+                const snap = accessSnapshot();
                 return DEV_KINDS.map(function (d) {
                     const ch = chanById(d.ch) || { kind: 'IoT 消息', name: d.ch, rows: 0, status: '正常' };
                     const out = Object.assign({}, d, {
@@ -988,13 +989,17 @@
                         /* 优先按「在册数量 × 单台日均入湖」精确推导，避免分摊比取整带来的口径误差；
                            未约定入湖口径的设备类型仍按通道分摊比折算 */
                         daily: d.per ? d.count * d.per : Math.round(ch.rows * d.share),
-                        status: d.online < 94 ? '缺报偏多' : '正常'
+                        status: d.online < 94 ? '缺报偏多' : '正常',
+                        snapTs: snap.ts
                     });
-                    const o = ST.devk[d.code];
-                    if (!o) return out;
-                    if (o.paused) { out.paused = true; out.status = '暂停接入'; out.online = 0; out.daily = 0; }
-                    if (o.trial) { out.trial = o.trial; out.trialAt = o.trialAt; }
-                    if (o.synced) { out.synced = o.synced; }
+                    const acc = snap.byCode[d.code];
+                    if (acc) {
+                        out.onboard = acc.onboard;
+                        out.topic = acc.topic;
+                        out.trial = acc.trial || null;
+                        if (acc.online != null) out.measured = acc.online;
+                        if (acc.paused) { out.paused = true; out.status = '暂停接入'; out.online = 0; out.daily = 0; }
+                    }
                     return out;
                 });
             }
@@ -1002,10 +1007,6 @@
                 const list = devKindList();
                 for (let i = 0; i < list.length; i++) { if (list[i].code === code) return list[i]; }
                 return null;
-            }
-            function patchDevKind(code, patch) {
-                ST.devk[code] = Object.assign({}, ST.devk[code] || {}, patch);
-                saveST();
             }
 
             /* 字段映射：按通道 id 稳定生成 */
@@ -1644,19 +1645,29 @@
                     '<td>' + SC.esc(d.freq) + '</td>' +
                     '<td><span class="mono">' + d.ch + '</span><div class="sc-hint" style="font-size:.78em">' + SC.esc(d.chName) + '</div></td>' +
                     '<td>' + (d.daily ? SC.num(d.daily / 10000, 1) + ' 万条' : '-') + '</td>' +
-                    '<td>' + SC.pct(d.online, 1) + '</td>' +
+                    '<td>' + SC.pct(d.online, 1) + (d.measured != null ?
+                        '<div class="sc-hint" style="font-size:.78em">抽检 ' + d.onboard + ' 台实测 ' + SC.pct(d.measured, 1) + '</div>' : '') + '</td>' +
                     '<td>' + tag(d.status, DEVK_TAG[d.status] || 'info') +
-                    (d.trial ? '<div class="sc-hint" style="font-size:.78em">试采：' + SC.esc(d.trial) + '</div>' : '') + '</td>' +
+                    (d.trial ? '<div class="sc-hint" style="font-size:.78em">联调试采：' + SC.esc(d.trial) + '</div>' : '') + '</td>' +
                     '<td><span class="sc-hint" style="font-size:.86em">' + SC.esc(d.biz) + '</span></td>' +
                     '<td>' + SC.esc(d.domain) + '</td>' +
-                    '<td><button class="sc-btn sm ' + (d.paused ? 'primary' : 'ghost') + '" data-act="pause" data-code="' + d.code + '">' +
-                    (d.paused ? '恢复' : '暂停') + '</button></td></tr>';
+                    '<td><button class="sc-btn sm ghost" data-act="access" data-code="' + d.code + '">🔌 接入操作</button></td></tr>';
             }
 
             function renderDevKinds() {
                 const el = q('#dev-table');
                 if (!el) return;
                 const list = devKindList();
+                const snap = accessSnapshot();
+                const hint = q('#dev-src-hint');
+                if (hint) {
+                    const paused = list.filter(function (d) { return d.paused; }).length;
+                    hint.textContent = (snap.ts
+                        ? '只读消费设备管理页（' + snap.page + '）' + SC.stamp(snap.ts) + ' 发布的接入快照'
+                        : '尚未收到设备管理页接入快照，按目录口径展示') +
+                        '；当前 ' + list.length + ' 类在册，' + (paused ? paused + ' 类已被暂停采集' : '全部采集正常') +
+                        '，暂停采集与联调试采请前往设备管理';
+                }
                 const domains = [];
                 list.forEach(function (d) { if (domains.indexOf(d.domain) < 0) domains.push(d.domain); });
                 put('#dev-chips', '<span class="sc-chip' + (devDom === '' ? ' active' : '') + '" data-dom="">全部 ' +
@@ -1704,8 +1715,13 @@
                         ['低电告警数', cur.lowbat ? cur.lowbat + ' 台' : '市电供电'],
                         ['故障在修', cur.fault + ' 台'],
                         ['主力厂商', SC.esc(cur.vendor)],
-                        ['接入时长', Math.round((Date.now() - cur.since) / DAY) + ' 天']
+                        ['接入时长', Math.round((Date.now() - cur.since) / DAY) + ' 天'],
+                        ['设备管理抽检建档', cur.onboard != null ? cur.onboard + ' 台' : '快照未含'],
+                        ['入网主题', cur.topic ? '<span class="mono">' + SC.esc(cur.topic) + '</span>' : '—'],
+                        ['联调试采结论', cur.trial ? SC.esc(cur.trial) : '设备管理页尚未试采']
                     ]) + '</div>' +
+                        '<div class="sc-note">本档案的设备清单、在册数量与接入状态来自设备管理页（equipment-data.html）发布的接入快照，' +
+                        '本页只做入湖映射与质量核算；暂停采集、联调试采与远程下发指令统一在设备管理页完成。</div>' +
                         '<div class="sc-section-title">业务口径</div>' +
                         '<div class="sc-hint">' + SC.esc(cur.biz) + '（归属 ' + SC.esc(cur.domain) + ' 域，数据落库 ' +
                         SC.esc((chanById(cur.ch) || { table: '-' }).table) + '）</div>' +
@@ -1733,10 +1749,8 @@
                 }
                 api.footer.innerHTML = '';
                 [
-                    { text: '▶ 本类试采', kind: 'primary', run: function (done) { trialDevKinds([code], done); } },
                     {
-                        text: d.paused ? '▶ 恢复接入' : '⏸ 暂停接入', kind: d.paused ? 'primary' : 'danger',
-                        run: function (done) { setDevKindPause(code, done); }
+                        text: '🔌 到设备管理接入档案', kind: 'primary', href: DevAccess.consoleHref({ module: 'access', kind: code })
                     },
                     { text: '📥 采集通道', kind: '', run: function () { api.close(); openChannel(d.ch); } },
                     {
@@ -1749,102 +1763,11 @@
                 ].forEach(function (cfg) {
                     const btn = SC.el('<button class="sc-btn ' + (cfg.kind || '') + '">' + SC.esc(cfg.text) + '</button>');
                     btn.addEventListener('click', function () {
+                        if (cfg.href) { location.href = cfg.href; return; }
                         if (!cfg.run) { api.close(); return; }
-                        /* 暂停 / 试采是异步确认的，完成回调里再关档案窗，避免展示旧状态 */
                         cfg.run(function () { api.close(); });
                     });
                     api.footer.appendChild(btn);
-                });
-            }
-
-            function setDevKindPause(code, done) {
-                const d = devKindByCode(code);
-                if (!d) return;
-                if (d.paused) {
-                    patchDevKind(code, { paused: false });
-                    renderCollect();
-                    renderLive();
-                    note('ok', '设备类型「' + d.name + '」已恢复接入，通道 ' + d.ch + ' 继续入湖');
-                    SC.toast('已恢复接入：' + d.name, { type: 'success' });
-                    if (done) done();
-                    return;
-                }
-                SC.modal.confirm({
-                    title: '确认暂停设备接入',
-                    html: '暂停后 <b>' + SC.esc(d.name) + '</b>（在册 ' + SC.num(d.count) + ' 台）的上报不再写入 ' +
-                        '<span class="mono">' + SC.esc(d.chName) + '</span> 目标表，<b>不影响同一通道上其他设备类型</b>。',
-                    okText: '确认暂停', danger: true
-                }).then(function (ok) {
-                    if (!ok) { if (done) done(); return; }
-                    patchDevKind(code, { paused: true });
-                    renderCollect();
-                    renderLive();
-                    note('warn', '设备类型「' + d.name + '」已暂停接入，昨日上报 ' + SC.num(d.daily / 10000, 1) + ' 万条不再入湖');
-                    SC.toast('已暂停接入：' + d.name, { type: 'warn' });
-                    if (done) done();
-                });
-            }
-
-            /** 批量试采：codes 为空时弹勾选框，从设备详情窗传入单类则直接跑 */
-            function trialDevKinds(codes, done) {
-                const avail = devKindList().filter(function (d) { return !d.paused; });
-                if (!avail.length) { SC.toast('全部设备类型已暂停接入，无法发起试采', { type: 'warn' }); return; }
-                if (codes && codes.length) { runTrial(codes, 100, true); if (done) done(); return; }
-                SC.modal.form({
-                    title: '▶ 末端设备批量试采', submitText: '开始试采', size: 'lg',
-                    fields: [
-                        {
-                            type: 'static', col: 1,
-                            html: '<div class="sc-note">试采按各类设备上报频率抽取样本报文，校验物模型字段、量纲与字典映射；结论写入接入档案，不覆盖正式目标表。</div>'
-                        },
-                        {
-                            name: 'kinds', label: '试采设备类型', type: 'checkgroup', full: true, required: true,
-                            options: function () {
-                                return avail.map(function (d) {
-                                    return { value: d.code, label: d.name + '（' + d.code + ' · 在册 ' + SC.num(d.count) + ' 台）' };
-                                });
-                            }
-                        },
-                        { name: 'n', label: '每类抽取报文数', type: 'number', min: 10, max: 500, step: 10, value: 100, col: 1 },
-                        { name: 'strict', label: '字典与量纲校验', type: 'switch', onText: '严格校验', value: true, col: 1 }
-                    ]
-                }).then(function (v) {
-                    if (!v) return;
-                    if (!(v.kinds || []).length) { SC.toast('请至少勾选一类设备', { type: 'error' }); return; }
-                    runTrial(v.kinds, v.n, v.strict);
-                });
-            }
-
-            function runTrial(codes, n, strict) {
-                const rows = [];
-                codes.forEach(function (code) {
-                    const d = devKindByCode(code);
-                    if (!d) return;
-                    resetSeed(hashSeed(code + '#trial'));
-                    const got = Math.max(10, Math.min(n, d.count));
-                    const miss = sri(0, Math.max(1, Math.round(got * 0.04)));
-                    const bad = strict ? sri(0, 3) : sri(0, 1);
-                    const verdict = miss / got > 0.03 ? '缺报偏高' : (bad > 0 ? '字段待补' : '校验通过');
-                    patchDevKind(code, { trial: verdict, trialAt: Date.now(), synced: got, paused: false });
-                    rows.push({ name: d.name, code: code, got: got, ok: got - miss - bad, miss: miss, bad: bad, verdict: verdict, field: d.model.f.length });
-                });
-                if (!rows.length) return;
-                renderCollect();
-                renderLive();
-                note('ok', '末端设备试采完成：' + rows.length + ' 类，抽取报文 ' +
-                    SC.num(rows.reduce(function (a, r) { return a + r.got; }, 0)) + ' 条');
-                SC.toast('试采完成，' + rows.length + ' 类设备已回写接入档案', { type: 'success' });
-                SC.modal.open({
-                    title: '✅ 试采结果 · ' + SC.stamp(new Date(), true), size: 'lg',
-                    body: '<div class="data-table-container"><table class="data-table"><thead><tr>' +
-                        '<th>设备类型</th><th>编码</th><th>物模型字段</th><th>抽取报文</th><th>校验通过</th><th>缺报</th><th>字段异常</th><th>结论</th>' +
-                        '</tr></thead><tbody>' + rows.map(function (r) {
-                            return '<tr><td>' + SC.esc(r.name) + '</td><td class="mono">' + r.code + '</td><td>' + r.field + '</td><td>' +
-                                SC.num(r.got) + '</td><td>' + SC.num(r.ok) + '</td><td>' + r.miss + '</td><td>' + r.bad + '</td><td>' +
-                                tag(r.verdict, r.verdict === '校验通过' ? 'ok' : 'warn') + '</td></tr>';
-                        }).join('') + '</tbody></table></div>' +
-                        '<div class="sc-hint">结论已回写至设备接入清单的“状态”列；如结论为缺报偏高，建议先核对现场供电与网络信号。</div>',
-                    footer: [{ text: '知道了', kind: 'primary' }]
                 });
             }
 
@@ -2974,9 +2897,11 @@
                     });
                 }
                 bindTable('#dev-table', function (code) { openDevKind(code); }, function (act, data) {
-                    if (act === 'pause') setDevKindPause(data.code);
+                    if (act === 'access') location.href = DevAccess.consoleHref({ module: 'access', kind: data.code });
                 });
-                if (q('#btn-dev-trial')) q('#btn-dev-trial').addEventListener('click', function () { trialDevKinds(); });
+                if (q('#btn-dev-console')) q('#btn-dev-console').addEventListener('click', function () {
+                    location.href = DevAccess.consoleHref({ module: 'access' });
+                });
                 if (q('#btn-dev-export')) q('#btn-dev-export').addEventListener('click', exportDevCatalog);
 
                 /* 整编 */
