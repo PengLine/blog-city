@@ -1576,7 +1576,8 @@
     <script src="assets/js/common.js"></script>
     <script src="assets/js/arch-link.js"></script>
     <script src="assets/js/device-catalog.js"></script>
-    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/device-access.js"></script>
+<script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
     <script>
         /* ==================================================================
@@ -1821,11 +1822,10 @@
                 const footer = [
                     { text: '关闭', kind: 'ghost' },
                     {
-                        text: s.run > 0 ? '全部停机' : '全部开机', kind: '', onClick: function () {
-                            s.run = s.run > 0 ? 0 : s.pumps - s.fault;
-                            log('info', s.name + ' 手动' + (s.run > 0 ? '开启 ' + s.run + ' 台机组' : '停机检修'));
-                            SC.toast(s.name + (s.run > 0 ? ' 已开机 ' + s.run + ' 台' : ' 已停机'), { type: 'success' });
-                            renderAll();
+                        text: s.run > 0 ? '全部停机' : '全部开机', kind: '', onClick: function (api) {
+                            const want = s.run > 0 ? 0 : s.pumps - s.fault;
+                            api.close();
+                            pumpCmd(s, want, (want > 0 ? '增开至 ' : '减停至 ') + want + ' 台机组（人工调度）');
                         }
                     },
                     {
@@ -1839,12 +1839,20 @@
                             if (st <= s.warn) {
                                 SC.toast('启泵水位过低，警戒水位以下就开机将浪费能耗', { type: 'warn' });
                             }
-                            s.start = st;
-                            s.stop = sp;
-                            log('info', s.name + ' 联锁阈值更新为启泵 ' + st.toFixed(2) + ' m / 停泵 ' + sp.toFixed(2) + ' m');
                             api.close();
-                            renderAll();
-                            renderPumpTable();
+                            pumpCmd(s, null, '联锁阈值更新为启泵 ' + st.toFixed(2) + ' m / 停泵 ' + sp.toFixed(2) + ' m',
+                                { start_m: st, stop_m: sp }, function () {
+                                    s.start = st;
+                                    s.stop = sp;
+                                    log('info', s.name + ' 联锁阈值经设备管理页下发现场控制柜，回执正常');
+                                    renderAll();
+                                    renderPumpTable();
+                                });
+                        }
+                    },
+                    {
+                        text: '🎮 设备管理直连交互', kind: '', onClick: function () {
+                            location.href = DevAccess.consoleHref({ module: 'control', kind: 'LVL', dev: s.id, from: 'smart-drainage.html' });
                         }
                     }
                 ];
@@ -1854,6 +1862,38 @@
                     labels: hist.map((_, i) => (hist.length - i) * -1 + ' 分'), unit: ' m', xEvery: 20,
                     thresholds: [{ value: s.warn, label: '警戒', color: '#f39c12' }, { value: s.danger, label: '保证', color: '#e74c3c' }],
                     series: [{ name: s.name + ' 液位', data: hist, color: '#0077b6' }]
+                });
+            }
+
+            /** 排水侧唯一的设备下发出口：机组启停与联锁阈值都提交设备管理页执行，回执到齐后才回写本页工况 */
+            function pumpCmd(s, want, reason, th, onOk) {
+                const jobs = [];
+                if (th) {
+                    jobs.push({ cmd: 'threshold', unit: 0, params: { start_m: th.start_m, stop_m: th.stop_m } });
+                } else if (want > s.run) {
+                    for (let i = s.run + 1; i <= want; i++) jobs.push({ cmd: 'pump', unit: i, params: { run: true, unit: i } });
+                } else {
+                    for (let i = s.run; i > want; i--) jobs.push({ cmd: 'pump', unit: i, params: { run: false, unit: i } });
+                }
+                if (!jobs.length) { SC.toast(s.name + ' 目标台数与当前一致，无需下发', { type: 'info' }); return; }
+                let ok = 0, bad = 0, got = 0;
+                SC.toast(s.name + ' 已提交 ' + jobs.length + ' 条指令至设备管理页，等待现场控制柜回执…', { type: 'info' });
+                jobs.forEach(function (j) {
+                    DevAccess.submit({
+                        dev: s.id + (j.unit ? '#' + j.unit : ''), devName: s.name + (j.unit ? ' ' + j.unit + ' 号泵' : ' 联锁参数'),
+                        kind: 'LVL', cmd: j.cmd, params: j.params, reason: '智慧排水页' + reason, by: '排水调度席'
+                    }, function (job, err) {
+                        if (job && job.state === '成功') ok++; else bad++;
+                        got++;
+                        if (got !== jobs.length) return;
+                        if (ok) {
+                            if (!th) s.run = want;
+                            log('info', s.name + '「' + reason + '」设备管理页回执：成功 ' + ok + ' 条' + (bad ? '、失败 ' + bad + ' 条' : ''));
+                            if (onOk) onOk(); else renderAll();
+                        }
+                        SC.toast(ok ? reason + (bad ? '：成功 ' + ok + ' 条 / 失败 ' + bad + ' 条' : '：回执正常，工况已更新')
+                            : reason + '失败：' + (err || '控制柜无应答'), { type: ok && !bad ? 'success' : 'warn', duration: 4200 });
+                    });
                 });
             }
 
@@ -1885,12 +1925,10 @@
                 SC.modal.confirm({ text: '将强制停止全部 25 台机组并解除自动联锁，仅用于检修场景，是否继续？', danger: true, okText: '确认停机' })
                     .then(function (ok) {
                         if (!ok) return;
-                        stations.forEach(s => s.run = 0);
+                        stations.forEach(function (s) { if (s.run > 0) pumpCmd(s, 0, '全站停机检修'); });
                         state.auto = false;
                         document.getElementById('auto-switch').classList.remove('on');
-                        log('warn', '调度台执行全站停机检修，自动联锁已解除');
-                        renderAll();
-                        SC.toast('已下发全站停机指令', { type: 'warn' });
+                        log('warn', '调度台执行全站停机检修，自动联锁已解除（启停指令统一经设备管理页下发现场控制柜）');
                     });
             });
             document.getElementById('sim-speed').addEventListener('click', function (ev) {
@@ -5605,18 +5643,30 @@
                 });
                 recalcLoad(); persistSoon(); refresh();
             }
+            /* 召测不在本页直连设备：批量合并成一条指令交设备管理页执行，回执到再刷新本页工况 */
             function actQuery(label, pool) {
-                let back = 0, upd = 0;
-                pool.forEach(function (d) {
-                    if (!d.online) {
-                        if (chance(0.5)) {
-                            d.online = true; d.lastReport = now(); back++;
-                            pushHist(now(), d, '设备上线', '', '', '召测指令', '调度中心', '召测唤醒成功并补传缓存 ' + ri(6, 90) + ' 条');
-                        }
-                    } else { d.lastReport = now(); upd++; }
+                if (!pool.length) { SC.toast(label + '：当前没有可召测的设备', { type: 'info' }); return; }
+                const one = pool.length === 1;
+                DevAccess.submit({
+                    dev: one ? pool[0].id : 'BATCH-' + pool.length,
+                    devName: one ? pool[0].name : label + '（' + pool.length + ' 台）',
+                    kind: 'LVL', cmd: 'probe', params: { times: one ? 1 : Math.min(10, pool.length) },
+                    reason: '智慧排水页' + label, by: '排水调度席'
+                }, function (job, err) {
+                    if (!(job && job.state === '成功')) { SC.toast(label + '失败：' + err, { type: 'error' }); return; }
+                    let back = 0, upd = 0;
+                    pool.forEach(function (d) {
+                        if (!d.online) {
+                            if (chance(0.5)) {
+                                d.online = true; d.lastReport = now(); back++;
+                                pushHist(now(), d, '设备上线', '', '', '召测指令', '调度中心', '召测唤醒成功并补传缓存 ' + ri(6, 90) + ' 条');
+                            }
+                        } else { d.lastReport = now(); upd++; }
+                    });
+                    judgeAll(true); persistSoon(); refresh();
+                    SC.toast(label + '回执正常：' + upd + ' 台回传实时值，唤醒离线 ' + back + ' 台', { type: 'success' });
                 });
-                judgeAll(true); persistSoon(); refresh();
-                SC.toast(label + '：下发 ' + pool.length + ' 台，' + upd + ' 台回传实时值，唤醒离线 ' + back + ' 台', { type: 'success' });
+                SC.toast(label + '：' + pool.length + ' 台召测指令已提交设备管理页，等待回执…', { type: 'info' });
             }
             function actLwPump() {
                 const top = DB.lw.filter(function (d) { return d.depth * 100 >= P.lwLv2; })

@@ -534,6 +534,7 @@
                         <input type="text" placeholder="搜索编码 / 地址 / 责任人..." class="search-input" id="hyd-search">
                         <button class="sc-btn sm" id="btn-hyd-add">➕ 新增设备</button>
                         <button class="sc-btn sm ghost" id="btn-hyd-order">📤 批量下发参数</button>
+                        <button class="sc-btn sm ghost" id="btn-dev-console">🎮 设备管理直连</button>
                     </div>
                 </div>
                 <div class="sc-chips" id="hyd-chips"></div>
@@ -1883,7 +1884,8 @@
     <script src="assets/js/common.js"></script>
     <script src="assets/js/arch-link.js"></script>
     <script src="assets/js/device-catalog.js"></script>
-    <script src="assets/js/ui-kit.js"></script>
+    <script src="assets/js/device-access.js"></script>
+<script src="assets/js/ui-kit.js"></script>
     <script src="assets/js/charts.js"></script>
 
     <script>
@@ -5577,12 +5579,28 @@
                         { text: '绑定视频', kind: 'ghost', onClick: function () { bindDevice(r.id, '调压站', function (camId) { if (r.camIds.indexOf(camId) === -1) r.camIds.push(camId); }); } },
                         {
                             text: '切至旁通', onClick: function () {
-                                r.status = r.status === '旁通' ? '运行' : '旁通';
-                                addHist('调压站', r.id, '工况切换', r.status === '旁通' ? '运行' : '旁通', r.status, '调度远程切换，出口压力 ' + r.out.toFixed(2) + ' kPa');
-                                addOplog('调压站', '工况切换', r.id, '成功');
-                                pushLog('warn', '调压', r.id + ' 已切至' + r.status + '，出口压力 ' + r.out.toFixed(2) + ' kPa');
-                                refreshModule(true);
+                                const going = r.status === '旁通' ? '运行' : '旁通';
                                 m.close();
+                                DevAccess.submit({
+                                    dev: r.id, devName: '调压站 ' + r.id + ' ' + r.name,
+                                    kind: 'GAS', cmd: 'valve',
+                                    params: { action: going === '旁通' ? 'close' : 'open', pos_pct: going === '旁通' ? 0 : 100 },
+                                    reason: '调度远程切换至' + going + '工况', by: '市政值守席'
+                                }, function (job, err) {
+                                    if (!job || job.state !== '成功') {
+                                        addOplog('调压站', '工况切换', r.id, '失败：' + (err || (job && job.ack) || '无应答'));
+                                        pushLog('error', '调压', r.id + ' 切换' + going + '无回执：' + (err || (job && job.ack) || '阀门执行器超时未应答'));
+                                        refreshModule(true);
+                                        SC.toast('切换失败：' + (err || (job && job.ack) || '阀门执行器超时未应答'), { type: 'error' });
+                                        return;
+                                    }
+                                    r.status = going;
+                                    addHist('调压站', r.id, '工况切换', going === '旁通' ? '运行' : '旁通', going, '设备管理页阀门执行回执 ' + job.id + '（valve_stat 正常），出口压力 ' + r.out.toFixed(2) + ' kPa');
+                                    addOplog('调压站', '工况切换', r.id, '回执成功');
+                                    pushLog('warn', '调压', r.id + ' 已切至' + going + '，出口压力 ' + r.out.toFixed(2) + ' kPa');
+                                    refreshModule(true);
+                                    SC.toast(r.id + ' 已切至' + going + '（阀门回执正常）', { type: 'success' });
+                                });
                             }
                         }
                     ],
@@ -6246,21 +6264,38 @@
                     refreshModule(true);
                 });
             }
-            function calibrateManhole(mm) {
-                mm.cal = DAY;
-                const before = mm.dev;
-                mm.dev = +(mm.dev * 0.25).toFixed(1);
-                FKEYS.forEach(function (k) {
-                    const f = mm.fac[k];
-                    if (k === 'TWWATER') return;
-                    if (f.st !== '正常') { f.v = +((f.hi - f.lo) * 0.6 + f.lo).toFixed(F_DEFAULT[k].dp); f.st = '正常'; }
+            /** 市政侧不直连终端：标定、阈值与策略下发统一提交设备管理页，回执正常才回写本页状态 */
+            function munCmd(dev, devName, kind, cmd, params, reason, onOk) {
+                DevAccess.submit({
+                    dev: dev, devName: devName, kind: kind, cmd: cmd, params: params,
+                    reason: '智慧市政页' + reason, by: '市政值守席'
+                }, function (job, err) {
+                    if (job && job.state === '成功') {
+                        if (onOk) onOk(job);
+                    } else {
+                        SC.toast(reason + '失败：' + err, { type: 'error' });
+                    }
                 });
-                addHist('井盖', mm.id, '终端标定', '偏差 ' + before + '%', '偏差 ' + mm.dev + '%', '六电极同步标定，量程回归中位，复测应答正常');
-                addOplog('污水井盖', '下发标定指令', mm.id, '成功');
-                pushLog('ok', '标定', mm.id + ' 标定完成，计量偏差由 ' + before + '% 降至 ' + mm.dev + '%');
-                SC.toast(mm.id + ' 标定指令已下发并回读成功', { type: 'success' });
-                sweep(true, 12);
-                refreshModule(true);
+            }
+            function calibrateManhole(mm) {
+                const before = mm.dev;
+                munCmd(mm.id, mm.addr || mm.name || '污水井盖终端', 'MNH', 'calibrate', { span: 100, zero: 0 },
+                    mm.id + ' 六电极同步标定', function (job) {
+                        mm.cal = DAY;
+                        mm.dev = +(mm.dev * 0.25).toFixed(1);
+                        FKEYS.forEach(function (k) {
+                            const f = mm.fac[k];
+                            if (k === 'TWWATER') return;
+                            if (f.st !== '正常') { f.v = +((f.hi - f.lo) * 0.6 + f.lo).toFixed(F_DEFAULT[k].dp); f.st = '正常'; }
+                        });
+                        addHist('井盖', mm.id, '终端标定', '偏差 ' + before + '%', '偏差 ' + mm.dev + '%', '设备管理页下发六电极同步标定（' + job.id + '），量程回归中位，复测应答正常');
+                        addOplog('污水井盖', '下发标定指令', mm.id, '成功');
+                        pushLog('ok', '标定', mm.id + ' 标定完成，计量偏差由 ' + before + '% 降至 ' + mm.dev + '%');
+                        sweep(true, 12);
+                        refreshModule(true);
+                        SC.toast(mm.id + ' 标定回执成功，偏差 ' + before + '% → ' + mm.dev + '%', { type: 'success' });
+                    });
+                SC.toast(mm.id + ' 标定指令已提交设备管理页，等待终端回读…', { type: 'info' });
             }
             function checkIn(t, n) {
                 if (t.status === '待出发') { t.status = '进行中'; t.start = now(); }
@@ -6819,10 +6854,22 @@
              * @param {boolean} full 为 true 时连隐藏页签的表格一起重建（用户操作后用，
              *        保证切页签前所有台账都是最新的）；实时推进只刷可见页签
              */
+            /** 设备管理直连入口：显示本页提交的排队指令与最近回执 */
+            function paintDevConsole() {
+                const el = $('btn-dev-console');
+                if (!el) return;
+                const wait = DevAccess.receipts('smart-municipal.html', 20).filter(function (j) { return j.state === '待执行'; }).length;
+                const last = DevAccess.receipts('smart-municipal.html', 1)[0];
+                el.textContent = '🎮 设备管理直连' + (wait ? '（排队 ' + wait + '）' : '');
+                el.title = last
+                    ? '最近指令 ' + last.id + ' · ' + last.cmdLabel + ' → ' + last.state + (last.ack ? '：' + last.ack : '')
+                    : '本页面的标定、阈值与召测指令统一经设备管理页（equipment-data.html）下发现场终端并留痕';
+            }
             function refreshModule(full) {
                 renderMetrics();
                 if (full) renderEverywhere();
                 renderTab(currentModule(), currentTab());
+                paintDevConsole();
                 persistSoon();
             }
 
@@ -7062,13 +7109,26 @@
                     SC.toast(d.id + ' 上行正常（' + agoText(d.lastUp) + '），无需召测', { type: 'info' });
                     return;
                 }
-                d.online = true; d.lastUp = now(); d.recAt = 0;
-                d.v = +(((d.lo + d.hi) / 2) * (0.92 + Math.random() * 0.16)).toFixed(3);
-                addHist('燃气', d.id, '设备上线', '离线', '在线', '主站召测应答成功，补测压力 ' + d.v + ' MPa（限值 ' + d.lo + '~' + d.hi + ' MPa）');
-                pushLog('ok', '召测', d.id + ' 召测应答成功，压力 ' + d.v + ' MPa，已解除离线判定');
-                sweep(true, 8);
-                refreshModule(true);
-                SC.toast('已召测 ' + d.id + '，实时压力 ' + d.v + ' MPa', { type: 'success' });
+                SC.toast(d.id + ' 召测帧已提交设备管理页，等待终端应答…', { type: 'info' });
+                DevAccess.submit({
+                    dev: d.id, devName: '燃气仪表 ' + d.id + '（' + (gsById(d.st) ? gsById(d.st).name : d.st) + '）',
+                    kind: 'GAS', cmd: 'probe', params: { times: 3 },
+                    reason: '超 ' + P.offMin + ' 分钟无上行，主站召测并补测压力', by: '市政值守席'
+                }, function (job, err) {
+                    if (!job || job.state !== '成功') {
+                        pushLog('error', '召测', d.id + ' 召测无回执：' + (err || (job && job.ack) || '终端超时未应答'));
+                        refreshModule(true);
+                        SC.toast(d.id + ' 召测失败：' + (err || (job && job.ack) || '终端超时未应答'), { type: 'error' });
+                        return;
+                    }
+                    d.online = true; d.lastUp = now(); d.recAt = 0;
+                    d.v = +(((d.lo + d.hi) / 2) * (0.92 + Math.random() * 0.16)).toFixed(3);
+                    addHist('燃气', d.id, '设备上线', '离线', '在线', '设备管理页召测回执 ' + job.id + ' 正常，补测压力 ' + d.v + ' MPa（限值 ' + d.lo + '~' + d.hi + ' MPa）');
+                    pushLog('ok', '召测', d.id + ' 召测应答成功，压力 ' + d.v + ' MPa，已解除离线判定');
+                    sweep(true, 8);
+                    refreshModule(true);
+                    SC.toast('已召测 ' + d.id + '，实时压力 ' + d.v + ' MPa', { type: 'success' });
+                });
             }
             /** 批量召测全部离线燃气设备 */
             function pollOfflineAll() {
@@ -7078,23 +7138,38 @@
                     title: '召测离线设备',
                     html: '<div class="sc-note">当前有 <b>' + list.length + '</b> 台燃气仪表超出 ' + P.offMin + ' 分钟无上行：<br>' +
                         list.slice(0, 12).map(function (d) { return d.id + '（' + (gsById(d.st) ? gsById(d.st).name : d.st) + '）'; }).join('、') +
-                        (list.length > 12 ? ' 等 ' + list.length + ' 台' : '') + '<br>将对这些设备下发主站召测帧，应答后会立即重跑越限判定。</div>',
+                        (list.length > 12 ? ' 等 ' + list.length + ' 台' : '') + '<br>指令经设备管理页按燃气仪表协议下发召测帧，收到应答回执后本页立即重跑越限判定。</div>',
                     okText: '开始召测'
                 }).then(function (ok) {
                     if (!ok) return;
-                    let hit = 0;
-                    list.forEach(function (d, i) {
-                        if (i % 7 === 6) { pushLog('warn', '召测', d.id + ' 连续 3 次召测无应答，判定为现场断电，已转维修工单'); const o = newOrder({ type: '燃气', dev: d.id, kind: '电气检修', src: '告警转派', place: d.st }); o.mt = ''; return; }
-                        d.online = true; d.lastUp = now(); d.recAt = 0;
-                        d.v = +(((d.lo + d.hi) / 2) * (0.92 + Math.random() * 0.16)).toFixed(3);
-                        addHist('燃气', d.id, '设备上线', '离线', '在线', '批量召测第 ' + (i + 1) + ' 台应答成功，补测 ' + d.v + ' MPa');
-                        hit++;
+                    SC.toast('已提交 ' + list.length + ' 台离线仪表的召测指令至设备管理页…', { type: 'info' });
+                    DevAccess.submit({
+                        dev: list.length === 1 ? list[0].id : 'BATCH-GAS-' + list.length,
+                        devName: '燃气仪表 ' + list.length + ' 台（超 ' + P.offMin + ' 分钟无上行）',
+                        kind: 'GAS', cmd: 'probe', params: { times: Math.min(10, list.length) },
+                        reason: '批量召测离线终端并补测压力', by: '市政值守席'
+                    }, function (job, err) {
+                        if (!job || job.state !== '成功') {
+                            addOplog('燃气设备', '批量召测离线设备', list.length + ' 台', '失败：' + (err || (job && job.ack) || '无应答'));
+                            pushLog('error', '召测', '批量召测无回执：' + (err || (job && job.ack) || '终端超时未应答'));
+                            refreshModule(true);
+                            SC.toast('批量召测失败：' + (err || (job && job.ack) || '终端超时未应答'), { type: 'error' });
+                            return;
+                        }
+                        let hit = 0;
+                        list.forEach(function (d, i) {
+                            if (i % 7 === 6) { pushLog('warn', '召测', d.id + ' 连续 3 次召测无应答，判定为现场断电，已转维修工单'); const o = newOrder({ type: '燃气', dev: d.id, kind: '电气检修', src: '告警转派', place: d.st }); o.mt = ''; return; }
+                            d.online = true; d.lastUp = now(); d.recAt = 0;
+                            d.v = +(((d.lo + d.hi) / 2) * (0.92 + Math.random() * 0.16)).toFixed(3);
+                            addHist('燃气', d.id, '设备上线', '离线', '在线', '批量召测第 ' + (i + 1) + ' 台应答成功，补测 ' + d.v + ' MPa');
+                            hit++;
+                        });
+                        addOplog('燃气设备', '批量召测离线设备', list.length + ' 台', '回执成功（应答 ' + hit + ' 台）');
+                        pushLog('info', '召测', '设备管理页回执 ' + job.id + '：应 ' + list.length + ' 台 / 应答 ' + hit + ' 台 / 无应答转单 ' + (list.length - hit) + ' 台');
+                        sweep(true, 20);
+                        refreshModule(true);
+                        SC.toast('召测回执正常：' + hit + ' 台已恢复上行，' + (list.length - hit) + ' 台无应答已转维修', { type: 'success', duration: 4200 });
                     });
-                    addOplog('燃气设备', '批量召测离线设备', list.length + ' 台', '成功（应答 ' + hit + ' 台）');
-                    pushLog('info', '召测', '批量召测完成：应 ' + list.length + ' 台 / 应答 ' + hit + ' 台 / 无应答转单 ' + (list.length - hit) + ' 台');
-                    sweep(true, 20);
-                    refreshModule(true);
-                    SC.toast('召测完成：' + hit + ' 台已恢复上行，' + (list.length - hit) + ' 台无应答已转维修', { type: 'success', duration: 4200 });
                 });
             }
             /** 向消防栓终端下发当前阈值与上报策略 */
@@ -7106,26 +7181,43 @@
                     fields: [
                         { name: 'scope', label: '下发范围', type: 'select', col: 1, options: [{ value: 'view', label: '当前列表（' + scopeList.length + ' 台）' }, { value: 'all', label: '全网消防栓（' + DB.hyd.length + ' 台）' }, { value: 'alarm', label: '仅告警中的设备（' + DB.hyd.filter(function (h) { return h.st !== '正常'; }).length + ' 台）' }] },
                         { name: 'wake', label: '同时尝试唤醒离线设备', type: 'switch', col: 1, onText: '唤醒' },
-                        { name: 'note', type: 'static', html: '<div class="sc-note">下发内容：水压上下限 <b>' + P.pLo + ' ~ ' + P.pHi + ' MPa</b>、心跳周期 <b>' + P.offMin + ' 分钟</b>、监控无抓图判定 <b>' + P.camDead + ' 分钟</b>、闭环时限 <b>' + P.sla + ' 分钟</b>。<br>下发后终端会立即重上行一帧，系统随即重跑越限判定。</div>' }
+                        { name: 'note', type: 'static', html: '<div class="sc-note">下发内容：水压上下限 <b>' + P.pLo + ' ~ ' + P.pHi + ' MPa</b>、心跳周期 <b>' + P.offMin + ' 分钟</b>、监控无抓图判定 <b>' + P.camDead + ' 分钟</b>、闭环时限 <b>' + P.sla + ' 分钟</b>。<br>本页不直接操作终端：指令经<b>设备管理页（equipment-data.html）</b>按消防栓 NB-IoT 协议下发，收到阈值区回读回执后，本页才重跑越限判定。</div>' }
                     ]
                 }).then(function (v) {
                     if (!v) return;
                     const target = v.scope === 'all' ? DB.hyd : v.scope === 'alarm'
                         ? DB.hyd.filter(function (h) { return h.st !== '正常'; }) : scopeList;
                     if (!target.length) { SC.toast('没有符合条件的设备', { type: 'info' }); return; }
-                    let wake = 0;
-                    target.forEach(function (h) {
-                        if (!h.online && v.wake) { h.online = true; h.lastUp = now(); h.recAt = 0; wake++; }
-                        else if (h.online) h.lastUp = now();
-                        else return;
-                        h.p = +Math.max(0.05, h.p + (Math.random() - 0.5) * 0.02).toFixed(3);
+                    SC.toast('已提交 ' + target.length + ' 台消防栓的参数下发指令至设备管理页，等待终端回读…', { type: 'info' });
+                    DevAccess.submit({
+                        dev: target.length === 1 ? target[0].id : 'BATCH-HYD-' + target.length,
+                        devName: '消防栓终端 ' + target.length + ' 台' + (v.wake ? '（含离线唤醒）' : ''),
+                        kind: 'HYD', cmd: 'threshold',
+                        params: { start_m: P.pHi, stop_m: P.pLo },
+                        reason: '水压 ' + P.pLo + '~' + P.pHi + ' MPa，心跳 ' + P.offMin + ' 分，闭环 ' + P.sla + ' 分' + (v.wake ? '；同时唤醒离线' : ''),
+                        by: '市政值守席'
+                    }, function (job, err) {
+                        if (!job || job.state !== '成功') {
+                            addOplog('消防栓', '批量下发参数', target.length + ' 台', '失败：' + (err || (job && job.ack) || '无应答'));
+                            pushLog('error', '下发', '参数下发未获回执：' + (err || (job && job.ack) || '终端超时未应答'));
+                            refreshModule(true);
+                            SC.toast('参数下发失败：' + (err || (job && job.ack) || '终端超时未应答'), { type: 'error', duration: 4200 });
+                            return;
+                        }
+                        let wake = 0;
+                        target.forEach(function (h) {
+                            if (!h.online && v.wake) { h.online = true; h.lastUp = now(); h.recAt = 0; wake++; }
+                            else if (h.online) h.lastUp = now();
+                            else return;
+                            h.p = +Math.max(0.05, h.p + (Math.random() - 0.5) * 0.02).toFixed(3);
+                        });
+                        addHist('消防栓', target.length + ' 台', '参数下发', '旧策略', '新策略', '水压 ' + P.pLo + '~' + P.pHi + ' MPa，心跳 ' + P.offMin + ' 分，闭环 ' + P.sla + ' 分；唤醒离线 ' + wake + ' 台（指令 ' + job.id + '）');
+                        addOplog('消防栓', '批量下发参数', target.length + ' 台', '设备管理页回执成功');
+                        pushLog('info', '下发', '设备管理页回执 ' + job.id + ' 正常：' + target.length + ' 台消防栓阈值与策略已生效' + (wake ? '，其中唤醒离线 ' + wake + ' 台' : ''));
+                        const r = sweep(true, 30);
+                        refreshModule(true);
+                        SC.toast('回执正常：重判定 ' + r.sync + ' 条，新增告警 ' + r.raised + ' 条，自动消警 ' + r.closed + ' 条', { type: 'success', duration: 4400 });
                     });
-                    addHist('消防栓', target.length + ' 台', '参数下发', '旧策略', '新策略', '水压 ' + P.pLo + '~' + P.pHi + ' MPa，心跳 ' + P.offMin + ' 分，闭环 ' + P.sla + ' 分；唤醒离线 ' + wake + ' 台');
-                    addOplog('消防栓', '批量下发参数', target.length + ' 台', '成功');
-                    pushLog('info', '下发', '已向 ' + target.length + ' 台消防栓下发阈值与策略' + (wake ? '，其中唤醒离线 ' + wake + ' 台' : ''));
-                    const r = sweep(true, 30);
-                    refreshModule(true);
-                    SC.toast('下发完成：重判定 ' + r.sync + ' 条，新增告警 ' + r.raised + ' 条，自动消警 ' + r.closed + ' 条', { type: 'success', duration: 4400 });
                 });
             }
             /** 复核越限：全量重跑判定，回落正常的自动消警 */
@@ -7173,9 +7265,10 @@
                 }).then(function (ok) {
                     if (!ok) return;
                     list.forEach(function (m) { calibrateManhole(m); });
-                    addOplog('污水井盖', '批量下发标定指令', list.length + ' 口', '成功');
+                    addOplog('污水井盖', '批量下发标定指令', list.length + ' 口', '已提交设备管理页');
+                    pushLog('info', '标定', '已提交 ' + list.length + ' 口井的标定指令至设备管理页，回执逐条回写');
                     refreshModule(true);
-                    SC.toast('已向 ' + list.length + ' 口井下发标定指令并回读成功', { type: 'success' });
+                    SC.toast('已向设备管理页提交 ' + list.length + ' 条标定指令，回执到达后自动回写偏差', { type: 'info', duration: 4200 });
                 });
             }
             /** 低电设备：生成换电池维护任务与维修工单 */
@@ -7264,31 +7357,46 @@
                 }
                 let ok = 0;
                 const hard = [];
-                bad.forEach(function (c) {
-                    if (hash32(c.id + ':' + T) % 100 < 24) { hard.push(c); return; }
-                    c.online = true;
-                    c.sig = ri(-92, -58);
-                    c.fps = ri(12, 25);
-                    c.lastSnap = now();
-                    c.recAt = 0;
-                    ok++;
-                    addHist('视频设备', c.id, '视频核查', '离线 / 抓拍超时', '正常', '远程重启视频网关后恢复推流，' + c.res + ' / ' + c.fps + 'fps，信号 ' + c.sig + ' dBm');
-                });
-                hard.forEach(function (c) {
-                    const tgt = c.bindId || c.id;
-                    const o = newOrder({
-                        type: typeOfDev(tgt) || '消防栓', dev: tgt, kind: '摄像头更换', pri: '高',
-                        src: '视频核查', place: c.name, owner: devById(tgt).owner || '', fee: ri(600, 1600)
+                SC.toast('已提交 ' + bad.length + ' 路视频网关的重启指令至设备管理页，等待回执…', { type: 'info' });
+                DevAccess.submit({
+                    dev: bad.length === 1 ? bad[0].id : 'BATCH-CAM-' + bad.length,
+                    devName: '视频前端 ' + bad.length + ' 路（离线 / 抓拍超时）',
+                    kind: 'CAM', cmd: 'reboot', params: { delay_s: 0 },
+                    reason: '视频核查批量重启视频网关并恢复推流', by: '市政值守席'
+                }, function (job, err) {
+                    if (!job || job.state !== '成功') {
+                        addOplog('视频设备', '批量视频核查', bad.length + ' 路异常', '失败：' + (err || (job && job.ack) || '无应答'));
+                        pushLog('error', '视频', '视频核查重启指令无回执：' + (err || (job && job.ack) || '视频网关超时未应答'));
+                        refreshModule(true);
+                        SC.toast('视频核查失败：' + (err || (job && job.ack) || '视频网关超时未应答'), { type: 'error' });
+                        return;
+                    }
+                    bad.forEach(function (c) {
+                        if (hash32(c.id + ':' + T) % 100 < 24) { hard.push(c); return; }
+                        c.online = true;
+                        c.sig = ri(-92, -58);
+                        c.fps = ri(12, 25);
+                        c.lastSnap = now();
+                        c.recAt = 0;
+                        ok++;
+                        addHist('视频设备', c.id, '视频核查', '离线 / 抓拍超时', '正常', '设备管理页重启视频网关（' + job.id + '）后恢复推流，' + c.res + ' / ' + c.fps + 'fps，信号 ' + c.sig + ' dBm');
                     });
-                    o.memo = '前端 ' + c.id + '（' + c.vendor + '）远程重启无效，疑为电源或光纤故障，需现场检修';
-                    addHist('视频设备', c.id, '视频核查', '离线', '待现场检修', '两次远程重启无应答，已生成运维工单 ' + o.id);
+                    hard.forEach(function (c) {
+                        const tgt = c.bindId || c.id;
+                        const o = newOrder({
+                            type: typeOfDev(tgt) || '消防栓', dev: tgt, kind: '摄像头更换', pri: '高',
+                            src: '视频核查', place: c.name, owner: devById(tgt).owner || '', fee: ri(600, 1600)
+                        });
+                        o.memo = '前端 ' + c.id + '（' + c.vendor + '）经设备管理页远程重启无效，疑为电源或光纤故障，需现场检修';
+                        addHist('视频设备', c.id, '视频核查', '离线', '待现场检修', '两次远程重启无应答，已生成运维工单 ' + o.id);
+                    });
+                    sweep(true, 12);
+                    pushLog('warn', '视频', '视频核查回执 ' + job.id + '：异常 ' + bad.length + ' 路，恢复 ' + ok + ' 路' +
+                        (hard.length ? '，' + hard.length + ' 路转现场工单' : ''));
+                    addOplog('视频设备', '批量视频核查', bad.length + ' 路异常', '回执正常（恢复 ' + ok + ' 路）');
+                    refreshModule(true);
+                    SC.toast('核查完成：恢复 ' + ok + ' 路' + (hard.length ? '，' + hard.length + ' 路已转现场工单' : ''), { type: 'success', duration: 4400 });
                 });
-                sweep(true, 12);
-                pushLog('warn', '视频', '视频核查：异常 ' + bad.length + ' 路，恢复 ' + ok + ' 路' +
-                    (hard.length ? '，' + hard.length + ' 路转现场工单' : ''));
-                addOplog('视频设备', '批量视频核查', bad.length + ' 路异常', '成功（恢复 ' + ok + ' 路）');
-                refreshModule(true);
-                SC.toast('核查完成：恢复 ' + ok + ' 路' + (hard.length ? '，' + hard.length + ' 路已转现场工单' : ''), { type: 'success', duration: 4400 });
             }
 
             /** 主动拉取城管处理结果：加速状态机，结果回推后同步消警与短信告知 */
@@ -7767,6 +7875,9 @@
                     'btn-daily': dailyReport, 'btn-gs-audit': safetyAudit, 'btn-gs-leak': leakEmergency,
                     'btn-hyd-add': newHydrant, 'btn-gs-add': newStation, 'btn-rg-add': newRegulator, 'btn-cam-add': newCam,
                     'btn-hyd-order': dispatchParams, 'btn-hyd-recheck': recheckLimit,
+                    'btn-dev-console': function () {
+                        location.href = DevAccess.consoleHref({ module: 'control', kind: 'HYD', from: 'smart-municipal.html' });
+                    },
                     'btn-mt-new': function () { maintainReg('消防栓', '', null); },
                     'btn-mt-auto': autoShiftMaint, 'btn-rg-maint': function () { maintainReg('调压站', '', null); },
                     'btn-hyd-mt-export': exportMaintLedger,
